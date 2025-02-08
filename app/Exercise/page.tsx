@@ -1,70 +1,98 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
-import { fetchTopic, fetchAllPosts, fetchLang } from "./FetchData";
-import FilterLang from "./components/FilterLang";
-import FilterTopic from "./components/FilterTopic";
-import PostCard from "./components/PostCard";
+"use client"
+
+import React, { useEffect, useState } from "react"
+import { useSearchParams } from "next/navigation"
+import Typewriter from "typewriter-effect"
+import { fetchAllPosts, fetchLang, fetchTopic } from "./FetchData"
+import FilterLang from "./components/FilterLang"
+import FilterTopic from "./components/FilterTopic"
+import PostCard from "./components/PostCard"
 
 function Exercise() {
-  const [topics, setTopics] = useState([]);
-  const [posts, setPosts] = useState([]);
-  const [filteredPosts, setFilteredPosts] = useState([]);
-  const [lang, setLang] = useState([]);
+  const [topics, setTopics] = useState([])
+  const [posts, setPosts] = useState([])
+  const [filteredPosts, setFilteredPosts] = useState([])
+  const [lang, setLang] = useState([])
+  const [dataLoaded, setDataLoaded] = useState(false)
+  const [typingComplete, setTypingComplete] = useState(false)
 
-  const searchParams = useSearchParams();
-  const langParam = searchParams.get("lang");
-  const topicParam = searchParams.get("topic");
+  const searchParams = useSearchParams()
+  const langParam = searchParams.get("lang")
+  const topicParam = searchParams.get("topic")
 
   useEffect(() => {
     async function fetchData() {
-      const fetchedTopics = await fetchTopic();
-      const fetchedPosts = await fetchAllPosts();
-      const fetchedLang = await fetchLang();
+      const fetchedTopics = await fetchTopic()
+      const fetchedPosts = await fetchAllPosts()
+      const fetchedLang = await fetchLang()
 
-      setTopics(fetchedTopics);
-      setPosts(fetchedPosts);
-      setLang(fetchedLang);
+      setTopics(fetchedTopics)
+      setPosts(fetchedPosts)
+      setLang(fetchedLang)
+      setDataLoaded(true)
     }
-    fetchData();
-  }, []);
+    fetchData()
+  }, [])
 
-  // **Filter posts based on search params**
+  // Filter posts based on search params
   useEffect(() => {
-    let filtered = posts;
+    let filtered = posts
 
     // Filter by Language if langParam exists
     if (langParam) {
-      filtered = filtered.filter((post: any) => 
-        post.programming_languages?.some((lang: any) => lang.documentId === langParam)
-      );
+      filtered = filtered.filter((post) =>
+        post.programming_languages?.some(
+          (lang) => lang.documentId === langParam
+        )
+      )
     }
-    
+
     // Filter by Topic if topicParam exists
     if (topicParam) {
-      filtered = filtered.filter((post: any) => 
-        post.topics?.some((topic: any) => topic.documentId === topicParam)
-      );
+      filtered = filtered.filter((post) =>
+        post.topics?.some((topic) => topic.documentId === topicParam)
+      )
     }
 
-    setFilteredPosts(filtered);
-  }, [posts, langParam, topicParam]); // **Runs when posts or search params change**
-  console.log(posts);
-  
+    setFilteredPosts(filtered)
+  }, [posts, langParam, topicParam])
+
+  // Until both data is fetched and the typewriter animation is complete, show the loading screen.
+  if (!dataLoaded || !typingComplete) {
+    return (
+      <div className="flex min-h-[100vh] items-center justify-center bg-black text-[5vw] text-white">
+        <Typewriter
+          onInit={(typewriter) => {
+            typewriter
+              .changeDelay(20)
+              .changeDeleteSpeed(5)
+              .typeString("Keep coding...")
+              .pauseFor(500)
+              .deleteChars(25)
+              .pauseFor(50)
+              .typeString("You're closer than you were yesterday....")
+              .pauseFor(500)
+              .callFunction(() => setTypingComplete(true))
+              .start()
+          }}
+        />
+      </div>
+    )
+  }
 
   return (
-    <div className="exercise bg-black text-white min-h-[100vh] flex items-stretch pb-20">
-      <div className="ex-page flex pt-[12vh] items-stretch flex-grow">
+    <div className="exercise flex min-h-[100vh] items-stretch bg-black pb-20 text-white">
+      <div className="ex-page flex flex-grow items-stretch pt-[12vh]">
         <FilterLang lang={lang} />
-        <div className="flex flex-col  flex-grow p-3 gap-4 pl-7 md:grid md:grid-cols-2">
-          {filteredPosts?.map((post: object, i) => (
+        <div className="z-0 flex flex-grow flex-col gap-4 p-3 pl-7 md:grid md:grid-cols-2">
+          {filteredPosts?.map((post, i) => (
             <PostCard key={i} post={{ ...post, index: i }} />
           ))}
         </div>
         <FilterTopic topics={topics} />
       </div>
     </div>
-  );
+  )
 }
 
-export default Exercise;
+export default Exercise

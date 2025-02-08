@@ -1,11 +1,13 @@
-import { Suspense } from 'react'
+import { Suspense } from "react"
 import { Analytics } from "@vercel/analytics/react"
 import type { Metadata } from "next"
 import { geistMono, geistSans } from "./fonts"
 import "./globals.css"
 import Header from "./layouts/Header"
 import Socials from "./layouts/Socials"
-import ScreenLoaderNew from '@/app/components/ScreenLoaderNew'
+import EndSection from "./sections/EndSection"
+
+const WALink = `https://wa.me/918637704621?text=I%20Want%20to%20learn%20coding%20and%20be%20successful%20Coder`
 
 export const metadata: Metadata = {
   title: "CodeHub",
@@ -51,7 +53,7 @@ export const metadata: Metadata = {
     "Master full-stack development in Nashik",
     "Kickstart your software development career",
     "Build a career in MERN stack development",
-    "Learn advanced full-stack web development techniques"
+    "Learn advanced full-stack web development techniques",
   ],
   category: "education",
   authors: [{ name: "CodeHub Team", url: "https://codehubindia.in/" }],
@@ -83,20 +85,25 @@ export const metadata: Metadata = {
       alt: "CodeHub Banner",
     },
   },
-};
+}
 
-export default function RootLayout({ children }: Readonly<{
-  children: React.ReactNode;
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         {/* <ScreenLoaderNew /> */}
         <Suspense>
           <Header />
           <Socials />
           <Analytics />
           {children}
+          <EndSection WALink={WALink} />
         </Suspense>
       </body>
     </html>
