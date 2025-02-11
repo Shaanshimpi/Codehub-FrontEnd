@@ -34,7 +34,7 @@ function FilterLang({ lang }: { lang: any[] }) {
         {lang?.map((item) => (
           <button
             key={item.documentId}
-            className={`block w-[60px] flex-grow rounded-r-md py-2 text-xl text-white transition-all md:hover:w-[100px] ${
+            className={`block w-[60px] flex-grow rounded-r-md py-2 text-lg text-white transition-all md:hover:w-[100px] ${
               item.documentId === langParam ? "bg-red-500" : "bg-primary-ch"
             }`}
             onClick={() => handleLangChange(item.documentId)}

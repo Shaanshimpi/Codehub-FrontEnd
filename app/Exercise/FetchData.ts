@@ -7,7 +7,7 @@ const headers = {
 export const fetchTopic = async () => {
   try {
     const response = await fetch(
-      "https://codehub-exercise-2.onrender.com/api/topics?populate=*",
+      "http://65.2.75.239:1337/api/topics?populate=*",
       {
         headers,
         next: { revalidate: 60 }, // Cache for 60 seconds
@@ -31,7 +31,7 @@ export const fetchTopic = async () => {
 export const fetchLang = async () => {
   try {
     const response = await fetch(
-      "https://codehub-exercise-2.onrender.com/api/programming-languages?populate=*",
+      "http://65.2.75.239:1337/api/programming-languages?populate=*",
       {
         headers,
         next: { revalidate: 60 }, // Cache for 60 seconds
@@ -55,7 +55,7 @@ export const fetchLang = async () => {
 export const fetchAllPosts = async () => {
   try {
     const response = await fetch(
-      "https://codehub-exercise-2.onrender.com/api/posts?populate=*",
+      "http://65.2.75.239:1337/api/posts?populate=*",
       {
         headers,
         next: { revalidate: 60 }, // Cache for 60 seconds
@@ -79,7 +79,7 @@ export const fetchAllPosts = async () => {
 export const fetchSinglePost = async (id: string) => {
   try {
     const response = await fetch(
-      `https://codehub-exercise-2.onrender.com/api/posts/${id}?populate=*`,
+      `http://65.2.75.239:1337/api/posts/${id}?populate=*`,
       {
         headers: {
           ...headers,
