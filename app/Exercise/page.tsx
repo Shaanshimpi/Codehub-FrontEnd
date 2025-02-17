@@ -25,7 +25,7 @@ function Exercise() {
       const fetchedTopics = await fetchTopic()
       const fetchedPosts = await fetchAllPosts()
       const fetchedLang = await fetchLang()
-
+      console.log(fetchedPosts)
       setTopics(fetchedTopics)
       setPosts(fetchedPosts)
       setLang(fetchedLang)
