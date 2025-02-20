@@ -1,6 +1,7 @@
 import { Suspense } from "react"
 import { Analytics } from "@vercel/analytics/react"
 import type { Metadata } from "next"
+import ScreenLoaderNew from "./components/ScreenLoaderNew"
 import { geistMono, geistSans } from "./fonts"
 import "./globals.css"
 import Header from "./layouts/Header"
@@ -97,7 +98,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* <ScreenLoaderNew /> */}
+        <ScreenLoaderNew />
         <Suspense>
           <Header />
           <Socials />
