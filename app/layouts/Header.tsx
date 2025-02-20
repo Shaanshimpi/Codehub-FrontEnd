@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect } from "react"
+import logo from "@/app/assets/logo.png"
 import gsap from "gsap"
 import mountLenis from "../utils/mountLenis"
-import logo from "@/app/assets/logo.png"
+
 export default function Header() {
   mountLenis()
 
@@ -12,18 +13,18 @@ export default function Header() {
       display: "block",
       delay: 2.6,
     })
-    gsap.to(`.logo`,{
+    gsap.to(`.logo`, {
       x: `-30vw`,
-      scale:.6,
+      scale: 0.6,
       duration: 1.5,
       ease: "power3.inOut",
       scrollTrigger: {
-        trigger:`.pinned`,
+        trigger: `.pinned`,
         start: "top center",
         end: "top top",
         // markers: true,
-        scrub: true
-      }
+        scrub: true,
+      },
     })
   }, [])
 
@@ -67,12 +68,14 @@ export default function Header() {
     //     />
     //   </svg>
     // </div>
-    <div className="logo pointer-events-none fixed z-50 flex w-screen items-center h-[10vh] md:h-[15vh] justify-center mix-blend-difference">
-      <img 
-        src={logo.src}
-        alt="codehub logo"
-        className="w-[20vw] min-w-[200px] max-w-[300px]"
-      />
+    <div className="logo pointer-events-none fixed z-50 flex h-[10vh] w-screen items-center justify-center mix-blend-difference md:h-[15vh]">
+      <a href="/">
+        <img
+          src={logo.src}
+          alt="codehub logo"
+          className="w-[20vw] min-w-[200px] max-w-[300px]"
+        />
+      </a>
     </div>
   )
 }

@@ -1,3 +1,4 @@
+import ScreenLoaderNew from "./components/ScreenLoaderNew"
 import BioSection from "./sections/BioSection"
 import FixedSection from "./sections/FixedSection"
 import HeroSection from "./sections/HeroSection"
@@ -13,6 +14,8 @@ export default function Home() {
 
   return (
     <div className="max-w-screen bg-primary-ch h-auto overflow-hidden">
+      <ScreenLoaderNew />
+
       <HeroSection />
       <FixedSection WALink={WALink} />
       <PinSection WALink={WALink} />
