@@ -1,9 +1,9 @@
 // Common headers to avoid repetition
 const headers = {
-  Authorization: `Bearer 3ba2ba597a98422664409dd367a9893caaf9aaaf6ed2e68ddf502e4caeb52ce0e23a425fc9fa753a7c091f06f91c509ab87dfb25afd26d19145f347eb5127302c5243166f05af738597bbc5704fd6a73f7f9446d70598d876fe974176602d960d7a8c22453c3fbb4e743d684bf48699f1ca93ed3ee350e8e41f1ed7b33594f2b`,
+  Authorization: `Bearer 4157da6744daedf6f854e78b19fc256ef6c3ce21ebc919544609075fc63560d51d496960c593273d8c059eda187d2ae9c3d5f3a5246be560d836d0a6fa9e6ca6ebadeade1caca4c7ce9906f074215a6c4feed350172958a2d590c4bf0cd0c2090574ab76b2d8842afa0e3486e0978c7776584ee003fabe3b8bb049ab5e246cc6`,
   "Content-Type": "application/json",
 }
-const apiURL = `https://codehub-exercise-2-production.up.railway.app/`
+const apiURL = `https://codehub-exercise-2-production.up.railway.app/api/`
 export const fetchTopic = async () => {
   try {
     const response = await fetch(`${apiURL}topics?populate=*`, {
