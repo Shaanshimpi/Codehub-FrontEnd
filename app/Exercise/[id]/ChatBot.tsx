@@ -39,8 +39,6 @@ const ChatBot = ({ question, code }) => {
     setIsLoading(true)
 
     try {
-      console.log(process)
-
       const response = await fetch(
         "https://openrouter.ai/api/v1/chat/completions",
         {
@@ -49,7 +47,7 @@ const ChatBot = ({ question, code }) => {
             // "HTTP-Referer": "https://codehub-front-end.vercel.app/",
             // "X-Title": "CodeHub",
             "Content-Type": "application/json",
-            Authorization: `bearer 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`,
+            Authorization: `bearer ${process.env.NEXT_PUBLIC_AI_CHATBOT_API_KEY}`,
           },
           body: JSON.stringify({
             model: "google/gemma-2-9b-it:free",
@@ -68,10 +66,8 @@ const ChatBot = ({ question, code }) => {
           }),
         }
       )
-      console.log(response)
 
       const data = (await response.json()) || []
-      console.log(data)
 
       setMessages((prev) => [
         ...prev,
