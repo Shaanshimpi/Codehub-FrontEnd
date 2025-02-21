@@ -1,9 +1,11 @@
+// Import the ChatBot component
+import { notFound } from "next/navigation"
 import { fetchAllPosts } from "../FetchData"
+import ChatBot from "./ChatBot"
 import ExerciseContent from "./ExerciseContent"
 
 export async function generateStaticParams() {
   const posts = await fetchAllPosts()
-
   return posts.map((post) => ({
     id: post.documentId.toString(),
   }))
@@ -15,23 +17,33 @@ const extractCodeFromJSON = (codeArray) => {
     .join("\n")
 }
 
-async function ExercisePage({ params }) {
+async function ExercisePage({ params }: { params: { id: string } }) {
   if (!params?.id) {
-    return <p className="text-red-500">Invalid post ID.</p> // Fallback UI
+    return notFound()
   }
 
   const posts = await fetchAllPosts()
   const post = posts.find((p) => p?.documentId === params.id)
 
   if (!post) {
-    return <p className="text-red-500">Post not found.</p> // Handle missing post gracefully
+    return <p className="text-red-500">Post not found.</p>
   }
 
   const codeString = extractCodeFromJSON(post?.Code || [])
   const language = post?.programming_languages?.[0]?.Name?.toLowerCase() || "c"
 
   return (
-    <ExerciseContent post={post} codeString={codeString} language={language} />
+    <div className="relative">
+      <ExerciseContent
+        post={post}
+        codeString={codeString}
+        language={language}
+      />
+      <ChatBot
+        question={post?.Title || "No question available"}
+        code={codeString}
+      />
+    </div>
   )
 }
 
