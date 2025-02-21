@@ -46,8 +46,10 @@ const ChatBot = ({ question, code }) => {
         {
           method: "POST",
           headers: {
+            // "HTTP-Referer": "https://codehub-front-end.vercel.app/",
+            // "X-Title": "CodeHub",
             "Content-Type": "application/json",
-            Authorization: `bearer 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`,
+            Authorization: `bearer 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`,
           },
           body: JSON.stringify({
             model: "google/gemma-2-9b-it:free",
