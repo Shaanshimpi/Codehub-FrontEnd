@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Typewriter from "typewriter-effect"
-import { fetchAllPosts, fetchLang, fetchTopic } from "./FetchData"
+import { fetchAllPosts, fetchLang, fetchTopic } from "../../lib/FetchData"
 import FilterLang from "./components/FilterLang"
 import FilterTopic from "./components/FilterTopic"
 import PostCard from "./components/PostCard"

@@ -1,6 +1,6 @@
 // Import the ChatBot component
 import { notFound } from "next/navigation"
-import { fetchAllPosts } from "../FetchData"
+import { fetchAllPosts } from "../../../lib/FetchData"
 import ChatBot from "./ChatBot"
 import ExerciseContent from "./ExerciseContent"
 

@@ -6,6 +6,7 @@ import ReactMarkdown from "react-markdown"
 import { createHighlighter } from "shiki"
 
 const ChatBot = ({ question, code }) => {
+  console.log(process.env.NEXT_PUBLIC_AI_CHATBOT_API_KEY)
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState("")
   const [highlighter, setHighlighter] = useState(null)
@@ -120,7 +121,7 @@ const ChatBot = ({ question, code }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute bottom-14 right-0 flex h-[80vh] w-[40vw] flex-col rounded-lg border bg-white p-4 shadow-lg dark:bg-gray-800">
+        <div className="absolute bottom-14 right-0 flex h-[80vh] w-[80vw] max-w-[400px] flex-col rounded-lg border bg-white p-4 shadow-lg dark:bg-gray-800">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-lg font-semibold">Ask CodeHub JARVIS</h3>
             <button
