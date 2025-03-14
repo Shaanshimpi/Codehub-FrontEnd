@@ -93,3 +93,46 @@ export const fetchSinglePost = async (id: string) => {
     return null;
   }
 };
+
+export async function deleteAllPosts() {
+  try {
+    // Fetch all posts to get their IDs
+    const response = await fetch(`${apiURL}posts`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_AUTH}`, // If authentication is needed
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch posts: ${response.statusText}`);
+    }
+
+    const json = await response.json();
+    const posts = await json.data;
+    console.log(posts);
+
+    // Iterate and delete each post
+    for (const post of posts) {
+      const deleteResponse = await fetch(`${apiURL}posts/${post.documentId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_AUTH}`, // If authentication is needed
+        },
+      });
+
+      if (!deleteResponse.ok) {
+        console.error(
+          `Failed to delete post ID ${post.id}: ${deleteResponse.statusText}`,
+        );
+      } else {
+        console.log(`Deleted post ID: ${post.id}`);
+      }
+    }
+
+    console.log("All posts deleted successfully!");
+  } catch (error) {
+    console.error("Error deleting posts:", error);
+  }
+}

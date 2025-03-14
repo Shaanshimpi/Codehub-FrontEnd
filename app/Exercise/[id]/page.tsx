@@ -29,7 +29,8 @@ async function ExercisePage({ params }: { params: { id: string } }) {
     return <p className="text-red-500">Post not found.</p>
   }
 
-  const codeString = extractCodeFromJSON(post?.Code || [])
+  // const codeString = extractCodeFromJSON(post?.Code || [])
+  const codeString = post?.Code
   const language = post?.programming_languages?.[0]?.Name?.toLowerCase() || "c"
 
   return (

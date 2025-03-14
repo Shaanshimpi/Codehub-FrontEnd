@@ -6,7 +6,6 @@ import ReactMarkdown from "react-markdown"
 import { createHighlighter } from "shiki"
 
 const ChatBot = ({ question, code }) => {
-  console.log(process.env.NEXT_PUBLIC_AI_CHATBOT_API_KEY)
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState("")
   const [highlighter, setHighlighter] = useState(null)
