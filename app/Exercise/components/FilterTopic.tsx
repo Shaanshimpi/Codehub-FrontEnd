@@ -18,19 +18,21 @@ function FilterTopic({ topics }: { topics: any }) {
 
   return (
     <div className="topic-bar fixed bottom-0 flex h-[50px] w-[100%] items-center gap-3 overflow-y-visible overflow-x-scroll bg-white p-2 text-lg text-black">
-      {topics?.map((topic) => (
-        <button
-          key={topic.documentId}
-          className={`h-[100%] whitespace-nowrap rounded px-3 py-1 hover:bg-red-300 ${
-            topic.documentId === topicParam
-              ? "bg-red-500 text-white"
-              : "bg-primary-ch text-white"
-          }`}
-          onClick={() => handleFilterClick(topic.documentId)}
-        >
-          {topic.Name}
-        </button>
-      ))}
+      {topics
+        ?.sort((a, b) => a.index > b.index)
+        .map((topic) => (
+          <button
+            key={topic.documentId}
+            className={`h-[100%] whitespace-nowrap rounded px-3 py-1 hover:bg-red-300 ${
+              topic.documentId === topicParam
+                ? "bg-red-500 text-white"
+                : "bg-primary-ch text-white"
+            }`}
+            onClick={() => handleFilterClick(topic.documentId)}
+          >
+            {topic.Name}
+          </button>
+        ))}
     </div>
   )
 }

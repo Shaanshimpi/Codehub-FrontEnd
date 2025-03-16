@@ -34,7 +34,7 @@ async function ExercisePage({ params }: { params: { id: string } }) {
   const language = post?.programming_languages?.[0]?.Name?.toLowerCase() || "c"
 
   return (
-    <div className="relative">
+    <div className="relative md:px-[30vh]">
       <ExerciseContent
         post={post}
         codeString={codeString}

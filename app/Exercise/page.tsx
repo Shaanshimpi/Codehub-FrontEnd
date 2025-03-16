@@ -25,7 +25,7 @@ function Exercise() {
       const fetchedTopics = await fetchTopic()
       const fetchedPosts = await fetchAllPosts()
       const fetchedLang = await fetchLang()
-      console.log(fetchedPosts)
+      // console.log(fetchedPosts)
       setTopics(fetchedTopics)
       setPosts(fetchedPosts)
       setLang(fetchedLang)
@@ -41,9 +41,9 @@ function Exercise() {
     // Filter by Language if langParam exists
     if (langParam) {
       filtered = filtered.filter((post) =>
-        post.programming_languages?.some(
-          (lang) => lang.documentId === langParam
-        )
+        post.programming_languages
+          ?.some((lang) => lang.documentId === langParam)
+          .sort((a, b) => a.index > b.index)
       )
     }
 
@@ -81,10 +81,10 @@ function Exercise() {
   }
 
   return (
-    <div className="exercise flex min-h-[100vh] items-stretch bg-black pb-20 text-white">
+    <div className="exercise flex min-h-[100vh] items-stretch bg-[#070d17] pb-20 text-white">
       <div className="ex-page flex flex-grow items-stretch pt-[12vh]">
         <FilterLang lang={lang} />
-        <div className="z-0 flex flex-grow flex-col gap-4 p-3 pl-7 md:grid md:grid-cols-2">
+        <div className="z-0 flex flex-grow flex-col gap-8 p-3 pl-7 md:grid md:grid-cols-2">
           {filteredPosts?.map((post, i) => (
             <PostCard key={i} post={{ ...post, index: i }} />
           ))}
