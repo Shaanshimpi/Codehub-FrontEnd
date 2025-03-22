@@ -20,6 +20,7 @@ function Exercise() {
   const langParam = searchParams.get("lang")
   const topicParam = searchParams.get("topic")
 
+  scrollTo({ top: 0, behavior: "smooth" })
   useEffect(() => {
     async function fetchData() {
       const fetchedTopics = await fetchTopic()
@@ -60,7 +61,7 @@ function Exercise() {
   // Until both data is fetched and the typewriter animation is complete, show the loading screen.
   if (!dataLoaded || !typingComplete) {
     return (
-      <div className="flex min-h-[100vh] items-center justify-center bg-black text-[5vw] text-white">
+      <div className="flex min-h-[100vh] items-center justify-center bg-[#09090B] text-[5vw] text-white">
         <Typewriter
           onInit={(typewriter) => {
             typewriter

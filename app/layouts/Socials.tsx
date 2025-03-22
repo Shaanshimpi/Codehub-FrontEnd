@@ -66,7 +66,7 @@ export default function Socials() {
   return (
     <div
       id="socials-section"
-      className="fixed top-0 z-50 flex h-[15vh] w-screen items-center justify-end bg-transparent pr-3 md:flex md:pr-10"
+      className="fixed top-0 z-50 flex h-[10vh] w-screen items-center justify-end bg-transparent pr-3 md:flex md:pr-10"
       style={{ translate: "none" }}
     >
       <div

@@ -55,7 +55,7 @@ const ChatBot = ({ question, code }) => {
               {
                 role: "system",
                 content:
-                  "You are a programming assistant. Format responses with Markdown. explain just the topic at hand line by line. no need to explain each line, but the topic the question is focusing on. also if user asks to answer in other lang just use the other language just enough to understand to non-english speakers still try to use important words in english",
+                  "You are a programming assistant. Format responses with Markdown. explain just the topic at hand line by line. no need to explain each line, but the topic the question is focusing on. also if user asks to answer in other lang just use the other language just enough to understand to non-english speakers still try to use important words in english. explain the answer to a 12 year old.",
               },
               ...messages.map((msg) => ({
                 role: msg.sender === "user" ? "user" : "assistant",
@@ -111,7 +111,7 @@ const ChatBot = ({ question, code }) => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="z-100 fixed bottom-6 right-6">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="rounded-full bg-blue-600 p-3 text-white shadow-lg transition hover:bg-blue-700"
@@ -120,18 +120,22 @@ const ChatBot = ({ question, code }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute bottom-14 right-0 flex h-[80vh] w-[80vw] max-w-[400px] flex-col rounded-lg border bg-white p-4 shadow-lg dark:bg-gray-800">
+        <div className="absolute bottom-14 right-0 z-[200] flex h-[80vh] w-[90vw] flex-col rounded-lg border bg-white p-2 shadow-lg dark:bg-gray-800 md:max-w-[600px]">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-lg font-semibold">Ask CodeHub JARVIS</h3>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-gray-500 hover:text-gray-700"
+              className="z-100 text-gray-500 hover:text-gray-700"
             >
               <X size={20} />
             </button>
           </div>
 
-          <div className="flex h-[60vh] max-h-[60vh] flex-col gap-4 overflow-y-auto overflow-x-hidden p-4">
+          <div
+            className="z-[200] flex h-[60vh] max-h-[60vh] flex-col gap-4 overflow-y-auto overflow-x-hidden p-1"
+            onWheel={(e) => e.stopPropagation()} // Ensure events aren't blocked
+            style={{ overflowY: "scroll", scrollBehavior: "smooth" }} // Force smooth scrolling
+          >
             {messages.map((msg, index) => (
               <MessageComponent key={index} message={msg} />
             ))}

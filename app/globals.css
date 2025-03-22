@@ -155,6 +155,10 @@ html.lenis body {
   color: #87acd8;
 }
 
+button {
+  /* z-index: 50; */
+}
+
 @layer utilities {
   /* Chrome, Safari and Opera */
   .topic-bar::-webkit-scrollbar {

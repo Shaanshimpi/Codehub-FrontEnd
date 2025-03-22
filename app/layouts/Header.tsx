@@ -68,12 +68,12 @@ export default function Header() {
     //     />
     //   </svg>
     // </div>
-    <div className="logo pointer-events-none fixed z-50 flex h-[10vh] w-screen items-center justify-center mix-blend-difference md:h-[15vh]">
+    <div className="logo pointer-events-none fixed z-[200] flex h-[10vh] w-screen items-center justify-center mix-blend-difference md:h-[12vh]">
       <a href="/">
         <img
           src={logo.src}
           alt="codehub logo"
-          className="w-[20vw] min-w-[200px] max-w-[300px]"
+          className="pointer-events-auto z-[500] w-[20vw] min-w-[200px] max-w-[300px]"
         />
       </a>
     </div>
