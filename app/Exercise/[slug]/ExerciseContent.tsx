@@ -93,7 +93,7 @@ const ExerciseContent = ({ post, codeString, language }) => {
       )}
       {/* youtube video */}
 
-      {!post.VideoLink && (
+      {post.VideoLink && (
         <>
           {/* Code Toggle Button */}
           <div className="mt-4">

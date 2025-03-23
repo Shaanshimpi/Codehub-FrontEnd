@@ -7,7 +7,8 @@ import ExerciseContent from "./ExerciseContent"
 function generateSlug(post) {
   if (!post || !post.Title) return "" // Prevent errors if post or Title is undefined
 
-  return `${post.Title.toLowerCase()
+  return `${post.Title.slice(0, 50)
+    .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, "") // Remove special characters
     .replace(/\s+/g, "-")}-${post.documentId}` // Replace spaces with hyphens
 }
