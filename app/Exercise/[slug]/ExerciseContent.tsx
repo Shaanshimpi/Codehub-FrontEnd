@@ -67,7 +67,7 @@ const ExerciseContent = ({ post, codeString, language }) => {
           {["english", "hindi", "marathi"].map((lang) => (
             <button
               key={lang}
-              className={`px-4 py-2 transition-all ${
+              className={`px-4 py-2 text-black transition-all ${
                 selectedLanguage === lang
                   ? "rounded-t-lg bg-blue-900 text-white"
                   : "rounded-sm bg-gray-200"

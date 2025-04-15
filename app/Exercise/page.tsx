@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
+import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import Typewriter from "typewriter-effect"
 import { fetchAllPosts, fetchLang, fetchTopic } from "../../lib/FetchData"
@@ -20,7 +21,7 @@ function Exercise() {
   const langParam = searchParams.get("lang")
   const topicParam = searchParams.get("topic")
 
-  scrollTo({ top: 0, behavior: "smooth" })
+  // scrollTo({ top: 0, behavior: "smooth" })
   useEffect(() => {
     async function fetchData() {
       const fetchedTopics = await fetchTopic()
@@ -31,6 +32,8 @@ function Exercise() {
       setPosts(fetchedPosts)
       setLang(fetchedLang)
       setDataLoaded(true)
+      console.log(fetchedPosts)
+      console.log(fetchedLang)
     }
     fetchData()
   }, [])
@@ -38,13 +41,12 @@ function Exercise() {
   // Filter posts based on search params
   useEffect(() => {
     let filtered = posts
-
     // Filter by Language if langParam exists
     if (langParam) {
       filtered = filtered.filter((post) =>
-        post.programming_languages
-          ?.some((lang) => lang.documentId === langParam)
-          .sort((a, b) => a.index > b.index)
+        post.programming_languages?.some(
+          (lang) => lang.documentId === langParam
+        )
       )
     }
 
@@ -55,6 +57,7 @@ function Exercise() {
       )
     }
 
+    filtered = filtered.sort((a, b) => a.index - b.index)
     setFilteredPosts(filtered)
   }, [posts, langParam, topicParam])
 
@@ -86,10 +89,19 @@ function Exercise() {
       <div className="ex-page flex flex-grow items-stretch pt-[12vh]">
         <FilterLang lang={lang} />
         <div className="z-0 flex flex-grow flex-col gap-8 p-3 pl-7 md:grid md:grid-cols-2">
+          <div className="mb-1 flex justify-end md:col-span-2">
+            <Link href="/ask-exercise">
+              <button className="rounded-2xl bg-blue-600 px-4 py-2 text-white transition-all duration-200 hover:bg-blue-700">
+                Try your own Exercise
+              </button>
+            </Link>
+          </div>
+
           {filteredPosts?.map((post, i) => (
             <PostCard key={i} post={{ ...post, index: i }} />
           ))}
         </div>
+
         <FilterTopic topics={topics} />
       </div>
     </div>

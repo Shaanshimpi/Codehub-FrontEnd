@@ -19,7 +19,7 @@ function FilterTopic({ topics }: { topics: any }) {
   return (
     <div className="topic-bar fixed bottom-0 flex h-[50px] w-[100%] items-center gap-3 overflow-y-visible overflow-x-scroll bg-white p-2 text-lg text-black">
       {topics
-        ?.sort((a, b) => a.index > b.index)
+        ?.sort((a, b) => a.index - b.index)
         .map((topic) => (
           <button
             key={topic.documentId}

@@ -120,7 +120,7 @@ const ChatBot = ({ question, code }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute bottom-14 right-0 z-[200] flex h-[80vh] w-[90vw] flex-col rounded-lg border bg-white p-2 shadow-lg dark:bg-gray-800 md:max-w-[600px]">
+        <div className="absolute bottom-14 right-0 z-[200] flex h-[80vh] w-[90vw] flex-col rounded-lg border bg-white p-2 text-black shadow-lg dark:bg-gray-800 md:max-w-[600px]">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-lg font-semibold">Ask CodeHub JARVIS</h3>
             <button

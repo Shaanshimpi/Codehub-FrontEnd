@@ -51,10 +51,13 @@ export const fetchLang = async () => {
 
 export const fetchAllPosts = async () => {
   try {
-    const response = await fetch(`${apiURL}posts?populate=*`, {
-      headers,
-      next: { revalidate: 60 }, // Cache for 60 seconds
-    });
+    const response = await fetch(
+      `${apiURL}posts?populate=*&pagination[page]=1&pagination[pageSize]=150`,
+      {
+        headers,
+        next: { revalidate: 60 }, // Cache for 60 seconds
+      },
+    );
 
     if (!response.ok) {
       const errorText = await response.text();

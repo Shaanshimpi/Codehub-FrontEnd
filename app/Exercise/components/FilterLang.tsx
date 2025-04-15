@@ -18,7 +18,6 @@ function FilterLang({ lang }: { lang: any[] }) {
   const handleClearFilters = () => {
     router.push(pathname, { scroll: false }) // Clears all search params
   }
-
   return (
     <div className="z-[1000] w-[60px] self-stretch">
       <div className="fixed flex w-[60px] flex-col gap-2">
@@ -31,17 +30,19 @@ function FilterLang({ lang }: { lang: any[] }) {
         </button>
 
         {/* Language Buttons */}
-        {lang?.map((item) => (
-          <button
-            key={item.documentId}
-            className={`block w-[60px] flex-grow rounded-r-md py-2 text-lg text-white transition-all md:hover:w-[100px] ${
-              item.documentId === langParam ? "bg-red-500" : "bg-primary-ch"
-            }`}
-            onClick={() => handleLangChange(item.documentId)}
-          >
-            {item.Name}
-          </button>
-        ))}
+        {lang
+          .sort((a, b) => a.index - b.index)
+          ?.map((item) => (
+            <button
+              key={item.documentId}
+              className={`block w-[60px] flex-grow rounded-r-md py-2 text-lg text-white transition-all md:hover:w-[100px] ${
+                item.documentId === langParam ? "bg-red-500" : "bg-primary-ch"
+              }`}
+              onClick={() => handleLangChange(item.documentId)}
+            >
+              {item.Name}
+            </button>
+          ))}
       </div>
     </div>
   )
