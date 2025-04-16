@@ -29,7 +29,7 @@ const ExerciseContent = ({ post, codeString, language }) => {
         <h3 className="inline min-h-[10vh] w-[100%] rounded-t-md p-3 text-4xl font-semibold text-white">
           Hints
         </h3>
-        <div className="min-h-[40vh] bg-[#1E2F53] p-3 text-slate-300">
+        <div className="min-h-[40vh] text-wrap bg-[#1E2F53] p-3 text-slate-300">
           <ReactMarkdown>{post.Hints}</ReactMarkdown>
         </div>
       </div>

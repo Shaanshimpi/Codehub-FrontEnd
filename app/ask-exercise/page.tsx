@@ -23,7 +23,7 @@ const AddExercisePage = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "openai/gpt-4o-mini",
+          model: "google/gemini-2.0-flash-exp:free",
           messages: [
             {
               role: "user",
@@ -114,7 +114,7 @@ const AddExercisePage = () => {
   }
 
   return (
-    <div className="bg-[#0F172A] px-[40vh] py-14 text-white">
+    <div className="bg-[#0F172A] px-[3vh] py-14 text-white md:px-[40vh]">
       <h1 className="mb-6 text-3xl font-bold">Ask your own Exercise</h1>
 
       <form onSubmit={handleSubmit}>
