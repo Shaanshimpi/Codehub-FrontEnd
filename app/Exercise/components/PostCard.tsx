@@ -21,7 +21,7 @@ function PostCard({ post }: { post: any }) {
 
         <div className="meta absolute bottom-0 left-0 right-0 flex items-center justify-between gap-1 pb-2 pr-2">
           <div className="show-answer">
-            <button className="m-2 rounded-lg bg-sky-600 px-3 py-1 text-lg hover:bg-blue-900 md:ml-2">
+            <button className="m-2 min-w-[120px] rounded-lg bg-sky-600 px-3 py-1 text-lg hover:bg-blue-900 md:ml-2">
               Learn more
             </button>
           </div>
@@ -34,14 +34,30 @@ function PostCard({ post }: { post: any }) {
                 {lang.Name}
               </span>
             ))}
-            {post.topics?.slice(0, 2).map((topic: object) => (
-              <span
-                className="rounded-md bg-slate-50 bg-opacity-20 p-1 text-xs"
-                key={topic.documentId}
-              >
-                {topic.Name}
-              </span>
-            ))}
+            {(() => {
+              let charLimit = 28 // Adjust this as needed
+              let totalChars = 0
+              const topicsToShow = []
+
+              for (const topic of post.topics || []) {
+                const topicLength = topic.Name.length + 2 // account for spacing/padding
+                if (totalChars + topicLength <= charLimit) {
+                  topicsToShow.push(topic)
+                  totalChars += topicLength
+                } else {
+                  break
+                }
+              }
+
+              return topicsToShow.map((topic: any) => (
+                <span
+                  className="rounded-md bg-slate-50 bg-opacity-20 p-1 text-xs"
+                  key={topic.documentId}
+                >
+                  {topic.Name}
+                </span>
+              ))
+            })()}
           </div>
         </div>
       </div>

@@ -78,7 +78,6 @@ export const fetchSinglePost = async (id: string) => {
     const response = await fetch(`${apiURL}posts/${id}?populate=*`, {
       headers: {
         ...headers,
-        Authorization: `Bearer YOUR_TOKEN_HERE`, // You might want to fix this token
       },
       next: { revalidate: 60 }, // Cache for 60 seconds
     });

@@ -32,8 +32,6 @@ function Exercise() {
       setPosts(fetchedPosts)
       setLang(fetchedLang)
       setDataLoaded(true)
-      console.log(fetchedPosts)
-      console.log(fetchedLang)
     }
     fetchData()
   }, [])
