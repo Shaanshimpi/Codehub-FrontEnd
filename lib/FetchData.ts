@@ -7,8 +7,8 @@ const apiURL = process.env.NEXT_PUBLIC_STRAPI_API_URL;
 
 export const fetchTopic = async () => {
   try {
-    console.log("fetching topic...");
-    console.log(apiURL);
+    // console.log("fetching topic...");
+    // console.log(apiURL);
     const response = await fetch(`${apiURL}topics?populate=*`, {
       headers,
       next: { revalidate: 60 }, // Cache for 60 seconds
@@ -23,7 +23,7 @@ export const fetchTopic = async () => {
     const json = await response.json();
     return json?.data;
   } catch (error: any) {
-    console.error(`Fetch error:`, error.message);
+    console.error(`Fetch error:`, error);
     return null;
   }
 };
@@ -44,7 +44,7 @@ export const fetchLang = async () => {
     const json = await response.json();
     return json?.data;
   } catch (error: any) {
-    console.error(`Fetch error:`, error.message);
+    console.error(`Fetch error:`, error);
     return null;
   }
 };
@@ -68,7 +68,7 @@ export const fetchAllPosts = async () => {
     const json = await response.json();
     return json?.data;
   } catch (error: any) {
-    console.error(`Fetch error:`, error.message);
+    console.error(`Fetch error:`, error);
     return null;
   }
 };
@@ -91,7 +91,7 @@ export const fetchSinglePost = async (id: string) => {
     const json = await response.json();
     return json?.data;
   } catch (error: any) {
-    console.error("Fetch error:", error.message);
+    console.error("Fetch error:", error);
     return null;
   }
 };
@@ -113,7 +113,7 @@ export async function deleteAllPosts() {
 
     const json = await response.json();
     const posts = await json.data;
-    console.log(posts);
+    // console.log(posts);
 
     // Iterate and delete each post
     for (const post of posts) {
@@ -133,7 +133,7 @@ export async function deleteAllPosts() {
       }
     }
 
-    console.log("All posts deleted successfully!");
+    // console.log("All posts deleted successfully!");
   } catch (error) {
     console.error("Error deleting posts:", error);
   }

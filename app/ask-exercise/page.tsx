@@ -104,7 +104,7 @@ const AddExercisePage = () => {
       const content = data.choices?.[0]?.message?.content
 
       const parsed = JSON.parse(content)
-      console.log(parsed)
+      // console.log(parsed)
       setExerciseData(parsed)
     } catch (err) {
       console.error("Error generating exercise:", err)
