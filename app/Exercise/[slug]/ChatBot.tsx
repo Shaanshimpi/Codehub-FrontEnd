@@ -50,7 +50,7 @@ const ChatBot = ({ question, code }) => {
             Authorization: `bearer ${process.env.NEXT_PUBLIC_AI_CHATBOT_API_KEY}`,
           },
           body: JSON.stringify({
-            model: "google/gemma-2-9b-it:free",
+            model: "google/gemini-2.0-flash-exp:free",
             messages: [
               {
                 role: "system",

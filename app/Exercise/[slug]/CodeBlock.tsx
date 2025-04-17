@@ -23,7 +23,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, language }) => {
   }, [code, language])
 
   return (
-    <div className="overflow-hidden rounded-lg md:w-[60vw] md:max-w-[1200px]">
+    <div className="overflow-x-hidden rounded-lg md:w-[60vw] md:max-w-[1200px]">
       {/* Code Header */}
       <div className="flex items-center gap-2 bg-blue-800 px-4 py-2">
         <div className="flex gap-2">
@@ -36,7 +36,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, language }) => {
 
       {/* Code Content */}
       <div
-        className="overflow-x-auto p-4 text-sm"
+        className="overflow-x-scroll p-4 text-sm"
         style={{
           background: "#1e1e1e",
           borderRadius: "0 0 0.5rem 0.5rem",

@@ -14,7 +14,7 @@ function PostCard({ post }: { post: any }) {
   const slug = generateSlug(post)
 
   return (
-    <Link href={`/Exercise/${slug}`} className="block h-full">
+    <Link href={`/Exercise/${slug}`} className="block h-full self-start">
       <div className="relative z-0 flex h-full min-h-[200px] flex-col rounded-lg bg-blue-900 bg-opacity-30 p-3 pb-20 text-white transition-colors hover:bg-opacity-40">
         <span className="text-lg font-bold">{post.index + 1}.</span>
         <h3 className="text-xl">{post?.Title}</h3>

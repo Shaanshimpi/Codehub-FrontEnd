@@ -114,7 +114,7 @@ const AddExercisePage = () => {
   }
 
   return (
-    <div className="bg-[#0F172A] px-[3vh] py-14 text-white md:px-[40vh]">
+    <div className="bg-[#0F172A] px-[5vw] py-14 text-white lg:px-[20vw]">
       <h1 className="mb-6 text-3xl font-bold">Ask your own Exercise</h1>
 
       <form onSubmit={handleSubmit}>

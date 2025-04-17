@@ -20,7 +20,7 @@ const ExerciseContent = ({ post, codeString, language }) => {
   const descriptionContent = post[descriptionKey] || "No explanation available."
 
   return (
-    <div className="overflow-hidden rounded-md bg-[#1E293B] px-5 py-[10vh]">
+    <div className="overflow-hidden rounded-md bg-[#1E293B] px-6 py-[10vh]">
       <h2 className="rounded-md bg-[#0F172A] p-[2vh] text-2xl font-bold text-white dark:text-white">
         {post.Title}
       </h2>
