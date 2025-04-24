@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 // adjust if needed
-import ChatBot from "../Exercise/[slug]/ChatBot"
-import ExerciseContent from "../Exercise/[slug]/ExerciseContent"
+import ChatBot from "../[slug]/ChatBot"
+import ExerciseContent from "../[slug]/ExerciseContent"
 
 const AddExercisePage = () => {
   const [questionInput, setQuestionInput] = useState("")

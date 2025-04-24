@@ -1,5 +1,6 @@
 // app/Exercise/page.tsx
 import { Metadata } from "next"
+import { fetchAllPosts, fetchLang, fetchTopic } from "../../lib/FetchData"
 import Exercise from "./Exercise"
 
 export const metadata: Metadata = {
@@ -23,6 +24,12 @@ export const metadata: Metadata = {
   },
 }
 
-export default function ExercisePage() {
-  return <Exercise />
+export default async function ExercisePage() {
+  const [posts, lang, topics] = await Promise.all([
+    fetchAllPosts(),
+    fetchLang(),
+    fetchTopic(),
+  ])
+
+  return <Exercise posts={posts} lang={lang} topics={topics} />
 }

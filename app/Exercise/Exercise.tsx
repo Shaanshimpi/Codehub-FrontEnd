@@ -6,17 +6,12 @@ import { Search } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import Typewriter from "typewriter-effect"
-import { fetchAllPosts, fetchLang, fetchTopic } from "../../lib/FetchData"
 import FilterLang from "./components/FilterLang"
 import FilterTopic from "./components/FilterTopic"
 import PostCard from "./components/PostCard"
 
-function Exercise() {
-  const [topics, setTopics] = useState([])
-  const [posts, setPosts] = useState([])
+function Exercise({ posts, lang, topics }) {
   const [filteredPosts, setFilteredPosts] = useState([])
-  const [lang, setLang] = useState([])
-  const [dataLoaded, setDataLoaded] = useState(false)
   const [typingComplete, setTypingComplete] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [searchOpen, setSearchOpen] = useState(false)
@@ -27,19 +22,6 @@ function Exercise() {
 
   const inputRef = useRef(null)
   const containerRef = useRef(null)
-
-  useEffect(() => {
-    async function fetchData() {
-      const fetchedTopics = await fetchTopic()
-      const fetchedPosts = await fetchAllPosts()
-      const fetchedLang = await fetchLang()
-      setTopics(fetchedTopics)
-      setPosts(fetchedPosts)
-      setLang(fetchedLang)
-      setDataLoaded(true)
-    }
-    fetchData()
-  }, [])
 
   useEffect(() => {
     let filtered = posts
@@ -96,7 +78,7 @@ function Exercise() {
     })
   }
 
-  if (!dataLoaded || !typingComplete) {
+  if (!typingComplete) {
     return (
       <div className="flex min-h-[100vh] items-center justify-center bg-[#09090B] text-[5vw] text-white">
         <Typewriter
@@ -127,7 +109,7 @@ function Exercise() {
         <div className="z-0 flex min-h-full flex-grow flex-col items-start gap-8 p-3 pl-7 md:grid md:grid-cols-2 md:items-start">
           <div className="mb-1 flex justify-end gap-4 md:col-span-2">
             {/* Ask Exercise Button */}
-            <Link href="/ask-exercise">
+            <Link href="Exercise/ask-exercise">
               <button className="rounded-2xl bg-blue-600 px-4 py-2 text-white transition-all duration-200 hover:bg-blue-700">
                 Try your own Exercise
               </button>

@@ -10,7 +10,6 @@ const ExerciseContent = ({ post, codeString, language }) => {
   const [showCode, setShowCode] = useState(false)
   const [showVideo, setShowVideo] = useState(false)
 
-  // Construct description key dynamically
   const descriptionKey = `Description${
     selectedLanguage === "english"
       ? ""
@@ -20,7 +19,53 @@ const ExerciseContent = ({ post, codeString, language }) => {
   const descriptionContent = post[descriptionKey] || "No explanation available."
 
   return (
-    <div className="overflow-hidden rounded-md bg-[#1E293B] px-6 py-[10vh]">
+    <div className="overflow-hidden rounded-md bg-[#1E293B] px-6 py-[5vh]">
+      {/* Difficulty Badge */}
+      {typeof post.difficultyLevel === "number" && (
+        <div className="flex justify-end">
+          <div
+            className="mb-3 inline-block rounded-full px-4 py-1 text-sm font-semibold text-white"
+            style={{
+              backgroundColor:
+                post.difficultyLevel === 1
+                  ? "#16A34A" // Green - Easy
+                  : post.difficultyLevel === 2
+                    ? "#FACC15" // Yellow - Medium
+                    : "#EF4444", // Red - Hard
+            }}
+          >
+            Difficulty:{" "}
+            {post.difficultyLevel === 1
+              ? "Easy"
+              : post.difficultyLevel === 2
+                ? "Medium"
+                : "Hard"}
+          </div>
+        </div>
+      )}
+
+      {/* Programming Languages */}
+      {post.topics?.length > 0 && post.programming_languages?.length > 0 && (
+        <div className="mb-2 flex flex-wrap justify-end gap-2">
+          {post.topics.map((topic, index) => (
+            <span
+              key={index}
+              className="rounded-full bg-green-800 px-3 py-1 text-sm font-medium text-white"
+            >
+              {topic.Name}
+            </span>
+          ))}
+          {post.programming_languages.map((lang, index) => (
+            <span
+              key={index}
+              className="rounded-full bg-blue-800 px-3 py-1 text-sm font-medium text-white"
+            >
+              {lang.Name}
+            </span>
+          ))}
+        </div>
+      )}
+
       <h2 className="rounded-md bg-[#0F172A] p-[2vh] text-2xl font-bold text-white dark:text-white">
         {post.Title}
       </h2>
@@ -91,11 +136,10 @@ const ExerciseContent = ({ post, codeString, language }) => {
           </div>
         </div>
       )}
-      {/* youtube video */}
 
+      {/* YouTube Video */}
       {post.VideoLink && (
         <>
-          {/* Code Toggle Button */}
           <div className="mt-4">
             <button
               className="w-full rounded-md bg-[#0F1729] px-4 py-2 text-white transition-all hover:bg-blue-600"
@@ -105,22 +149,15 @@ const ExerciseContent = ({ post, codeString, language }) => {
             </button>
           </div>
           {showVideo && (
-            <>
-              <h3 className="mt-6 min-h-[10vh] w-[100%] rounded-t-md p-3 text-4xl font-semibold text-white">
-                Video Explanation
-              </h3>
-              <div className="relative w-full pt-[56.25%]">
-                {" "}
-                {/* 16:9 Aspect Ratio */}
-                <iframe
-                  className="absolute left-0 top-0 h-full w-full"
-                  src={post?.VideoLink}
-                  title="CodeHub India"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
-              </div>
-            </>
+            <div className="relative w-full pt-[56.25%]">
+              <iframe
+                className="absolute left-0 top-0 h-full w-full"
+                src={post?.VideoLink}
+                title="Video Explanation"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
           )}
         </>
       )}

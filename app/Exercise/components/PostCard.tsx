@@ -16,7 +16,32 @@ function PostCard({ post }: { post: any }) {
   return (
     <Link href={`/Exercise/${slug}`} className="block h-full self-start">
       <div className="relative z-0 flex h-full min-h-[200px] flex-col rounded-lg bg-blue-900 bg-opacity-30 p-3 pb-20 text-white transition-colors hover:bg-opacity-40">
-        <span className="text-lg font-bold">{post.index + 1}.</span>
+        <div className="flex justify-between">
+          <span className="flex justify-start text-lg font-bold">
+            {post.index + 1}.
+          </span>
+          {/* Difficulty Badge */}
+          {typeof post.difficultyLevel === "number" && (
+            <span
+              className={`text-s flex justify-end rounded-md px-2 py-1 font-semibold text-white`}
+              style={{
+                color:
+                  post.difficultyLevel === 1
+                    ? "#16A34A" // Easy - green
+                    : post.difficultyLevel === 2
+                      ? "#FACC15" // Medium - yellow
+                      : "#EF4444", // Hard - red
+              }}
+            >
+              {post.difficultyLevel === 1
+                ? "Easy"
+                : post.difficultyLevel === 2
+                  ? "Medium"
+                  : "Hard"}
+            </span>
+          )}
+        </div>
+
         <h3 className="text-xl">{post?.Title}</h3>
 
         <div className="meta absolute bottom-0 left-0 right-0 flex items-center justify-between gap-1 pb-2 pr-2">
