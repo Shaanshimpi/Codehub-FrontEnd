@@ -138,3 +138,27 @@ export async function deleteAllPosts() {
     console.error("Error deleting posts:", error);
   }
 }
+
+export const fetchTutorialsByLanguage = async (langId: number) => {
+  try {
+    const response = await fetch(
+      `${apiURL}tutorials?filters[programming_language][id][$eq]=${langId}&sort=index:asc`,
+      {
+        headers,
+        next: { revalidate: 60 },
+      },
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Failed to fetch tutorials:`, response.status, errorText);
+      throw new Error(`HTTP Error: ${response.status}`);
+    }
+
+    const json = await response.json();
+    return json?.data;
+  } catch (error: any) {
+    console.error(`Fetch error:`, error);
+    return null;
+  }
+};

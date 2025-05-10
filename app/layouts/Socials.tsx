@@ -2,10 +2,14 @@
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
+import { usePathname } from "next/navigation"
 import { reckoner } from "../fonts"
+import { useTheme } from "../theme-context"
 
 export default function Socials() {
   const [whiteBg, setWhiteBg] = useState(false)
+  const { toggleTheme, theme } = useTheme()
+  const pathname = usePathname()
 
   // useEffect(() => {
   //   ScrollTrigger.create({
@@ -54,7 +58,7 @@ export default function Socials() {
       target={href.startsWith("http") ? "_blank" : "_self"}
       rel={href.startsWith("http") ? "noreferrer" : undefined}
       className={cn(
-        "relative bg-black px-2 text-lg font-medium tracking-wider text-white mix-blend-difference before:absolute before:left-0 before:top-0 before:z-[-1] before:h-full before:w-0 before:bg-white before:transition-all before:content-[''] hover:text-black hover:before:w-full md:block",
+        "relative z-[500] bg-black px-2 text-lg font-medium tracking-wider text-white mix-blend-difference before:absolute before:left-0 before:top-0 before:z-[-1] before:h-full before:w-0 before:bg-white before:transition-all before:content-[''] hover:text-black hover:before:w-full md:block",
         { "before:bg-primary-ch hover:text-white": whiteBg },
         { hidden: label != "Exercise." }
       )}
@@ -66,7 +70,7 @@ export default function Socials() {
   return (
     <div
       id="socials-section"
-      className="fixed top-0 z-50 flex h-[10vh] w-screen items-center justify-end bg-transparent pr-3 md:flex md:pr-10"
+      className="fixed top-0 z-[5000] flex h-[10vh] w-screen items-center justify-end bg-transparent pr-3 md:flex md:pr-10"
       style={{ translate: "none" }}
     >
       <div
@@ -78,6 +82,14 @@ export default function Socials() {
         {links.map((link, index) => (
           <LinkItem key={index} {...link} />
         ))}
+        {pathname != "/" && (
+          <button
+            onClick={toggleTheme}
+            className="right-6 z-[5000] rounded-full border border-gray-300 bg-white px-3 py-1 text-lg shadow dark:bg-black dark:text-white"
+          >
+            {theme === "dark" ? "🌞 Light" : "🌙 Dark"}
+          </button>
+        )}
       </div>
     </div>
   )

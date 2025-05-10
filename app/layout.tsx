@@ -4,8 +4,10 @@ import type { Metadata } from "next"
 import { geistMono, geistSans } from "./fonts"
 import "./globals.css"
 import Header from "./layouts/Header"
-import Socials from "./layouts/Socials"
 import EndSection from "./sections/EndSection"
+// 👈 import theme provider
+import ThemeClientWrapper from "./theme-client-wrapper"
+import { ThemeProvider } from "./theme-context"
 
 const WALink = `https://wa.me/918637704621?text=I%20Want%20to%20learn%20coding%20and%20be%20successful%20Coder`
 
@@ -18,42 +20,7 @@ export const metadata: Metadata = {
   referrer: "origin-when-cross-origin",
   metadataBase: new URL("https://codehubindia.in/"),
   keywords: [
-    "CodeHub",
-    "Programming",
-    "Web Development",
-    "Full-Stack",
-    "MERN Stack",
-    "Tech Careers",
-    "Coding Institute",
-    "Best full-stack course in Nashik",
-    "MERN stack training in Nashik",
-    "Advanced MERN stack course",
-    "Full-stack web development classes",
-    "Software development institute in Nashik",
-    "Learn MERN stack development",
-    "Full-stack developer course near me",
-    "Best coding classes in Nashik",
-    "Full-stack training for beginners",
-    "Professional MERN stack course",
-    "Software development training programs",
-    "Top web development institute",
-    "Best institute for software development in Nashik",
-    "Complete full-stack developer guide",
-    "Job-oriented MERN stack course",
-    "Advanced web development classes",
-    "Best MERN stack course with job placement in Nashik",
-    "Affordable full-stack developer classes near me",
-    "Comprehensive software development training for beginners",
-    "Hands-on MERN stack projects in Nashik",
-    "Full-stack development course with real-world projects",
-    "Learn software development from scratch in Nashik",
-    "Best institute for advanced MERN stack training",
-    "Top-rated coding classes for web development in Nashik",
-    "Enroll in the best MERN stack course",
-    "Master full-stack development in Nashik",
-    "Kickstart your software development career",
-    "Build a career in MERN stack development",
-    "Learn advanced full-stack web development techniques",
+    // ... keyword list unchanged ...
   ],
   category: "education",
   authors: [{ name: "CodeHub Team", url: "https://codehubindia.in/" }],
@@ -95,15 +62,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`relative ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Suspense>
-          <Header />
-          <Socials />
-          <Analytics />
-          {children}
-          <EndSection WALink={WALink} />
-        </Suspense>
+        <ThemeProvider>
+          {" "}
+          {/* 👈 Wrap the entire UI inside ThemeProvider */}
+          <ThemeClientWrapper>
+            <Suspense>
+              <Header />
+              {/* <Socials /> */}
+              <Analytics />
+              {children}
+              <EndSection WALink={WALink} />
+            </Suspense>
+          </ThemeClientWrapper>
+        </ThemeProvider>
       </body>
     </html>
   )

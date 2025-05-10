@@ -170,3 +170,55 @@ button {
     scrollbar-width: none; /* Firefox */
   }
 }
+
+/* Brand Primary */
+.text-primary-ch {
+  color: #0f4c9c;
+}
+.bg-primary-ch {
+  background: #002f6d;
+}
+
+/* Sidebar Styling */
+.sidebar {
+  background-color: #e6eef7;
+}
+
+.dark .sidebar {
+  background-color: #001e3c;
+}
+
+/* List Item Base */
+.list-item {
+  border-bottom: 1px solid #d1d5db; /* gray-300 */
+  color: #0f4c9c;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.dark .list-item {
+  color: #93c5fd;
+  border-color: #334155; /* slate-700 */
+}
+
+/* Hover State */
+.list-item:hover {
+  background-color: #0f4c9c;
+  color: #ffffff;
+}
+
+.dark .list-item:hover {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+/* Active State */
+.list-item.active {
+  background-color: #002f6d;
+  color: #ffffff;
+}
+
+.dark .list-item.active {
+  background-color: #0f4c9c;
+  color: #ffffff;
+}

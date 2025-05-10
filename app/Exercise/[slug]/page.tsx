@@ -64,6 +64,7 @@ export async function generateMetadata({
       "programming practice",
       "code walkthrough",
       "beginner programming problems",
+      ...(post?.topics ?? "Exercise"),
     ],
   }
 }
@@ -95,7 +96,7 @@ export default async function ExercisePage({
   )
 
   return (
-    <div className="relative bg-[#09090B] md:px-[30vh] md:py-[10vh]">
+    <div className="md: relative bg-white pb-[5vh] text-black dark:bg-[#09090B] dark:text-white md:px-[30vh] md:py-[10vh]">
       {/* Render ExerciseContent */}
       <ExerciseContent
         post={post}
@@ -109,15 +110,11 @@ export default async function ExercisePage({
       {/* Render Related Posts Section Below */}
       {relatedPosts.length > 0 && (
         <div className="related-questions mt-10">
-          <h3 className="mb-4 text-2xl font-semibold text-white">
-            Related Questions
-          </h3>
+          <h3 className="mb-4 text-2xl font-semibold">Related Questions</h3>
           <div className="grid gap-4 px-5 md:px-0">
-            {relatedPosts
-              ?.slice(0, 5)
-              .map((relatedPost, i) => (
-                <PostCard key={i} post={{ ...relatedPost, index: i }} />
-              ))}
+            {relatedPosts.slice(0, 5).map((relatedPost, i) => (
+              <PostCard key={i} post={{ ...relatedPost, index: i }} />
+            ))}
           </div>
         </div>
       )}

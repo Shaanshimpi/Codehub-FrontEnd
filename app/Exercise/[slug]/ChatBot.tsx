@@ -111,7 +111,7 @@ const ChatBot = ({ question, code }) => {
   }
 
   return (
-    <div className="z-100 fixed bottom-6 right-6">
+    <div className="fixed bottom-6 right-6 z-10">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="rounded-full bg-blue-600 p-3 text-white shadow-lg transition hover:bg-blue-700"
@@ -122,7 +122,9 @@ const ChatBot = ({ question, code }) => {
       {isOpen && (
         <div className="absolute bottom-14 right-0 z-[200] flex h-[80vh] w-[90vw] flex-col rounded-lg border bg-white p-2 text-black shadow-lg dark:bg-gray-800 md:max-w-[600px]">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Ask CodeHub JARVIS</h3>
+            <h3 className="text-lg font-semibold text-black dark:text-white">
+              Ask CodeHub JARVIS
+            </h3>
             <button
               onClick={() => setIsOpen(false)}
               className="z-100 text-gray-500 hover:text-gray-700"
