@@ -1,14 +1,3 @@
-// import { type MetadataRoute } from "next";
-// // Add all your static pages here
-// const staticRoutes = ["", "Exercise", "Learn", "Blog"];
-// export default function sitemap(): MetadataRoute.Sitemap {
-//   const baseUrl = "https://codehubindia.in";
-//   const routes = staticRoutes.map((route) => ({
-//     url: `${baseUrl}/${route}`,
-//     lastModified: new Date().toISOString(),
-//   }));
-//   return [...routes];
-// }
 import { type MetadataRoute } from "next"
 
 const BASE_URL = "https://codehubindia.in"
@@ -32,25 +21,39 @@ function generateTutorialSlug(tutorial: any): string {
   return generateSlug(tutorial.Title)
 }
 
-// Fetch all data
+// Fetch all data (with safety)
 async function fetchAllData() {
-  const [exercisesRes, langsRes] = await Promise.all([
-    fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/exercises`),
-    fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/languages`),
-  ])
+  try {
+    const [exercisesRes, langsRes] = await Promise.all([
+      fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/exercises`),
+      fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/languages`),
+    ])
 
-  const exercises = await exercisesRes.json()
-  const languages = await langsRes.json()
+    const exercisesJson = await exercisesRes.json()
+    const languagesJson = await langsRes.json()
 
-  return { exercises, languages }
+    return {
+      exercises: Array.isArray(exercisesJson) ? exercisesJson : [],
+      languages: Array.isArray(languagesJson) ? languagesJson : [],
+    }
+  } catch (error) {
+    console.error("Error fetching exercise or language data:", error)
+    return { exercises: [], languages: [] }
+  }
 }
 
-// Fetch tutorials per language
+// Fetch tutorials per language (safe fallback)
 async function fetchTutorialsByLang(langId: number) {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/tutorials?lang=${langId}`
-  )
-  return await res.json()
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/tutorials?lang=${langId}`
+    )
+    const json = await res.json()
+    return Array.isArray(json) ? json : []
+  } catch (error) {
+    console.error(`Error fetching tutorials for lang ${langId}:`, error)
+    return []
+  }
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -85,4 +88,4 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 }
 
-export const revalidate = 86400 // regenerate daily
+export const revalidate = 86400 // Regenerate daily
