@@ -23,7 +23,7 @@ const AddExercisePage = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.0-flash-exp:free",
+          model: "google/gemini-2.0-flash-001",
           messages: [
             {
               role: "user",
@@ -101,8 +101,8 @@ const AddExercisePage = () => {
       })
 
       const data = await res.json()
+      console.log(data)
       const content = data.choices?.[0]?.message?.content
-
       const parsed = JSON.parse(content)
       // console.log(parsed)
       setExerciseData(parsed)

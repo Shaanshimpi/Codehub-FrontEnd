@@ -1,82 +1,116 @@
 import { type MetadataRoute } from "next"
 
 const BASE_URL = "https://codehubindia.in"
+const API_URL = process.env.NEXT_PUBLIC_STRAPI_API_URL
+const AUTH = process.env.NEXT_PUBLIC_STRAPI_API_AUTH
 
-// Slug generator (shared for both)
-function generateSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
+const headers = {
+  Authorization: `Bearer ${AUTH}`,
+  "Content-Type": "application/json",
+}
+
+// Slug generator (safe)
+function generateSlug(name: string | undefined): string {
+  return (
+    name
+      ?.toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-") ?? ""
+  )
 }
 
 // Exercise slug (Title + ID)
 function generateExerciseSlug(post: any): string {
-  return `${generateSlug(post.Title)}-${post.documentId}`
+  const title = post?.Title
+  const id = post?.documentId
+  return title && id ? `${generateSlug(title)}-${id}` : ""
 }
 
-// Learn route slug (lang + tutorial)
+// Learn route slug
 function generateTutorialSlug(tutorial: any): string {
-  return generateSlug(tutorial.Title)
+  const title = tutorial?.Title
+  return generateSlug(title)
 }
 
-// Fetch all data (with safety)
-async function fetchAllData() {
+// Fetch exercises
+async function fetchExercises() {
   try {
-    const [exercisesRes, langsRes] = await Promise.all([
-      fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/exercises`),
-      fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/languages`),
-    ])
-
-    const exercisesJson = await exercisesRes.json()
-    const languagesJson = await langsRes.json()
-
-    return {
-      exercises: Array.isArray(exercisesJson) ? exercisesJson : [],
-      languages: Array.isArray(languagesJson) ? languagesJson : [],
-    }
-  } catch (error) {
-    console.error("Error fetching exercise or language data:", error)
-    return { exercises: [], languages: [] }
+    const res = await fetch(
+      `${API_URL}posts?populate=*&pagination[pageSize]=1000`,
+      {
+        headers,
+        next: { revalidate: 86400 },
+      }
+    )
+    const json = await res.json()
+    return Array.isArray(json?.data) ? json.data : []
+  } catch (e) {
+    console.error("Failed to fetch exercises", e)
+    return []
   }
 }
 
-// Fetch tutorials per language (safe fallback)
+// Fetch languages
+async function fetchLanguages() {
+  try {
+    const res = await fetch(`${API_URL}programming-languages?populate=*`, {
+      headers,
+      next: { revalidate: 86400 },
+    })
+    const json = await res.json()
+    return Array.isArray(json?.data) ? json.data : []
+  } catch (e) {
+    console.error("Failed to fetch languages", e)
+    return []
+  }
+}
+
+// Fetch tutorials for a language
 async function fetchTutorialsByLang(langId: number) {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/tutorials?lang=${langId}`
+      `${API_URL}tutorials?filters[programming_language][id][$eq]=${langId}&populate=*`,
+      {
+        headers,
+        next: { revalidate: 86400 },
+      }
     )
     const json = await res.json()
-    return Array.isArray(json) ? json : []
-  } catch (error) {
-    console.error(`Error fetching tutorials for lang ${langId}:`, error)
+    return Array.isArray(json?.data) ? json.data : []
+  } catch (e) {
+    console.error(`Failed to fetch tutorials for lang ${langId}`, e)
     return []
   }
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const { exercises, languages } = await fetchAllData()
-
-  // Static paths
+  const [exercises, languages] = await Promise.all([
+    fetchExercises(),
+    fetchLanguages(),
+  ])
   const staticPaths = ["", "Exercise", "Learn", "Blog"]
 
-  // Exercise pages
-  const exercisePaths = exercises.map(
-    (post: any) => `Exercise/${generateExerciseSlug(post)}`
-  )
+  const exercisePaths = exercises
+    .map((post: any) => generateExerciseSlug(post))
+    .filter(Boolean)
+    .map((slug) => `Exercise/${slug}`)
 
-  // Learn pages
   const tutorialPaths: string[] = []
 
   for (const lang of languages) {
-    const langSlug = generateSlug(lang.Name)
+    const langName = lang?.Name
+    const langSlug = generateSlug(langName)
+
+    if (!langSlug || !lang.id) continue
+
     const tutorials = await fetchTutorialsByLang(lang.id)
 
     for (const tut of tutorials) {
       const tutSlug = generateTutorialSlug(tut)
-      tutorialPaths.push(`Learn/${langSlug}/${tutSlug}`)
+      if (tutSlug) {
+        tutorialPaths.push(`Learn/${langSlug}/${tutSlug}`)
+      }
     }
   }
 
@@ -88,4 +122,4 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 }
 
-export const revalidate = 86400 // Regenerate daily
+export const revalidate = 86400 // daily
