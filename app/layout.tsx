@@ -1,6 +1,7 @@
 import { Suspense } from "react"
 import { Analytics } from "@vercel/analytics/react"
 import type { Metadata } from "next"
+import Script from "next/script"
 import { geistMono, geistSans } from "./fonts"
 import "./globals.css"
 import Header from "./layouts/Header"
@@ -61,6 +62,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      {/* <!-- Google tag (gtag.js) --> */}
+      <Script
+        async
+        src="https://www.googletagmanager.com/gtag/js?id=G-WSTK7J1CKR"
+        strategy="afterInteractive"
+      />
+      <Script strategy="afterInteractive" id="google-analytics">
+        {`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-WSTK7J1CKR');
+        `}
+      </Script>
       <body
         className={`relative ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
