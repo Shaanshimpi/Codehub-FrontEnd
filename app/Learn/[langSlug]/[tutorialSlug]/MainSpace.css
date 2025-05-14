@@ -98,3 +98,75 @@
 .dark .content-container strong {
   color: #93c5fd; /* blue-300 */
 }
+
+.keyword {
+  font-family: monospace;
+  background-color: #f0f0f0;
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: #d63384; /* example: purple */
+}
+/* Inline code style */
+.keyword {
+  font-family: monospace;
+  background-color: #f0f0f0;
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: #d63384; /* pink/purple */
+}
+
+.dark .keyword {
+  background-color: #334155; /* slate-700 */
+  color: #f472b6; /* pink-400 */
+}
+/* Table Styles */
+.content-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  background-color: #ffffff; /* light background */
+  color: #1f2937; /* gray-800 */
+  border: 1px solid #e5e7eb; /* gray-200 */
+}
+
+.dark .content-container table {
+  background-color: #1e293b; /* slate-800 */
+  color: #f1f5f9; /* slate-100 */
+  border-color: #334155; /* slate-700 */
+}
+
+/* Table headers */
+.content-container table th {
+  background-color: #f1f5f9; /* slate-100 */
+  color: #0f172a; /* slate-900 */
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem;
+  border-bottom: 1px solid #e5e7eb; /* gray-200 */
+}
+
+.dark .content-container table th {
+  background-color: #334155; /* slate-700 */
+  color: #e2e8f0; /* slate-200 */
+  border-color: #475569; /* slate-600 */
+}
+
+/* Table body */
+.content-container table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e5e7eb; /* gray-200 */
+}
+
+.dark .content-container table td {
+  border-color: #475569; /* slate-600 */
+}
+
+/* Optional: striped rows */
+.content-container table tbody tr:nth-child(even) {
+  background-color: #f9fafb; /* gray-50 */
+}
+
+.dark .content-container table tbody tr:nth-child(even) {
+  background-color: #273549; /* slate-700-ish */
+}

@@ -23,7 +23,7 @@ export default async function LangRedirectPage({
 
   const tutorials = await fetchTutorialsByLanguage(lang.id)
   if (!tutorials || tutorials.length === 0) return <div>No tutorials found</div>
-
+  console.log(tutorials)
   const firstTutorialSlug = generateSlug(tutorials[0].Title)
 
   redirect(`/Learn/${params.langSlug}/${firstTutorialSlug}`)
