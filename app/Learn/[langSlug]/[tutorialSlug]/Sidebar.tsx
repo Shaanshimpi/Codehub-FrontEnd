@@ -41,14 +41,14 @@ function Sidebar({
       {/* Toggle Button (mobile only) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed left-2 top-[50vh] z-[501] translate-y-[-50%] transform rounded-full border border-gray-300 bg-white p-1 shadow transition-transform duration-300 ease-in-out dark:border-gray-700 dark:bg-slate-900 md:hidden ${isOpen ? "left-[90vw]" : "left-2"}`}
+        className={`fixed left-2 top-[50vh] z-[501] h-[10vh] translate-y-[-50%] transform rounded-full border border-gray-300 bg-white shadow transition-transform duration-300 ease-in-out dark:border-gray-700 dark:bg-slate-900 md:hidden ${isOpen ? "left-[80vw]" : "left-2"}`}
       >
         {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
       </button>
 
       {/* Sidebar overlay for mobile */}
       <div
-        className={`fixed inset-0 z-[500] transform bg-white py-[10vh] transition-transform duration-300 ease-in-out dark:bg-slate-900 ${
+        className={`fixed inset-0 z-[500] w-[80vw] transform bg-white py-[10vh] transition-transform duration-300 ease-in-out dark:bg-slate-900 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } md:static md:block md:h-full md:w-[15vw] md:min-w-[15vw] md:translate-x-0`}
         style={{ maxHeight: "100vh", overflowY: "auto" }}
@@ -62,7 +62,7 @@ function Sidebar({
               <li key={tutorial.id}>
                 <Link href={`/Learn/${langSlug}/${tutorialSlug}`}>
                   <button
-                    className={`list-item px-4 py-2 text-xl transition-all ${
+                    className={`list-item w-full px-4 py-2 text-left text-xl transition-all ${
                       isActive ? "active" : ""
                     }`}
                     onClick={() => setIsOpen(false)}

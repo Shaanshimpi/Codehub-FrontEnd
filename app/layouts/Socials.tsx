@@ -37,8 +37,9 @@ export default function Socials() {
   //   // })
   // }, [])
   const links = [
-    { href: "/", label: "Home.", showMd: true },
+    { href: "/", label: "Home.", showMd: false },
     { href: "/Exercise", label: "Exercise.", showMd: true },
+    { href: "/Learn", label: "Learn.", showMd: true },
     {
       href: "https://www.instagram.com/code.hub.india/",
       label: "Instagram.",
@@ -58,9 +59,9 @@ export default function Socials() {
       target={href.startsWith("http") ? "_blank" : "_self"}
       rel={href.startsWith("http") ? "noreferrer" : undefined}
       className={cn(
-        "relative z-[500] bg-black px-2 text-lg font-medium tracking-wider text-white mix-blend-difference before:absolute before:left-0 before:top-0 before:z-[-1] before:h-full before:w-0 before:bg-white before:transition-all before:content-[''] hover:text-black hover:before:w-full md:block",
+        "text-md relative z-[500] bg-black px-1 font-medium tracking-wider text-white mix-blend-difference before:absolute before:left-0 before:top-0 before:z-[-1] before:h-full before:w-0 before:bg-white before:transition-all before:content-[''] hover:text-black hover:before:w-full md:block md:text-lg",
         { "before:bg-primary-ch hover:text-white": whiteBg },
-        { hidden: label != "Exercise." }
+        { hidden: !showMd }
       )}
     >
       {label}
@@ -70,13 +71,13 @@ export default function Socials() {
   return (
     <div
       id="socials-section"
-      className="fixed top-0 z-[5000] flex h-[10vh] w-screen items-center justify-end bg-transparent pr-3 md:flex md:pr-10"
+      className="fixed top-0 z-[5000] flex h-[10vh] w-screen items-center justify-end bg-transparent pr-1 md:flex md:pr-10"
       style={{ translate: "none" }}
     >
       <div
         className={cn(
           reckoner.className,
-          "flex items-center gap-3 transition-all"
+          "flex items-center gap-2 transition-all"
         )}
       >
         {links.map((link, index) => (
@@ -85,7 +86,7 @@ export default function Socials() {
         {pathname != "/" && (
           <button
             onClick={toggleTheme}
-            className="right-6 z-[5000] rounded-full border border-gray-300 bg-white px-3 py-1 text-lg shadow dark:bg-black dark:text-white"
+            className="text-md right-3 z-[5000] rounded-full border border-gray-300 bg-white px-3 py-1 shadow dark:bg-black dark:text-white md:text-lg"
           >
             {theme === "dark" ? "🌞 Light" : "🌙 Dark"}
           </button>
