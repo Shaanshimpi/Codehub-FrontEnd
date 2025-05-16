@@ -170,3 +170,38 @@
 .dark .content-container table tbody tr:nth-child(even) {
   background-color: #273549; /* slate-700-ish */
 }
+
+/* Default: Mobile-friendly padding */
+.content-container {
+  padding: 1rem;
+  font-family: "Inter", sans-serif;
+  color: #1f2937;
+  background-color: #ffffff;
+}
+
+/* Larger padding for tablet and up */
+@media (min-width: 640px) {
+  .content-container {
+    padding: 2rem;
+  }
+}
+.content-container {
+  overflow-x: hidden;
+  word-wrap: break-word;
+}
+/* Wrap all tables in scrollable containers */
+.content-container table {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+  width: 100%;
+}
+
+/* Optional: Prevent breaking layout on mobile */
+.content-container td,
+.content-container th {
+  white-space: nowrap;
+}
+.content-container table {
+  -webkit-overflow-scrolling: touch;
+}

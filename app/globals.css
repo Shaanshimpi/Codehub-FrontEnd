@@ -1,6 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* globals.css */
+html,
+body {
+  overflow-x: hidden;
+}
 
 body {
   font-family: Arial, Helvetica, sans-serif;
@@ -221,4 +226,18 @@ button {
 .dark .list-item.active {
   background-color: #0f4c9c;
   color: #ffffff;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* MainSpace.css */
+.scrollbar-hidden {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }

@@ -64,7 +64,7 @@ export async function generateMetadata({
       "programming practice",
       "code walkthrough",
       "beginner programming problems",
-      ...(post?.topics ?? "Exercise"),
+      ...(post?.topics.map((t) => t.name) ?? "Exercise"),
     ],
   }
 }

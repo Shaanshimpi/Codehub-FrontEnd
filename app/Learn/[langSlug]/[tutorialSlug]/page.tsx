@@ -27,7 +27,7 @@ export default async function Page(context: {
   if (!tutorial) return <div>Tutorial not found</div>
 
   return (
-    <div className="flex min-h-[100vh]">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar tutorials={tutorials} langSlug={langSlug} />
       <MainSpace tutorial={tutorial} />
     </div>

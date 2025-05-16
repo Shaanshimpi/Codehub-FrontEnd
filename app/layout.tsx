@@ -81,15 +81,14 @@ export default function RootLayout({
         className={`relative ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-          {" "}
-          {/* 👈 Wrap the entire UI inside ThemeProvider */}
           <ThemeClientWrapper>
             <Suspense>
-              <Header />
-              {/* <Socials /> */}
+              <div className="flex min-h-screen flex-col">
+                <Header />
+                <main className="flex-1">{children}</main>
+                <EndSection WALink={WALink} />
+              </div>
               <Analytics />
-              {children}
-              <EndSection WALink={WALink} />
             </Suspense>
           </ThemeClientWrapper>
         </ThemeProvider>

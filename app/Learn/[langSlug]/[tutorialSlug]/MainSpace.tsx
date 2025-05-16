@@ -14,8 +14,13 @@ function MainSpace({ tutorial }: { tutorial: any }) {
   const formattedContent = formatContent(tutorial.Content || "")
 
   return (
-    <div className="p-8 pt-[10vh]">
-      <h1 className="mb-4 text-3xl font-bold">{tutorial.Title}</h1>
+    <div
+      className="scrollbar-hidden flex-1 overflow-y-auto sm:p-8"
+      data-lenis-prevent
+    >
+      <h1 className="mb-4 ml-2 mt-[10vh] text-3xl font-bold md:ml-0">
+        {tutorial.Title}
+      </h1>
       <div
         className="content-container dark:bg-black dark:text-white"
         dangerouslySetInnerHTML={{ __html: formattedContent }}
