@@ -59,7 +59,7 @@ export default function Socials() {
       target={href.startsWith("http") ? "_blank" : "_self"}
       rel={href.startsWith("http") ? "noreferrer" : undefined}
       className={cn(
-        "text-md relative z-[500] bg-black px-1 font-medium tracking-wider text-white mix-blend-difference before:absolute before:left-0 before:top-0 before:z-[-1] before:h-full before:w-0 before:bg-white before:transition-all before:content-[''] hover:text-black hover:before:w-full md:block md:text-lg",
+        "text-md relative z-[500] w-full bg-black px-1 font-medium tracking-wider text-white mix-blend-difference before:absolute before:left-0 before:top-0 before:z-[-1] before:h-full before:w-0 before:bg-white before:transition-all before:content-[''] hover:text-black hover:before:w-full md:block md:text-lg",
         { "before:bg-primary-ch hover:text-white": whiteBg },
         { hidden: !showMd }
       )}
@@ -71,13 +71,13 @@ export default function Socials() {
   return (
     <div
       id="socials-section"
-      className="fixed top-0 z-[5000] flex h-[10vh] w-screen items-center justify-end bg-transparent pr-1 md:flex md:pr-10"
+      className="fixed top-0 z-[100] flex h-[10vh] w-screen items-center justify-end bg-transparent pr-1 md:flex md:pr-10"
       style={{ translate: "none" }}
     >
       <div
         className={cn(
           reckoner.className,
-          "flex items-center gap-2 transition-all"
+          "absolute right-3 top-3 flex flex-col-reverse items-center gap-2 transition-all md:flex-row"
         )}
       >
         {links.map((link, index) => (
@@ -86,7 +86,7 @@ export default function Socials() {
         {pathname != "/" && (
           <button
             onClick={toggleTheme}
-            className="text-md right-3 z-[5000] rounded-full border border-gray-300 bg-white px-3 py-1 shadow dark:bg-black dark:text-white md:text-lg"
+            className="text-md right-3 z-[5000] rounded-full border border-gray-300 bg-white px-2 py-1 shadow dark:bg-black dark:text-white md:text-lg"
           >
             {theme === "dark" ? "🌞 Light" : "🌙 Dark"}
           </button>
