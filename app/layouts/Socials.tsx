@@ -86,9 +86,12 @@ export default function Socials() {
         {pathname != "/" && (
           <button
             onClick={toggleTheme}
-            className="text-md right-3 z-[5000] rounded-full border border-gray-300 bg-white px-2 py-1 shadow dark:bg-black dark:text-white md:text-lg"
+            className={cn(
+              reckoner.className,
+              "text-md z-[5000] rounded-full border border-gray-300 bg-white px-2 py-1 shadow dark:bg-black dark:text-white md:text-lg"
+            )}
           >
-            {theme === "dark" ? "🌞 Light" : "🌙 Dark"}
+            {theme === "dark" ? "🌞" : "🌙"}
           </button>
         )}
       </div>

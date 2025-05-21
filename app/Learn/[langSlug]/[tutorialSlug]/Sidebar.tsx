@@ -48,7 +48,7 @@ function Sidebar({
 
       {/* Sidebar overlay for mobile */}
       <div
-        className={`fixed inset-0 z-[500] w-[80vw] transform bg-white py-[10vh] transition-transform duration-300 ease-in-out dark:bg-slate-900 ${
+        className={`fixed inset-0 z-[300] w-[80vw] transform bg-white py-[10vh] transition-transform duration-300 ease-in-out dark:bg-slate-900 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } md:static md:block md:h-full md:w-[15vw] md:min-w-[15vw] md:translate-x-0`}
         style={{ maxHeight: "100vh", overflowY: "auto" }}
