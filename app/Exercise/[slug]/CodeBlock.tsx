@@ -2,6 +2,7 @@
 
 // Necessary for client-side rendering in Next.js
 import React, { useEffect, useState } from "react"
+import { useTheme } from "@/app/theme-context"
 import { codeToHtml } from "shiki"
 
 interface CodeBlockProps {
@@ -11,19 +12,21 @@ interface CodeBlockProps {
 const CodeBlock: React.FC<CodeBlockProps> = ({ code, language }) => {
   const [highlightedCode, setHighlightedCode] = useState("")
 
+  const { theme } = useTheme()
+
   useEffect(() => {
     async function highlightCode() {
       const html = await codeToHtml(code, {
         lang: language,
-        theme: "github-dark", // Change this to any supported Shiki theme
+        theme: theme === "dark" ? "github-dark" : "light-plus",
       })
       setHighlightedCode(html)
     }
     highlightCode()
-  }, [code, language])
+  }, [code, language, theme])
 
   return (
-    <div className="overflow-x-hidden rounded-lg md:w-[60vw] md:max-w-[1200px]">
+    <div className="overflow-x-hidden rounded-lg md:w-[50vw] md:max-w-[1200px]">
       {/* Code Header */}
       <div className="flex items-center gap-2 bg-blue-800 px-4 py-2">
         <div className="flex gap-2">
@@ -36,9 +39,9 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, language }) => {
 
       {/* Code Content */}
       <div
-        className="overflow-x-scroll p-4 text-sm"
+        className="overflow-x-scroll bg-[#e2e1e1] p-4 text-sm dark:bg-black"
         style={{
-          background: "#1e1e1e",
+          // background: "#1e1e1e",
           borderRadius: "0 0 0.5rem 0.5rem",
           fontSize: "14px",
           whiteSpace: "pre-wrap",

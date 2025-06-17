@@ -114,7 +114,7 @@ const AddExercisePage = () => {
   }
 
   return (
-    <div className="bg-[#0F172A] px-[5vw] py-14 text-white lg:px-[20vw]">
+    <div className="bg-white px-[5vw] py-14 text-black dark:bg-[#0F172A] dark:text-white lg:px-[20vw]">
       <h1 className="mb-6 text-3xl font-bold">Ask your own Exercise</h1>
 
       <form onSubmit={handleSubmit}>
@@ -129,7 +129,7 @@ const AddExercisePage = () => {
         <button
           type="submit"
           disabled={loading}
-          className={`mt-4 w-full rounded-md bg-blue-600 px-4 py-2 font-semibold transition hover:bg-blue-700 ${loading ? `opacity-50` : `opacity-100`}`}
+          className={`mt-4 w-full rounded-md bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 ${loading ? `opacity-50` : `opacity-100`}`}
         >
           {loading ? "Generating..." : "Generate Exercise"}
         </button>
