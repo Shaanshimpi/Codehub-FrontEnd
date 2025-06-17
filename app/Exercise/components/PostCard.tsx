@@ -15,7 +15,8 @@ function PostCard({ post }: { post: any }) {
 
   return (
     <Link href={`/Exercise/${slug}`} className="block h-full self-start">
-      <div className="relative z-0 flex h-full min-h-[200px] flex-col rounded-lg bg-blue-900 p-3 pb-20 text-white transition-colors hover:bg-blue-700 dark:bg-opacity-30 dark:hover:bg-opacity-40">
+      <div className="relative z-0 flex h-full min-h-[200px] flex-col rounded-lg bg-sky-200 p-3 pb-20 text-gray-800 transition-colors hover:bg-sky-400 dark:bg-[#1E2F53] dark:text-white dark:hover:bg-blue-800">
+        {/* hover:bg-[#1E2F53] dark:bg-opacity-30 dark:hover:bg-[#1E293B] dark:hover:bg-opacity-40 */}
         <div className="flex justify-between">
           <span className="flex justify-start text-lg font-bold">
             {post.index + 1}.
@@ -51,10 +52,11 @@ function PostCard({ post }: { post: any }) {
             </button>
           </div>
 
-          <div className="flex flex-grow flex-row-reverse flex-wrap gap-2 dark:text-gray-200">
+          <div className="flex flex-grow flex-row-reverse flex-wrap gap-2 text-white">
             {post.programming_languages?.slice(0, 2).map((lang: any) => (
               <span
-                className="rounded-md bg-gray-300 bg-opacity-40 p-1 text-center text-xs dark:bg-slate-50 dark:bg-opacity-20"
+                // className="rounded-md bg-gray-300 bg-opacity-40 p-1 text-center text-xs dark:bg-slate-50 dark:bg-opacity-20"
+                className="rounded-md bg-gray-900 bg-opacity-40 p-1 text-xs dark:bg-slate-50 dark:bg-opacity-20"
                 key={lang.documentId}
               >
                 {lang.Name}
@@ -78,7 +80,7 @@ function PostCard({ post }: { post: any }) {
 
               return topicsToShow.map((topic: any) => (
                 <span
-                  className="rounded-md bg-gray-300 bg-opacity-40 p-1 text-xs dark:bg-slate-50 dark:bg-opacity-20"
+                  className="rounded-md bg-gray-900 bg-opacity-40 p-1 text-xs dark:bg-slate-50 dark:bg-opacity-20"
                   key={topic.documentId}
                 >
                   {topic.Name}

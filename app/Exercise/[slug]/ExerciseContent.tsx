@@ -118,7 +118,7 @@ const ExerciseContent = ({ post, codeString, language }) => {
               className={`px-4 py-2 text-sm font-medium transition-all ${
                 selectedLanguage === lang
                   ? "rounded-t-lg bg-white p-3 text-[#1E2F53] dark:bg-[#1E2F53] dark:bg-opacity-100 dark:text-slate-300"
-                  : "rounded-sm bg-gray-200 text-black dark:bg-gray-100"
+                  : "rounded-lg bg-gray-600 text-white dark:bg-gray-100 dark:text-black"
               }`}
               onClick={() => setSelectedLanguage(lang)}
             >
