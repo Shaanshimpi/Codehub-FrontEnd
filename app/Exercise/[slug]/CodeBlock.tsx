@@ -26,7 +26,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, language }) => {
   }, [code, language, theme])
 
   return (
-    <div className="overflow-x-hidden rounded-lg md:w-[50vw] md:max-w-[1200px]">
+    <div className="w-full overflow-x-hidden rounded-lg">
       {/* Code Header */}
       <div className="flex items-center gap-2 bg-blue-800 px-4 py-2">
         <div className="flex gap-2">

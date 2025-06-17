@@ -99,7 +99,8 @@
   color: #93c5fd; /* blue-300 */
 }
 
-.keyword {
+.keyword,
+p code {
   font-family: monospace;
   background-color: #f0f0f0;
   padding: 2px 4px;
@@ -107,7 +108,8 @@
   color: #d63384; /* example: purple */
 }
 /* Inline code style */
-.keyword {
+.keyword,
+p code {
   font-family: monospace;
   background-color: #f0f0f0;
   padding: 2px 4px;
@@ -115,7 +117,8 @@
   color: #d63384; /* pink/purple */
 }
 
-.dark .keyword {
+.dark .keyword,
+.dark p code {
   background-color: #334155; /* slate-700 */
   color: #f472b6; /* pink-400 */
 }

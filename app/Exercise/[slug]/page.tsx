@@ -48,7 +48,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      url: `https://codehubindia.in/Exercise/${params.slug}`,
+      url: `https://codehubindia.in/Exercise/${params?.slug}`,
       type: "article",
     },
     twitter: {

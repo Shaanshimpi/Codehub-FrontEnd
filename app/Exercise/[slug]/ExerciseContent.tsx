@@ -76,7 +76,7 @@ const ExerciseContent = ({ post, codeString, language }) => {
         <h3 className="inline-block w-full rounded-t-md bg-[#1E2F53] p-3 text-4xl font-semibold text-white dark:bg-[#0F172A]">
           Hints
         </h3>
-        <div className="min-h-[40vh] whitespace-pre-wrap bg-blue-300 p-3 text-[#1E2F53] dark:bg-[#1E2F53] dark:bg-opacity-100 dark:text-slate-300">
+        <div className="min-h-[40vh] whitespace-pre-wrap bg-sky-200 p-3 text-[#1E2F53] dark:bg-[#1E2F53] dark:bg-opacity-100 dark:text-slate-300">
           <ReactMarkdown>{post.Hints}</ReactMarkdown>
         </div>
       </div>
