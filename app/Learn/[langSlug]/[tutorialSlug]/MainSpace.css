@@ -3,7 +3,7 @@
   padding: 2rem;
   font-family: "Inter", sans-serif;
   color: #1f2937; /* gray-800 */
-  background-color: oklch(92.8% 0.006 264.531);
+  background-color: #e0f2fe;
 }
 
 .dark .content-container {
