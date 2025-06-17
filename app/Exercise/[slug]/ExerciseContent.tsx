@@ -67,16 +67,16 @@ const ExerciseContent = ({ post, codeString, language }) => {
       )}
 
       {/* Title */}
-      <h2 className="rounded-md bg-[#1E2F53] p-[2vh] text-2xl font-bold text-white dark:bg-[#0F172A]">
+      <h2 className="rounded-md bg-sky-200 p-[2vh] text-2xl font-bold text-gray-800 dark:bg-[#0F172A] dark:text-white">
         {post.Title}
       </h2>
 
       {/* Hints Section */}
       <div className="text-primary-ch mt-6 min-h-[400px]">
-        <h3 className="inline-block w-full rounded-t-md bg-[#1E2F53] p-3 text-4xl font-semibold text-white dark:bg-[#0F172A]">
+        <h3 className="inline-block w-full rounded-t-md bg-sky-200 p-3 text-4xl font-semibold text-gray-800 dark:bg-[#0F172A] dark:text-white">
           Hints
         </h3>
-        <div className="min-h-[40vh] whitespace-pre-wrap bg-sky-200 p-3 text-[#1E2F53] dark:bg-[#1E2F53] dark:bg-opacity-100 dark:text-slate-300">
+        <div className="min-h-[40vh] whitespace-pre-wrap bg-white p-3 text-[#1E2F53] dark:bg-[#1E2F53] dark:bg-opacity-100 dark:text-slate-300">
           <ReactMarkdown>{post.Hints}</ReactMarkdown>
         </div>
       </div>
@@ -84,7 +84,7 @@ const ExerciseContent = ({ post, codeString, language }) => {
       {/* Code Toggle Button */}
       <div className="mt-4">
         <button
-          className="w-full rounded-md bg-[#1E2F53] px-4 py-2 text-white transition-all hover:bg-blue-600 dark:bg-[#0F172A]"
+          className="w-full rounded-md bg-sky-200 px-4 py-2 text-gray-800 transition-all dark:bg-[#0F172A] dark:text-white"
           onClick={() => setShowCode(!showCode)}
         >
           {showCode ? "Hide Code" : "Show Code"}
@@ -101,7 +101,8 @@ const ExerciseContent = ({ post, codeString, language }) => {
       {/* Explanation Toggle Button */}
       <div className="mt-4">
         <button
-          className="w-full rounded-md bg-[#1E2F53] px-4 py-2 text-white transition-all hover:bg-blue-600 dark:bg-[#0F172A]"
+          // className="w-full rounded-md bg-[#1E2F53] px-4 py-2 text-white transition-all dark:bg-[#0F172A]"
+          className="w-full rounded-md bg-sky-200 px-4 py-2 text-gray-800 transition-all dark:bg-[#0F172A] dark:text-white"
           onClick={() => setShowExplanation(!showExplanation)}
         >
           {showExplanation ? "Hide Explanation" : "Show Explanation"}
