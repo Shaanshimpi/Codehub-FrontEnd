@@ -117,7 +117,7 @@ const ExerciseContent = ({ post, codeString, language }) => {
               key={lang}
               className={`px-4 py-2 text-sm font-medium transition-all ${
                 selectedLanguage === lang
-                  ? "rounded-t-lg bg-blue-600 text-white dark:bg-blue-900"
+                  ? "rounded-t-lg bg-white p-3 text-[#1E2F53] dark:bg-[#1E2F53] dark:bg-opacity-100 dark:text-slate-300"
                   : "rounded-sm bg-gray-200 text-black dark:bg-gray-100"
               }`}
               onClick={() => setSelectedLanguage(lang)}
@@ -130,7 +130,7 @@ const ExerciseContent = ({ post, codeString, language }) => {
 
       {/* Explanation Section */}
       {showExplanation && (
-        <div className="ex-desc min-h-[400px] w-full max-w-[85vw] overflow-auto rounded-b-md rounded-tr-md bg-gradient-to-t from-gray-800 to-blue-600 p-4 text-[#E1E4E8] dark:to-blue-900">
+        <div className="ex-desc min-h-[400px] w-full max-w-[85vw] overflow-auto rounded-b-md rounded-tr-md bg-white p-3 text-[#1E2F53] dark:bg-[#1E2F53] dark:bg-opacity-100 dark:text-slate-300">
           <h3 className="mb-3 text-xl font-semibold">Explanation</h3>
           <div className="ff-expl my-2">
             <ReactMarkdown>
