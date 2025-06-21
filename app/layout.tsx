@@ -74,9 +74,14 @@ export default function RootLayout({
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
 
+        // GA4
         gtag('config', 'G-WSTK7J1CKR');
-        `}
+
+        // Google Ads
+        gtag('config', 'AW-16774184716');
+      `}
       </Script>
+
       <body
         className={`relative ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -90,6 +95,7 @@ export default function RootLayout({
               </div>
               <Analytics />
             </Suspense>
+            {/* <PopupForm /> */}
           </ThemeClientWrapper>
         </ThemeProvider>
       </body>
