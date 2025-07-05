@@ -18,7 +18,7 @@ export async function fetchCollection(
   if (limit) params.append("limit", limit.toString());
 
   // Build URL manually to preserve square brackets in where clause
-  let url = `${process.env.NEXT_PUBLIC_PAYLOAD_API_URL}/${collectionSlug}`;
+  let url = `${process.env.PAYLOAD_API_URL}/${collectionSlug}`;
   const paramString = params.toString();
 
   if (paramString || where) {
