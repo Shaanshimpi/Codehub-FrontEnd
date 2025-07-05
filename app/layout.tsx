@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import PopupForm from "@/components/ui/PopupForm"
 import { Analytics } from "@vercel/analytics/react"
 import type { Metadata } from "next"
 import Script from "next/script"
@@ -95,7 +96,7 @@ export default function RootLayout({
               </div>
               <Analytics />
             </Suspense>
-            {/* <PopupForm /> */}
+            {process.env.ENVIRONMENT != "DEV" && <PopupForm />}
           </ThemeClientWrapper>
         </ThemeProvider>
       </body>

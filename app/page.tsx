@@ -76,7 +76,7 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <ScreenLoaderNew />
+      {process.env.ENVIRONMENT != "DEV" && <ScreenLoaderNew />}
       <HeroSection />
       <FixedSection WALink={WALink} />
       <PinSection WALink={WALink} />
