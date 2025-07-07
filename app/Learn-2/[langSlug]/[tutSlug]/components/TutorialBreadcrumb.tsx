@@ -16,7 +16,10 @@ const TutorialBreadcrumb: React.FC<TutorialBreadcrumbProps> = ({
 
   return (
     <nav className="mb-8 flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400">
-      <Link href="/" className="hover:text-blue-600 dark:hover:text-blue-400">
+      <Link
+        href={`/${baseSegment}`}
+        className="hover:text-blue-600 dark:hover:text-blue-400"
+      >
         Learn
       </Link>
       <span>/</span>

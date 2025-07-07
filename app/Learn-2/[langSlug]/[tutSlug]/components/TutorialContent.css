@@ -47,7 +47,7 @@
 
 /* Code Blocks */
 .tutorial-content .code-block {
-  @apply mb-8 rounded-xl border border-slate-700 bg-gradient-to-br from-slate-900 to-slate-800 shadow-lg transition-transform duration-300 hover:shadow-xl;
+  @apply mb-8 rounded-xl border border-slate-700 bg-gradient-to-br from-slate-900 to-slate-800 p-4 shadow-lg transition-transform duration-300 hover:shadow-xl;
 }
 .tutorial-content .code-block:hover {
   @apply scale-[1.02] transform shadow-blue-600/20;
@@ -101,11 +101,12 @@
 }
 
 /* Explanation after code block */
-.tutorial-content .code-block + p {
-  @apply mb-6 mt-4 rounded-lg border-l-4 border-blue-600 bg-sky-50 p-4 text-base text-slate-600 dark:border-blue-400 dark:bg-slate-800 dark:text-slate-400;
-}
+
 .tutorial-content .code-block + p strong {
   @apply font-semibold text-blue-800 dark:text-blue-300;
+}
+.tutorial-content .code-block p {
+  @apply mb-6 mt-4 rounded-lg border-l-4 border-blue-600 bg-sky-50 p-4 text-base text-slate-600 dark:border-blue-400 dark:bg-slate-900 dark:text-slate-200;
 }
 
 /* Green Header for Examples */
@@ -207,4 +208,11 @@
 .tutorial-content .content-topic-title strong,
 .tutorial-content .content-topic-subtitle strong {
   @apply bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text font-bold text-transparent;
+}
+.tutorial-content .table-wrapper {
+  @apply mb-8 w-full overflow-x-auto;
+}
+
+.tutorial-content .table-wrapper table {
+  @apply min-w-[600px]; /* prevent squishing on small screens */
 }

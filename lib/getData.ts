@@ -4,7 +4,7 @@ import { Language, Tutorial } from "@/app/Learn-2/types/TutorialTypes";
 // Returns all languages or single language by slug
 export async function getLanguageBySlug(
   langSlug?: string,
-): Promise<Language[] | Language | null> {
+): Promise<Language | null> {
   try {
     if (!langSlug) {
       const languages = await fetchCollection("programming-languages", {

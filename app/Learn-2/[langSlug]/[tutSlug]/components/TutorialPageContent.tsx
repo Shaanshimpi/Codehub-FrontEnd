@@ -14,7 +14,7 @@ const TutorialPageContent: React.FC<TutorialPageContentProps> = ({
   nextTutorial,
 }) => {
   return (
-    <div className="grid min-h-screen place-items-center bg-white dark:bg-slate-900">
+    <div className="min-h-screen bg-white dark:bg-slate-900">
       {/* Sidebar */}
       <TutorialSidebar
         tutorials={allTutorials}

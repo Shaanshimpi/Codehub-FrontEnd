@@ -1,6 +1,7 @@
 import { fetchCollection } from "@/lib/FetchDataPayload"
+import { getLanguageBySlug, getTutorialsByLanguageId } from "@/lib/getData"
 import { notFound } from "next/navigation"
-import { Language, Tutorial } from "../types/TutorialTypes"
+import { Language } from "../types/TutorialTypes"
 import LanguageHeader from "./LanguageHeader"
 import TutorialsList from "./TutorialsList"
 
@@ -10,35 +11,35 @@ interface LanguagePageProps {
   }>
 }
 
-async function getLanguageBySlug(langSlug: string): Promise<Language | null> {
-  try {
-    const languages = await fetchCollection("programming-languages", {
-      where: `[slug][equals]=${langSlug}`,
-    })
+// async function getLanguageBySlug(langSlug: string): Promise<Language | null> {
+//   try {
+//     const languages = await fetchCollection("programming-languages", {
+//       where: `[slug][equals]=${langSlug}`,
+//     })
 
-    return languages.length > 0 ? languages[0] : null
-  } catch (error) {
-    console.error("Error fetching language:", error)
-    return null
-  }
-}
+//     return languages.length > 0 ? languages[0] : null
+//   } catch (error) {
+//     console.error("Error fetching language:", error)
+//     return null
+//   }
+// }
 
-async function getTutorialsByLanguageId(
-  languageId: string | number
-): Promise<Tutorial[]> {
-  try {
-    const tutorials = await fetchCollection("tutorials", {
-      where: `programmingLanguage[equals]=${languageId}`,
-      sort: "index",
-      depth: 2,
-    })
+// async function getTutorialsByLanguageId(
+//   languageId: string | number
+// ): Promise<Tutorial[]> {
+//   try {
+//     const tutorials = await fetchCollection("tutorials", {
+//       where: `programmingLanguage[equals]=${languageId}`,
+//       sort: "index",
+//       depth: 2,
+//     })
 
-    return tutorials
-  } catch (error) {
-    console.error("Error fetching tutorials:", error)
-    return []
-  }
-}
+//     return tutorials
+//   } catch (error) {
+//     console.error("Error fetching tutorials:", error)
+//     return []
+//   }
+// }
 
 export default async function LanguagePage({ params }: LanguagePageProps) {
   const { langSlug } = await params
