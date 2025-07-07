@@ -1,0 +1,416 @@
+/* Tutorial Content Styling - Matching Theme with Dark Mode */
+
+/* CSS Variables for Theme Colors */
+:root {
+  /* Light Mode Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+  --accent-primary: #2563eb;
+  --accent-secondary: #0ea5e9;
+  --accent-tertiary: #10b981;
+  --border-color: #e2e8f0;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --code-bg: #1e293b;
+  --code-text: #e2e8f0;
+  --table-header: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+}
+
+/* Dark Mode Colors */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    --accent-primary: #3b82f6;
+    --accent-secondary: #0ea5e9;
+    --accent-tertiary: #10b981;
+    --border-color: #334155;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --code-bg: #0f172a;
+    --code-text: #e2e8f0;
+    --table-header: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  }
+}
+
+/* Dark mode class override */
+.dark {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #94a3b8;
+  --accent-primary: #3b82f6;
+  --accent-secondary: #0ea5e9;
+  --accent-tertiary: #10b981;
+  --border-color: #334155;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --code-bg: #0f172a;
+  --code-text: #e2e8f0;
+  --table-header: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+}
+
+/* Typography and Base Styles */
+/* body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  margin: 0;
+  padding: 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+} */
+
+/* Content Container */
+.tutorial-content {
+  max-width: 900px;
+  margin: 0 auto;
+  background: var(--bg-primary);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow:
+    0 4px 6px -1px var(--shadow-color),
+    0 2px 4px -1px var(--shadow-color);
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* Headings */
+.content-topic-title {
+  color: var(--text-primary);
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 3px solid var(--accent-primary);
+  font-size: 1.5rem;
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.content-topic-title:first-child {
+  margin-top: 0;
+  font-size: 2rem;
+  color: var(--accent-primary);
+}
+
+.content-topic-subtitle {
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  padding-left: 1rem;
+  border-left: 4px solid var(--accent-tertiary);
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Paragraphs */
+p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  transition: color 0.3s ease;
+}
+
+p strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Lists */
+ul {
+  margin: 1rem 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+ul li {
+  position: relative;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  transition: color 0.3s ease;
+}
+
+ul li::before {
+  content: "▶";
+  position: absolute;
+  left: 0;
+  color: var(--accent-primary);
+  font-size: 0.8rem;
+  top: 0.1rem;
+}
+
+ul li strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Code Blocks */
+.code-block {
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px var(--shadow-color);
+  position: relative;
+  transition: box-shadow 0.3s ease;
+}
+
+.code-block::before {
+  content: "C";
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  background: var(--accent-primary);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.code-block pre {
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 1.5rem;
+  margin: 0;
+  overflow-x: auto;
+  font-family: "Fira Code", "Monaco", "Consolas", monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* Inline Code */
+code {
+  background: var(--bg-tertiary);
+  color: var(--accent-primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-family: "Fira Code", "Monaco", "Consolas", monospace;
+  font-size: 0.9em;
+  font-weight: 500;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px var(--shadow-color);
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+table thead {
+  background: var(--table-header);
+  color: white;
+}
+
+table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+table tbody tr:hover {
+  background: var(--bg-tertiary);
+  transition: background-color 0.2s ease;
+}
+
+table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+table td code {
+  background: var(--bg-tertiary);
+  color: var(--accent-primary);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+}
+
+/* Special Styling for Explanations */
+p:has(strong:first-child) {
+  background: var(--bg-tertiary);
+  border-left: 4px solid var(--accent-secondary);
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 0 8px 8px 0;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+p:has(strong:first-child) strong {
+  color: var(--accent-secondary);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-secondary);
+}
+
+/* Selection Styling */
+::selection {
+  background: var(--accent-primary);
+  color: white;
+}
+
+/* Focus Styles for Accessibility */
+table:focus-within,
+.code-block:focus-within {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  .tutorial-content {
+    padding: 1rem;
+    margin: 0;
+  }
+
+  .content-topic-title:first-child {
+    font-size: 1.75rem;
+  }
+
+  .content-topic-title {
+    font-size: 1.25rem;
+  }
+
+  .content-topic-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .code-block pre {
+    padding: 1rem;
+    font-size: 0.8rem;
+  }
+
+  table {
+    font-size: 0.8rem;
+  }
+
+  table th,
+  table td {
+    padding: 0.5rem;
+  }
+
+  /* Horizontal scroll for tables on mobile */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  table thead,
+  table tbody,
+  table tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+}
+
+/* Print Styles */
+@media print {
+  :root {
+    --bg-primary: white;
+    --bg-secondary: white;
+    --bg-tertiary: #f5f5f5;
+    --text-primary: black;
+    --text-secondary: #333;
+    --text-tertiary: #666;
+    --accent-primary: #2563eb;
+    --accent-secondary: #0ea5e9;
+    --accent-tertiary: #10b981;
+    --border-color: #ccc;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --code-bg: #f5f5f5;
+    --code-text: black;
+  }
+
+  body {
+    background: white;
+    color: black;
+    padding: 0;
+  }
+
+  .tutorial-content {
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .code-block pre {
+    border: 1px solid #ccc;
+  }
+
+  table {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+}

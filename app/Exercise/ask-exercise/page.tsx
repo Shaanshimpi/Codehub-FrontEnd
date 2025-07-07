@@ -101,7 +101,6 @@ const AddExercisePage = () => {
       })
 
       const data = await res.json()
-      console.log(data)
       const content = data.choices?.[0]?.message?.content
       const parsed = JSON.parse(content)
       // console.log(parsed)

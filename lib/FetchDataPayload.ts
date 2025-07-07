@@ -1,34 +1,33 @@
+import qs from "qs";
+
 export async function fetchCollection(
   collectionSlug: string,
   {
     depth = 1,
-    sort = "",
+    sort,
     limit = 100,
-    where = "",
+    where,
   }: {
     depth?: number;
     sort?: string;
     limit?: number;
-    where?: string;
+    where?: Record<string, any>;
   } = {},
 ) {
-  const params = new URLSearchParams();
-  if (depth) params.append("depth", depth.toString());
-  if (sort) params.append("sort", sort);
-  if (limit) params.append("limit", limit.toString());
+  const queryObject: Record<string, any> = {
+    depth,
+    limit,
+  };
 
-  // Build URL manually to preserve square brackets in where clause
-  let url = `${process.env.PAYLOAD_API_URL}/${collectionSlug}`;
-  const paramString = params.toString();
+  if (sort) queryObject.sort = sort;
+  if (where) queryObject.where = where; // ⬅️ Proper nesting for Payload
 
-  if (paramString || where) {
-    url += "?";
-    if (paramString) url += paramString;
-    if (where) {
-      url += paramString ? "&" : "";
-      url += `where${where}`; // Don't encode this
-    }
-  }
+  const queryString = qs.stringify(queryObject, {
+    addQueryPrefix: true,
+    encode: false,
+  });
+
+  const url = `${process.env.PAYLOAD_API_URL}/${collectionSlug}${queryString.replace(`where=`, `where`)}`;
 
   try {
     const res = await fetch(url, {
