@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { TutorialBreadcrumbProps } from "@/app/Learn-2/types/TutorialTypes"
+import { TutorialBreadcrumbProps } from "@/app/Learn/types/TutorialTypes"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 

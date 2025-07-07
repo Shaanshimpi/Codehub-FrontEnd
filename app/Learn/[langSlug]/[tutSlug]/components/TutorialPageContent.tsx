@@ -1,5 +1,5 @@
 import React from "react"
-import { TutorialPageContentProps } from "@/app/Learn-2/types/TutorialTypes"
+import { TutorialPageContentProps } from "@/app/Learn/types/TutorialTypes"
 import TutorialBreadcrumb from "./TutorialBreadcrumb"
 import TutorialContent from "./TutorialContent"
 import TutorialHeader from "./TutorialHeader"

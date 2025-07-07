@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { TutorialNavigationProps } from "@/app/Learn-2/types/TutorialTypes"
+import { TutorialNavigationProps } from "@/app/Learn/types/TutorialTypes"
 import { ArrowLeft, ArrowRight, Book } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"

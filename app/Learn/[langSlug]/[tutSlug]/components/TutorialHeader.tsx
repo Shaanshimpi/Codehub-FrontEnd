@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { TutorialHeaderProps } from "@/app/Learn-2/types/TutorialTypes"
+import { TutorialHeaderProps } from "@/app/Learn/types/TutorialTypes"
 import { readTime } from "../../utils"
 
 const TutorialHeader: React.FC<TutorialHeaderProps> = ({

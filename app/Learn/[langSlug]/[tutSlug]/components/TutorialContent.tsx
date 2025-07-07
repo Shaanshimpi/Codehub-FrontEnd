@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect } from "react"
-import { TutorialContentProps } from "@/app/Learn-2/types/TutorialTypes"
+import { TutorialContentProps } from "@/app/Learn/types/TutorialTypes"
 import "./TutorialContent.css"
 
 const TutorialContent: React.FC<TutorialContentProps> = ({ content }) => {

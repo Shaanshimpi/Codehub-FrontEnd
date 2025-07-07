@@ -1,5 +1,5 @@
 import { fetchCollection } from "@/lib/FetchDataPayload";
-import { Language, Tutorial } from "@/app/Learn-2/types/TutorialTypes";
+import { Language, Tutorial } from "@/app/Learn/types/TutorialTypes";
 
 // Returns all languages or single language by slug
 export async function getLanguageBySlug(

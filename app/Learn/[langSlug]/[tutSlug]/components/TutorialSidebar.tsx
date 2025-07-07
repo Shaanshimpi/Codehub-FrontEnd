@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { Language, Tutorial } from "@/app/Learn-2/types/TutorialTypes"
+import { Language, Tutorial } from "@/app/Learn/types/TutorialTypes"
 import { BookOpen, ChevronLeft, ChevronRight, Clock } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
