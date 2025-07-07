@@ -1,416 +1,210 @@
-/* Tutorial Content Styling - Matching Theme with Dark Mode */
-
-/* CSS Variables for Theme Colors */
-:root {
-  /* Light Mode Colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --bg-tertiary: #f1f5f9;
-  --text-primary: #1e293b;
-  --text-secondary: #475569;
-  --text-tertiary: #64748b;
-  --accent-primary: #2563eb;
-  --accent-secondary: #0ea5e9;
-  --accent-tertiary: #10b981;
-  --border-color: #e2e8f0;
-  --shadow-color: rgba(0, 0, 0, 0.1);
-  --code-bg: #1e293b;
-  --code-text: #e2e8f0;
-  --table-header: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+/* Topic Titles */
+.tutorial-content .content-topic-title {
+  @apply relative mb-6 mt-12 text-3xl font-extrabold text-slate-900 dark:text-white sm:text-2xl;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* Dark Mode Colors */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --bg-tertiary: #334155;
-    --text-primary: #f1f5f9;
-    --text-secondary: #cbd5e1;
-    --text-tertiary: #94a3b8;
-    --accent-primary: #3b82f6;
-    --accent-secondary: #0ea5e9;
-    --accent-tertiary: #10b981;
-    --border-color: #334155;
-    --shadow-color: rgba(0, 0, 0, 0.3);
-    --code-bg: #0f172a;
-    --code-text: #e2e8f0;
-    --table-header: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
-  }
+.tutorial-content .content-topic-title:first-child {
+  @apply mt-0;
 }
 
-/* Dark mode class override */
-.dark {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-tertiary: #94a3b8;
-  --accent-primary: #3b82f6;
-  --accent-secondary: #0ea5e9;
-  --accent-tertiary: #10b981;
-  --border-color: #334155;
-  --shadow-color: rgba(0, 0, 0, 0.3);
-  --code-bg: #0f172a;
-  --code-text: #e2e8f0;
-  --table-header: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+.tutorial-content .content-topic-title::after {
+  content: "";
+  @apply absolute bottom-0 left-0 h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-blue-800;
 }
 
-/* Typography and Base Styles */
-/* body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.6;
-  color: var(--text-primary);
-  background-color: var(--bg-secondary);
-  margin: 0;
-  padding: 20px;
-  transition: background-color 0.3s ease, color 0.3s ease;
-} */
-
-/* Content Container */
-.tutorial-content {
-  max-width: 900px;
-  margin: 0 auto;
-  background: var(--bg-primary);
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow:
-    0 4px 6px -1px var(--shadow-color),
-    0 2px 4px -1px var(--shadow-color);
-  transition:
-    background-color 0.3s ease,
-    box-shadow 0.3s ease;
+/* Subtitles */
+.tutorial-content .content-topic-subtitle {
+  @apply mb-4 mt-8 flex items-center text-xl font-semibold text-slate-800 dark:text-gray-200;
 }
-
-/* Headings */
-.content-topic-title {
-  color: var(--text-primary);
-  font-weight: 700;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 3px solid var(--accent-primary);
-  font-size: 1.5rem;
-  transition:
-    color 0.3s ease,
-    border-color 0.3s ease;
-}
-
-.content-topic-title:first-child {
-  margin-top: 0;
-  font-size: 2rem;
-  color: var(--accent-primary);
-}
-
-.content-topic-subtitle {
-  color: var(--text-secondary);
-  font-weight: 600;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-  font-size: 1.25rem;
-  padding-left: 1rem;
-  border-left: 4px solid var(--accent-tertiary);
-  transition:
-    color 0.3s ease,
-    border-color 0.3s ease;
+.tutorial-content .content-topic-subtitle::before {
+  content: "▶";
+  @apply mr-2 text-base text-blue-600 dark:text-blue-400;
 }
 
 /* Paragraphs */
-p {
-  margin-bottom: 1rem;
-  font-size: 1rem;
-  line-height: 1.7;
-  color: var(--text-secondary);
-  transition: color 0.3s ease;
+.tutorial-content p {
+  @apply mb-6 text-lg leading-relaxed text-slate-700 dark:text-slate-300;
 }
 
-p strong {
-  color: var(--text-primary);
-  font-weight: 600;
+/* Unordered Lists */
+.tutorial-content ul {
+  @apply mb-8 space-y-3 rounded-lg border border-sky-200 bg-sky-50 p-6 dark:border-slate-700 dark:bg-slate-800;
 }
-
-/* Lists */
-ul {
-  margin: 1rem 0;
-  padding-left: 0;
-  list-style: none;
+.tutorial-content ul li {
+  @apply relative flex items-start pl-6 text-slate-700 dark:text-slate-300;
 }
-
-ul li {
-  position: relative;
-  margin-bottom: 0.5rem;
-  padding-left: 1.5rem;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  transition: color 0.3s ease;
+.tutorial-content ul li::before {
+  content: "";
+  @apply absolute left-0 top-2 h-3 w-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-800;
 }
-
-ul li::before {
-  content: "▶";
-  position: absolute;
-  left: 0;
-  color: var(--accent-primary);
-  font-size: 0.8rem;
-  top: 0.1rem;
-}
-
-ul li strong {
-  color: var(--text-primary);
-  font-weight: 600;
+.tutorial-content ul li strong {
+  @apply bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text font-semibold text-transparent;
 }
 
 /* Code Blocks */
-.code-block {
-  margin: 1.5rem 0;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px var(--shadow-color);
-  position: relative;
-  transition: box-shadow 0.3s ease;
+.tutorial-content .code-block {
+  @apply mb-8 rounded-xl border border-slate-700 bg-gradient-to-br from-slate-900 to-slate-800 shadow-lg transition-transform duration-300 hover:shadow-xl;
+}
+.tutorial-content .code-block:hover {
+  @apply scale-[1.02] transform shadow-blue-600/20;
+}
+.tutorial-content .code-block pre {
+  @apply overflow-x-auto rounded-xl p-6 font-mono text-sm text-slate-200;
 }
 
-.code-block::before {
-  content: "C";
-  position: absolute;
-  top: 0.5rem;
-  right: 0.75rem;
-  background: var(--accent-primary);
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  z-index: 1;
+.tutorial-content p code,
+.tutorial-content li code,
+.tutorial-content td code {
+  @apply rounded-md border border-sky-200 bg-sky-100 px-2 py-1 font-mono text-sm text-blue-800 shadow-sm dark:border-slate-600 dark:bg-slate-700 dark:text-blue-300;
 }
 
-.code-block pre {
-  background: var(--code-bg);
-  color: var(--code-text);
-  padding: 1.5rem;
-  margin: 0;
-  overflow-x: auto;
-  font-family: "Fira Code", "Monaco", "Consolas", monospace;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+.tutorial-content p strong,
+.tutorial-content li strong,
+.tutorial-content td strong {
+  @apply relative bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text font-bold text-transparent;
 }
 
-.code-block code {
-  background: none;
-  color: inherit;
-  padding: 0;
-  font-size: inherit;
+.tutorial-content strong::before {
+  content: "";
+  @apply absolute inset-0 -z-10 rounded-sm bg-gradient-to-r from-blue-50 to-sky-100 opacity-20 dark:from-slate-700 dark:to-slate-600;
 }
-
-/* Inline Code */
-code {
-  background: var(--bg-tertiary);
-  color: var(--accent-primary);
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-family: "Fira Code", "Monaco", "Consolas", monospace;
-  font-size: 0.9em;
-  font-weight: 500;
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+.tutorial-content p strong,
+.tutorial-content li strong {
+  @apply rounded-sm px-1 py-0.5;
 }
 
 /* Tables */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
-  background: var(--bg-primary);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px var(--shadow-color);
-  transition:
-    background-color 0.3s ease,
-    box-shadow 0.3s ease;
+.tutorial-content table {
+  @apply mb-8 w-full border-collapse overflow-hidden rounded-xl border bg-white shadow-lg dark:bg-slate-800;
+}
+.tutorial-content th {
+  @apply bg-gradient-to-r from-blue-600 to-blue-800 p-4 text-left font-semibold text-white;
+}
+.tutorial-content td {
+  @apply border-b border-slate-200 p-4 text-slate-700 dark:border-slate-600 dark:text-slate-300;
+}
+.tutorial-content tr:last-child td {
+  @apply border-b-0;
+}
+.tutorial-content tr:hover {
+  @apply bg-sky-50 dark:bg-slate-700/50;
+}
+.tutorial-content table code {
+  @apply rounded border border-sky-200 bg-sky-100 px-2 py-1 font-mono text-sm text-blue-800 shadow-sm dark:border-slate-500 dark:bg-slate-600 dark:text-blue-300;
+}
+.tutorial-content table strong {
+  @apply bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text px-1 py-0.5 text-transparent;
 }
 
-table thead {
-  background: var(--table-header);
-  color: white;
+/* Explanation after code block */
+.tutorial-content .code-block + p {
+  @apply mb-6 mt-4 rounded-lg border-l-4 border-blue-600 bg-sky-50 p-4 text-base text-slate-600 dark:border-blue-400 dark:bg-slate-800 dark:text-slate-400;
+}
+.tutorial-content .code-block + p strong {
+  @apply font-semibold text-blue-800 dark:text-blue-300;
 }
 
-table th {
-  padding: 1rem;
-  text-align: left;
-  font-weight: 600;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+/* Green Header for Examples */
+.tutorial-content h4.content-topic-subtitle:has(+ .code-block) {
+  @apply relative z-10 -mb-2 rounded-t-lg bg-gradient-to-r from-green-600 to-green-800 px-4 py-2 text-white;
 }
 
-table td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--border-color);
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  transition:
-    color 0.3s ease,
-    border-color 0.3s ease;
+/* Last topic title - remove underline */
+.tutorial-content .content-topic-title:last-of-type::after {
+  display: none;
 }
 
-table tbody tr:hover {
-  background: var(--bg-tertiary);
-  transition: background-color 0.2s ease;
-}
-
-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-table td code {
-  background: var(--bg-tertiary);
-  color: var(--accent-primary);
-  padding: 0.2rem 0.4rem;
-  border-radius: 3px;
-  font-size: 0.8rem;
-}
-
-/* Special Styling for Explanations */
-p:has(strong:first-child) {
-  background: var(--bg-tertiary);
-  border-left: 4px solid var(--accent-secondary);
-  padding: 1rem;
-  margin: 1rem 0;
-  border-radius: 0 8px 8px 0;
-  transition:
-    background-color 0.3s ease,
-    border-color 0.3s ease;
-}
-
-p:has(strong:first-child) strong {
-  color: var(--accent-secondary);
-}
-
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-tertiary);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--accent-primary);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-secondary);
-}
-
-/* Selection Styling */
-::selection {
-  background: var(--accent-primary);
-  color: white;
-}
-
-/* Focus Styles for Accessibility */
-table:focus-within,
-.code-block:focus-within {
-  outline: 2px solid var(--accent-primary);
-  outline-offset: 2px;
-}
-
-/* Responsive Design */
+/* Responsive Tweaks */
 @media (max-width: 768px) {
-  body {
-    padding: 10px;
+  .tutorial-content .content-topic-title {
+    @apply text-2xl;
   }
-
-  .tutorial-content {
-    padding: 1rem;
-    margin: 0;
+  .tutorial-content .content-topic-subtitle {
+    @apply text-lg;
   }
-
-  .content-topic-title:first-child {
-    font-size: 1.75rem;
+  .tutorial-content p {
+    @apply text-base;
   }
-
-  .content-topic-title {
-    font-size: 1.25rem;
+  .tutorial-content ul {
+    @apply p-4;
   }
-
-  .content-topic-subtitle {
-    font-size: 1.1rem;
-  }
-
-  .code-block pre {
-    padding: 1rem;
-    font-size: 0.8rem;
-  }
-
-  table {
-    font-size: 0.8rem;
-  }
-
-  table th,
-  table td {
-    padding: 0.5rem;
-  }
-
-  /* Horizontal scroll for tables on mobile */
-  table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-
-  table thead,
-  table tbody,
-  table tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
+  .tutorial-content .code-block pre {
+    @apply p-4;
   }
 }
+/* Fix text-wrapping issues for strong tags inside lists */
+.tutorial-content li strong,
+.tutorial-content p strong,
+.tutorial-content td strong {
+  @apply bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text font-semibold text-transparent;
+  white-space: normal !important;
+  display: inline; /* Allow proper line wrapping */
+  background-clip: text !important;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.5;
+}
 
-/* Print Styles */
-@media print {
-  :root {
-    --bg-primary: white;
-    --bg-secondary: white;
-    --bg-tertiary: #f5f5f5;
-    --text-primary: black;
-    --text-secondary: #333;
-    --text-tertiary: #666;
-    --accent-primary: #2563eb;
-    --accent-secondary: #0ea5e9;
-    --accent-tertiary: #10b981;
-    --border-color: #ccc;
-    --shadow-color: rgba(0, 0, 0, 0.1);
-    --code-bg: #f5f5f5;
-    --code-text: black;
-  }
+/* Remove problematic ::before layer that causes line spacing issues */
+.tutorial-content strong::before {
+  display: none;
+}
+/* Override strong styles specifically inside <li> */
+.tutorial-content ul li strong {
+  @apply font-semibold text-blue-700 dark:text-blue-300;
+  background: none !important; /* remove gradient */
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: initial !important;
+  background-clip: initial !important;
+  text-wrap: pretty;
+  white-space: normal;
+  display: inline;
+}
+/* ===============================
+   ✅ STRONG TAG CLEANUP
+   =============================== */
 
-  body {
-    background: white;
-    color: black;
-    padding: 0;
-  }
+/* Remove wrapping bugs caused by gradient or text-transparent */
+.tutorial-content p strong,
+.tutorial-content li strong,
+.tutorial-content td strong,
+.tutorial-content table strong,
+.tutorial-content .code-block + p strong {
+  @apply rounded-sm px-1 py-0.5 font-semibold text-blue-800 dark:text-blue-300;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: initial !important;
+  background-clip: initial !important;
+  color: inherit !important;
+  white-space: normal;
+  display: inline;
+  line-height: 1.5;
+}
 
-  .tutorial-content {
-    box-shadow: none;
-    padding: 0;
-  }
+/* Remove gradient ::before layer that breaks layout */
+.tutorial-content strong::before {
+  display: none !important;
+}
 
-  .code-block pre {
-    border: 1px solid #ccc;
-  }
+/* Specific override inside unordered lists to prevent breakage */
+.tutorial-content ul li strong {
+  @apply font-semibold text-blue-700 dark:text-blue-300;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: initial !important;
+  background-clip: initial !important;
+  white-space: normal;
+  display: inline;
+  text-wrap: pretty;
+  line-height: 1.5;
+}
 
-  table {
-    box-shadow: none;
-    border: 1px solid #ccc;
-  }
+/* Optional: Keep gradient ONLY in headings */
+.tutorial-content .content-topic-title strong,
+.tutorial-content .content-topic-subtitle strong {
+  @apply bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text font-bold text-transparent;
 }
