@@ -3,6 +3,7 @@ import PopupForm from "@/components/ui/PopupForm"
 import { Analytics } from "@vercel/analytics/react"
 import type { Metadata } from "next"
 import Script from "next/script"
+import ScrollToTop from "./ScrollToTop"
 import { geistMono, geistSans } from "./fonts"
 import "./globals.css"
 import Header from "./layouts/Header"
@@ -86,6 +87,7 @@ export default function RootLayout({
       <body
         className={`relative ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ScrollToTop />
         <ThemeProvider>
           <ThemeClientWrapper>
             <Suspense>
