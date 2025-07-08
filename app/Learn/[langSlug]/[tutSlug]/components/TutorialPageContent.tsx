@@ -1,5 +1,6 @@
 import React from "react"
 import { TutorialPageContentProps } from "@/app/Learn/types/TutorialTypes"
+import TryYourSelfSection from "./TryYourSelfDirectory/TryYourSelfSection"
 import TutorialBreadcrumb from "./TutorialBreadcrumb"
 import TutorialContent from "./TutorialContent"
 import TutorialHeader from "./TutorialHeader"
@@ -33,6 +34,8 @@ const TutorialPageContent: React.FC<TutorialPageContentProps> = ({
         />
 
         <TutorialContent content={tutorial.content} />
+
+        <TryYourSelfSection language={language} />
 
         <TutorialNavigation
           language={language}
