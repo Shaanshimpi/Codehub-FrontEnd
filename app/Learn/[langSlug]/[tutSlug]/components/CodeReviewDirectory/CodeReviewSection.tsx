@@ -46,7 +46,14 @@ const CodeReviewSection: React.FC<CodeReviewSectionProps> = ({
 
     const userMessage = {
       sender: "user",
-      text: `**Review Request:**\n${prompt}\n\n**Code:**\n\`\`\`${language}\n${code}\n\`\`\``,
+      text: [
+        prompt.trim() ? `**📝 Prompt:**\n${prompt.trim()}` : "",
+        code.trim()
+          ? `**💻 Code:**\n\`\`\`${language}\n${code.trim()}\n\`\`\``
+          : "",
+      ]
+        .filter(Boolean)
+        .join("\n\n"),
     }
 
     setMessages((prev) => [...prev, userMessage])
@@ -216,7 +223,8 @@ const CodeReviewSection: React.FC<CodeReviewSectionProps> = ({
                   </svg>
                 </div>
                 <h2 className="text-xl font-bold text-white">
-                  AI Code Review & Learning
+                  <span className="text-blue-700">VIVY</span> AI Code Review &
+                  Learning
                 </h2>
               </div>
               <button

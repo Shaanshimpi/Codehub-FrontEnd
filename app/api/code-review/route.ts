@@ -1,10 +1,15 @@
 // app/api/chatbot/route.ts
 import { NextRequest, NextResponse } from "next/server"
 
+// 🎯 Best AI models for visual code explanation and beginner-friendly tutorials
 const models = [
-  "deepseek/deepseek-r1-0528:free",
-  "google/gemini-2.5-pro-exp-03-25",
-  "meta-llama/llama-3-70b-instruct:free",
+  "qwen/qwen-2.5-coder-32b-instruct:free", // 🔥 Excellent for programming with visual diagrams
+  "google/gemini-flash-1.5:free", // 📊 Great at creating text-based visual representations
+  "mistralai/mistral-nemo:free", // 🚀 Good balance of speed and educational explanations
+  "qwen/qwen2.5-72b-instruct:free", // 🧠 Deep reasoning with clear step-by-step logic
+  "meta-llama/llama-3.3-70b-instruct:free", // 📚 Clean explanations, good for beginners
+  "openai/gpt-4o-mini:free", // 💡 Solid for educational content and visual text
+  "microsoft/wizardlm-2-8x22b:free", // 🎓 Good at educational explanations
 ]
 
 export async function POST(request: NextRequest) {
@@ -33,57 +38,114 @@ Use these special formats to make explanations beginner-friendly and visually un
 
 1. **Memory tables** (for variables, values, arrays, etc.):
    Use three vertical bars \`|||\` to format tables:
-   Example:
    \`\`\`
-   ||| Variable | Value |||
-   |||----------|-------|||
-   |||    x     |   5   |||
+   ||| Variable | Value | Type |||
+   |||----------|-------|------|||
+   |||    x     |   5   | int  |||
+   |||    y     |  "hi" | str  |||
    \`\`\`
 
-2. **Visual diagrams or logic (e.g., Venn Diagrams for conditions)**:
-   Use triple slashes \`///\` to represent visual space:
-      Example (if condition "a && b"):
-      \`\`\`
-      ///
-        (A) ●─────●
-            │ A and B
-        (B) ●─────●
-      ///
-      \`\`\`
+2. **Step-by-step execution** (DRY RUN):
+   \`\`\`
+   🔄 STEP 1: x = 5
+   📦 Memory: [x: 5]
+   
+   🔄 STEP 2: y = x + 3
+   📦 Memory: [x: 5, y: 8]
+   
+   🔄 STEP 3: print(y)
+   📺 Output: 8
+   \`\`\`
 
-    3. **Arrows** to show flow:
-      \`➡️\` means something is moving, stored, or flowing into something.
+3. **Visual diagrams for logic**:
+   Use triple slashes \`///\` for visual space:
+   \`\`\`
+   ///
+   IF condition is TRUE:
+   ┌─────────────────┐
+   │   Do this code  │
+   └─────────────────┘
+           ↓
+   ELSE (condition is FALSE):
+   ┌─────────────────┐
+   │   Do other code │
+   └─────────────────┘
+   ///
+   \`\`\`
 
-    4. **Boxes** for variable storage:
-      Example: 📦 \`x = 5\` means "we stored 5 inside a box called x".
+4. **Flow arrows**: ➡️ means something flows/moves
+5. **Boxes for storage**: 📦 \`variable = value\`
+6. **Loop visualization**:
+   \`\`\`
+   ///
+   🔄 LOOP: i goes from 0 to 2
+   
+   i=0: ┌─────┐ ➡️ Do something
+        │  0  │
+        └─────┘
+   
+   i=1: ┌─────┐ ➡️ Do something  
+        │  1  │
+        └─────┘
+   
+   i=2: ┌─────┐ ➡️ Do something
+        │  2  │
+        └─────┘
+   ///
+   \`\`\`
 
-    ---
+7. **Function call visualization**:
+   \`\`\`
+   ///
+   📞 CALLING: factorial(3)
+   
+   factorial(3) ➡️ 3 × factorial(2)
+                    ↓
+   factorial(2) ➡️ 2 × factorial(1)  
+                    ↓
+   factorial(1) ➡️ 1
+   
+   📤 RESULT: 3 × 2 × 1 = 6
+   ///
+   \`\`\`
 
-    ### 🧾 Format your response like this:
+---
 
-    **🧐 What This Code Does**
-    Explain in plain, step-by-step language.
+### 🧾 Format your response like this:
 
-    **⚠️ Mistakes or Confusion**
-    Point out any bugs or things that might confuse a beginner.
+**🧐 What This Code Does**
+Explain in plain, step-by-step language what the code accomplishes.
 
-    **✅ How to Improve It**
-    Give one clear way to improve the code or explain how to think about it.
+**🔄 Line-by-Line Execution (DRY RUN)**
+Walk through each line showing exactly what happens in memory and output.
 
-    **📘 Lesson Recap**
-    Reinforce the lesson they just learned with a summary.
+**📊 Visual Representation**
+Use diagrams, tables, or visual elements to show how the code works.
 
-    **📄 Corrected Code**
-    If needed, provide a beginner-friendly version of the corrected code.
+**⚠️ Mistakes or Areas for Improvement**
+Point out any bugs or confusing parts (keep it simple - no need for complex error handling).
 
-    ---
+**✅ Beginner-Friendly Version**
+If needed, provide a simplified version that focuses on core logic.
 
-    🎯 Your goal is to make the student think: “Wow, I get it now!”  
-    Don’t assume they know technical words. Be kind, warm, simple, and visual.
+**📘 Lesson Connection**
+Connect this code back to the lesson: "${content}"
 
-    Language of code: ${language}  
-    Prompt from student: "${prompt}"  
-    `
+**🎯 Key Takeaway**
+One simple sentence about what they should remember.
+
+---
+
+🎯 REMEMBER: 
+- Keep code simple (no complex error handling unless essential)
+- Focus on core logic understanding
+- Use LOTS of visual elements
+- Explain like they're 12 years old
+- Make them feel successful and confident
+
+Language of code: ${language}  
+Student's question: "${prompt}"  
+`
 
     const fullMessages = [
       { role: "system", content: systemPrompt },
@@ -91,8 +153,11 @@ Use these special formats to make explanations beginner-friendly and visually un
       { role: "user", content: `Here is the code in ${language}:\n\n${code}` },
     ]
 
+    // Try models in order of preference for educational explanations
     for (const model of models) {
       try {
+        console.log(`🤖 Trying model: ${model}`)
+
         const response = await fetch(
           "https://openrouter.ai/api/v1/chat/completions",
           {
@@ -104,6 +169,8 @@ Use these special formats to make explanations beginner-friendly and visually un
             body: JSON.stringify({
               model,
               messages: fullMessages,
+              temperature: 0.7, // Good balance for educational content
+              max_tokens: 2000, // Enough for detailed explanations
             }),
           }
         )
@@ -118,8 +185,12 @@ Use these special formats to make explanations beginner-friendly and visually un
         const aiResponse = data?.choices?.[0]?.message?.content
 
         if (aiResponse) {
-          console.log(`✅ Response from model: ${model}`)
-          return NextResponse.json({ response: aiResponse, model })
+          console.log(`✅ Success with model: ${model}`)
+          return NextResponse.json({
+            response: aiResponse,
+            model,
+            success: true,
+          })
         }
       } catch (err) {
         console.warn(`⚠️ Error with model "${model}":`, err)
@@ -129,13 +200,19 @@ Use these special formats to make explanations beginner-friendly and visually un
 
     // If none of the models worked
     return NextResponse.json(
-      { error: "All models failed to generate a response." },
+      {
+        error: "All models failed to generate a response. Please try again.",
+        success: false,
+      },
       { status: 500 }
     )
   } catch (error) {
     console.error("❌ Server Error:", error)
     return NextResponse.json(
-      { error: "Unexpected server error" },
+      {
+        error: "Unexpected server error. Please try again.",
+        success: false,
+      },
       { status: 500 }
     )
   }
