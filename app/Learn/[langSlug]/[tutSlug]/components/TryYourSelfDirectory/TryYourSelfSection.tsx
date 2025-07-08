@@ -25,8 +25,7 @@ function TryYourSelfSection({ language }: TryYourSelfSectionProps) {
           {`Practice What You've Learned`}
         </h3>
         <p className="mb-4 text-slate-600 dark:text-slate-400">
-          Try out the concepts from this tutorial in our interactive code
-          editor.
+          Try out you code our interactive code editor.
         </p>
         <CodeRunnerWrapper
           language={langKey}

@@ -1,5 +1,6 @@
 import React from "react"
 import { TutorialPageContentProps } from "@/app/Learn/types/TutorialTypes"
+import CodeReviewSection from "./CodeReviewDirectory/CodeReviewSection"
 import TryYourSelfSection from "./TryYourSelfDirectory/TryYourSelfSection"
 import TutorialBreadcrumb from "./TutorialBreadcrumb"
 import TutorialContent from "./TutorialContent"
@@ -43,6 +44,9 @@ const TutorialPageContent: React.FC<TutorialPageContentProps> = ({
           nextTutorial={nextTutorial}
         />
       </div>
+
+      {/* Floating Code Review Section */}
+      <CodeReviewSection language={language.title} content={tutorial.content} />
     </div>
   )
 }

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import { Language } from "../types/TutorialTypes"
 import LanguageHeader from "./LanguageHeader"
 import TutorialsList from "./TutorialsList"
+import TryYourSelfSection from "./[tutSlug]/components/TryYourSelfDirectory/TryYourSelfSection"
 
 interface LanguagePageProps {
   params: Promise<{
@@ -67,6 +68,7 @@ export default async function LanguagePage({ params }: LanguagePageProps) {
             examples.
           </p>
         </div>
+        <TryYourSelfSection language={language} />
 
         {tutorials.length > 0 ? (
           <TutorialsList tutorials={tutorials} />
