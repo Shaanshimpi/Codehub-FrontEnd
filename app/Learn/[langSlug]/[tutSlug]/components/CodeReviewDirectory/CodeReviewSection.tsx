@@ -131,7 +131,7 @@ const CodeReviewSection: React.FC<CodeReviewSectionProps> = ({
   return (
     <>
       {/* Floating Button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-6 right-6 z-40">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl"
@@ -175,7 +175,7 @@ const CodeReviewSection: React.FC<CodeReviewSectionProps> = ({
 
       {/* Code Review Panel */}
       {isOpen && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-2 backdrop-blur-sm sm:p-4">
           <div className="h-[80vh] w-full max-w-7xl overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900 md:h-[90vh]">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-slate-200 bg-gradient-to-r from-blue-600 to-blue-800 px-4 py-3 dark:border-slate-700 sm:px-6 sm:py-4">

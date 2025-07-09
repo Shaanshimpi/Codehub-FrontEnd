@@ -5,7 +5,15 @@ import { useEffect, useRef } from "react"
 import logo from "@/app/assets/logo.png"
 import { useTheme } from "@/app/theme-context"
 import { cn } from "@/lib/utils"
-import { BookOpen, ChevronDown, Home, Menu, Moon, Sun } from "lucide-react"
+import {
+  BookOpen,
+  ChevronDown,
+  Home,
+  Menu,
+  Moon,
+  SquareGanttChart,
+  Sun,
+} from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Language } from "../types/TutorialTypes"
@@ -32,6 +40,8 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
       if (currentScrollY > lastScrollY.current) {
         // Scrolling down
         setIsShrunk(true)
+        setIsDropdownOpen(false)
+        setIsMobileMenuOpen(false)
       } else {
         // Scrolling up
         setIsShrunk(false)
@@ -44,12 +54,21 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  useEffect(() => {
+    if (isDropdownOpen) {
+      setIsShrunk(false)
+    }
+    if (isMobileMenuOpen) {
+      setIsShrunk(false)
+    }
+  }, [isDropdownOpen, isMobileMenuOpen])
+
   return (
     <header
       className={cn(
-        "fixed top-0 z-50 w-full transition-all duration-300 ease-in-out",
+        "fixed top-0 z-30 w-full transition-all duration-300 ease-in-out",
         "border-b border-slate-700/50 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 shadow-xl dark:from-slate-950 dark:via-slate-900 dark:to-slate-950",
-        isShrunk ? "text-md h-8" : "h-16 text-lg", // shrinking effect
+        isShrunk ? "text-md h-8 opacity-60" : "h-16 text-lg", // shrinking effect
         className
       )}
     >
@@ -66,7 +85,7 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
           {/* Logo Section */}
           <div className="flex items-center space-x-8">
             <div className="flex items-center space-x-3">
-              <div className="relative flex min-w-[10vw] items-center justify-between">
+              <div className="relative flex min-w-[10vw] items-center justify-center">
                 <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-600 to-blue-800 opacity-30 blur" />
                 <Link href="/">
                   <img
@@ -116,7 +135,7 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                     isShrunk ? "rounded-sm px-4 py-0" : "rounded-lg px-4 py-4"
                   )}
                 >
-                  <BookOpen className="h-4 w-4" />
+                  <SquareGanttChart className="h-4 w-4" />
                   <span className="font-medium">Tutorials</span>
                   <ChevronDown
                     className={cn(
@@ -128,7 +147,11 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
 
                 {/* Dropdown Menu */}
                 {isDropdownOpen && (
-                  <div className="absolute left-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-slate-200/50 bg-white/95 shadow-2xl backdrop-blur-md dark:border-slate-700/50 dark:bg-slate-800/95">
+                  <div
+                    className={
+                      "absolute left-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-slate-200/50 bg-white/95 opacity-100 shadow-2xl backdrop-blur-md dark:border-slate-700/50 dark:bg-slate-800/95"
+                    }
+                  >
                     <div className="p-2">
                       <div className="mb-2 px-3 py-2">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
@@ -176,11 +199,18 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
             <button
               onClick={setTheme}
               className={cn(
-                "group relative flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 transition-all duration-200 hover:scale-105 hover:bg-white/20 dark:bg-slate-800/50 dark:hover:bg-slate-700/50",
-                isShrunk ? "rounded-sm px-4 py-0" : "rounded-lg px-4 py-4"
+                "group relative flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 transition-all duration-200 hover:bg-white/20 dark:bg-slate-800/50 dark:hover:bg-slate-700/50",
+                isShrunk
+                  ? "hover:scale-80 scale-75"
+                  : "scale-100 hover:scale-105"
               )}
             >
-              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-600/20 to-purple-600/20 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+              <div
+                className={cn(
+                  "absolute inset-0 rounded-lg bg-gradient-to-r from-blue-600/20 to-purple-600/20 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                  // isShrunk ? "rounded-sm px-4 py-0" : "rounded-lg px-4 py-4"
+                )}
+              />
               <div className="relative">
                 {theme === "dark" ? (
                   <Sun className="h-5 w-5 text-yellow-400" />
@@ -193,7 +223,12 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 transition-all duration-200 hover:bg-white/20 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 md:hidden"
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 transition-all duration-200 hover:bg-white/20 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 md:hidden",
+                isShrunk
+                  ? "hover:scale-80 scale-75"
+                  : "scale-100 hover:scale-105"
+              )}
             >
               <Menu className="h-5 w-5 text-slate-300" />
             </button>
