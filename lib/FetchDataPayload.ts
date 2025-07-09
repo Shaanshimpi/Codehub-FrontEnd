@@ -28,7 +28,6 @@ export async function fetchCollection(
   });
 
   const url = `${process.env.PAYLOAD_API_URL}/${collectionSlug}${queryString.replace(`where=`, `where`)}`;
-
   try {
     const res = await fetch(url, {
       method: "GET",

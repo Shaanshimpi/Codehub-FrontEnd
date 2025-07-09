@@ -1,7 +1,9 @@
 import logosqr from "@/app/assets/logo-sqr.png"
 import Script from "next/script"
 import ScreenLoaderNew from "./components/ScreenLoaderNew"
+import Header from "./layouts/Header"
 import BioSection from "./sections/BioSection"
+import EndSection from "./sections/EndSection"
 import FixedSection from "./sections/FixedSection"
 import HeroSection from "./sections/HeroSection"
 import ImagesSection from "./sections/ImagesSection"
@@ -77,6 +79,7 @@ export default function Home() {
       />
 
       {process.env.ENVIRONMENT != "DEV" && <ScreenLoaderNew />}
+      <Header />
       <HeroSection />
       <FixedSection WALink={WALink} />
       <PinSection WALink={WALink} />
@@ -86,6 +89,7 @@ export default function Home() {
       <SliderSection />
       <BioSection WALink={WALink} />
       <ImagesSection WALink={WALink} />
+      <EndSection WALink={WALink} />
     </div>
   )
 }

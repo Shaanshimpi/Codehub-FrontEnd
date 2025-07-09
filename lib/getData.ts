@@ -1,6 +1,19 @@
 import { fetchCollection } from "@/lib/FetchDataPayload";
 import { Language, Tutorial } from "@/app/Learn/types/TutorialTypes";
 
+export async function getLanguages(): Promise<Language[]> {
+  try {
+    const languages = await fetchCollection("programming-languages", {
+      limit: 100,
+      sort: `index`,
+    });
+    return languages;
+  } catch (err) {
+    console.error("Error fetching languages:", err);
+    return [];
+  }
+}
+
 // Returns all languages or single language by slug
 export async function getLanguageBySlug(
   langSlug?: string,

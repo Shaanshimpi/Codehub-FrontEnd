@@ -25,7 +25,7 @@ const TutorialPageContent: React.FC<TutorialPageContentProps> = ({
       />
 
       {/* Main Content */}
-      <div className="mx-auto max-w-4xl px-6 py-[10vh]">
+      <div className="mx-auto max-w-4xl px-2 py-[10vh]">
         <TutorialBreadcrumb language={language} tutorial={tutorial} />
 
         <TutorialHeader

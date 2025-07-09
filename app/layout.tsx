@@ -6,8 +6,8 @@ import Script from "next/script"
 import ScrollToTop from "./ScrollToTop"
 import { geistMono, geistSans } from "./fonts"
 import "./globals.css"
-import Header from "./layouts/Header"
-import EndSection from "./sections/EndSection"
+// import Header from "./layouts/Header"
+// import EndSection from "./sections/EndSection"
 // 👈 import theme provider
 import ThemeClientWrapper from "./theme-client-wrapper"
 import { ThemeProvider } from "./theme-context"
@@ -92,9 +92,9 @@ export default function RootLayout({
           <ThemeClientWrapper>
             <Suspense>
               <div className="flex min-h-screen flex-col">
-                <Header />
+                {/* <Header /> */}
                 <main className="flex-1">{children}</main>
-                <EndSection WALink={WALink} />
+                {/* <EndSection WALink={WALink} /> */}
               </div>
               <Analytics />
             </Suspense>

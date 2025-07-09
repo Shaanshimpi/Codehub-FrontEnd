@@ -241,3 +241,7 @@ button {
 .scrollbar-hidden::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
+header,
+header div {
+  transition: height 0.3s ease-in-out;
+}

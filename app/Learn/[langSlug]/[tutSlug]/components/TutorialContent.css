@@ -47,13 +47,13 @@
 
 /* Code Blocks */
 .tutorial-content .code-block {
-  @apply mb-8 rounded-xl border border-slate-700 bg-gradient-to-br from-slate-900 to-slate-800 p-4 shadow-lg transition-transform duration-300 hover:shadow-xl;
+  @apply mb-8 rounded-xl border border-slate-700 bg-gradient-to-br from-slate-900 to-slate-800 p-4 px-2 shadow-lg transition-transform duration-300 hover:shadow-xl;
 }
 .tutorial-content .code-block:hover {
   @apply scale-[1.02] transform shadow-blue-600/20;
 }
 .tutorial-content .code-block pre {
-  @apply overflow-x-auto rounded-xl p-6 font-mono text-sm text-slate-200;
+  @apply overflow-x-auto rounded-xl p-6 px-3 font-mono text-sm text-slate-200;
 }
 
 .tutorial-content p code,
