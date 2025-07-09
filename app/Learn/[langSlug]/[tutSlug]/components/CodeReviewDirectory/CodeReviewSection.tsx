@@ -223,7 +223,7 @@ const CodeReviewSection: React.FC<CodeReviewSectionProps> = ({
                   </svg>
                 </div>
                 <h2 className="text-xl font-bold text-white">
-                  <span className="text-blue-700">VIVY</span> AI Code Review &
+                  <span className="text-violet-400">VIVY</span> AI Code Review &
                   Learning
                 </h2>
               </div>

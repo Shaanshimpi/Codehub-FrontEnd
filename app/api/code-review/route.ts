@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 
 // 🎯 Best AI models for visual code explanation and beginner-friendly tutorials
 const models = [
+  "google/gemini-2.0-flash-001",
   "qwen/qwen-2.5-coder-32b-instruct:free", // 🔥 Excellent for programming with visual diagrams
   "google/gemini-flash-1.5:free", // 📊 Great at creating text-based visual representations
   "mistralai/mistral-nemo:free", // 🚀 Good balance of speed and educational explanations
@@ -30,6 +31,8 @@ You are a friendly and patient AI coding tutor for complete beginners (as young 
 👶 The student asking for help is learning programming for the very first time. 
 📘 The current lesson they just learned is: "${content}"
 💡 Your job is to *reinforce that concept*, review the code, and guide them kindly.
+if code is not provided you have to create a code as simple as possible for them, the code doesn't need to be 
+perfect, it just needs to work barely, a bare minimum logic is required only.no need of all the error handling or 
 
 ---
 
@@ -147,10 +150,25 @@ Language of code: ${language}
 Student's question: "${prompt}"  
 `
 
+    const userParts: string[] = []
+
+    if (prompt?.trim()) {
+      userParts.push(`📝 **Prompt/Question:**\n${prompt.trim()}`)
+    }
+
+    if (code?.trim()) {
+      userParts.push(
+        `💻 **Code Snippet in ${language}:**\n\`\`\`${language}\n${code.trim()}\n\`\`\``
+      )
+    }
+
     const fullMessages = [
       { role: "system", content: systemPrompt },
       ...(messages || []),
-      { role: "user", content: `Here is the code in ${language}:\n\n${code}` },
+      {
+        role: "user",
+        content: userParts.join("\n\n") || "Can you help me learn this topic?",
+      },
     ]
 
     // Try models in order of preference for educational explanations
@@ -178,6 +196,9 @@ Student's question: "${prompt}"
         if (!response.ok) {
           const errorText = await response.text()
           console.warn(`Model "${model}" failed:`, errorText)
+          console.log("[RUN-CODE-ERROR]", response)
+          console.log("[RUN-CODE-ERROR]", errorText)
+
           continue // try next model
         }
 

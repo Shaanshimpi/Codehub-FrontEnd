@@ -28,6 +28,7 @@ export async function POST(req: Request) {
     })
   } catch (err) {
     console.error("[RUN-CODE-ERROR]", err)
+    console.log("[RUN-CODE-ERROR]", err)
     return new Response(
       JSON.stringify({ status: "error", error: "Internal Server Error" }),
       { status: 500 }
