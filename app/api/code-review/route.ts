@@ -174,7 +174,9 @@ Student's question: "${prompt}"
     // Try models in order of preference for educational explanations
     for (const model of models) {
       try {
-        console.log(`🤖 Trying model: ${model}`)
+        console.log(
+          `🤖 Trying model: ${model} with api:${process.env.AI_CHATBOT_API_KEY}`
+        )
 
         const response = await fetch(
           "https://openrouter.ai/api/v1/chat/completions",
