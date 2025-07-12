@@ -33,8 +33,8 @@ export interface TutorialPageContentProps {
   tutorial: Tutorial
   language: Language
   allTutorials: Tutorial[]
-  previousTutorial: Tutorial | null
-  nextTutorial: Tutorial | null
+  previousTutorial: Tutorial
+  nextTutorial: Tutorial
 }
 
 export interface TutorialContentProps {
@@ -56,4 +56,6 @@ export interface TutorialHeaderProps {
   tutorial: Tutorial
   language: Language
   allTutorials: Tutorial[]
+  previousTutorial: Tutorial
+  nextTutorial: Tutorial
 }

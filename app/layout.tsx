@@ -3,12 +3,13 @@ import PopupForm from "@/components/ui/PopupForm"
 import { Analytics } from "@vercel/analytics/react"
 import type { Metadata } from "next"
 import Script from "next/script"
-import ScrollToTop from "./ScrollToTop"
-import { geistMono, geistSans } from "./fonts"
-import "./globals.css"
 // import Header from "./layouts/Header"
 // import EndSection from "./sections/EndSection"
 // 👈 import theme provider
+import { UserProvider } from "./(payload)/_providers/UserProvider"
+import ScrollToTop from "./ScrollToTop"
+import { geistMono, geistSans } from "./fonts"
+import "./globals.css"
 import ThemeClientWrapper from "./theme-client-wrapper"
 import { ThemeProvider } from "./theme-context"
 
@@ -88,19 +89,21 @@ export default function RootLayout({
         className={`relative ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ScrollToTop />
-        <ThemeProvider>
-          <ThemeClientWrapper>
-            <Suspense>
-              <div className="flex min-h-screen flex-col">
-                {/* <Header /> */}
-                <main className="flex-1">{children}</main>
-                {/* <EndSection WALink={WALink} /> */}
-              </div>
-              <Analytics />
-            </Suspense>
-            {process.env.ENVIRONMENT != "DEV" && <PopupForm />}
-          </ThemeClientWrapper>
-        </ThemeProvider>
+        <UserProvider>
+          <ThemeProvider>
+            <ThemeClientWrapper>
+              <Suspense>
+                <div className="flex min-h-screen flex-col">
+                  {/* <Header /> */}
+                  <main className="flex-1">{children}</main>
+                  {/* <EndSection WALink={WALink} /> */}
+                </div>
+                <Analytics />
+              </Suspense>
+              {process.env.ENVIRONMENT != "DEV" && <PopupForm />}
+            </ThemeClientWrapper>
+          </ThemeProvider>
+        </UserProvider>
       </body>
     </html>
   )

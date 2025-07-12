@@ -32,6 +32,8 @@ const TutorialPageContent: React.FC<TutorialPageContentProps> = ({
           tutorial={tutorial}
           language={language}
           allTutorials={allTutorials}
+          previousTutorial={previousTutorial}
+          nextTutorial={nextTutorial}
         />
 
         <TutorialContent content={tutorial.content} />

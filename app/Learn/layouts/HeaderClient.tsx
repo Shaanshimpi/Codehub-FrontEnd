@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useEffect, useRef } from "react"
+import { useUser } from "@/app/(payload)/_providers/UserProvider"
 import logo from "@/app/assets/logo.png"
 import { useTheme } from "@/app/theme-context"
 import { cn } from "@/lib/utils"
@@ -9,10 +10,12 @@ import {
   BookOpen,
   ChevronDown,
   Home,
+  LogIn,
   Menu,
   Moon,
   SquareGanttChart,
   Sun,
+  User,
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -24,6 +27,7 @@ interface HeaderClientProps {
 }
 
 const HeaderClient = ({ className, languages }: HeaderClientProps) => {
+  const { user, isLoading } = useUser()
   const { toggleTheme, theme } = useTheme()
   const pathname = usePathname()
   const baseSegment = pathname?.split("/")[1] || "learn"
@@ -62,7 +66,7 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
       setIsShrunk(false)
     }
   }, [isDropdownOpen, isMobileMenuOpen])
-
+  console.log(user)
   return (
     <header
       className={cn(
@@ -195,6 +199,37 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-3">
+            {/* Auth Button - Desktop Only */}
+            <div className="hidden items-center space-x-3 md:flex">
+              {isLoading ? (
+                <div className="h-10 w-20 animate-pulse rounded-lg bg-white/10" />
+              ) : user ? (
+                <Link
+                  href="/profile"
+                  className={cn(
+                    "group relative flex h-10 items-center justify-center rounded-lg bg-white/10 px-4 text-white transition-all duration-200 hover:bg-white/20 dark:bg-slate-800/50 dark:hover:bg-slate-700/50",
+                    isShrunk
+                      ? "hover:scale-80 scale-75"
+                      : "scale-100 hover:scale-105"
+                  )}
+                >
+                  Profile
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  className={cn(
+                    "group relative flex h-10 items-center justify-center rounded-lg bg-white/10 px-4 text-white transition-all duration-200 hover:bg-white/20 dark:bg-slate-800/50 dark:hover:bg-slate-700/50",
+                    isShrunk
+                      ? "hover:scale-80 scale-75"
+                      : "scale-100 hover:scale-105"
+                  )}
+                >
+                  Login
+                </Link>
+              )}
+            </div>
+
             {/* Theme Toggle */}
             <button
               onClick={setTheme}
@@ -240,7 +275,7 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
           <div className="absolute left-0 right-0 top-full z-50 border-t border-slate-700/50 bg-slate-900/95 shadow-2xl backdrop-blur-md md:hidden">
             <div className="space-y-3 px-6 py-4">
               <Link
-                href={baseSegment}
+                href={`/${baseSegment}`}
                 className="flex items-center space-x-3 rounded-lg px-4 py-3 text-slate-100 transition-all duration-200 hover:bg-white/10"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -257,7 +292,7 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                 {languages.map((language) => (
                   <Link
                     key={language.slug}
-                    href={`${baseSegment}/${language.slug}`}
+                    href={`/${baseSegment}/${language.slug}`}
                     className="flex items-center space-x-3 rounded-lg px-4 py-3 text-slate-100 transition-all duration-200 hover:bg-white/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -273,6 +308,36 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                     <span className="font-medium">{language.title}</span>
                   </Link>
                 ))}
+              </div>
+
+              {/* Mobile Auth Section */}
+              <div className="border-t border-slate-700/50 pt-3">
+                <div className="px-4 py-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    Account
+                  </p>
+                </div>
+                {isLoading ? (
+                  <div className="mx-4 h-12 animate-pulse rounded-lg bg-white/10" />
+                ) : user ? (
+                  <Link
+                    href="/profile"
+                    className="flex items-center space-x-3 rounded-lg px-4 py-3 text-slate-100 transition-all duration-200 hover:bg-white/10"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <User className="h-5 w-5" />
+                    <span className="font-medium">Profile</span>
+                  </Link>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="flex items-center space-x-3 rounded-lg px-4 py-3 text-slate-100 transition-all duration-200 hover:bg-white/10"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <LogIn className="h-5 w-5" />
+                    <span className="font-medium">Login</span>
+                  </Link>
+                )}
               </div>
             </div>
           </div>

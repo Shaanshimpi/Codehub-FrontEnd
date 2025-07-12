@@ -2,7 +2,7 @@
 
 import React from "react"
 import { TutorialNavigationProps } from "@/app/Learn/types/TutorialTypes"
-import { ArrowLeft, ArrowRight, Book } from "lucide-react"
+import { ArrowLeft, ArrowRight, CornerDownLeft } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -22,7 +22,7 @@ const TutorialNavigation: React.FC<TutorialNavigationProps> = ({
           href={`/${baseSegment}/${language.slug}`}
           className="inline-flex items-center text-blue-600 transition-colors hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
         >
-          <Book className="mr-2 h-4 w-4" />
+          <CornerDownLeft className="mr-2 h-4 w-4" />
           Back to {language.title} Tutorials
         </Link>
       </div>
