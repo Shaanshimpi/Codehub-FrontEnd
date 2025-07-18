@@ -1,6 +1,6 @@
 import React from "react"
 import { Language } from "@/app/Learn/types/TutorialTypes"
-import { langMap } from "../../../utils"
+import { langMap } from "../../utils"
 import CodeRunnerWrapper from "./CodeRunnerWrapper"
 
 // adjust the path accordingly

@@ -1,10 +1,10 @@
 import { fetchCollection } from "@/lib/FetchDataPayload"
 import { getLanguageBySlug, getTutorialsByLanguageId } from "@/lib/getData"
 import { notFound } from "next/navigation"
+import TryYourSelfSection from "../Interactives/TryYourSelfDirectory/TryYourSelfSection"
 import { Language } from "../types/TutorialTypes"
 import LanguageHeader from "./LanguageHeader"
 import TutorialsList from "./TutorialsList"
-import TryYourSelfSection from "./[tutSlug]/components/TryYourSelfDirectory/TryYourSelfSection"
 
 interface LanguagePageProps {
   params: Promise<{

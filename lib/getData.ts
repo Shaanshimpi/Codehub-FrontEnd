@@ -1,5 +1,9 @@
 import { fetchCollection } from "@/lib/FetchDataPayload";
-import { Language, Tutorial } from "@/app/Learn/types/TutorialTypes";
+import {
+  ExerciseAIData,
+  Language,
+  Tutorial,
+} from "@/app/Learn/types/TutorialTypes";
 
 export async function getLanguages(): Promise<Language[]> {
   try {
@@ -86,4 +90,51 @@ export async function getTutorialBySlug(
   }
 }
 
-// Universal fetch function
+export async function generateExercise(
+  questionInput: string,
+  selectedLanguage: string,
+  difficulty: number,
+  selectedModel: string,
+): Promise<ExerciseAIData> {
+  try {
+    const response = await fetch("/api/generate-exercise", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        questionInput,
+        selectedLanguage,
+        difficulty,
+        selectedModel,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData || `API request failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error("Error generating exercise:", error);
+    throw error;
+  }
+}
+
+export async function submitExercise(exercisePayload: any): Promise<void> {
+  // Replace with your actual Payload CMS API call
+  const response = await fetch("/api/generate-exercise/submit-exercise", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(exercisePayload),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to submit exercise: ${response.status}`);
+  }
+}

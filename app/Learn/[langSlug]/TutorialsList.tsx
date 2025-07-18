@@ -5,7 +5,7 @@ import { BookOpen, Clock } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Tutorial } from "../types/TutorialTypes"
-import { readTime } from "./utils"
+import { readTime } from "../utils"
 
 interface TutorialsListProps {
   tutorials: Tutorial[]

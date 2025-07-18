@@ -8,10 +8,11 @@ import Script from "next/script"
 // 👈 import theme provider
 import { UserProvider } from "./(payload)/_providers/UserProvider"
 import ScrollToTop from "./ScrollToTop"
+import { LanguageProvider } from "./contexts/LanguageContext"
+import ThemeClientWrapper from "./contexts/theme-client-wrapper"
+import { ThemeProvider } from "./contexts/theme-context"
 import { geistMono, geistSans } from "./fonts"
 import "./globals.css"
-import ThemeClientWrapper from "./theme-client-wrapper"
-import { ThemeProvider } from "./theme-context"
 
 const WALink = `https://wa.me/918637704621?text=I%20Want%20to%20learn%20coding%20and%20be%20successful%20Coder`
 
@@ -89,21 +90,23 @@ export default function RootLayout({
         className={`relative ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ScrollToTop />
-        <UserProvider>
-          <ThemeProvider>
-            <ThemeClientWrapper>
-              <Suspense>
-                <div className="flex min-h-screen flex-col">
-                  {/* <Header /> */}
-                  <main className="flex-1">{children}</main>
-                  {/* <EndSection WALink={WALink} /> */}
-                </div>
-                <Analytics />
-              </Suspense>
-              {process.env.ENVIRONMENT != "DEV" && <PopupForm />}
-            </ThemeClientWrapper>
-          </ThemeProvider>
-        </UserProvider>
+        <LanguageProvider defaultLanguage="en">
+          <UserProvider>
+            <ThemeProvider>
+              <ThemeClientWrapper>
+                <Suspense>
+                  <div className="flex min-h-screen flex-col">
+                    {/* <Header /> */}
+                    <main className="flex-1">{children}</main>
+                    {/* <EndSection WALink={WALink} /> */}
+                  </div>
+                  <Analytics />
+                </Suspense>
+                {process.env.ENVIRONMENT != "DEV" && <PopupForm />}
+              </ThemeClientWrapper>
+            </ThemeProvider>
+          </UserProvider>
+        </LanguageProvider>
       </body>
     </html>
   )

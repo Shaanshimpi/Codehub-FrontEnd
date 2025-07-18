@@ -9,8 +9,10 @@ import remarkGfm from "remark-gfm"
 
 // components/ChatMessage.tsx
 
+// components/ChatMessage.tsx
+
 interface ChatMessageProps {
-  sender: "user" | "bot"
+  sender: string
   text: string
 }
 

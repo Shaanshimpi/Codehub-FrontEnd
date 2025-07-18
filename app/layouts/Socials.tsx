@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { usePathname } from "next/navigation"
+import { useTheme } from "../contexts/theme-context"
 import { reckoner } from "../fonts"
-import { useTheme } from "../theme-context"
 
 export default function Socials() {
   const [whiteBg, setWhiteBg] = useState(false)

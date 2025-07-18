@@ -1,7 +1,7 @@
 import React from "react"
+import CodeReviewModalButton from "@/app/Learn/Interactives/CodeReviewDirectory/CodeReviewModalButton"
 import { TutorialPageContentProps } from "@/app/Learn/types/TutorialTypes"
-import CodeReviewSection from "./CodeReviewDirectory/CodeReviewSection"
-import TryYourSelfSection from "./TryYourSelfDirectory/TryYourSelfSection"
+import TryYourSelfSection from "../../../Interactives/TryYourSelfDirectory/TryYourSelfSection"
 import TutorialBreadcrumb from "./TutorialBreadcrumb"
 import TutorialContent from "./TutorialContent"
 import TutorialHeader from "./TutorialHeader"
@@ -48,7 +48,10 @@ const TutorialPageContent: React.FC<TutorialPageContentProps> = ({
       </div>
 
       {/* Floating Code Review Section */}
-      <CodeReviewSection language={language.title} content={tutorial.content} />
+      <CodeReviewModalButton
+        language={language.title}
+        content={tutorial.content}
+      />
     </div>
   )
 }

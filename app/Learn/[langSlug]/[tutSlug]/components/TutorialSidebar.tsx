@@ -5,7 +5,7 @@ import { Language, Tutorial } from "@/app/Learn/types/TutorialTypes"
 import { BookOpen, ChevronLeft, ChevronRight, Clock } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { readTime } from "../../utils"
+import { readTime } from "../../../utils"
 
 interface TutorialSidebarProps {
   tutorials: Tutorial[]

@@ -2,7 +2,7 @@
 
 // Necessary for client-side rendering in Next.js
 import React, { useEffect, useState } from "react"
-import { useTheme } from "@/app/theme-context"
+import { useTheme } from "@/app/contexts/theme-context"
 import { codeToHtml } from "shiki"
 
 interface CodeBlockProps {

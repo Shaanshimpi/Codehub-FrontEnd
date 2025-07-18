@@ -3,7 +3,7 @@
 import React from "react"
 import { TutorialHeaderProps } from "@/app/Learn/types/TutorialTypes"
 import { usePathname } from "next/navigation"
-import { readTime } from "../../utils"
+import { readTime } from "../../../utils"
 import TutorialNavigation from "./TutorialNavigation"
 
 const TutorialHeader: React.FC<TutorialHeaderProps> = ({

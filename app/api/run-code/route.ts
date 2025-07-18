@@ -1,5 +1,5 @@
 // app/api/run-code/route.ts
-import { extMap, langMap } from "@/app/Learn/[langSlug]/utils"
+import { extMap, langMap } from "@/app/Learn/utils"
 
 export async function POST(req: Request) {
   try {

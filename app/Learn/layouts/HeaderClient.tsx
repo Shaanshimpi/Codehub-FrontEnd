@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useEffect, useRef } from "react"
 import { useUser } from "@/app/(payload)/_providers/UserProvider"
 import logo from "@/app/assets/logo.png"
-import { useTheme } from "@/app/theme-context"
+import { useTheme } from "@/app/contexts/theme-context"
 import { cn } from "@/lib/utils"
 import {
   BookOpen,
@@ -20,6 +20,7 @@ import {
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Language } from "../types/TutorialTypes"
+import { LanguageSwitcher } from "./LanguageSwitcher"
 
 interface HeaderClientProps {
   className?: string
@@ -31,7 +32,10 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
   const { toggleTheme, theme } = useTheme()
   const pathname = usePathname()
   const baseSegment = pathname?.split("/")[1] || "learn"
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+
+  const [isTutorialsOpen, setIsTutorialsOpen] = useState(false)
+  const [isInteractiveOpen, setIsInteractiveOpen] = useState(false)
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isShrunk, setIsShrunk] = useState(false)
   const lastScrollY = useRef(0)
@@ -44,7 +48,8 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
       if (currentScrollY > lastScrollY.current) {
         // Scrolling down
         setIsShrunk(true)
-        setIsDropdownOpen(false)
+        setIsTutorialsOpen(false)
+        setIsInteractiveOpen(false)
         setIsMobileMenuOpen(false)
       } else {
         // Scrolling up
@@ -59,14 +64,11 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
   }, [])
 
   useEffect(() => {
-    if (isDropdownOpen) {
+    if (isTutorialsOpen || isInteractiveOpen || isMobileMenuOpen) {
       setIsShrunk(false)
     }
-    if (isMobileMenuOpen) {
-      setIsShrunk(false)
-    }
-  }, [isDropdownOpen, isMobileMenuOpen])
-  console.log(user)
+  }, [isTutorialsOpen, isInteractiveOpen, isMobileMenuOpen])
+
   return (
     <header
       className={cn(
@@ -133,7 +135,10 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
               {/* Tutorials Dropdown */}
               <div className="relative">
                 <button
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  onClick={() => {
+                    setIsTutorialsOpen(!isTutorialsOpen)
+                    setIsInteractiveOpen(false)
+                  }}
                   className={cn(
                     "group flex items-center space-x-2 rounded-lg text-slate-100 transition-all duration-200 hover:bg-white/10 hover:text-white dark:text-slate-300 dark:hover:text-white",
                     isShrunk ? "rounded-sm px-4 py-0" : "rounded-lg px-4 py-4"
@@ -144,18 +149,13 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                   <ChevronDown
                     className={cn(
                       "h-4 w-4 transition-transform duration-200",
-                      isDropdownOpen ? "rotate-180" : "rotate-0"
+                      isTutorialsOpen ? "rotate-180" : "rotate-0"
                     )}
                   />
                 </button>
 
-                {/* Dropdown Menu */}
-                {isDropdownOpen && (
-                  <div
-                    className={
-                      "absolute left-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-slate-200/50 bg-white/95 opacity-100 shadow-2xl backdrop-blur-md dark:border-slate-700/50 dark:bg-slate-800/95"
-                    }
-                  >
+                {isTutorialsOpen && (
+                  <div className="absolute left-0 top-full z-50 mt-2 w-64 rounded-xl border border-slate-200/50 bg-white/95 shadow-2xl backdrop-blur-md dark:border-slate-700/50 dark:bg-slate-800/95">
                     <div className="p-2">
                       <div className="mb-2 px-3 py-2">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
@@ -166,8 +166,8 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                         <Link
                           key={language.slug}
                           href={`/${baseSegment}/${language.slug}`}
-                          className="group flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 transition-all duration-200 hover:bg-blue-50 dark:text-slate-300 dark:hover:bg-slate-700/50"
-                          onClick={() => setIsDropdownOpen(false)}
+                          className="group flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-blue-50 dark:text-slate-300 dark:hover:bg-slate-700/50"
+                          onClick={() => setIsTutorialsOpen(false)}
                         >
                           {language.logo && (
                             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 p-1 dark:bg-slate-700">
@@ -181,7 +181,7 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                             </div>
                           )}
                           <div className="flex-1">
-                            <div className="font-medium text-slate-900 transition-colors group-hover:text-blue-600 dark:text-slate-100 dark:group-hover:text-blue-400">
+                            <div className="font-medium text-slate-900 group-hover:text-blue-600 dark:text-slate-100 dark:group-hover:text-blue-400">
                               {language.title}
                             </div>
                             <div className="text-xs text-slate-500 dark:text-slate-400">
@@ -194,11 +194,66 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                   </div>
                 )}
               </div>
+
+              {/* Interactive Dropdown */}
+              {false && (
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setIsInteractiveOpen(!isInteractiveOpen)
+                      setIsTutorialsOpen(false)
+                    }}
+                    className={cn(
+                      "group flex items-center space-x-2 rounded-lg text-slate-100 transition-all duration-200 hover:bg-white/10 hover:text-white dark:text-slate-300 dark:hover:text-white",
+                      isShrunk ? "rounded-sm px-4 py-0" : "rounded-lg px-4 py-4"
+                    )}
+                  >
+                    <SquareGanttChart className="h-4 w-4" />
+                    <span className="font-medium">Interactive</span>
+                    <ChevronDown
+                      className={cn(
+                        "h-4 w-4 transition-transform duration-200",
+                        isInteractiveOpen ? "rotate-180" : "rotate-0"
+                      )}
+                    />
+                  </button>
+
+                  {isInteractiveOpen && (
+                    <div className="absolute left-0 top-full z-50 mt-2 w-48 rounded-xl border border-slate-200/50 bg-white/95 shadow-2xl backdrop-blur-md dark:border-slate-700/50 dark:bg-slate-800/95">
+                      <div className="p-2">
+                        <Link
+                          href={`/${baseSegment}/Interactives/code-review`}
+                          className="block rounded-lg px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 dark:text-slate-300 dark:hover:bg-slate-700/50"
+                          onClick={() => setIsInteractiveOpen(false)}
+                        >
+                          Code Review
+                        </Link>
+                        <Link
+                          href={`/${baseSegment}/Interactives/code-runner`}
+                          className="block rounded-lg px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 dark:text-slate-300 dark:hover:bg-slate-700/50"
+                          onClick={() => setIsInteractiveOpen(false)}
+                        >
+                          Code Runner
+                        </Link>
+                        <Link
+                          href={`/${baseSegment}/Interactives/ai-exercise`}
+                          className="block rounded-lg px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 dark:text-slate-300 dark:hover:bg-slate-700/50"
+                          onClick={() => setIsInteractiveOpen(false)}
+                        >
+                          AI Exercise
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </nav>
           </div>
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-3">
+            {/* Language Switcher */}
+            <LanguageSwitcher />
             {/* Auth Button - Desktop Only */}
             <div className="hidden items-center space-x-3 md:flex">
               {isLoading ? (
@@ -345,10 +400,13 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
       </div>
 
       {/* Dropdown Overlay */}
-      {isDropdownOpen && (
+      {(isTutorialsOpen || isInteractiveOpen) && (
         <button
           className="fixed inset-0 z-40"
-          onClick={() => setIsDropdownOpen(false)}
+          onClick={() => {
+            setIsTutorialsOpen(false)
+            setIsInteractiveOpen(false)
+          }}
         />
       )}
 

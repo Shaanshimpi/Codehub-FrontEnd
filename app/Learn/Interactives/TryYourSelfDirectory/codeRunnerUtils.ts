@@ -1,5 +1,5 @@
 // utils/codeRunnerUtils.ts
-import { extMap, langMap } from "../../../utils"
+import { extMap, langMap } from "../../utils"
 
 export const runCodeOnServer = async (
   language: string,
@@ -26,7 +26,7 @@ export const runCodeOnServer = async (
       body: JSON.stringify({
         language: lang,
         stdin,
-        files: [{ name: `main.${ext}`, content: code }],
+        files: [{ name: `Main.${ext}`, content: code }],
       }),
     })
 
