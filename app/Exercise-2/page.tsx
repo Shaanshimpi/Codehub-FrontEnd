@@ -1,30 +1,32 @@
-import { fetchCollection } from "@/lib/FetchDataPayload"
+"use client"
 
-export default async function Page() {
-  const languages = await fetchCollection("programming-languages", {
-    sort: "index",
-  })
-  const tutorials = await fetchCollection("tutorials")
-  //   const exercises = await fetchCollection('exercises');
-  //   const media = await fetchCollection('media');
-  //   const users = await fetchCollection('users');
+import React from "react"
+import { MermaidDiagram } from "@lightenna/react-mermaid-diagram"
 
+function page() {
   return (
     <div>
-      <h1>Fetched Data</h1>
-      <h2>Languages</h2>
-      <ul>
-        {languages.map((l: any) => (
-          <li key={l.id}>{l.title}</li>
-        ))}
-      </ul>
-
-      <h2>Tutorials</h2>
-      <ul>
-        {tutorials.map((t: any) => (
-          <li key={t.id}>{t.title}</li>
-        ))}
-      </ul>
+      <MermaidDiagram>
+        {`graph TD
+    A[Start] --> B{number <= 10}
+    style A fill:#f9f,stroke:#333,stroke-width:2px,color:#333
+    style B fill:#ccf,stroke:#333,stroke-width:2px,color:#333
+    B -- Yes --> C{number % 2 == 0}
+    style C fill:#ccf,stroke:#333,stroke-width:2px,color:#333
+    C -- Yes --> D[Print number is even]
+    style D fill:#aef,stroke:#333,stroke-width:2px,color:#333
+    C -- No --> E[Print number is odd]
+    style E fill:#aef,stroke:#333,stroke-width:2px,color:#333
+    D --> F[number++]
+    E --> F
+    style F fill:#bbf,stroke:#333,stroke-width:2px,color:#333
+    F --> B
+    B -- No --> G[End]
+    style G fill:#f9f,stroke:#333,stroke-width:2px,color:#333
+          `}
+      </MermaidDiagram>
     </div>
   )
 }
+
+export default page

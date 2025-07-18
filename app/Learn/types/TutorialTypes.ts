@@ -100,15 +100,61 @@ export interface CodeRunnerPageProps {
   stdin?: string
 }
 
+// export interface ExerciseAIData {
+//   title_en: string
+//   title_hi: string
+//   title_mr: string
+//   code: string
+//   hints_en: string
+//   explanation_en: string
+//   hints_hi: string
+//   explanation_hi: string
+//   hints_mr: string
+//   explanation_mr: string
+// }
+
+export interface VisualVariable {
+  name: string
+  value: string
+  type: string
+}
+
+export interface MemoryState {
+  step: string
+  variables: VisualVariable[]
+}
+
+export interface ExecutionStep {
+  step: number
+  line: string
+  description: string
+  output?: string
+}
+
+export interface Concept {
+  name: string
+  description: string
+  visual_metaphor?: string
+}
+
+export interface VisualElements {
+  memory_states?: MemoryState[]
+  execution_steps?: ExecutionStep[]
+  concepts?: Concept[]
+}
+
 export interface ExerciseAIData {
   title_en: string
   title_hi: string
   title_mr: string
   code: string
+  mermaid_diagram: string
   hints_en: string
   explanation_en: string
   hints_hi: string
   explanation_hi: string
   hints_mr: string
   explanation_mr: string
+  visual_elements?: VisualElements
+  languages?: Language[] // Add this if needed for language detection
 }

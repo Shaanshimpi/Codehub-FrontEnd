@@ -33,7 +33,11 @@ const Section = ({
         </div>
       </button>
 
-      {show && <div className="animate-fadeIn mt-4">{children}</div>}
+      {
+        <div className={`animate-fadeIn mt-4 ${!show && "hidden"}`}>
+          {children}
+        </div>
+      }
     </div>
   )
 }

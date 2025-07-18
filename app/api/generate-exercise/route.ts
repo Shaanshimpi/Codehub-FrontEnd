@@ -1,3 +1,4 @@
+// app/api/generate-exercise/route.ts
 import { NextResponse } from "next/server"
 import { buildPrompt } from "./systemPrompts"
 
@@ -18,8 +19,8 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           model: selectedModel,
-          max_tokens: 8000, // Optimized for better response completeness
-          temperature: 0.3, // Consistent, focused responses
+          max_tokens: 8000,
+          temperature: 0.3,
           top_p: 0.9,
           frequency_penalty: 0.1,
           presence_penalty: 0.1,
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
             {
               role: "system",
               content:
-                "You are an expert programming instructor. Generate complete, educational programming exercises following the detailed instructions. Focus on concept clarity and practical understanding.",
+                "You are an expert programming instructor. Generate complete, educational programming exercises with rich visual content for enhanced learning.",
             },
             {
               role: "user",
@@ -60,7 +61,7 @@ export async function POST(request: Request) {
                   code: {
                     type: "string",
                     description:
-                      "Complete working code with numbered comments [1], [2], etc. formatted as HTML with inline CSS syntax highlighting",
+                      "Complete working code with numbered comments [1], [2], etc. Plain code with proper formatting",
                   },
                   mermaid_diagram: {
                     type: "string",
@@ -70,12 +71,12 @@ export async function POST(request: Request) {
                   hints_en: {
                     type: "string",
                     description:
-                      "10-20 practical hints in English with markdown formatting",
+                      "10-20 practical hints in English, numbered list format",
                   },
                   explanation_en: {
                     type: "string",
                     description:
-                      "Clear explanation in English referencing numbered code parts",
+                      "Clear explanation in English referencing numbered code parts [1], [2], etc.",
                   },
                   hints_hi: {
                     type: "string",
@@ -96,6 +97,56 @@ export async function POST(request: Request) {
                     type: "string",
                     description:
                       "Explanation in Marathi (English script with Marathi structure, technical terms in English)",
+                  },
+                  visual_elements: {
+                    type: "object",
+                    description: "Optional visual learning elements",
+                    properties: {
+                      memory_states: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            step: { type: "string" },
+                            variables: {
+                              type: "array",
+                              items: {
+                                type: "object",
+                                properties: {
+                                  name: { type: "string" },
+                                  value: { type: "string" },
+                                  type: { type: "string" },
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                      execution_steps: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            step: { type: "number" },
+                            line: { type: "string" },
+                            description: { type: "string" },
+                            output: { type: "string" },
+                          },
+                        },
+                      },
+                      concepts: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            name: { type: "string" },
+                            description: { type: "string" },
+                            visual_metaphor: { type: "string" },
+                          },
+                        },
+                      },
+                    },
+                    additionalProperties: false,
                   },
                 },
                 required: [
@@ -140,12 +191,9 @@ export async function POST(request: Request) {
       )
     }
 
-    if (data.choices?.[0]?.finish_reason === "length") {
-      console.warn("Response was truncated due to max_tokens limit")
-    }
-
     try {
       const parsedContent = JSON.parse(content)
+      // Simply return the parsed content - no formatting here
       return NextResponse.json(parsedContent)
     } catch (parseError) {
       console.error("JSON parsing error:", parseError)

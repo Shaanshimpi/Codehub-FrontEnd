@@ -1,17 +1,25 @@
+// app/Learn/Interactives/AIExercise/ExerciseGenerator/ExercisePreview/ExercisePreview.tsx
 "use client"
 
 import React, { useState } from "react"
 import type { ExerciseAIData } from "@/app/Learn/types/TutorialTypes"
-import CodeBlock from "./components/CodeBlock"
+import { MermaidDiagram } from "@lightenna/react-mermaid-diagram"
 import Header from "./components/Header"
 import Metadata from "./components/Metadata"
 import Section from "./components/Section"
 import Title from "./components/Title"
 import {
+  formatCode,
+  formatExplanation,
+  formatHints,
+  formatVisualElements,
+} from "./utils/exerciseFormatter"
+import {
   getDifficultyLabel,
   getLocalizedContent,
 } from "./utils/exerciseHelpers"
-import { formatExplanation } from "./utils/textFormatter"
+
+// app/Learn/Interactives/AIExercise/ExerciseGenerator/ExercisePreview/ExercisePreview.tsx
 
 interface ExercisePreviewProps {
   exerciseData: ExerciseAIData
@@ -29,43 +37,138 @@ const ExercisePreview: React.FC<ExercisePreviewProps> = ({
   const [showHints, setShowHints] = useState(false)
   const [showCode, setShowCode] = useState(true)
   const [showExplanation, setShowExplanation] = useState(false)
+  const [showDiagram, setShowDiagram] = useState(false)
+  const [showVisuals, setShowVisuals] = useState(false)
+  const [diagramError, setDiagramError] = useState(false)
 
-  const content = getLocalizedContent(exerciseData, "en") // Replace 'en' with a dynamic language if needed
-  console.log(exerciseData)
-  const style = document.createElement("style")
-  style.textContent = `
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .animate-fadeIn {
-      animation: fadeIn 0.3s ease-out;
-    }
-  `
-  document.head.appendChild(style)
+  const content = getLocalizedContent(exerciseData, "en") // Replace with dynamic language
+  const language = formData?.selectedLanguage
+    ? exerciseData.languages?.find(
+        (lang) => lang.id === parseInt(formData.selectedLanguage)
+      )?.slug || "javascript"
+    : "javascript"
+
+  // Add custom styles for the component
+  React.useEffect(() => {
+    const style = document.createElement("style")
+    style.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      .animate-fadeIn {
+        animation: fadeIn 0.3s ease-out;
+      }
+      
+      .exercise-preview-container {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      }
+      
+      .section-content {
+        animation: fadeIn 0.3s ease-out;
+      }
+      
+      .mermaid-container {
+        max-width: 100%;
+        overflow-x: auto;
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+      }
+      
+      .mermaid-error {
+        background: #fee;
+        border: 1px solid #fcc;
+        border-radius: 8px;
+        padding: 1rem;
+        color: #c00;
+      }
+    `
+    document.head.appendChild(style)
+    return () => document.head.removeChild(style)
+  }, [])
+
   return (
-    <div className="mx-auto max-w-4xl rounded-lg bg-slate-900 p-6 text-white shadow-lg">
+    <div className="exercise-preview-container mx-auto max-w-4xl rounded-lg p-6 text-white shadow-2xl">
       <Header onBack={onBack} onContinue={onContinue} />
-      <div className="space-y-4">
+
+      <div className="space-y-6">
         <Title title={content.title} />
+
+        {/* Hints Section */}
         <Section show={showHints} setShow={setShowHints} label="💡 Show Hints">
-          <div className="rounded-lg bg-slate-800 p-4 text-slate-300">
-            {content.hints}
+          <div className="section-content">{formatHints(content.hints)}</div>
+        </Section>
+
+        {/* Code Section */}
+        <Section show={showCode} setShow={setShowCode} label="💻 Show Code">
+          <div className="section-content">
+            {formatCode(exerciseData.code, language)}
           </div>
         </Section>
-        <Section show={showCode} setShow={setShowCode} label="💻 Show Code">
-          <CodeBlock code={exerciseData.code} />
-        </Section>
+
+        {/* Mermaid Diagram */}
+        {
+          <Section
+            show={showDiagram}
+            setShow={setShowDiagram}
+            label="📊 Concept Diagram"
+          >
+            <div className="section-content">
+              <div className="mermaid-container">
+                {diagramError ? (
+                  <div className="mermaid-error">
+                    <p>{`Error rendering diagram. Here's the raw diagram code:`}</p>
+                    <pre
+                      style={{
+                        marginTop: "0.5rem",
+                        padding: "0.5rem",
+                        background: "#f5f5f5",
+                        borderRadius: "4px",
+                        overflow: "auto",
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      {exerciseData.mermaid_diagram}
+                    </pre>
+                  </div>
+                ) : (
+                  <div>
+                    <MermaidDiagram>
+                      {exerciseData.mermaid_diagram}
+                    </MermaidDiagram>
+                  </div>
+                )}
+              </div>
+            </div>
+          </Section>
+        }
+
+        {/* Visual Elements */}
+        {exerciseData.visual_elements && (
+          <Section
+            show={showVisuals}
+            setShow={setShowVisuals}
+            label="🎨 Visual Learning Aids"
+          >
+            <div className="section-content">
+              {formatVisualElements(exerciseData.visual_elements)}
+            </div>
+          </Section>
+        )}
+
+        {/* Explanation Section */}
         <Section
           show={showExplanation}
           setShow={setShowExplanation}
           label="📝 Show Explanation"
         >
-          <div className="rounded-lg bg-slate-800 p-4">
+          <div className="section-content">
             {formatExplanation(content.explanation)}
           </div>
         </Section>
+
         <Metadata
           difficulty={getDifficultyLabel(formData?.difficulty)}
           slug={formData?.slug}
