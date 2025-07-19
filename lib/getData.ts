@@ -11,6 +11,7 @@ export async function getLanguages(): Promise<Language[]> {
       limit: 100,
       sort: `index`,
     });
+    console.log(languages);
     return languages;
   } catch (err) {
     console.error("Error fetching languages:", err);

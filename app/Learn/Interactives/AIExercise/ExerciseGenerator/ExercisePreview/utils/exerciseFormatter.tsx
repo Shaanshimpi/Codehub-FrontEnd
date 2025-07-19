@@ -1,5 +1,6 @@
 // app/Learn/Interactives/AIExercise/ExerciseGenerator/ExercisePreview/utils/exerciseFormatter.tsx
 import React from "react"
+import CodeBlock from "../components/CodeBlock"
 
 // Language-specific syntax highlighting configurations
 const SYNTAX_CONFIGS = {
@@ -65,199 +66,199 @@ const SYNTAX_CONFIGS = {
 }
 
 // Create a separate component for the code block
-const CodeBlock: React.FC<{ code: string; language: string }> = ({
-  code,
-  language,
-}) => {
-  const [copied, setCopied] = React.useState(false)
+// const CodeBlock: React.FC<{ code: string; language: string }> = ({
+//   code,
+//   language,
+// }) => {
+//   const [copied, setCopied] = React.useState(false)
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }
+//   const handleCopy = () => {
+//     navigator.clipboard.writeText(code).then(() => {
+//       setCopied(true)
+//       setTimeout(() => setCopied(false), 2000)
+//     })
+//   }
 
-  if (!code) {
-    return (
-      <pre className="code-block">
-        <code>No code available</code>
-      </pre>
-    )
-  }
+//   if (!code) {
+//     return (
+//       <pre className="code-block">
+//         <code>No code available</code>
+//       </pre>
+//     )
+//   }
 
-  const config = SYNTAX_CONFIGS[language as keyof typeof SYNTAX_CONFIGS]
+//   const config = SYNTAX_CONFIGS[language as keyof typeof SYNTAX_CONFIGS]
 
-  // Apply syntax highlighting
-  const lines = code.split("\n")
-  const highlightedLines = lines.map((line, lineIndex) => {
-    let highlightedLine = line
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;")
+//   // Apply syntax highlighting
+//   const lines = code.split("\n")
+//   const highlightedLines = lines.map((line, lineIndex) => {
+//     let highlightedLine = line
+//       .replace(/</g, "&lt;")
+//       .replace(/>/g, "&gt;")
+//       .replace(/"/g, "&quot;")
+//       .replace(/'/g, "&#39;")
 
-    // Apply language-specific highlighting if config exists
-    if (config) {
-      // Apply highlighting based on language config
-      // This is a simplified version - you can expand this based on your needs
-      Object.entries(config).forEach(([type, regex]) => {
-        if (regex instanceof RegExp) {
-          highlightedLine = highlightedLine.replace(regex, (match) => {
-            const color = getColorForType(type)
-            return `<span style="color: ${color}">${match}</span>`
-          })
-        }
-      })
-    }
+//     // Apply language-specific highlighting if config exists
+//     if (config) {
+//       // Apply highlighting based on language config
+//       // This is a simplified version - you can expand this based on your needs
+//       Object.entries(config).forEach(([type, regex]) => {
+//         if (regex instanceof RegExp) {
+//           highlightedLine = highlightedLine.replace(regex, (match) => {
+//             const color = getColorForType(type)
+//             return `<span style="color: ${color}">${match}</span>`
+//           })
+//         }
+//       })
+//     }
 
-    return `<span>${highlightedLine}</span>`
-  })
+//     return `<span>${highlightedLine}</span>`
+//   })
 
-  return (
-    <div style={{ position: "relative" }}>
-      {/* Code toolbar */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          background: "rgba(0, 0, 0, 0.3)",
-          padding: "0.5rem 1rem",
-          borderRadius: "8px 8px 0 0",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-        }}
-      >
-        <span
-          style={{
-            color: "#9CA3AF",
-            fontSize: "0.875rem",
-            fontFamily: "monospace",
-          }}
-        >
-          {language.toUpperCase()}
-        </span>
+//   return (
+//     <div style={{ position: "relative" }}>
+//       {/* Code toolbar */}
+//       <div
+//         style={{
+//           display: "flex",
+//           alignItems: "center",
+//           justifyContent: "space-between",
+//           background: "rgba(0, 0, 0, 0.3)",
+//           padding: "0.5rem 1rem",
+//           borderRadius: "8px 8px 0 0",
+//           borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+//         }}
+//       >
+//         <span
+//           style={{
+//             color: "#9CA3AF",
+//             fontSize: "0.875rem",
+//             fontFamily: "monospace",
+//           }}
+//         >
+//           {language.toUpperCase()}
+//         </span>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          {/* Window controls decoration */}
-          <div style={{ display: "flex", gap: "0.5rem" }}>
-            <div
-              style={{
-                width: "12px",
-                height: "12px",
-                borderRadius: "50%",
-                background: "#EF4444",
-              }}
-            />
-            <div
-              style={{
-                width: "12px",
-                height: "12px",
-                borderRadius: "50%",
-                background: "#F59E0B",
-              }}
-            />
-            <div
-              style={{
-                width: "12px",
-                height: "12px",
-                borderRadius: "50%",
-                background: "#10B981",
-              }}
-            />
-          </div>
+//         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+//           {/* Window controls decoration */}
+//           <div style={{ display: "flex", gap: "0.5rem" }}>
+//             <div
+//               style={{
+//                 width: "12px",
+//                 height: "12px",
+//                 borderRadius: "50%",
+//                 background: "#EF4444",
+//               }}
+//             />
+//             <div
+//               style={{
+//                 width: "12px",
+//                 height: "12px",
+//                 borderRadius: "50%",
+//                 background: "#F59E0B",
+//               }}
+//             />
+//             <div
+//               style={{
+//                 width: "12px",
+//                 height: "12px",
+//                 borderRadius: "50%",
+//                 background: "#10B981",
+//               }}
+//             />
+//           </div>
 
-          {/* Copy button */}
-          <button
-            onClick={handleCopy}
-            style={{
-              background: copied ? "#10B981" : "rgba(59, 130, 246, 0.2)",
-              border: "1px solid rgba(59, 130, 246, 0.3)",
-              borderRadius: "4px",
-              padding: "0.25rem 0.75rem",
-              color: copied ? "white" : "#60A5FA",
-              fontSize: "0.75rem",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.25rem",
-            }}
-            onMouseEnter={(e) => {
-              if (!copied) {
-                e.currentTarget.style.background = "rgba(59, 130, 246, 0.3)"
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!copied) {
-                e.currentTarget.style.background = "rgba(59, 130, 246, 0.2)"
-              }
-            }}
-          >
-            {copied ? (
-              <>
-                <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
-                  <path
-                    d="M6.5 10.5L9 13L14 8"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                Copied!
-              </>
-            ) : (
-              <>
-                <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
-                  <rect
-                    x="5"
-                    y="5"
-                    width="10"
-                    height="12"
-                    rx="2"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                  <path
-                    d="M9 5V3C9 1.89543 9.89543 1 11 1H16C17.1046 1 18 1.89543 18 3V11C18 12.1046 17.1046 13 16 13H15"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                </svg>
-                Copy
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+//           {/* Copy button */}
+//           <button
+//             onClick={handleCopy}
+//             style={{
+//               background: copied ? "#10B981" : "rgba(59, 130, 246, 0.2)",
+//               border: "1px solid rgba(59, 130, 246, 0.3)",
+//               borderRadius: "4px",
+//               padding: "0.25rem 0.75rem",
+//               color: copied ? "white" : "#60A5FA",
+//               fontSize: "0.75rem",
+//               cursor: "pointer",
+//               transition: "all 0.2s ease",
+//               display: "flex",
+//               alignItems: "center",
+//               gap: "0.25rem",
+//             }}
+//             onMouseEnter={(e) => {
+//               if (!copied) {
+//                 e.currentTarget.style.background = "rgba(59, 130, 246, 0.3)"
+//               }
+//             }}
+//             onMouseLeave={(e) => {
+//               if (!copied) {
+//                 e.currentTarget.style.background = "rgba(59, 130, 246, 0.2)"
+//               }
+//             }}
+//           >
+//             {copied ? (
+//               <>
+//                 <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+//                   <path
+//                     d="M6.5 10.5L9 13L14 8"
+//                     stroke="currentColor"
+//                     strokeWidth="2"
+//                     strokeLinecap="round"
+//                     strokeLinejoin="round"
+//                   />
+//                 </svg>
+//                 Copied!
+//               </>
+//             ) : (
+//               <>
+//                 <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+//                   <rect
+//                     x="5"
+//                     y="5"
+//                     width="10"
+//                     height="12"
+//                     rx="2"
+//                     stroke="currentColor"
+//                     strokeWidth="1.5"
+//                   />
+//                   <path
+//                     d="M9 5V3C9 1.89543 9.89543 1 11 1H16C17.1046 1 18 1.89543 18 3V11C18 12.1046 17.1046 13 16 13H15"
+//                     stroke="currentColor"
+//                     strokeWidth="1.5"
+//                   />
+//                 </svg>
+//                 Copy
+//               </>
+//             )}
+//           </button>
+//         </div>
+//       </div>
 
-      {/* Code content */}
-      <pre
-        style={{
-          background: "linear-gradient(145deg, #111827 0%, #1e293b 100%)",
-          borderRadius: "0 0 8px 8px",
-          padding: "1.5rem",
-          overflowX: "auto",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
-          border: "1px solid rgba(255, 255, 255, 0.1)",
-          borderTop: "none",
-          color: "#e5e7eb",
-          fontFamily: "'Fira Code', 'Consolas', monospace",
-          fontSize: "0.875rem",
-          lineHeight: "1.5",
-          margin: 0,
-        }}
-      >
-        <code
-          dangerouslySetInnerHTML={{
-            __html: highlightedLines.join("<br>"),
-          }}
-        />
-      </pre>
-    </div>
-  )
-}
+//       {/* Code content */}
+//       <pre
+//         style={{
+//           background: "linear-gradient(145deg, #111827 0%, #1e293b 100%)",
+//           borderRadius: "0 0 8px 8px",
+//           padding: "1.5rem",
+//           overflowX: "auto",
+//           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
+//           border: "1px solid rgba(255, 255, 255, 0.1)",
+//           borderTop: "none",
+//           color: "#e5e7eb",
+//           fontFamily: "'Fira Code', 'Consolas', monospace",
+//           fontSize: "0.875rem",
+//           lineHeight: "1.5",
+//           margin: 0,
+//         }}
+//       >
+//         <code
+//           dangerouslySetInnerHTML={{
+//             __html: highlightedLines.join("<br>"),
+//           }}
+//         />
+//       </pre>
+//     </div>
+//   )
+// }
 
 // Helper function to get colors for syntax highlighting
 const getColorForType = (type: string): string => {
@@ -285,7 +286,7 @@ const getColorForType = (type: string): string => {
 
 // Format code with syntax highlighting - now returns a component
 export const formatCode = (code: string, language: string): JSX.Element => {
-  return <CodeBlock code={code} language={language} />
+  return <CodeBlock code={code} />
 }
 
 // Format hints with visual styling
@@ -294,10 +295,40 @@ export const formatHints = (hintsText: string): JSX.Element => {
     return <div className="text-gray-400">No hints available</div>
   }
 
-  const hints = hintsText
-    .split("\n")
-    .filter((line) => line.trim())
-    .map((hint) => hint.replace(/^\d+\.\s*/, "").trim())
+  // Handle both numbered string format and newline-separated format
+  let hints: string[] = []
+
+  // First try to split by numbered patterns with better regex
+  const numberedMatches = hintsText.match(/\d+\.\s+[^0-9]+?(?=\d+\.\s+|$)/g)
+
+  if (numberedMatches && numberedMatches.length > 0) {
+    // Use regex matches for numbered format
+    hints = numberedMatches
+      .map((hint) => hint.replace(/^\d+\.\s*/, "").trim())
+      .filter((hint) => hint.length > 0)
+  } else if (hintsText.includes(". ")) {
+    // Fallback: split by '. ' and try to reconstruct
+    const parts = hintsText.split(/\d+\.\s+/).filter((part) => part.trim())
+    hints = parts.map((part) => part.trim()).filter((hint) => hint.length > 0)
+  } else {
+    // Final fallback: newline separation
+    hints = hintsText
+      .split("\n")
+      .filter((line) => line.trim())
+      .map((hint) => hint.replace(/^\d+\.\s*/, "").trim())
+      .filter((hint) => hint.length > 0)
+  }
+
+  // If we still don't have good hints, try a different approach
+  if (hints.length === 0 || hints.some((hint) => hint.length < 5)) {
+    // Try splitting by periods followed by numbers
+    const betterSplit = hintsText.split(/(?<=\.)\s*(?=\d+\.)/)
+    if (betterSplit.length > 1) {
+      hints = betterSplit
+        .map((hint) => hint.replace(/^\d+\.\s*/, "").trim())
+        .filter((hint) => hint.length > 5)
+    }
+  }
 
   return (
     <div
@@ -355,6 +386,168 @@ export const formatHints = (hintsText: string): JSX.Element => {
           </span>
         </div>
       ))}
+    </div>
+  )
+}
+
+export const formatHintsArray = (
+  hints: Array<{ text: string; code_snippet?: string }>
+): JSX.Element => {
+  if (!hints || hints.length === 0) {
+    return <div className="text-gray-400">No hints available</div>
+  }
+
+  return (
+    <div className="hints-container space-y-3">
+      {hints.map((hint, index) => (
+        <div
+          key={index}
+          className="hint-item group"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            padding: "1rem",
+            background: "rgba(59, 130, 246, 0.05)",
+            borderLeft: "4px solid #3B82F6",
+            borderRadius: "0 8px 8px 0",
+            transition: "all 0.3s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateX(4px)"
+            e.currentTarget.style.background = "rgba(59, 130, 246, 0.1)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateX(0)"
+            e.currentTarget.style.background = "rgba(59, 130, 246, 0.05)"
+          }}
+        >
+          <div className="flex items-start gap-3">
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "28px",
+                height: "28px",
+                background: "#3B82F6",
+                color: "white",
+                borderRadius: "50%",
+                flexShrink: 0,
+                fontWeight: "bold",
+                fontSize: "14px",
+              }}
+            >
+              {index + 1}
+            </span>
+            <span style={{ color: "#e5e7eb", lineHeight: "1.6", flex: 1 }}>
+              {formatTextWithCode(hint.text)}
+            </span>
+          </div>
+
+          {hint.code_snippet && (
+            <div className="ml-10 mt-3">
+              <pre
+                style={{
+                  background: "rgba(0, 0, 0, 0.3)",
+                  padding: "0.5rem",
+                  borderRadius: "4px",
+                  fontSize: "0.875rem",
+                  fontFamily: "monospace",
+                  color: "#60A5FA",
+                  overflow: "auto",
+                }}
+              >
+                <code>{hint.code_snippet}</code>
+              </pre>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// Format explanation from array structure
+export const formatExplanationArray = (
+  explanation: Array<{
+    text: string
+    type: "text" | "code" | "concept" | "warning" | "tip"
+    code_ref?: number[]
+  }>
+): JSX.Element => {
+  if (!explanation || explanation.length === 0) {
+    return <div className="text-gray-400">No explanation available</div>
+  }
+
+  const typeStyles = {
+    text: {
+      background: "transparent",
+      borderLeft: "none",
+      icon: null,
+    },
+    code: {
+      background: "rgba(59, 130, 246, 0.05)",
+      borderLeft: "4px solid #3B82F6",
+      icon: "💻",
+    },
+    concept: {
+      background: "rgba(139, 92, 246, 0.05)",
+      borderLeft: "4px solid #8B5CF6",
+      icon: "🎯",
+    },
+    warning: {
+      background: "rgba(239, 68, 68, 0.05)",
+      borderLeft: "4px solid #EF4444",
+      icon: "⚠️",
+    },
+    tip: {
+      background: "rgba(16, 185, 129, 0.05)",
+      borderLeft: "4px solid #10B981",
+      icon: "💡",
+    },
+  }
+
+  return (
+    <div className="explanation-container space-y-4">
+      {explanation.map((block, index) => {
+        const style = typeStyles[block.type] || typeStyles.text
+
+        // Format text with code references
+        let formattedText = block.text
+        if (block.code_ref && block.code_ref.length > 0) {
+          block.code_ref.forEach((ref) => {
+            formattedText = formattedText.replace(
+              new RegExp(`\\[${ref}\\]`, "g"),
+              `<span style="display: inline-block; background: #8B5CF6; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.875rem; font-weight: bold; margin: 0 4px;">${ref}</span>`
+            )
+          })
+        }
+
+        return (
+          <div
+            key={index}
+            style={{
+              background: style.background,
+              borderLeft: style.borderLeft,
+              padding: style.background ? "1rem" : "0",
+              borderRadius: style.background ? "0 8px 8px 0" : "0",
+              marginBottom: "1rem",
+            }}
+          >
+            {style.icon && (
+              <span style={{ marginRight: "0.5rem", fontSize: "1.25rem" }}>
+                {style.icon}
+              </span>
+            )}
+            <span
+              style={{ color: "#e5e7eb", lineHeight: "1.8" }}
+              dangerouslySetInnerHTML={{
+                __html: formatTextWithCode(formattedText),
+              }}
+            />
+          </div>
+        )
+      })}
     </div>
   )
 }

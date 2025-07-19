@@ -10,14 +10,16 @@ import Section from "./components/Section"
 import Title from "./components/Title"
 import {
   formatCode,
-  formatExplanation,
-  formatHints,
+  formatExplanationArray,
+  formatHintsArray,
   formatVisualElements,
 } from "./utils/exerciseFormatter"
 import {
   getDifficultyLabel,
   getLocalizedContent,
 } from "./utils/exerciseHelpers"
+
+// app/Learn/Interactives/AIExercise/ExerciseGenerator/ExercisePreview/ExercisePreview.tsx
 
 // app/Learn/Interactives/AIExercise/ExerciseGenerator/ExercisePreview/ExercisePreview.tsx
 
@@ -98,7 +100,9 @@ const ExercisePreview: React.FC<ExercisePreviewProps> = ({
 
         {/* Hints Section */}
         <Section show={showHints} setShow={setShowHints} label="💡 Show Hints">
-          <div className="section-content">{formatHints(content.hints)}</div>
+          <div className="section-content">
+            {formatHintsArray(content.hints)}
+          </div>
         </Section>
 
         {/* Code Section */}
@@ -165,7 +169,7 @@ const ExercisePreview: React.FC<ExercisePreviewProps> = ({
           label="📝 Show Explanation"
         >
           <div className="section-content">
-            {formatExplanation(content.explanation)}
+            {formatExplanationArray(content.explanation)}
           </div>
         </Section>
 

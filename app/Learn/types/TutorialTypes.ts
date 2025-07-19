@@ -143,18 +143,57 @@ export interface VisualElements {
   concepts?: Concept[]
 }
 
+// app/Learn/types/TutorialTypes.ts (updated ExerciseAIData interface)
+
+export interface HintItem {
+  text: string
+  code_snippet?: string
+}
+
+export interface ExplanationItem {
+  text: string
+  type: "text" | "code" | "concept" | "warning" | "tip"
+  code_ref?: number[]
+}
+
 export interface ExerciseAIData {
   title_en: string
   title_hi: string
   title_mr: string
   code: string
   mermaid_diagram: string
-  hints_en: string
-  explanation_en: string
-  hints_hi: string
-  explanation_hi: string
-  hints_mr: string
-  explanation_mr: string
+  hints_en: HintItem[]
+  explanation_en: ExplanationItem[]
+  hints_hi: HintItem[]
+  explanation_hi: ExplanationItem[]
+  hints_mr: HintItem[]
+  explanation_mr: ExplanationItem[]
   visual_elements?: VisualElements
-  languages?: Language[] // Add this if needed for language detection
+}
+
+// Update the getLocalizedContent helper
+export const getLocalizedContent = (
+  exerciseData: ExerciseAIData,
+  language: string
+) => {
+  switch (language) {
+    case "hi":
+      return {
+        title: exerciseData.title_hi,
+        hints: exerciseData.hints_hi,
+        explanation: exerciseData.explanation_hi,
+      }
+    case "mr":
+      return {
+        title: exerciseData.title_mr,
+        hints: exerciseData.hints_mr,
+        explanation: exerciseData.explanation_mr,
+      }
+    default:
+      return {
+        title: exerciseData.title_en,
+        hints: exerciseData.hints_en,
+        explanation: exerciseData.explanation_en,
+      }
+  }
 }

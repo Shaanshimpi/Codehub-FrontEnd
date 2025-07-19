@@ -1,3 +1,4 @@
+// app/api/generate-exercise/route.ts (updated schema portion)
 // app/api/generate-exercise/route.ts
 import { NextResponse } from "next/server"
 import { buildPrompt } from "./systemPrompts"
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
             {
               role: "system",
               content:
-                "You are an expert programming instructor. Generate complete, educational programming exercises with rich visual content for enhanced learning.",
+                "You are an expert programming instructor. Generate complete, educational programming exercises with rich visual content for enhanced learning. You MUST always include comprehensive visual elements including memory states, execution steps, and key concepts for every exercise.",
             },
             {
               role: "user",
@@ -61,91 +62,267 @@ export async function POST(request: Request) {
                   code: {
                     type: "string",
                     description:
-                      "Complete working code with numbered comments [1], [2], etc. Plain code with proper formatting",
+                      "Complete working code with numbered comments [1], [2], etc. HTML formatted with VS Code styling",
                   },
                   mermaid_diagram: {
                     type: "string",
                     description:
-                      "Pure Mermaid code for educational diagram (flowchart, sequence, or class diagram with colorful styling)",
+                      "Pure Mermaid code for educational diagram (no semicolons or quotes)",
                   },
                   hints_en: {
-                    type: "string",
-                    description:
-                      "10-20 practical hints in English, numbered list format",
+                    type: "array",
+                    description: "8-10 practical hints in English",
+                    minItems: 8,
+                    maxItems: 10,
+                    items: {
+                      type: "object",
+                      properties: {
+                        text: {
+                          type: "string",
+                          description: "The hint text",
+                        },
+                        code_snippet: {
+                          type: "string",
+                          description:
+                            "Optional code snippet related to this hint",
+                        },
+                      },
+                      required: ["text"],
+                      additionalProperties: false,
+                    },
                   },
                   explanation_en: {
-                    type: "string",
+                    type: "array",
                     description:
-                      "Clear explanation in English referencing numbered code parts [1], [2], etc.",
+                      "Clear explanation in English with code references",
+                    minItems: 3,
+                    items: {
+                      type: "object",
+                      properties: {
+                        text: {
+                          type: "string",
+                          description:
+                            "Explanation text, can include [1], [2] references",
+                        },
+                        type: {
+                          type: "string",
+                          enum: ["text", "code", "concept", "warning", "tip"],
+                          description: "Type of explanation block",
+                        },
+                        code_ref: {
+                          type: "array",
+                          description:
+                            "Array of code comment numbers this explanation refers to",
+                          items: { type: "number" },
+                        },
+                      },
+                      required: ["text", "type"],
+                      additionalProperties: false,
+                    },
                   },
                   hints_hi: {
-                    type: "string",
-                    description:
-                      "10-20 hints in Hindi (English script with Hindi structure, technical terms in English)",
+                    type: "array",
+                    description: "8-10 practical hints in Hindi",
+                    minItems: 8,
+                    maxItems: 10,
+                    items: {
+                      type: "object",
+                      properties: {
+                        text: {
+                          type: "string",
+                          description:
+                            "The hint text in Hindi (English script)",
+                        },
+                        code_snippet: {
+                          type: "string",
+                          description: "Optional code snippet",
+                        },
+                      },
+                      required: ["text"],
+                      additionalProperties: false,
+                    },
                   },
                   explanation_hi: {
-                    type: "string",
+                    type: "array",
                     description:
-                      "Explanation in Hindi (English script with Hindi structure, technical terms in English)",
+                      "Clear explanation in Hindi with code references",
+                    minItems: 3,
+                    items: {
+                      type: "object",
+                      properties: {
+                        text: {
+                          type: "string",
+                          description:
+                            "Explanation text in Hindi (English script)",
+                        },
+                        type: {
+                          type: "string",
+                          enum: ["text", "code", "concept", "warning", "tip"],
+                        },
+                        code_ref: {
+                          type: "array",
+                          items: { type: "number" },
+                        },
+                      },
+                      required: ["text", "type"],
+                      additionalProperties: false,
+                    },
                   },
                   hints_mr: {
-                    type: "string",
-                    description:
-                      "10-20 hints in Marathi (English script with Marathi structure, technical terms in English)",
+                    type: "array",
+                    description: "8-10 practical hints in Marathi",
+                    minItems: 8,
+                    maxItems: 10,
+                    items: {
+                      type: "object",
+                      properties: {
+                        text: {
+                          type: "string",
+                          description:
+                            "The hint text in Marathi (English script)",
+                        },
+                        code_snippet: {
+                          type: "string",
+                          description: "Optional code snippet",
+                        },
+                      },
+                      required: ["text"],
+                      additionalProperties: false,
+                    },
                   },
                   explanation_mr: {
-                    type: "string",
+                    type: "array",
                     description:
-                      "Explanation in Marathi (English script with Marathi structure, technical terms in English)",
+                      "Clear explanation in Marathi with code references",
+                    minItems: 3,
+                    items: {
+                      type: "object",
+                      properties: {
+                        text: {
+                          type: "string",
+                          description:
+                            "Explanation text in Marathi (English script)",
+                        },
+                        type: {
+                          type: "string",
+                          enum: ["text", "code", "concept", "warning", "tip"],
+                        },
+                        code_ref: {
+                          type: "array",
+                          items: { type: "number" },
+                        },
+                      },
+                      required: ["text", "type"],
+                      additionalProperties: false,
+                    },
                   },
                   visual_elements: {
                     type: "object",
-                    description: "Optional visual learning elements",
+                    description:
+                      "Required visual learning elements - MUST be provided for every exercise",
                     properties: {
                       memory_states: {
                         type: "array",
+                        description:
+                          "Memory state visualization showing variable changes through execution",
+                        minItems: 1,
                         items: {
                           type: "object",
                           properties: {
-                            step: { type: "string" },
+                            step: {
+                              type: "string",
+                              description:
+                                "Step identifier (e.g., 'Initial', 'After line 5', 'Final')",
+                            },
                             variables: {
                               type: "array",
+                              minItems: 1,
                               items: {
                                 type: "object",
                                 properties: {
-                                  name: { type: "string" },
-                                  value: { type: "string" },
-                                  type: { type: "string" },
+                                  name: {
+                                    type: "string",
+                                    description: "Variable name",
+                                  },
+                                  value: {
+                                    type: "string",
+                                    description:
+                                      "Current value of the variable",
+                                  },
+                                  type: {
+                                    type: "string",
+                                    description:
+                                      "Data type (int, string, array, etc.)",
+                                  },
                                 },
+                                required: ["name", "value", "type"],
+                                additionalProperties: false,
                               },
                             },
                           },
+                          required: ["step", "variables"],
+                          additionalProperties: false,
                         },
                       },
                       execution_steps: {
                         type: "array",
+                        description:
+                          "Step-by-step execution trace of the program",
+                        minItems: 3,
                         items: {
                           type: "object",
                           properties: {
-                            step: { type: "number" },
-                            line: { type: "string" },
-                            description: { type: "string" },
-                            output: { type: "string" },
+                            step: {
+                              type: "number",
+                              description: "Sequential step number",
+                            },
+                            line: {
+                              type: "string",
+                              description: "Code line being executed",
+                            },
+                            description: {
+                              type: "string",
+                              description: "What happens in this step",
+                            },
+                            output: {
+                              type: "string",
+                              description:
+                                "Any output produced (empty string if no output)",
+                            },
                           },
+                          required: ["step", "line", "description", "output"],
+                          additionalProperties: false,
                         },
                       },
                       concepts: {
                         type: "array",
+                        description:
+                          "Key programming concepts demonstrated in the exercise",
+                        minItems: 2,
                         items: {
                           type: "object",
                           properties: {
-                            name: { type: "string" },
-                            description: { type: "string" },
-                            visual_metaphor: { type: "string" },
+                            name: {
+                              type: "string",
+                              description:
+                                "Concept name (e.g., 'Loops', 'Arrays', 'Functions')",
+                            },
+                            description: {
+                              type: "string",
+                              description: "Clear explanation of the concept",
+                            },
+                            visual_metaphor: {
+                              type: "string",
+                              description:
+                                "Real-world analogy or metaphor to explain the concept",
+                            },
                           },
+                          required: ["name", "description", "visual_metaphor"],
+                          additionalProperties: false,
                         },
                       },
                     },
+                    required: ["memory_states", "execution_steps", "concepts"],
                     additionalProperties: false,
                   },
                 },
@@ -161,6 +338,7 @@ export async function POST(request: Request) {
                   "explanation_hi",
                   "hints_mr",
                   "explanation_mr",
+                  "visual_elements",
                 ],
                 additionalProperties: false,
               },
@@ -181,6 +359,7 @@ export async function POST(request: Request) {
     }
 
     const data = await response.json()
+    console.log(data)
     const content = data.choices?.[0]?.message?.content
 
     if (!content) {
@@ -193,7 +372,110 @@ export async function POST(request: Request) {
 
     try {
       const parsedContent = JSON.parse(content)
-      // Simply return the parsed content - no formatting here
+
+      // Validate that visual_elements are present and have required content
+      if (!parsedContent.visual_elements) {
+        console.error("Missing visual_elements in response")
+        return NextResponse.json(
+          { error: "Response missing required visual elements" },
+          { status: 500 }
+        )
+      }
+
+      const visualElements = parsedContent.visual_elements
+
+      // Check for required visual elements
+      if (
+        !visualElements.memory_states ||
+        !Array.isArray(visualElements.memory_states) ||
+        visualElements.memory_states.length === 0
+      ) {
+        console.error("Missing or empty memory_states")
+        return NextResponse.json(
+          { error: "Response missing required memory states visualization" },
+          { status: 500 }
+        )
+      }
+
+      if (
+        !visualElements.execution_steps ||
+        !Array.isArray(visualElements.execution_steps) ||
+        visualElements.execution_steps.length < 3
+      ) {
+        console.error("Missing or insufficient execution_steps")
+        return NextResponse.json(
+          {
+            error:
+              "Response missing required execution steps (minimum 3 steps)",
+          },
+          { status: 500 }
+        )
+      }
+
+      if (
+        !visualElements.concepts ||
+        !Array.isArray(visualElements.concepts) ||
+        visualElements.concepts.length < 2
+      ) {
+        console.error("Missing or insufficient concepts")
+        return NextResponse.json(
+          { error: "Response missing required concepts (minimum 2 concepts)" },
+          { status: 500 }
+        )
+      }
+
+      // Additional validation for content quality
+      const hasValidMemoryStates = visualElements.memory_states.every(
+        (state) =>
+          state.step &&
+          state.variables &&
+          Array.isArray(state.variables) &&
+          state.variables.length > 0
+      )
+
+      const hasValidExecutionSteps = visualElements.execution_steps.every(
+        (step) =>
+          typeof step.step === "number" &&
+          step.line &&
+          step.description &&
+          step.output !== undefined
+      )
+
+      const hasValidConcepts = visualElements.concepts.every(
+        (concept) =>
+          concept.name && concept.description && concept.visual_metaphor
+      )
+
+      if (!hasValidMemoryStates) {
+        console.error("Invalid memory states structure")
+        return NextResponse.json(
+          { error: "Invalid memory states structure in response" },
+          { status: 500 }
+        )
+      }
+
+      if (!hasValidExecutionSteps) {
+        console.error("Invalid execution steps structure")
+        return NextResponse.json(
+          { error: "Invalid execution steps structure in response" },
+          { status: 500 }
+        )
+      }
+
+      if (!hasValidConcepts) {
+        console.error("Invalid concepts structure")
+        return NextResponse.json(
+          { error: "Invalid concepts structure in response" },
+          { status: 500 }
+        )
+      }
+
+      console.log("✅ Visual elements validation passed:", {
+        memoryStates: visualElements.memory_states.length,
+        executionSteps: visualElements.execution_steps.length,
+        concepts: visualElements.concepts.length,
+      })
+
       return NextResponse.json(parsedContent)
     } catch (parseError) {
       console.error("JSON parsing error:", parseError)

@@ -85,7 +85,9 @@ export async function fetchCollection(
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-    return await res.json();
+    const languages = await res.json();
+    console.log(languages);
+    return languages;
   } catch (error) {
     console.error(`❌ Failed to fetch ${collectionSlug}:`, error);
     return [];

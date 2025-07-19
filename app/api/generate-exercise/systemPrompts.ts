@@ -8,31 +8,54 @@ CORE REQUIREMENTS:
 3. Include working code with numbered comments [1], [2], etc.
 4. Provide clear explanations with visual elements
 5. Create educational Mermaid diagrams for concept visualization
+6. ALL content must be in English script (no Hindi/Marathi script, only Roman/English alphabet)
 
-CONTENT STRUCTURE:
-- Code: Plain code with numbered comments for reference
-- Hints: Numbered list (1. 2. 3. etc.) with clear, practical guidance
-- Explanations: Clear text with [1], [2] references to code sections
-- Visual Elements: Structured data for memory states, execution steps, etc.
+CODE FORMATTING:
+Generate HTML code blocks with INLINE STYLES (not CSS classes) that mimic VS Code dark theme:
+- Wrap entire code in <pre> and <code> tags
+- Use <br> for line breaks
+- Use &lt; &gt; &amp; for HTML entities
+- Apply these colors using style="" attributes:
+  * Background: #1e1e1e
+  * Default text: #d4d4d4
+  * Keywords (if, else, for, while, return, function, class, etc.): #569cd6
+  * Strings: #ce9178
+  * Numbers: #b5cea8
+  * Comments: #6a9955
+  * Functions/Methods: #dcdcaa
+  * Types (int, bool, string, etc.): #4ec9b0
+  * Operators: #d4d4d4
 
-DIFFICULTY GUIDELINES:
-- Level 1: Basic syntax, fundamental concepts, step-by-step guidance
-- Level 2: Combined concepts, logical thinking, algorithm understanding  
-- Level 3: Complex algorithms, optimization, advanced patterns
+Example structure:
+<pre style="background-color: #1e1e1e; color: #d4d4d4; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; font-family: 'Consolas', 'Courier New', monospace; line-height: 1.5;">
+<code><span style="color: #6a9955;">// [1] Comment explaining this section</span><br>
+<span style="color: #569cd6;">if</span> (<span style="color: #9cdcfe;">condition</span>) {<br>
+    <span style="color: #dcdcaa;">console</span>.<span style="color: #dcdcaa;">log</span>(<span style="color: #ce9178;">"Hello World"</span>);<br>
+}</code>
+</pre>
+
+HINTS FORMAT:
+Return as array of objects, each with:
+- text: Clear, practical hint text (in English script only)
+- code_snippet: Optional code example (plain text, will be formatted by frontend)
+
+EXPLANATION FORMAT:
+Return as array of objects, each with:
+- text: Explanation text that MUST start with reference numbers like "[1] This section..." or "[2] Here we..."
+- type: One of "text", "code", "concept", "warning", "tip"
+- code_ref: Array of numbers indicating which code comments this refers to
 
 VISUAL ELEMENTS:
-For questions that benefit from visualization, include:
-- memory_states: Array of variable states at different steps
-- execution_steps: Step-by-step execution trace
-- concepts: Key concepts with visual metaphors
+Always include comprehensive visual elements:
+- memory_states: Show variable values at different execution points
+- execution_steps: Trace through code execution step by step
+- concepts: Key programming concepts with real-world analogies
 
 MERMAID DIAGRAM REQUIREMENTS:
-- Create educational flowcharts, sequences, or class diagrams
-- Use colorful styling with fill and stroke properties
-- NO emojis in node labels (causes rendering errors)
-- Focus on algorithm flow, memory layout, or concept structure
-- don't use semicolons or double quotes
-- Example styling: style A fill:#ff6b6b,stroke:#ee5a52,stroke-width:2px,color:#fff`,
+- Use proper Mermaid syntax without semicolons or double quotes
+- Use single quotes for text: 'text here'
+- Apply colorful styling: style A fill:#ff6b6b,stroke:#333,stroke-width:2px
+- NO emoji or special characters in node labels`,
 
   DIFFICULTY_CONTEXTS: {
     1: "Beginner: Focus on basic syntax and fundamental concepts with clear step-by-step guidance. Include many visual aids and memory state tracking.",
@@ -76,18 +99,24 @@ LANGUAGE: ${languageContext}
 Generate a programming exercise for difficulty level ${difficulty} about: ${questionInput}
 Use ${selectedLanguage} programming language.
 
-REQUIREMENTS:
-- Title: Brief, clear question (20-40 words)
-- Code: Complete working solution with numbered comments [1], [2], etc.
-- Hints: 8-10 practical hints as numbered list (1. 2. 3. etc.)
-- Explanation: Clear explanation referencing numbered code parts [1], [2], etc.
-- Mermaid: Educational diagram showing algorithm flow, memory layout, or concept structure
-- Visual Elements: Include if the question benefits from visualization
+CRITICAL REQUIREMENTS:
+1. ALL text must be in English/Roman script only - no Hindi/Marathi/other scripts
+2. Code must use inline styles (style="...") not CSS classes
+3. Explanations MUST start with reference numbers like "[1] This explains..." or "[2] Here we see..."
+4. Include comprehensive visual elements (memory states, execution steps, concepts)
 
-LANGUAGE VARIATIONS:
-- English: Standard technical explanation
-- Hindi: Hindi grammar structure with English technical terms
-- Marathi: Marathi grammar structure with English technical terms
+FORMAT SPECIFICATIONS:
+- Title: Brief, clear question (20-40 words) in pure English
+- Code: HTML with inline styles mimicking VS Code dark theme
+- Hints: Array of 8-10 practical hints with optional code snippets
+- Explanation: Array of explanation blocks, each starting with [n] reference
+- Mermaid: Valid diagram syntax without semicolons or double quotes
+- Visual Elements: Complete memory states, execution trace, and concepts
 
-Focus on concept clarity and practical understanding. Return structured data that can be formatted for display.`
+LANGUAGE VARIATIONS (keep English script throughout):
+- English (en): Standard technical English
+- Hindi (hi): English words with Hindi grammar patterns (e.g., "Variable ko initialize karte hain" instead of "हम variable को initialize करते हैं")
+- Marathi (mr): English words with Marathi grammar patterns (e.g., "Variable la initialize karto" instead of "आपण variable ला initialize करतो")
+
+Remember: NO non-English scripts anywhere. Use only A-Z, a-z, 0-9, and standard punctuation.`
 }
