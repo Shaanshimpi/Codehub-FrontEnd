@@ -1,5 +1,4 @@
-// app/api/generate-exercise/route.ts (updated schema portion)
-// app/api/generate-exercise/route.ts
+// app/api/generate-exercise/route.ts (Updated for Plain Text Code)
 import { NextResponse } from "next/server"
 import { buildPrompt } from "./systemPrompts"
 
@@ -25,12 +24,11 @@ export async function POST(request: Request) {
           top_p: 0.9,
           frequency_penalty: 0.1,
           presence_penalty: 0.1,
-
           messages: [
             {
               role: "system",
               content:
-                "You are an expert programming instructor. Generate complete, educational programming exercises with rich visual content for enhanced learning. You MUST always include comprehensive visual elements including memory states, execution steps, and key concepts for every exercise.",
+                "You are an expert programming instructor. Generate complete, educational programming exercises with rich visual content for enhanced learning. You MUST always include comprehensive visual elements including memory states, execution steps, and key concepts for every exercise. Additionally, determine if the exercise is suitable for automated testing and provide test cases and boilerplate code when appropriate. IMPORTANT: Always generate PLAIN TEXT code for the main code field - never use HTML formatting.",
             },
             {
               role: "user",
@@ -47,44 +45,43 @@ export async function POST(request: Request) {
                 properties: {
                   title_en: {
                     type: "string",
-                    description: "Exercise title in English (20-40 words)",
+                    description:
+                      "Exercise question in brief couple of lines in English",
                   },
                   title_hi: {
                     type: "string",
                     description:
-                      "Exercise title in Hindi (English script with Hindi structure)",
+                      "Exercise question in brief couple of lines in use enough Hindi grammar for a Hindi first language person to understand. Use mostly nouns in English(English script)",
                   },
                   title_mr: {
                     type: "string",
                     description:
-                      "Exercise title in Marathi (English script with Marathi structure)",
+                      "Exercise question in brief couple of lines in almost English. use enough marathi grammar for a marathi first language person to understand. Use mostly nouns in English(English script)",
                   },
                   code: {
                     type: "string",
                     description:
-                      "Complete working code with numbered comments [1], [2], etc. HTML formatted with VS Code styling",
+                      "Complete working PLAIN TEXT code with numbered comments [1], [2], etc. NO HTML formatting - just clean, copyable code that can be executed directly.",
                   },
                   mermaid_diagram: {
                     type: "string",
                     description:
-                      "Pure Mermaid code for educational diagram (no semicolons or quotes)",
+                      "Educational Mermaid flowchart explaining the code logic. Must start with diagram type (graph TD, flowchart TD, etc.) and use proper syntax without special characters in node labels.",
                   },
                   hints_en: {
                     type: "array",
-                    description: "8-10 practical hints in English",
-                    minItems: 8,
-                    maxItems: 10,
+                    description: "Practical hints array in English",
                     items: {
                       type: "object",
                       properties: {
                         text: {
                           type: "string",
-                          description: "The hint text",
+                          description:
+                            "Clear, practical hint text. Use backticks for inline code.",
                         },
                         code_snippet: {
                           type: "string",
-                          description:
-                            "Optional code snippet related to this hint",
+                          description: "Optional plain text code example",
                         },
                       },
                       required: ["text"],
@@ -93,27 +90,26 @@ export async function POST(request: Request) {
                   },
                   explanation_en: {
                     type: "array",
-                    description:
-                      "Clear explanation in English with code references",
-                    minItems: 3,
+                    description: "Detailed explanation array in English",
                     items: {
                       type: "object",
                       properties: {
                         text: {
                           type: "string",
                           description:
-                            "Explanation text, can include [1], [2] references",
+                            "Explanation text starting with [1], [2], etc.",
                         },
                         type: {
                           type: "string",
                           enum: ["text", "code", "concept", "warning", "tip"],
-                          description: "Type of explanation block",
+                          description:
+                            "Type of explanation for proper formatting",
                         },
                         code_ref: {
                           type: "array",
-                          description:
-                            "Array of code comment numbers this explanation refers to",
                           items: { type: "number" },
+                          description:
+                            "Array of comment numbers this explanation refers to",
                         },
                       },
                       required: ["text", "type"],
@@ -122,20 +118,18 @@ export async function POST(request: Request) {
                   },
                   hints_hi: {
                     type: "array",
-                    description: "8-10 practical hints in Hindi",
-                    minItems: 8,
-                    maxItems: 10,
+                    description:
+                      "Practical hints array in use enough Hindi grammar for a Hindi first language person to understand. Use mostly nouns in English(English script)",
                     items: {
                       type: "object",
                       properties: {
                         text: {
                           type: "string",
-                          description:
-                            "The hint text in Hindi (English script)",
+                          description: "Clear, practical hint text",
                         },
                         code_snippet: {
                           type: "string",
-                          description: "Optional code snippet",
+                          description: "Optional plain text code example",
                         },
                       },
                       required: ["text"],
@@ -145,23 +139,26 @@ export async function POST(request: Request) {
                   explanation_hi: {
                     type: "array",
                     description:
-                      "Clear explanation in Hindi with code references",
-                    minItems: 3,
+                      "Detailed explanation array in use enough Hindi grammar for a Hindi first language person to understand. Use mostly nouns in English(English script)",
                     items: {
                       type: "object",
                       properties: {
                         text: {
                           type: "string",
                           description:
-                            "Explanation text in Hindi (English script)",
+                            "Explanation text starting with [1], [2], etc.",
                         },
                         type: {
                           type: "string",
                           enum: ["text", "code", "concept", "warning", "tip"],
+                          description:
+                            "Type of explanation for proper formatting",
                         },
                         code_ref: {
                           type: "array",
                           items: { type: "number" },
+                          description:
+                            "Array of comment numbers this explanation refers to",
                         },
                       },
                       required: ["text", "type"],
@@ -170,20 +167,18 @@ export async function POST(request: Request) {
                   },
                   hints_mr: {
                     type: "array",
-                    description: "8-10 practical hints in Marathi",
-                    minItems: 8,
-                    maxItems: 10,
+                    description:
+                      "Practical hints array in almost English. use enough marathi grammar for a marathi first language person to understand. Use mostly nouns in English(English script)",
                     items: {
                       type: "object",
                       properties: {
                         text: {
                           type: "string",
-                          description:
-                            "The hint text in Marathi (English script)",
+                          description: "Clear, practical hint text",
                         },
                         code_snippet: {
                           type: "string",
-                          description: "Optional code snippet",
+                          description: "Optional plain text code example",
                         },
                       },
                       required: ["text"],
@@ -193,23 +188,26 @@ export async function POST(request: Request) {
                   explanation_mr: {
                     type: "array",
                     description:
-                      "Clear explanation in Marathi with code references",
-                    minItems: 3,
+                      "Detailed explanation array in almost English. use enough marathi grammar for a marathi first language person to understand. Use mostly nouns in English(English script)",
                     items: {
                       type: "object",
                       properties: {
                         text: {
                           type: "string",
                           description:
-                            "Explanation text in Marathi (English script)",
+                            "Explanation text starting with [1], [2], etc.",
                         },
                         type: {
                           type: "string",
                           enum: ["text", "code", "concept", "warning", "tip"],
+                          description:
+                            "Type of explanation for proper formatting",
                         },
                         code_ref: {
                           type: "array",
                           items: { type: "number" },
+                          description:
+                            "Array of comment numbers this explanation refers to",
                         },
                       },
                       required: ["text", "type"],
@@ -218,25 +216,20 @@ export async function POST(request: Request) {
                   },
                   visual_elements: {
                     type: "object",
-                    description:
-                      "Required visual learning elements - MUST be provided for every exercise",
+                    description: "Required visual learning elements",
                     properties: {
                       memory_states: {
                         type: "array",
-                        description:
-                          "Memory state visualization showing variable changes through execution",
-                        minItems: 1,
+                        description: "Memory state visualization",
                         items: {
                           type: "object",
                           properties: {
                             step: {
                               type: "string",
-                              description:
-                                "Step identifier (e.g., 'Initial', 'After line 5', 'Final')",
+                              description: "Step identifier",
                             },
                             variables: {
                               type: "array",
-                              minItems: 1,
                               items: {
                                 type: "object",
                                 properties: {
@@ -251,8 +244,7 @@ export async function POST(request: Request) {
                                   },
                                   type: {
                                     type: "string",
-                                    description:
-                                      "Data type (int, string, array, etc.)",
+                                    description: "Data type",
                                   },
                                 },
                                 required: ["name", "value", "type"],
@@ -266,9 +258,7 @@ export async function POST(request: Request) {
                       },
                       execution_steps: {
                         type: "array",
-                        description:
-                          "Step-by-step execution trace of the program",
-                        minItems: 3,
+                        description: "Step-by-step execution trace",
                         items: {
                           type: "object",
                           properties: {
@@ -286,8 +276,7 @@ export async function POST(request: Request) {
                             },
                             output: {
                               type: "string",
-                              description:
-                                "Any output produced (empty string if no output)",
+                              description: "Any output produced",
                             },
                           },
                           required: ["step", "line", "description", "output"],
@@ -296,16 +285,13 @@ export async function POST(request: Request) {
                       },
                       concepts: {
                         type: "array",
-                        description:
-                          "Key programming concepts demonstrated in the exercise",
-                        minItems: 2,
+                        description: "Key programming concepts demonstrated",
                         items: {
                           type: "object",
                           properties: {
                             name: {
                               type: "string",
-                              description:
-                                "Concept name (e.g., 'Loops', 'Arrays', 'Functions')",
+                              description: "Concept name",
                             },
                             description: {
                               type: "string",
@@ -313,8 +299,7 @@ export async function POST(request: Request) {
                             },
                             visual_metaphor: {
                               type: "string",
-                              description:
-                                "Real-world analogy or metaphor to explain the concept",
+                              description: "Real-world analogy or metaphor",
                             },
                           },
                           required: ["name", "description", "visual_metaphor"],
@@ -324,6 +309,56 @@ export async function POST(request: Request) {
                     },
                     required: ["memory_states", "execution_steps", "concepts"],
                     additionalProperties: false,
+                  },
+                  // Test case structure
+                  is_testable: {
+                    type: "boolean",
+                    description:
+                      "Whether this exercise can be automatically tested",
+                  },
+                  test_reason: {
+                    type: "string",
+                    description:
+                      "Brief explanation of why the exercise is testable or not",
+                  },
+                  test_cases: {
+                    type: "array",
+                    description:
+                      "Array of test cases (only if is_testable is true)",
+                    items: {
+                      type: "object",
+                      properties: {
+                        name: {
+                          type: "string",
+                          description: "Descriptive name for the test case",
+                        },
+                        input: {
+                          type: "string",
+                          description: "Plain text input data for the test",
+                        },
+                        expected_output: {
+                          type: "string",
+                          description: "Plain text expected output",
+                        },
+                        is_hidden: {
+                          type: "boolean",
+                          description:
+                            "Whether this test case is hidden from students",
+                        },
+                      },
+                      required: [
+                        "name",
+                        "input",
+                        "expected_output",
+                        "is_hidden",
+                      ],
+                      additionalProperties: false,
+                    },
+                  },
+                  boilerplate_code: {
+                    type: "string",
+                    description:
+                      "PLAIN TEXT starter code template for students (only if is_testable is true). Must be clean, copyable code that can be executed directly.",
                   },
                 },
                 required: [
@@ -339,6 +374,8 @@ export async function POST(request: Request) {
                   "hints_mr",
                   "explanation_mr",
                   "visual_elements",
+                  "is_testable",
+                  "test_reason",
                 ],
                 additionalProperties: false,
               },
@@ -359,7 +396,6 @@ export async function POST(request: Request) {
     }
 
     const data = await response.json()
-    console.log(data)
     const content = data.choices?.[0]?.message?.content
 
     if (!content) {
@@ -373,7 +409,7 @@ export async function POST(request: Request) {
     try {
       const parsedContent = JSON.parse(content)
 
-      // Validate that visual_elements are present and have required content
+      // Validate that visual_elements are present
       if (!parsedContent.visual_elements) {
         console.error("Missing visual_elements in response")
         return NextResponse.json(
@@ -384,13 +420,12 @@ export async function POST(request: Request) {
 
       const visualElements = parsedContent.visual_elements
 
-      // Check for required visual elements
+      // Check for required visual elements with simplified validation
       if (
         !visualElements.memory_states ||
-        !Array.isArray(visualElements.memory_states) ||
-        visualElements.memory_states.length === 0
+        !Array.isArray(visualElements.memory_states)
       ) {
-        console.error("Missing or empty memory_states")
+        console.error("Missing or invalid memory_states")
         return NextResponse.json(
           { error: "Response missing required memory states visualization" },
           { status: 500 }
@@ -399,81 +434,56 @@ export async function POST(request: Request) {
 
       if (
         !visualElements.execution_steps ||
-        !Array.isArray(visualElements.execution_steps) ||
-        visualElements.execution_steps.length < 3
+        !Array.isArray(visualElements.execution_steps)
       ) {
-        console.error("Missing or insufficient execution_steps")
+        console.error("Missing or invalid execution_steps")
         return NextResponse.json(
-          {
-            error:
-              "Response missing required execution steps (minimum 3 steps)",
-          },
+          { error: "Response missing required execution steps" },
           { status: 500 }
         )
+      }
+
+      if (!visualElements.concepts || !Array.isArray(visualElements.concepts)) {
+        console.error("Missing or invalid concepts")
+        return NextResponse.json(
+          { error: "Response missing required concepts" },
+          { status: 500 }
+        )
+      }
+
+      // Validate that code is plain text (not HTML)
+      if (
+        parsedContent.code &&
+        (parsedContent.code.includes("<pre>") ||
+          parsedContent.code.includes("<code>"))
+      ) {
+        console.warn(
+          "⚠️ Main code contains HTML formatting - this should be plain text"
+        )
+        // Could optionally strip HTML here if needed
       }
 
       if (
-        !visualElements.concepts ||
-        !Array.isArray(visualElements.concepts) ||
-        visualElements.concepts.length < 2
+        parsedContent.boilerplate_code &&
+        (parsedContent.boilerplate_code.includes("<pre>") ||
+          parsedContent.boilerplate_code.includes("<code>"))
       ) {
-        console.error("Missing or insufficient concepts")
-        return NextResponse.json(
-          { error: "Response missing required concepts (minimum 2 concepts)" },
-          { status: 500 }
+        console.warn(
+          "⚠️ Boilerplate code contains HTML formatting - this should be plain text"
         )
       }
 
-      // Additional validation for content quality
-      const hasValidMemoryStates = visualElements.memory_states.every(
-        (state) =>
-          state.step &&
-          state.variables &&
-          Array.isArray(state.variables) &&
-          state.variables.length > 0
-      )
-
-      const hasValidExecutionSteps = visualElements.execution_steps.every(
-        (step) =>
-          typeof step.step === "number" &&
-          step.line &&
-          step.description &&
-          step.output !== undefined
-      )
-
-      const hasValidConcepts = visualElements.concepts.every(
-        (concept) =>
-          concept.name && concept.description && concept.visual_metaphor
-      )
-
-      if (!hasValidMemoryStates) {
-        console.error("Invalid memory states structure")
-        return NextResponse.json(
-          { error: "Invalid memory states structure in response" },
-          { status: 500 }
-        )
-      }
-
-      if (!hasValidExecutionSteps) {
-        console.error("Invalid execution steps structure")
-        return NextResponse.json(
-          { error: "Invalid execution steps structure in response" },
-          { status: 500 }
-        )
-      }
-
-      if (!hasValidConcepts) {
-        console.error("Invalid concepts structure")
-        return NextResponse.json(
-          { error: "Invalid concepts structure in response" },
-          { status: 500 }
-        )
-      }
-
-      console.log("✅ Visual elements validation passed:", {
+      console.log("✅ All validations passed:", {
         memoryStates: visualElements.memory_states.length,
         executionSteps: visualElements.execution_steps.length,
         concepts: visualElements.concepts.length,
+        isTestable: parsedContent.is_testable,
+        testCasesCount: parsedContent.test_cases?.length || 0,
+        hasBoilerplate: !!parsedContent.boilerplate_code,
+        codeFormat: parsedContent.code?.includes("<") ? "HTML" : "Plain Text",
+        boilerplateFormat: parsedContent.boilerplate_code?.includes("<")
+          ? "HTML"
+          : "Plain Text",
       })
 
       return NextResponse.json(parsedContent)

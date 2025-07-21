@@ -68,6 +68,7 @@ const ExerciseForm: React.FC<ExerciseFormProps> = ({ onGenerate }) => {
 
       const formData = {
         selectedLanguage,
+        selectedLangObj,
         difficulty,
         selectedModel,
         slug: generateSlug(exerciseResponse.title_en),

@@ -1,3 +1,5 @@
+// app/Learn/types/TutorialTypes.ts (Updated with optional test case fields)
+
 export interface Language {
   id: string | number
   title: string
@@ -100,19 +102,6 @@ export interface CodeRunnerPageProps {
   stdin?: string
 }
 
-// export interface ExerciseAIData {
-//   title_en: string
-//   title_hi: string
-//   title_mr: string
-//   code: string
-//   hints_en: string
-//   explanation_en: string
-//   hints_hi: string
-//   explanation_hi: string
-//   hints_mr: string
-//   explanation_mr: string
-// }
-
 export interface VisualVariable {
   name: string
   value: string
@@ -143,8 +132,6 @@ export interface VisualElements {
   concepts?: Concept[]
 }
 
-// app/Learn/types/TutorialTypes.ts (updated ExerciseAIData interface)
-
 export interface HintItem {
   text: string
   code_snippet?: string
@@ -156,6 +143,33 @@ export interface ExplanationItem {
   code_ref?: number[]
 }
 
+// Test case related interfaces (NEW)
+export interface TestCase {
+  id: string
+  name: string
+  description: string
+  input: string
+  expected_output: string
+  is_hidden: boolean
+  difficulty: 1 | 2 | 3
+  points: number
+  timeout_ms: number
+  test_type: "basic" | "edge_case" | "performance" | "error_handling"
+}
+
+export interface TestingConfig {
+  is_testable: boolean
+  reason: string
+  test_type?: "function" | "complete_program" | "output_only" | "interactive"
+}
+
+export interface SolutionApproach {
+  steps: string[]
+  key_concepts: string[]
+  common_mistakes: string[]
+}
+
+// Updated ExerciseAIData interface with SIMPLIFIED test case fields
 export interface ExerciseAIData {
   title_en: string
   title_hi: string
@@ -169,6 +183,20 @@ export interface ExerciseAIData {
   hints_mr: HintItem[]
   explanation_mr: ExplanationItem[]
   visual_elements?: VisualElements
+
+  // NEW: Simplified test case fields
+  is_testable?: boolean
+  test_reason?: string
+  test_cases?: SimpleTestCase[]
+  boilerplate_code?: string
+}
+
+// Simplified test case interface
+export interface SimpleTestCase {
+  name: string
+  input: string
+  expected_output: string
+  is_hidden: boolean
 }
 
 // Update the getLocalizedContent helper

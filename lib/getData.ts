@@ -1,9 +1,5 @@
 import { fetchCollection } from "@/lib/FetchDataPayload";
-import {
-  ExerciseAIData,
-  Language,
-  Tutorial,
-} from "@/app/Learn/types/TutorialTypes";
+import { Language, Tutorial } from "@/app/Learn/types/TutorialTypes";
 
 export async function getLanguages(): Promise<Language[]> {
   try {
@@ -96,8 +92,15 @@ export async function generateExercise(
   selectedLanguage: string,
   difficulty: number,
   selectedModel: string,
-): Promise<ExerciseAIData> {
+) {
   try {
+    console.log("🔄 Generating exercise with params:", {
+      questionInput,
+      selectedLanguage,
+      difficulty,
+      selectedModel,
+    });
+
     const response = await fetch("/api/generate-exercise", {
       method: "POST",
       headers: {
@@ -111,31 +114,41 @@ export async function generateExercise(
       }),
     });
 
+    console.log("📡 API Response status:", response.status);
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData || `API request failed: ${response.status}`);
+      const errorText = await response.text();
+      console.error(
+        "❌ API Response Error:",
+        response.status,
+        response.statusText,
+      );
+      console.error("❌ Error details:", errorText);
+
+      let errorObj;
+      try {
+        errorObj = JSON.parse(errorText);
+      } catch {
+        errorObj = { error: errorText };
+      }
+
+      throw new Error(
+        `API Error ${response.status}: ${errorObj.error || errorText}`,
+      );
     }
 
     const data = await response.json();
-    console.log(data);
+    console.log("✅ Exercise generated successfully:", data);
+
     return data;
   } catch (error) {
-    console.error("Error generating exercise:", error);
-    throw error;
-  }
-}
+    console.error("❌ Error in generateExercise:", error);
 
-export async function submitExercise(exercisePayload: any): Promise<void> {
-  // Replace with your actual Payload CMS API call
-  const response = await fetch("/api/generate-exercise/submit-exercise", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(exercisePayload),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to submit exercise: ${response.status}`);
+    // Re-throw with more specific error message
+    if (error instanceof Error) {
+      throw new Error(`Exercise generation failed: ${error.message}`);
+    } else {
+      throw new Error(`Exercise generation failed: ${String(error)}`);
+    }
   }
 }

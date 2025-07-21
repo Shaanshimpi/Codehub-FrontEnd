@@ -8,21 +8,26 @@ function page() {
     <div>
       <MermaidDiagram>
         {`graph TD
-    A[Start] --> B{number <= 10}
-    style A fill:#f9f,stroke:#333,stroke-width:2px,color:#333
-    style B fill:#ccf,stroke:#333,stroke-width:2px,color:#333
-    B -- Yes --> C{number % 2 == 0}
-    style C fill:#ccf,stroke:#333,stroke-width:2px,color:#333
-    C -- Yes --> D[Print number is even]
-    style D fill:#aef,stroke:#333,stroke-width:2px,color:#333
-    C -- No --> E[Print number is odd]
-    style E fill:#aef,stroke:#333,stroke-width:2px,color:#333
-    D --> F[number++]
-    E --> F
-    style F fill:#bbf,stroke:#333,stroke-width:2px,color:#333
-    F --> B
-    B -- No --> G[End]
-    style G fill:#f9f,stroke:#333,stroke-width:2px,color:#333
+    A[SchoolMember] --> B(Teacher)
+    A --> C(Student)
+    A --> D(Other School Member)
+
+    style A fill:#ff6b6b,stroke:#333,stroke-width:2px
+    style B fill:#feca57,stroke:#333,stroke-width:2px
+    style C fill:#1dd1a1,stroke:#333,stroke-width:2px
+    style D fill:#5f27cd,stroke:#333,stroke-width:2px
+
+    A --> E{'getRole'} 
+    A --> F{'displayInfo'}
+
+    E -.-> B
+    E -.-> C
+    F -.-> B
+    F -.-> C
+
+    linkStyle 0,1,2 stroke-width:2px,stroke:#333
+    linkStyle 3,4 stroke-width:2px,stroke:#333
+    linkStyle 5,6 stroke-width:2px,stroke:#333
           `}
       </MermaidDiagram>
     </div>

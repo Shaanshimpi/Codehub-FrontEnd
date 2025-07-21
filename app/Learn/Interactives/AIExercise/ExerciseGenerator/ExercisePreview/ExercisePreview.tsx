@@ -3,6 +3,7 @@
 
 import React, { useState } from "react"
 import type { ExerciseAIData } from "@/app/Learn/types/TutorialTypes"
+import { useLanguage } from "@/app/contexts/LanguageContext"
 import { MermaidDiagram } from "@lightenna/react-mermaid-diagram"
 import Header from "./components/Header"
 import Metadata from "./components/Metadata"
@@ -18,8 +19,6 @@ import {
   getDifficultyLabel,
   getLocalizedContent,
 } from "./utils/exerciseHelpers"
-
-// app/Learn/Interactives/AIExercise/ExerciseGenerator/ExercisePreview/ExercisePreview.tsx
 
 // app/Learn/Interactives/AIExercise/ExerciseGenerator/ExercisePreview/ExercisePreview.tsx
 
@@ -43,12 +42,9 @@ const ExercisePreview: React.FC<ExercisePreviewProps> = ({
   const [showVisuals, setShowVisuals] = useState(false)
   const [diagramError, setDiagramError] = useState(false)
 
-  const content = getLocalizedContent(exerciseData, "en") // Replace with dynamic language
-  const language = formData?.selectedLanguage
-    ? exerciseData.languages?.find(
-        (lang) => lang.id === parseInt(formData.selectedLanguage)
-      )?.slug || "javascript"
-    : "javascript"
+  const { language } = useLanguage()
+
+  const content = getLocalizedContent(exerciseData, language) // Replace with dynamic language
 
   // Add custom styles for the component
   React.useEffect(() => {
@@ -108,7 +104,7 @@ const ExercisePreview: React.FC<ExercisePreviewProps> = ({
         {/* Code Section */}
         <Section show={showCode} setShow={setShowCode} label="💻 Show Code">
           <div className="section-content">
-            {formatCode(exerciseData.code, language)}
+            {formatCode(exerciseData.code, formData.selectedLangObj)}
           </div>
         </Section>
 

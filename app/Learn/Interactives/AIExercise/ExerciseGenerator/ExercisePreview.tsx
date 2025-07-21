@@ -4,7 +4,10 @@ import React, { useEffect, useState } from "react"
 import type { ExerciseAIData } from "@/app/Learn/types/TutorialTypes"
 import { useLanguage } from "@/app/contexts/LanguageContext"
 import { ChevronDown, ChevronUp, Eye, X } from "lucide-react"
-import { formatHintsArray } from "./ExercisePreview/utils/exerciseFormatter"
+import {
+  formatExplanationArray,
+  formatHintsArray,
+} from "./ExercisePreview/utils/exerciseFormatter"
 
 interface ExercisePreviewProps {
   exerciseData: ExerciseAIData
@@ -485,7 +488,7 @@ const ExercisePreview: React.FC<ExercisePreviewProps> = ({
           setShow={setShowExplanation}
           label="📝 Show Explanation"
         >
-          {formatExplanation(content.explanation)}
+          {formatExplanationArray(content.explanation)}
         </RevealButton>
 
         {/* Metadata */}
