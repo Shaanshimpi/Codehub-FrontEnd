@@ -12,13 +12,13 @@ const TITLE_EN_SCHEMA = {
 const TITLE_HI_SCHEMA = {
   type: "string",
   description:
-    "Exercise question in brief couple of lines in use enough Hindi grammar for a Hindi first language person to understand. Use mostly nouns in English(English script) as a statement",
+    "Exercise question in brief couple of lines in use enough Hindi grammar for a Hindi first language person to understand. Use mostly nouns in English(English script) as a statement (Roman script)",
 }
 
 const TITLE_MR_SCHEMA = {
   type: "string",
   description:
-    "Exercise question in brief couple of lines in almost English. use enough marathi grammar for a marathi first language person to understand. Use mostly nouns in English(English script) as a statement",
+    "Exercise question in brief couple of lines in almost English. use enough marathi grammar for a marathi first language person to understand. Use mostly nouns in English(English script) as a statement (Roman script)",
 }
 
 const CODE_SCHEMA = {
@@ -66,7 +66,7 @@ const EXPLANATION_SCHEMA = {
       },
       type: {
         type: "string",
-        enum: ["text", "code", "concept", "warning", "tip"],
+        enum: ["text", "solution_code", "concept", "warning", "tip"],
         description: "Type of explanation for proper formatting",
       },
       code_ref: {
@@ -188,6 +188,28 @@ const BOILERPLATE_SCHEMA = {
     "PLAIN TEXT starter code template for students with TODO comments and empty implementation areas. Must be clean, copyable code that can be executed directly. Should be 20%-30% part of original code for students to get started with clear guidance.",
 }
 
+const LEARNING_OBJECTIVES_SCHEMA = {
+  type: "array",
+  description: "Learning objectives for the exercise",
+  items: {
+    type: "string",
+    description: "Specific learning objective starting with action verb",
+  },
+  minItems: 2,
+  maxItems: 4,
+}
+
+const TAGS_SCHEMA = {
+  type: "array",
+  description: "Programming concept tags",
+  items: {
+    type: "string",
+    description: "Single programming concept or technique",
+  },
+  minItems: 3,
+  maxItems: 6,
+}
+
 export async function POST(request: Request) {
   try {
     const { questionInput, selectedLanguage, difficulty, selectedModel } =
@@ -232,10 +254,12 @@ export async function POST(request: Request) {
                   title_en: TITLE_EN_SCHEMA,
                   title_hi: TITLE_HI_SCHEMA,
                   title_mr: TITLE_MR_SCHEMA,
-                  code: CODE_SCHEMA,
+                  solution_code: CODE_SCHEMA,
                   mermaid_diagram: MERMAID_SCHEMA,
                   hints_en: HINTS_SCHEMA,
                   explanation_en: EXPLANATION_SCHEMA,
+                  tags: TAGS_SCHEMA,
+                  learning_objectives: LEARNING_OBJECTIVES_SCHEMA,
                   hints_hi: {
                     ...HINTS_SCHEMA,
                     description:
@@ -263,7 +287,7 @@ export async function POST(request: Request) {
                   "title_en",
                   "title_hi",
                   "title_mr",
-                  "code",
+                  "solution_code",
                   "mermaid_diagram",
                   "hints_en",
                   "explanation_en",
@@ -350,9 +374,9 @@ export async function POST(request: Request) {
 
       // Validate that code is plain text (not HTML)
       if (
-        parsedContent.code &&
-        (parsedContent.code.includes("<pre>") ||
-          parsedContent.code.includes("<code>"))
+        parsedContent.solution_code &&
+        (parsedContent.solution_code.includes("<pre>") ||
+          parsedContent.solution_code.includes("<code>"))
       ) {
         console.warn(
           "⚠️ Main code contains HTML formatting - this should be plain text"
@@ -386,7 +410,9 @@ export async function POST(request: Request) {
         executionSteps: visualElements.execution_steps.length,
         concepts: visualElements.concepts.length,
         hasBoilerplate: !!parsedContent.boilerplate_code,
-        codeFormat: parsedContent.code?.includes("<") ? "HTML" : "Plain Text",
+        codeFormat: parsedContent.solution_code?.includes("<")
+          ? "HTML"
+          : "Plain Text",
         boilerplateFormat: parsedContent.boilerplate_code?.includes("<")
           ? "HTML"
           : "Plain Text",

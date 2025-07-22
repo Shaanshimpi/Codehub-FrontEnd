@@ -179,7 +179,7 @@ export interface ExerciseAIData {
   title_en: string
   title_hi: string
   title_mr: string
-  code: string
+  solution_code: string
   mermaid_diagram: string
   hints_en: HintItem[]
   explanation_en: ExplanationItem[]
@@ -189,6 +189,8 @@ export interface ExerciseAIData {
   explanation_mr: ExplanationItem[]
   visual_elements?: VisualElements
   boilerplate_code: string
+  learning_objectives?: string[]
+  tags?: string[]
 }
 
 // Update the getLocalizedContent helper

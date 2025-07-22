@@ -43,7 +43,7 @@ DO NOT use optimized algorithms like:
 Keep it EDUCATIONAL and UNDERSTANDABLE for learning purposes.`
 
 export const CODE_FORMATTING = `CODE FORMATTING RULES:
-1. For the main "code" field: Use PLAIN TEXT code with numbered comments [1], [2], etc.
+1. For the main "solution_code" field: Use PLAIN TEXT code with numbered comments [1], [2], etc.
 2. For hints/explanations: Use backticks \`code\` for inline code (frontend will format)
 
 MAIN CODE FIELD (Plain text with numbered comments):
@@ -363,10 +363,11 @@ CRITICAL INSTRUCTIONS:
 4. MERMAID: Use DOUBLE QUOTES for all text, NO special characters in labels
 5. Keep algorithms educational and understandable, not perfectly optimized
 6. Use proper JSON structure with all required fields
-7. Generate PLAIN TEXT code for both "code" and "boilerplate_code" fields
+7. Generate PLAIN TEXT code for both "solution_code" and "boilerplate_code" fields
 8. Create clear explanations that reference numbered comments
 9. Include practical hints for student understanding
 10. Make visual elements comprehensive and educational
+11. Strictly use ROMAN script, non-english text should be mostly in English just enough grammar of that language. Enough for non-english primary speaker to understand.
 
 REMEMBER: For beginners, SIMPLE is better than PERFECT. Focus on learning, not optimization.
 

@@ -5,9 +5,12 @@ import React, { useState } from "react"
 import type { ExerciseAIData } from "@/app/Learn/types/TutorialTypes"
 import { useLanguage } from "@/app/contexts/LanguageContext"
 import { MermaidDiagram } from "@lightenna/react-mermaid-diagram"
+import { Tag } from "lucide-react"
 import Header from "./components/Header"
+import LearningObjectivesDisplay from "./components/LearningObjectivesDisplay"
 import Metadata from "./components/Metadata"
 import Section from "./components/Section"
+import TagsDisplay from "./components/TagsDisplay"
 import Title from "./components/Title"
 import {
   formatCode,
@@ -19,6 +22,8 @@ import {
   getDifficultyLabel,
   getLocalizedContent,
 } from "./utils/exerciseHelpers"
+
+// app/Learn/Interactives/AIExercise/ExerciseGenerator/ExercisePreview/ExercisePreview.tsx
 
 // app/Learn/Interactives/AIExercise/ExerciseGenerator/ExercisePreview/ExercisePreview.tsx
 
@@ -43,6 +48,8 @@ const ExercisePreview: React.FC<ExercisePreviewProps> = ({
   const [showExplanation, setShowExplanation] = useState(false)
   const [showDiagram, setShowDiagram] = useState(false)
   const [showVisuals, setShowVisuals] = useState(false)
+
+  const [showLearningObjectives, setShowLearningObjectives] = useState(true)
   const [diagramError, setDiagramError] = useState(false)
 
   const { language } = useLanguage()
@@ -89,13 +96,32 @@ const ExercisePreview: React.FC<ExercisePreviewProps> = ({
     document.head.appendChild(style)
     return () => document.head.removeChild(style)
   }, [])
-  console.log(exerciseData)
+  // console.log(exerciseData)
   return (
     <div className="exercise-preview-container mx-auto max-w-4xl rounded-lg p-6 text-white shadow-2xl">
       <Header onBack={onBack} onContinue={onContinue} />
 
       <div className="space-y-6">
         <Title title={content.title} />
+        {/* Tags Section */}
+        <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-gray-800">
+            <Tag className="h-5 w-5 text-blue-600" />
+            Programming Concepts
+          </h3>
+          <TagsDisplay tags={exerciseData.tags} />
+        </div>
+
+        {/* Learning Objectives Section */}
+        <Section
+          show={showLearningObjectives}
+          setShow={setShowLearningObjectives}
+          label="🎯 Learning Objectives"
+        >
+          <LearningObjectivesDisplay
+            objectives={exerciseData.learning_objectives}
+          />
+        </Section>
 
         {/* Hints Section */}
         <Section show={showHints} setShow={setShowHints} label="💡 Show Hints">
@@ -107,7 +133,7 @@ const ExercisePreview: React.FC<ExercisePreviewProps> = ({
         {/* Code Section */}
         <Section show={showCode} setShow={setShowCode} label="💻 Show Code">
           <div className="section-content">
-            {formatCode(exerciseData.code, formData.selectedLangObj)}
+            {formatCode(exerciseData.solution_code, formData.selectedLangObj)}
           </div>
         </Section>
         {/* Code Section */}
