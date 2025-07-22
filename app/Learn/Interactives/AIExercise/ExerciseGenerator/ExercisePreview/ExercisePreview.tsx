@@ -22,6 +22,8 @@ import {
 
 // app/Learn/Interactives/AIExercise/ExerciseGenerator/ExercisePreview/ExercisePreview.tsx
 
+// app/Learn/Interactives/AIExercise/ExerciseGenerator/ExercisePreview/ExercisePreview.tsx
+
 interface ExercisePreviewProps {
   exerciseData: ExerciseAIData
   formData: any
@@ -37,6 +39,7 @@ const ExercisePreview: React.FC<ExercisePreviewProps> = ({
 }) => {
   const [showHints, setShowHints] = useState(false)
   const [showCode, setShowCode] = useState(true)
+  const [showBoilerCode, setShowBoilerCode] = useState(true)
   const [showExplanation, setShowExplanation] = useState(false)
   const [showDiagram, setShowDiagram] = useState(false)
   const [showVisuals, setShowVisuals] = useState(false)
@@ -86,7 +89,7 @@ const ExercisePreview: React.FC<ExercisePreviewProps> = ({
     document.head.appendChild(style)
     return () => document.head.removeChild(style)
   }, [])
-
+  console.log(exerciseData)
   return (
     <div className="exercise-preview-container mx-auto max-w-4xl rounded-lg p-6 text-white shadow-2xl">
       <Header onBack={onBack} onContinue={onContinue} />
@@ -107,7 +110,30 @@ const ExercisePreview: React.FC<ExercisePreviewProps> = ({
             {formatCode(exerciseData.code, formData.selectedLangObj)}
           </div>
         </Section>
+        {/* Code Section */}
+        <Section
+          show={showBoilerCode}
+          setShow={setShowBoilerCode}
+          label="BoilerPlate Code"
+        >
+          <div className="section-content">
+            {formatCode(
+              exerciseData.boilerplate_code,
+              formData.selectedLangObj
+            )}
+          </div>
+        </Section>
 
+        {/* Explanation Section */}
+        <Section
+          show={showExplanation}
+          setShow={setShowExplanation}
+          label="📝 Show Explanation"
+        >
+          <div className="section-content">
+            {formatExplanationArray(content.explanation)}
+          </div>
+        </Section>
         {/* Mermaid Diagram */}
         {
           <Section
@@ -157,17 +183,6 @@ const ExercisePreview: React.FC<ExercisePreviewProps> = ({
             </div>
           </Section>
         )}
-
-        {/* Explanation Section */}
-        <Section
-          show={showExplanation}
-          setShow={setShowExplanation}
-          label="📝 Show Explanation"
-        >
-          <div className="section-content">
-            {formatExplanationArray(content.explanation)}
-          </div>
-        </Section>
 
         <Metadata
           difficulty={getDifficultyLabel(formData?.difficulty)}

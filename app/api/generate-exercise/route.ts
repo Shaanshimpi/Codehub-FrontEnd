@@ -1,6 +1,192 @@
-// app/api/generate-exercise/route.ts (Updated for Plain Text Code)
+// app/api/generate-exercise/route.ts (Updated - Separate Variables)
 import { NextResponse } from "next/server"
 import { buildPrompt } from "./systemPrompts"
+
+// Separate variable definitions for better AI understanding
+const TITLE_EN_SCHEMA = {
+  type: "string",
+  description:
+    "Exercise question in brief couple of lines in English as a statement",
+}
+
+const TITLE_HI_SCHEMA = {
+  type: "string",
+  description:
+    "Exercise question in brief couple of lines in use enough Hindi grammar for a Hindi first language person to understand. Use mostly nouns in English(English script) as a statement",
+}
+
+const TITLE_MR_SCHEMA = {
+  type: "string",
+  description:
+    "Exercise question in brief couple of lines in almost English. use enough marathi grammar for a marathi first language person to understand. Use mostly nouns in English(English script) as a statement",
+}
+
+const CODE_SCHEMA = {
+  type: "string",
+  description:
+    "Complete working PLAIN TEXT code with numbered comments [1], [2], etc. NO HTML formatting - just clean, copyable code that can be executed directly. For BEGINNERS use SIMPLE algorithms without optimizations.",
+}
+
+const MERMAID_SCHEMA = {
+  type: "string",
+  description:
+    "Educational Mermaid flowchart explaining the code logic. Must start with diagram type (graph TD, flowchart TD, etc.). CRITICAL: Use DOUBLE QUOTES for ALL text labels. Mathematical expressions and simple code conditions are ALLOWED: sqrt(n), if(year%4==0), arr[i], i++. AVOID only these problematic characters: [], <>, \\, ;, : in node labels.",
+}
+
+const HINTS_SCHEMA = {
+  type: "array",
+  description: "Practical hints array",
+  items: {
+    type: "object",
+    properties: {
+      text: {
+        type: "string",
+        description:
+          "Clear, practical hint text. Use backticks for inline code.",
+      },
+      code_snippet: {
+        type: "string",
+        description: "Optional plain text code example",
+      },
+    },
+    required: ["text"],
+    additionalProperties: false,
+  },
+}
+
+const EXPLANATION_SCHEMA = {
+  type: "array",
+  description: "Detailed explanation array",
+  items: {
+    type: "object",
+    properties: {
+      text: {
+        type: "string",
+        description: "Explanation text starting with [1], [2], etc.",
+      },
+      type: {
+        type: "string",
+        enum: ["text", "code", "concept", "warning", "tip"],
+        description: "Type of explanation for proper formatting",
+      },
+      code_ref: {
+        type: "array",
+        items: { type: "number" },
+        description: "Array of comment numbers this explanation refers to",
+      },
+    },
+    required: ["text", "type"],
+    additionalProperties: false,
+  },
+}
+
+const MEMORY_STATES_SCHEMA = {
+  type: "array",
+  description: "Memory state visualization",
+  items: {
+    type: "object",
+    properties: {
+      step: {
+        type: "string",
+        description: "Step identifier",
+      },
+      variables: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            name: {
+              type: "string",
+              description: "Variable name",
+            },
+            value: {
+              type: "string",
+              description: "Current value of the variable",
+            },
+            type: {
+              type: "string",
+              description: "Data type",
+            },
+          },
+          required: ["name", "value", "type"],
+          additionalProperties: false,
+        },
+      },
+    },
+    required: ["step", "variables"],
+    additionalProperties: false,
+  },
+}
+
+const EXECUTION_STEPS_SCHEMA = {
+  type: "array",
+  description: "Step-by-step execution trace",
+  items: {
+    type: "object",
+    properties: {
+      step: {
+        type: "number",
+        description: "Sequential step number",
+      },
+      line: {
+        type: "string",
+        description: "Code line being executed",
+      },
+      description: {
+        type: "string",
+        description: "What happens in this step",
+      },
+      output: {
+        type: "string",
+        description: "Any output produced",
+      },
+    },
+    required: ["step", "line", "description", "output"],
+    additionalProperties: false,
+  },
+}
+
+const CONCEPTS_SCHEMA = {
+  type: "array",
+  description: "Key programming concepts demonstrated",
+  items: {
+    type: "object",
+    properties: {
+      name: {
+        type: "string",
+        description: "Concept name",
+      },
+      description: {
+        type: "string",
+        description: "Clear explanation of the concept",
+      },
+      visual_metaphor: {
+        type: "string",
+        description: "Real-world analogy or metaphor",
+      },
+    },
+    required: ["name", "description", "visual_metaphor"],
+    additionalProperties: false,
+  },
+}
+
+const VISUAL_ELEMENTS_SCHEMA = {
+  type: "object",
+  description: "Required visual learning elements",
+  properties: {
+    memory_states: MEMORY_STATES_SCHEMA,
+    execution_steps: EXECUTION_STEPS_SCHEMA,
+    concepts: CONCEPTS_SCHEMA,
+  },
+  required: ["memory_states", "execution_steps", "concepts"],
+  additionalProperties: false,
+}
+
+const BOILERPLATE_SCHEMA = {
+  type: "string",
+  description:
+    "PLAIN TEXT starter code template for students with TODO comments and empty implementation areas. Must be clean, copyable code that can be executed directly. Should be 20%-30% part of original code for students to get started with clear guidance.",
+}
 
 export async function POST(request: Request) {
   try {
@@ -28,7 +214,7 @@ export async function POST(request: Request) {
             {
               role: "system",
               content:
-                "You are an expert programming instructor. Generate complete, educational programming exercises with rich visual content for enhanced learning. You MUST always include comprehensive visual elements including memory states, execution steps, and key concepts for every exercise. Additionally, determine if the exercise is suitable for automated testing and provide test cases and boilerplate code when appropriate. IMPORTANT: Always generate PLAIN TEXT code for the main code field - never use HTML formatting.",
+                "You are an expert programming instructor. Generate complete, educational programming exercises with rich visual content for enhanced learning. You MUST always include comprehensive visual elements including memory states, execution steps, and key concepts for every exercise. For BEGINNERS use SIMPLE algorithms, not optimized ones. IMPORTANT: Always generate PLAIN TEXT code for the main code field - never use HTML formatting. In Mermaid diagrams, use DOUBLE QUOTES for all text. Mathematical expressions like sqrt(n), if(year%4==0), arr[i] are ALLOWED in Mermaid nodes.",
             },
             {
               role: "user",
@@ -43,323 +229,35 @@ export async function POST(request: Request) {
               schema: {
                 type: "object",
                 properties: {
-                  title_en: {
-                    type: "string",
-                    description:
-                      "Exercise question in brief couple of lines in English",
-                  },
-                  title_hi: {
-                    type: "string",
-                    description:
-                      "Exercise question in brief couple of lines in use enough Hindi grammar for a Hindi first language person to understand. Use mostly nouns in English(English script)",
-                  },
-                  title_mr: {
-                    type: "string",
-                    description:
-                      "Exercise question in brief couple of lines in almost English. use enough marathi grammar for a marathi first language person to understand. Use mostly nouns in English(English script)",
-                  },
-                  code: {
-                    type: "string",
-                    description:
-                      "Complete working PLAIN TEXT code with numbered comments [1], [2], etc. NO HTML formatting - just clean, copyable code that can be executed directly.",
-                  },
-                  mermaid_diagram: {
-                    type: "string",
-                    description:
-                      "Educational Mermaid flowchart explaining the code logic. Must start with diagram type (graph TD, flowchart TD, etc.) and use proper syntax without special characters in node labels.",
-                  },
-                  hints_en: {
-                    type: "array",
-                    description: "Practical hints array in English",
-                    items: {
-                      type: "object",
-                      properties: {
-                        text: {
-                          type: "string",
-                          description:
-                            "Clear, practical hint text. Use backticks for inline code.",
-                        },
-                        code_snippet: {
-                          type: "string",
-                          description: "Optional plain text code example",
-                        },
-                      },
-                      required: ["text"],
-                      additionalProperties: false,
-                    },
-                  },
-                  explanation_en: {
-                    type: "array",
-                    description: "Detailed explanation array in English",
-                    items: {
-                      type: "object",
-                      properties: {
-                        text: {
-                          type: "string",
-                          description:
-                            "Explanation text starting with [1], [2], etc.",
-                        },
-                        type: {
-                          type: "string",
-                          enum: ["text", "code", "concept", "warning", "tip"],
-                          description:
-                            "Type of explanation for proper formatting",
-                        },
-                        code_ref: {
-                          type: "array",
-                          items: { type: "number" },
-                          description:
-                            "Array of comment numbers this explanation refers to",
-                        },
-                      },
-                      required: ["text", "type"],
-                      additionalProperties: false,
-                    },
-                  },
+                  title_en: TITLE_EN_SCHEMA,
+                  title_hi: TITLE_HI_SCHEMA,
+                  title_mr: TITLE_MR_SCHEMA,
+                  code: CODE_SCHEMA,
+                  mermaid_diagram: MERMAID_SCHEMA,
+                  hints_en: HINTS_SCHEMA,
+                  explanation_en: EXPLANATION_SCHEMA,
                   hints_hi: {
-                    type: "array",
+                    ...HINTS_SCHEMA,
                     description:
                       "Practical hints array in use enough Hindi grammar for a Hindi first language person to understand. Use mostly nouns in English(English script)",
-                    items: {
-                      type: "object",
-                      properties: {
-                        text: {
-                          type: "string",
-                          description: "Clear, practical hint text",
-                        },
-                        code_snippet: {
-                          type: "string",
-                          description: "Optional plain text code example",
-                        },
-                      },
-                      required: ["text"],
-                      additionalProperties: false,
-                    },
                   },
                   explanation_hi: {
-                    type: "array",
+                    ...EXPLANATION_SCHEMA,
                     description:
                       "Detailed explanation array in use enough Hindi grammar for a Hindi first language person to understand. Use mostly nouns in English(English script)",
-                    items: {
-                      type: "object",
-                      properties: {
-                        text: {
-                          type: "string",
-                          description:
-                            "Explanation text starting with [1], [2], etc.",
-                        },
-                        type: {
-                          type: "string",
-                          enum: ["text", "code", "concept", "warning", "tip"],
-                          description:
-                            "Type of explanation for proper formatting",
-                        },
-                        code_ref: {
-                          type: "array",
-                          items: { type: "number" },
-                          description:
-                            "Array of comment numbers this explanation refers to",
-                        },
-                      },
-                      required: ["text", "type"],
-                      additionalProperties: false,
-                    },
                   },
                   hints_mr: {
-                    type: "array",
+                    ...HINTS_SCHEMA,
                     description:
                       "Practical hints array in almost English. use enough marathi grammar for a marathi first language person to understand. Use mostly nouns in English(English script)",
-                    items: {
-                      type: "object",
-                      properties: {
-                        text: {
-                          type: "string",
-                          description: "Clear, practical hint text",
-                        },
-                        code_snippet: {
-                          type: "string",
-                          description: "Optional plain text code example",
-                        },
-                      },
-                      required: ["text"],
-                      additionalProperties: false,
-                    },
                   },
                   explanation_mr: {
-                    type: "array",
+                    ...EXPLANATION_SCHEMA,
                     description:
                       "Detailed explanation array in almost English. use enough marathi grammar for a marathi first language person to understand. Use mostly nouns in English(English script)",
-                    items: {
-                      type: "object",
-                      properties: {
-                        text: {
-                          type: "string",
-                          description:
-                            "Explanation text starting with [1], [2], etc.",
-                        },
-                        type: {
-                          type: "string",
-                          enum: ["text", "code", "concept", "warning", "tip"],
-                          description:
-                            "Type of explanation for proper formatting",
-                        },
-                        code_ref: {
-                          type: "array",
-                          items: { type: "number" },
-                          description:
-                            "Array of comment numbers this explanation refers to",
-                        },
-                      },
-                      required: ["text", "type"],
-                      additionalProperties: false,
-                    },
                   },
-                  visual_elements: {
-                    type: "object",
-                    description: "Required visual learning elements",
-                    properties: {
-                      memory_states: {
-                        type: "array",
-                        description: "Memory state visualization",
-                        items: {
-                          type: "object",
-                          properties: {
-                            step: {
-                              type: "string",
-                              description: "Step identifier",
-                            },
-                            variables: {
-                              type: "array",
-                              items: {
-                                type: "object",
-                                properties: {
-                                  name: {
-                                    type: "string",
-                                    description: "Variable name",
-                                  },
-                                  value: {
-                                    type: "string",
-                                    description:
-                                      "Current value of the variable",
-                                  },
-                                  type: {
-                                    type: "string",
-                                    description: "Data type",
-                                  },
-                                },
-                                required: ["name", "value", "type"],
-                                additionalProperties: false,
-                              },
-                            },
-                          },
-                          required: ["step", "variables"],
-                          additionalProperties: false,
-                        },
-                      },
-                      execution_steps: {
-                        type: "array",
-                        description: "Step-by-step execution trace",
-                        items: {
-                          type: "object",
-                          properties: {
-                            step: {
-                              type: "number",
-                              description: "Sequential step number",
-                            },
-                            line: {
-                              type: "string",
-                              description: "Code line being executed",
-                            },
-                            description: {
-                              type: "string",
-                              description: "What happens in this step",
-                            },
-                            output: {
-                              type: "string",
-                              description: "Any output produced",
-                            },
-                          },
-                          required: ["step", "line", "description", "output"],
-                          additionalProperties: false,
-                        },
-                      },
-                      concepts: {
-                        type: "array",
-                        description: "Key programming concepts demonstrated",
-                        items: {
-                          type: "object",
-                          properties: {
-                            name: {
-                              type: "string",
-                              description: "Concept name",
-                            },
-                            description: {
-                              type: "string",
-                              description: "Clear explanation of the concept",
-                            },
-                            visual_metaphor: {
-                              type: "string",
-                              description: "Real-world analogy or metaphor",
-                            },
-                          },
-                          required: ["name", "description", "visual_metaphor"],
-                          additionalProperties: false,
-                        },
-                      },
-                    },
-                    required: ["memory_states", "execution_steps", "concepts"],
-                    additionalProperties: false,
-                  },
-                  // Test case structure
-                  is_testable: {
-                    type: "boolean",
-                    description:
-                      "Whether this exercise can be automatically tested",
-                  },
-                  test_reason: {
-                    type: "string",
-                    description:
-                      "Brief explanation of why the exercise is testable or not",
-                  },
-                  test_cases: {
-                    type: "array",
-                    description:
-                      "Array of test cases (only if is_testable is true)",
-                    items: {
-                      type: "object",
-                      properties: {
-                        name: {
-                          type: "string",
-                          description: "Descriptive name for the test case",
-                        },
-                        input: {
-                          type: "string",
-                          description: "Plain text input data for the test",
-                        },
-                        expected_output: {
-                          type: "string",
-                          description: "Plain text expected output",
-                        },
-                        is_hidden: {
-                          type: "boolean",
-                          description:
-                            "Whether this test case is hidden from students",
-                        },
-                      },
-                      required: [
-                        "name",
-                        "input",
-                        "expected_output",
-                        "is_hidden",
-                      ],
-                      additionalProperties: false,
-                    },
-                  },
-                  boilerplate_code: {
-                    type: "string",
-                    description:
-                      "PLAIN TEXT starter code template for students (only if is_testable is true). Must be clean, copyable code that can be executed directly.",
-                  },
+                  visual_elements: VISUAL_ELEMENTS_SCHEMA,
+                  boilerplate_code: BOILERPLATE_SCHEMA,
                 },
                 required: [
                   "title_en",
@@ -374,8 +272,7 @@ export async function POST(request: Request) {
                   "hints_mr",
                   "explanation_mr",
                   "visual_elements",
-                  "is_testable",
-                  "test_reason",
+                  "boilerplate_code",
                 ],
                 additionalProperties: false,
               },
@@ -473,17 +370,29 @@ export async function POST(request: Request) {
         )
       }
 
+      // Validate Mermaid diagram for double quotes
+      if (parsedContent.mermaid_diagram) {
+        const mermaidContent = parsedContent.mermaid_diagram
+        // Check for single quotes in node labels (potential issue)
+        if (mermaidContent.includes("'") && !mermaidContent.includes('"')) {
+          console.warn(
+            "⚠️ Mermaid diagram may be using single quotes instead of double quotes"
+          )
+        }
+      }
+
       console.log("✅ All validations passed:", {
         memoryStates: visualElements.memory_states.length,
         executionSteps: visualElements.execution_steps.length,
         concepts: visualElements.concepts.length,
-        isTestable: parsedContent.is_testable,
-        testCasesCount: parsedContent.test_cases?.length || 0,
         hasBoilerplate: !!parsedContent.boilerplate_code,
         codeFormat: parsedContent.code?.includes("<") ? "HTML" : "Plain Text",
         boilerplateFormat: parsedContent.boilerplate_code?.includes("<")
           ? "HTML"
           : "Plain Text",
+        mermaidQuotes: parsedContent.mermaid_diagram?.includes('"')
+          ? "Double Quotes"
+          : "Single Quotes",
       })
 
       return NextResponse.json(parsedContent)

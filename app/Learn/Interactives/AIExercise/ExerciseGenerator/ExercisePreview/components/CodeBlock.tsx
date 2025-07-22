@@ -143,38 +143,39 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
             </div>
           </div>
         ) : (
-          <div
-            className="overflow-x-auto bg-slate-900"
-            style={{
-              fontSize: "14px",
-              lineHeight: "1.5",
-              fontFamily:
-                "'Fira Code', 'JetBrains Mono', 'Consolas', monospace",
-            }}
-          >
-            {highlightedCode ? (
-              <div
-                dangerouslySetInnerHTML={{ __html: highlightedCode }}
-                className="[&>pre]:!m-0 [&>pre]:!border-none [&>pre]:!bg-transparent [&>pre]:!p-4"
-              />
-            ) : (
-              <pre className="whitespace-pre-wrap p-4 text-slate-300">
-                <code>{code}</code>
-              </pre>
-            )}
+          <div className="flex bg-slate-900">
+            {/* Line numbers */}
+            <div className="select-none border-r border-slate-700 bg-slate-800/50 px-3 py-5 font-mono text-xs leading-6 text-slate-500">
+              {code.split("\n").map((_, index) => (
+                <div key={index} className="text-right">
+                  {index + 1}
+                </div>
+              ))}
+            </div>
+
+            {/* Code content */}
+            <div
+              className="flex-1 overflow-x-auto"
+              style={{
+                fontSize: "14px",
+                lineHeight: "1.5",
+                fontFamily:
+                  "'Fira Code', 'JetBrains Mono', 'Consolas', monospace",
+              }}
+            >
+              {highlightedCode ? (
+                <div
+                  dangerouslySetInnerHTML={{ __html: highlightedCode }}
+                  className="[&>pre]:!m-0 [&>pre]:!border-none [&>pre]:!bg-transparent [&>pre]:!py-5 [&>pre]:!pl-4 [&>pre]:!pr-6"
+                />
+              ) : (
+                <pre className="m-0 border-none bg-transparent py-5 pl-4 pr-6 text-slate-300">
+                  <code>{code}</code>
+                </pre>
+              )}
+            </div>
           </div>
         )}
-
-        {/* Subtle line numbers overlay (optional) */}
-        <div className="pointer-events-none absolute left-0 top-0 hidden sm:block">
-          <div className="select-none p-4 font-mono text-xs leading-6 text-slate-600">
-            {code.split("\n").map((_, index) => (
-              <div key={index} className="w-8 pr-3 text-right">
-                {index + 1}
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   )

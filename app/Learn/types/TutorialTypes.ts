@@ -108,41 +108,6 @@ export interface VisualVariable {
   type: string
 }
 
-export interface MemoryState {
-  step: string
-  variables: VisualVariable[]
-}
-
-export interface ExecutionStep {
-  step: number
-  line: string
-  description: string
-  output?: string
-}
-
-export interface Concept {
-  name: string
-  description: string
-  visual_metaphor?: string
-}
-
-export interface VisualElements {
-  memory_states?: MemoryState[]
-  execution_steps?: ExecutionStep[]
-  concepts?: Concept[]
-}
-
-export interface HintItem {
-  text: string
-  code_snippet?: string
-}
-
-export interface ExplanationItem {
-  text: string
-  type: "text" | "code" | "concept" | "warning" | "tip"
-  code_ref?: number[]
-}
-
 // Test case related interfaces (NEW)
 export interface TestCase {
   id: string
@@ -169,7 +134,47 @@ export interface SolutionApproach {
   common_mistakes: string[]
 }
 
-// Updated ExerciseAIData interface with SIMPLIFIED test case fields
+// app/Learn/types/TutorialTypes.ts
+export interface MemoryState {
+  step: number
+  variables: {
+    name: string
+    value: string
+    type: string
+  }[]
+}
+
+export interface ExecutionStep {
+  step: number
+  line: string
+  description: string
+  output: string
+}
+
+export interface Concept {
+  name: string
+  description: string
+  visual_metaphor?: string
+}
+
+export interface VisualElements {
+  memory_states?: MemoryState[]
+  execution_steps?: ExecutionStep[]
+  concepts?: Concept[]
+}
+
+export interface HintItem {
+  text: string
+  code_snippet?: string
+}
+
+export interface ExplanationItem {
+  text: string
+  type: "text" | "code" | "concept" | "warning" | "tip"
+  code_ref?: number[]
+}
+
+// Updated ExerciseAIData interface with boilerplate_code as required
 export interface ExerciseAIData {
   title_en: string
   title_hi: string
@@ -183,20 +188,7 @@ export interface ExerciseAIData {
   hints_mr: HintItem[]
   explanation_mr: ExplanationItem[]
   visual_elements?: VisualElements
-
-  // NEW: Simplified test case fields
-  is_testable?: boolean
-  test_reason?: string
-  test_cases?: SimpleTestCase[]
-  boilerplate_code?: string
-}
-
-// Simplified test case interface
-export interface SimpleTestCase {
-  name: string
-  input: string
-  expected_output: string
-  is_hidden: boolean
+  boilerplate_code: string
 }
 
 // Update the getLocalizedContent helper
