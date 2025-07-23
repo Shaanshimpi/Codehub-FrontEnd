@@ -318,6 +318,38 @@ LANGUAGE-SPECIFIC CONSIDERATIONS:
 - Python: Highlight readability with straightforward logic
 - JavaScript: Cover basic programming concepts first`
 
+const LEARNING_STRUCTURE_REQUIREMENTS = `
+LEARNING STRUCTURE REQUIREMENTS:
+- Generate 2-4 specific learning objectives that students will achieve
+- Create 3-6 relevant tags for programming concepts covered
+- Learning objectives should be actionable and measurable
+- Tags should be single concepts (e.g., "loops", "arrays", "conditionals", "functions")
+
+LEARNING OBJECTIVES FORMAT:
+- Start with action verbs: "Understand", "Implement", "Apply", "Analyze"
+- Be specific about what skill/concept is learned
+- Focus on practical programming abilities
+
+TAGS GUIDELINES:
+- Use lowercase, single words or short phrases
+- Include programming concepts: loops, arrays, functions, conditionals, variables
+- Include algorithm types: sorting, searching, recursion
+- Include data structures: strings, lists, objects
+- Include programming paradigms: oop, functional, procedural
+- Avoid generic tags like "programming" or "coding"
+
+EXAMPLES:
+Learning Objectives:
+- "Understand how to implement iterative loops for repetitive tasks"
+- "Apply conditional logic to solve decision-making problems"
+- "Implement array manipulation techniques for data processing"
+
+Tags:
+- ["loops", "arrays", "iteration", "conditional-logic"]
+- ["recursion", "functions", "mathematical-computation"]
+- ["string-manipulation", "character-processing", "loops"]
+`
+
 export const SYSTEM_PROMPTS = {
   EXERCISE_GENERATOR: `${CORE_REQUIREMENTS}
 
@@ -329,7 +361,11 @@ ${MERMAID_RULES}
 
 ${BOILERPLATE_RULES}
 
-${EXERCISE_EXAMPLES}`,
+${EXERCISE_EXAMPLES}
+
+
+${LEARNING_STRUCTURE_REQUIREMENTS}
+`,
 
   DIFFICULTY_CONTEXTS: {
     1: "Beginner: Focus on basic syntax and fundamental concepts with clear step-by-step guidance. Use SIMPLE algorithms without optimizations. Include many visual aids and memory state tracking.",

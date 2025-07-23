@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import type { ExerciseAIData } from "@/app/Learn/types/TutorialTypes"
-import { submitExercise } from "@/lib/getData"
+import { submitExercise } from "@/lib/submitData"
 import ExerciseForm from "./ExerciseForm"
 import ExercisePreview from "./ExercisePreview/ExercisePreview"
 import ExerciseSubmit from "./ExerciseSubmit"
@@ -55,6 +55,7 @@ const ExerciseAIGenerator = () => {
         )}
         {step === 3 && (
           <ExerciseSubmit
+            exerciseData={exerciseData}
             formData={formData}
             onBack={() => setStep(2)}
             onSubmit={handleSubmit}
