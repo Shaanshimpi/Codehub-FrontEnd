@@ -6,6 +6,10 @@ import type { ExerciseAIData } from "@/app/Learn/types/TutorialTypes"
 import { useLanguage } from "@/app/contexts/LanguageContext"
 import { MermaidDiagram } from "@lightenna/react-mermaid-diagram"
 import { Tag } from "lucide-react"
+import {
+  getDifficultyLabel,
+  getLocalizedContent,
+} from "../../../../../utils/exerciseHelpers"
 import Header from "./components/Header"
 import LearningObjectivesDisplay from "./components/LearningObjectivesDisplay"
 import Metadata from "./components/Metadata"
@@ -18,12 +22,6 @@ import {
   formatHintsArray,
   formatVisualElements,
 } from "./utils/exerciseFormatter"
-import {
-  getDifficultyLabel,
-  getLocalizedContent,
-} from "./utils/exerciseHelpers"
-
-// app/Learn/Interactives/AIExercise/ExerciseGenerator/ExercisePreview/ExercisePreview.tsx
 
 // app/Learn/Interactives/AIExercise/ExerciseGenerator/ExercisePreview/ExercisePreview.tsx
 
