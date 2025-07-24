@@ -1,7 +1,7 @@
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/MermaidViewer.tsx
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { MermaidDiagram } from "@lightenna/react-mermaid-diagram"
 import {
   AlertCircle,
@@ -12,6 +12,8 @@ import {
   ZoomIn,
   ZoomOut,
 } from "lucide-react"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/MermaidViewer.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/MermaidViewer.tsx
 
@@ -27,6 +29,30 @@ const MermaidViewer: React.FC<MermaidViewerProps> = ({
   const [showRawCode, setShowRawCode] = useState(false)
   const [zoom, setZoom] = useState(100)
   const [diagramError, setDiagramError] = useState(false)
+
+  // Cleanup function to remove Mermaid DOM elements
+  const cleanupMermaidElements = () => {
+    // Cleanup Mermaid tooltips and SVG containers
+    const mermaidTooltips = document.querySelectorAll(".mermaidTooltip")
+    const mermaidSvgContainers = document.querySelectorAll(
+      '[id*="mermaid-svg"]'
+    )
+
+    mermaidTooltips.forEach((tooltip) => tooltip.remove())
+    mermaidSvgContainers.forEach((container) => container.remove())
+  }
+
+  // Cleanup on component unmount
+  useEffect(() => {
+    return cleanupMermaidElements
+  }, [])
+
+  // Cleanup when diagram changes
+  useEffect(() => {
+    if (diagram) {
+      cleanupMermaidElements()
+    }
+  }, [diagram])
 
   if (!diagram) {
     return (
@@ -57,11 +83,6 @@ const MermaidViewer: React.FC<MermaidViewerProps> = ({
   const zoomOut = () => {
     setZoom(Math.max(zoom - 25, 50))
   }
-
-  const handleDiagramError = () => {
-    setDiagramError(true)
-  }
-  // zoomOut()
 
   return (
     <div className="space-y-6">
@@ -201,6 +222,15 @@ const MermaidViewer: React.FC<MermaidViewerProps> = ({
           height: auto;
           display: block;
           margin: 0 auto;
+        }
+
+        /* Hide global Mermaid elements that appear outside component */
+        body :global(.mermaidTooltip) {
+          display: none !important;
+        }
+        
+        body :global([id*="mermaid-svg"]:not(.mermaid-container [id*="mermaid-svg"])) {
+          display: none !important;
         }
       `}</style>
     </div>

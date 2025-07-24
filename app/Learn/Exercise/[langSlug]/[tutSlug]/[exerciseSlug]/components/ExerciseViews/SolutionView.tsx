@@ -4,13 +4,22 @@
 import React, { useState } from "react"
 import { useLanguage } from "@/app/contexts/LanguageContext"
 import { getLocalizedContent } from "@/app/utils/exerciseHelpers"
-import { Database, FileText, Lightbulb, Network, Play } from "lucide-react"
-import AnswerCode from "../SolutionView/AnswerCode"
+import {
+  Code,
+  Database,
+  FileText,
+  Lightbulb,
+  Network,
+  Play,
+} from "lucide-react"
+import UnifiedCodeEditor from "../Shared/UnifiedCodeEditor"
 import ExecutionStepsPanel from "../SolutionView/ExecutionStepsPanel"
 import ExplanationTabs from "../SolutionView/ExplanationTabs"
 import KeyConceptsPanel from "../SolutionView/KeyConceptsPanel"
 import MemoryStatesPanel from "../SolutionView/MemoryStatesPanel"
 import MermaidViewer from "../SolutionView/MermaidViewer"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
@@ -28,6 +37,9 @@ const SolutionView: React.FC<SolutionViewProps> = ({
   onComplete,
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>("explanation")
+  const [mobileActiveTab, setMobileActiveTab] = useState<
+    "explanation" | "code"
+  >("explanation")
   const { language: currentLanguage } = useLanguage()
 
   // Get localized content based on selected language
@@ -112,55 +124,87 @@ const SolutionView: React.FC<SolutionViewProps> = ({
   }
 
   return (
-    <div className="flex h-[calc(100vh-200px)] overflow-hidden">
-      {/* Left Panel - Explanation and Learning Content */}
-      <div className="w-1/2 border-r border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
-        <div className="flex h-full flex-col">
-          {/* Header */}
-          <div className="border-b border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-                Solution & Learning
-              </h2>
-            </div>
-
-            {/* Tab Navigation */}
-            <div className="flex space-x-1 overflow-x-auto">
-              {tabs.map((tab) => {
-                const Icon = tab.icon
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex min-w-0 flex-shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all ${
-                      activeTab === tab.id
-                        ? "bg-blue-600 text-white shadow-sm"
-                        : "text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
-                    }`}
-                    title={tab.description}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span className="hidden sm:inline">{tab.label}</span>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Tab Content */}
-          <div className="flex-1 overflow-y-auto p-6">{renderTabContent()}</div>
+    <>
+      {/* Mobile Tab Switcher - Hidden on desktop */}
+      <div className="bg-white dark:bg-slate-900 lg:hidden">
+        <div className="flex">
+          <button
+            onClick={() => setMobileActiveTab("explanation")}
+            className={`flex flex-1 items-center justify-center gap-1 border-b-2 px-4 py-2 text-sm font-medium ${
+              mobileActiveTab === "explanation"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-slate-500"
+            }`}
+          >
+            <FileText className="h-3 w-3" />
+            Explanation
+          </button>
+          <button
+            onClick={() => setMobileActiveTab("code")}
+            className={`flex flex-1 items-center justify-center gap-1 border-b-2 px-4 py-2 text-sm font-medium ${
+              mobileActiveTab === "code"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-slate-500"
+            }`}
+          >
+            <Code className="h-3 w-3" />
+            Code
+          </button>
         </div>
       </div>
 
-      {/* Right Panel - Answer Code */}
-      <div className="w-1/2 bg-slate-900">
-        <AnswerCode
-          code={exercise.solution_code}
-          language={language}
-          title="Complete Solution"
-        />
+      {/* Responsive Layout */}
+      <div className="lg:flex lg:h-[calc(100vh-10rem)]">
+        {/* Explanation Panel */}
+        <div
+          className={`lg:w-1/2 lg:border-r lg:border-slate-200 lg:bg-white lg:dark:border-slate-700 lg:dark:bg-slate-900 ${mobileActiveTab === "explanation" ? "block h-[calc(100vh-6rem)]" : "hidden lg:block"} `}
+        >
+          <div className="flex h-full flex-col">
+            {/* Compact Header - Always visible */}
+            <div className="border-b border-slate-200 bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-800">
+              {/* Compact Tab Navigation */}
+              <div className="flex space-x-1 overflow-x-auto">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center gap-1 rounded px-2 py-1 text-xs font-medium transition-all ${
+                        activeTab === tab.id
+                          ? "bg-blue-600 text-white"
+                          : "text-slate-600 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700"
+                      }`}
+                      title={tab.description}
+                    >
+                      <Icon className="h-3 w-3" />
+                      <span className="hidden sm:inline">{tab.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Tab Content */}
+            <div className="flex-1 overflow-y-auto p-2">
+              {renderTabContent()}
+            </div>
+          </div>
+        </div>
+
+        {/* Solution Code Panel */}
+        <div
+          className={`lg:w-1/2 lg:bg-slate-900 ${mobileActiveTab === "code" ? "block h-[calc(100vh-6rem)]" : "hidden lg:block"} `}
+        >
+          <UnifiedCodeEditor
+            exercise={exercise}
+            language={language}
+            code={exercise.solution_code}
+            mode="solution"
+          />
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

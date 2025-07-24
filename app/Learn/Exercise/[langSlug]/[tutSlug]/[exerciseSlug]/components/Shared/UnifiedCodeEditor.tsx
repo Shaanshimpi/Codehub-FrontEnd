@@ -1,40 +1,55 @@
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ProblemView/CodeEditor.tsx
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/Shared/UnifiedCodeEditor.tsx
 "use client"
 
 import React, { useEffect, useRef, useState } from "react"
 import { Editor } from "@monaco-editor/react"
-import { Code2, Copy, Play, RotateCcw, Settings } from "lucide-react"
+import {
+  Code2,
+  Copy,
+  Play,
+  RotateCcw,
+  Settings,
+  ZoomIn,
+  ZoomOut,
+} from "lucide-react"
 
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ProblemView/CodeEditor.tsx
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/Shared/UnifiedCodeEditor.tsx
 
-interface CodeEditorProps {
+interface UnifiedCodeEditorProps {
   exercise: any
   language: any
-  userCode: string
-  onCodeChange: (code: string) => void
-  onLoadBoilerplate: () => void
-  onRunCode: () => void
-  isBoilerplateLoaded: boolean
+  code: string
+  onCodeChange?: (code: string) => void
+  onLoadBoilerplate?: () => void
+  onRunCode?: () => void
+  isBoilerplateLoaded?: boolean
   onBoilerplateStatusChange?: (loaded: boolean) => void
+  mode?: "problem" | "solution"
+  isReadOnly?: boolean
 }
 
-const CodeEditor: React.FC<CodeEditorProps> = ({
+const UnifiedCodeEditor: React.FC<UnifiedCodeEditorProps> = ({
   exercise,
   language,
-  userCode,
+  code,
   onCodeChange,
   onLoadBoilerplate,
   onRunCode,
-  isBoilerplateLoaded,
+  isBoilerplateLoaded = false,
   onBoilerplateStatusChange,
+  mode = "problem",
+  isReadOnly = false,
 }) => {
   const [output, setOutput] = useState("")
   const [isRunning, setIsRunning] = useState(false)
   const [input, setInput] = useState("")
   const [isEditorReady, setIsEditorReady] = useState(false)
+  const [fontSize, setFontSize] = useState(14)
+  const [showLineNumbers, setShowLineNumbers] = useState(true)
+  const [copied, setCopied] = useState(false)
   const editorRef = useRef<any>(null)
 
-  // Local state to track if boilerplate was loaded in this session
+  // Local state to track if boilerplate was loaded in this session (problem mode only)
   const [localBoilerplateLoaded, setLocalBoilerplateLoaded] =
     useState(isBoilerplateLoaded)
 
@@ -52,13 +67,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       try {
         // Mock output based on the content and language
         if (
-          userCode.includes("printf") ||
-          userCode.includes("cout") ||
-          userCode.includes("print")
+          code.includes("printf") ||
+          code.includes("cout") ||
+          code.includes("print")
         ) {
-          if (userCode.includes("scanf") && userCode.includes("if")) {
+          if (code.includes("scanf") && code.includes("if")) {
             setOutput("Enter your age: 25\nYou are eligible to vote.")
-          } else if (userCode.includes("Hello") || userCode.includes("hello")) {
+          } else if (code.includes("Hello") || code.includes("hello")) {
             setOutput("Hello, World!")
           } else {
             setOutput(
@@ -74,32 +89,52 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         setOutput("Error: " + (error as Error).message)
       } finally {
         setIsRunning(false)
-        onRunCode()
+        if (onRunCode) onRunCode()
       }
     }, 1500)
   }
 
   const handleCopyCode = () => {
-    if (userCode) {
-      navigator.clipboard.writeText(userCode)
-      // You could add a toast notification here
+    if (code) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard
+          .writeText(code)
+          .then(() => {
+            setCopied(true)
+            setTimeout(() => setCopied(false), 2000)
+          })
+          .catch((error) => {
+            console.error("Failed to copy code:", error)
+          })
+      } else {
+        // Fallback for older browsers
+        const textArea = document.createElement("textarea")
+        textArea.value = code
+        document.body.appendChild(textArea)
+        textArea.select()
+        document.execCommand("copy")
+        document.body.removeChild(textArea)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      }
     }
   }
 
   const handleResetCode = () => {
-    onCodeChange("") // Clear the code
-    setLocalBoilerplateLoaded(false) // Reset boilerplate status locally
-    setOutput("") // Clear output
-
-    // Notify parent component about boilerplate status change
-    if (onBoilerplateStatusChange) {
-      onBoilerplateStatusChange(false)
+    if (onCodeChange) onCodeChange("") // Clear the code
+    if (mode === "problem") {
+      setLocalBoilerplateLoaded(false) // Reset boilerplate status locally
+      // Notify parent component about boilerplate status change
+      if (onBoilerplateStatusChange) {
+        onBoilerplateStatusChange(false)
+      }
     }
+    setOutput("") // Clear output
   }
 
   const handleLoadBoilerplate = () => {
     setLocalBoilerplateLoaded(true) // Set local state
-    onLoadBoilerplate() // Call parent handler
+    if (onLoadBoilerplate) onLoadBoilerplate() // Call parent handler
 
     // Notify parent component about boilerplate status change
     if (onBoilerplateStatusChange) {
@@ -163,22 +198,36 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
     // Add keyboard shortcuts
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-      // Save functionality if needed
+      // Save shortcut pressed
     })
 
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
-      if (userCode.trim()) {
+      if (code.trim() && !isReadOnly) {
         handleRunCode()
       }
     })
 
-    // Focus the editor
-    editor.focus()
+    // Focus the editor if not read-only
+    if (!isReadOnly) {
+      editor.focus()
+    }
+  }
+
+  const increaseFontSize = () => {
+    setFontSize(Math.min(fontSize + 2, 20))
+  }
+
+  const decreaseFontSize = () => {
+    setFontSize(Math.max(fontSize - 2, 10))
+  }
+
+  const resetFontSize = () => {
+    setFontSize(14)
   }
 
   const editorOptions = {
     minimap: { enabled: false },
-    fontSize: 14,
+    fontSize: fontSize,
     lineHeight: 20,
     fontFamily:
       "'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace",
@@ -187,7 +236,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     scrollBeyondLastLine: false,
     renderLineHighlight: "gutter",
     selectOnLineNumbers: true,
-    lineNumbers: "on",
+    lineNumbers: showLineNumbers ? "on" : "off",
     glyphMargin: false,
     folding: true,
     lineDecorationsWidth: 0,
@@ -215,6 +264,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     cursorBlinking: "blink",
     cursorSmoothCaretAnimation: "on",
     smoothScrolling: true,
+    readOnly: isReadOnly,
     scrollbar: {
       vertical: "visible",
       horizontal: "visible",
@@ -231,8 +281,9 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
 // Pro tip: Use Ctrl+Enter to run your code quickly!`
 
-  // Determine if we should show the Load button
-  const shouldShowLoadButton = !localBoilerplateLoaded && !userCode.trim()
+  // Determine if we should show the Load button (problem mode only)
+  const shouldShowLoadButton =
+    mode === "problem" && !localBoilerplateLoaded && !code.trim()
 
   return (
     <div className="flex h-full flex-col">
@@ -241,8 +292,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         <Editor
           height="100%"
           language={getMonacoLanguage()}
-          value={userCode || placeholder}
-          onChange={(value) => onCodeChange(value || "")}
+          value={code || (mode === "problem" ? placeholder : "")}
+          onChange={(value) => onCodeChange && onCodeChange(value || "")}
           onMount={handleEditorDidMount}
           theme="vs-dark"
           options={editorOptions}
@@ -259,6 +310,41 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
       {/* Compact Bottom Section - Input + Actions */}
       <div className="border-t border-slate-200 bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-800">
+        {/* Font Size Controls */}
+        <div className="mb-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-600 dark:text-slate-400">
+              Font Size:
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={decreaseFontSize}
+                disabled={fontSize <= 10}
+                className="rounded p-1 text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700 disabled:opacity-50 dark:text-slate-400 dark:hover:bg-slate-700"
+              >
+                <ZoomOut className="h-3 w-3" />
+              </button>
+              <span className="w-6 text-center text-xs text-slate-600 dark:text-slate-300">
+                {fontSize}
+              </span>
+              <button
+                onClick={increaseFontSize}
+                disabled={fontSize >= 20}
+                className="rounded p-1 text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700 disabled:opacity-50 dark:text-slate-400 dark:hover:bg-slate-700"
+              >
+                <ZoomIn className="h-3 w-3" />
+              </button>
+              <button
+                onClick={resetFontSize}
+                className="ml-1 rounded p-1 text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700"
+                title="Reset font size"
+              >
+                <RotateCcw className="h-3 w-3" />
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Input Row */}
         <div className="mb-2">
           <input
@@ -286,7 +372,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
           <button
             onClick={handleRunCode}
-            disabled={!userCode.trim() || isRunning || !isEditorReady}
+            disabled={!code.trim() || isRunning || !isEditorReady}
             className="flex flex-1 items-center justify-center gap-1 rounded bg-green-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
             title="Ctrl+Enter to run"
           >
@@ -297,7 +383,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
           {/* Secondary Actions */}
           <button
             onClick={handleCopyCode}
-            disabled={!userCode || !isEditorReady}
+            disabled={!code || !isEditorReady}
             className="rounded p-1.5 text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-400 dark:hover:bg-slate-700"
             title="Copy code"
           >
@@ -306,7 +392,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
           <button
             onClick={handleResetCode}
-            disabled={!userCode || !isEditorReady}
+            disabled={!code || !isEditorReady}
             className="rounded p-1.5 text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-400 dark:hover:bg-slate-700"
             title="Reset code"
           >
@@ -330,8 +416,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
           <div className="mt-2 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
             <div className="flex items-center gap-3">
               <span>Language: {getMonacoLanguage()}</span>
-              <span>Lines: {userCode.split("\n").length}</span>
-              <span>Characters: {userCode.length}</span>
+              <span>Lines: {code.split("\n").length}</span>
+              <span>Characters: {code.length}</span>
             </div>
             <div className="text-xs opacity-70">
               Ctrl+Enter to run • Ctrl+S to save
@@ -374,4 +460,4 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   )
 }
 
-export default CodeEditor
+export default UnifiedCodeEditor

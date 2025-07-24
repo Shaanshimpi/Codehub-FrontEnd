@@ -7,7 +7,6 @@ export async function getLanguages(): Promise<Language[]> {
       limit: 100,
       sort: `index`,
     });
-    console.log(languages);
     return languages;
   } catch (err) {
     console.error("Error fetching languages:", err);
@@ -87,6 +86,49 @@ export async function getTutorialBySlug(
   }
 }
 
+// Get all exercises for a specific tutorial ID
+export async function getExercisesByTutorialId(
+  tutorialId: string | number,
+): Promise<any[]> {
+  try {
+    const exercises = await fetchCollection("exercises", {
+      where: {
+        tutorial: { equals: tutorialId },
+      },
+      sort: "index",
+      depth: 2,
+    });
+
+    return exercises;
+  } catch (error) {
+    console.error("Error fetching exercises:", error);
+    return [];
+  }
+}
+
+// Get single exercise by slug and tutorial
+export async function getExerciseBySlug(
+  exerciseSlug: string,
+  tutorialId: string | number,
+): Promise<any | null> {
+  try {
+    const exercises = await fetchCollection("exercises", {
+      where: {
+        and: [
+          { slug: { equals: exerciseSlug } },
+          { tutorial: { equals: tutorialId } },
+        ],
+      },
+      depth: 2,
+    });
+
+    return exercises.length > 0 ? exercises[0] : null;
+  } catch (error) {
+    console.error("Error fetching exercise:", error);
+    return null;
+  }
+}
+
 export async function generateExercise(
   questionInput: string,
   selectedLanguage: string,
@@ -94,13 +136,6 @@ export async function generateExercise(
   selectedModel: string,
 ) {
   try {
-    console.log("🔄 Generating exercise with params:", {
-      questionInput,
-      selectedLanguage,
-      difficulty,
-      selectedModel,
-    });
-
     const response = await fetch("/api/generate-exercise", {
       method: "POST",
       headers: {

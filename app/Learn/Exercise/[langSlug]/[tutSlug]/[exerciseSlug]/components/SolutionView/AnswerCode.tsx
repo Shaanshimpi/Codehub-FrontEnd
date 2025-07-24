@@ -14,6 +14,8 @@ import {
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/AnswerCode.tsx
 
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/AnswerCode.tsx
+
 interface AnswerCodeProps {
   code: string
   language: any
@@ -51,13 +53,27 @@ const AnswerCode: React.FC<AnswerCodeProps> = ({
     }
   }
 
-  const copyCode = async () => {
-    try {
-      await navigator.clipboard.writeText(code)
+  const copyCode = () => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(code)
+        .then(() => {
+          setCopied(true)
+          setTimeout(() => setCopied(false), 2000)
+        })
+        .catch((error) => {
+          console.error("Failed to copy code:", error)
+        })
+    } else {
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea")
+      textArea.value = code
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand("copy")
+      document.body.removeChild(textArea)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch (error) {
-      console.error("Failed to copy code:", error)
     }
   }
 
