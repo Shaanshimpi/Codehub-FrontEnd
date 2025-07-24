@@ -17,10 +17,16 @@ export default async function Page(context: {
   const { langSlug, tutorialSlug } = context.params
 
   const languages = await fetchLang()
+  if (!languages || !Array.isArray(languages)) {
+    return <div>Failed to load languages</div>
+  }
   const lang = languages.find((lang) => generateSlug(lang.Name) === langSlug)
   if (!lang) return <div>Language not found</div>
 
   const tutorials = await fetchTutorialsByLanguage(lang.id)
+  if (!tutorials || !Array.isArray(tutorials)) {
+    return <div>Failed to load tutorials</div>
+  }
   const tutorial = tutorials.find(
     (tut) => generateSlug(tut.Title) === tutorialSlug
   )

@@ -8,6 +8,8 @@ import UnifiedCodeEditor from "../Shared/UnifiedCodeEditor"
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/ProblemView.tsx
 
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/ProblemView.tsx
+
 interface PersistentCodeState {
   userCode: string
   isBoilerplateLoaded: boolean
@@ -20,6 +22,9 @@ interface ProblemViewProps {
   onComplete: () => void
   persistentState: PersistentCodeState
   onStateUpdate: (state: Partial<PersistentCodeState>) => void
+  isFullscreen?: boolean
+  panelWidth?: number
+  onPanelResize?: (e: React.MouseEvent) => void
 }
 
 const ProblemView: React.FC<ProblemViewProps> = ({
@@ -29,6 +34,9 @@ const ProblemView: React.FC<ProblemViewProps> = ({
   onComplete,
   persistentState,
   onStateUpdate,
+  isFullscreen = false,
+  panelWidth = 50,
+  onPanelResize,
 }) => {
   const [mobileActiveTab, setMobileActiveTab] = useState<"question" | "code">(
     "question"
@@ -177,17 +185,32 @@ main();`
       </div>
 
       {/* Responsive Layout */}
-      <div className="lg:flex lg:h-[calc(100vh-10rem)]">
+      <div
+        className={`lg:flex ${isFullscreen ? "h-screen" : "lg:min-h-[calc(100vh-10rem)]"}`}
+      >
         {/* Question Panel */}
         <div
-          className={`lg:w-1/2 lg:border-r lg:border-slate-200 lg:bg-sky-50 lg:dark:border-slate-700 lg:dark:bg-slate-800 ${mobileActiveTab === "question" ? "block h-[calc(100vh-6rem)]" : "hidden lg:block"} `}
+          className={`lg:border-r lg:border-slate-200 lg:bg-sky-50 lg:dark:border-slate-700 lg:dark:bg-slate-800 ${mobileActiveTab === "question" ? "block min-h-[calc(100vh-6rem)]" : "hidden lg:block"} ${!isFullscreen ? "lg:w-1/2" : "lg:flex-none"}`}
+          style={isFullscreen ? { width: `${panelWidth}%` } : {}}
         >
           <QuestionPanel exercise={exercise} language={language} />
         </div>
 
+        {/* Resize Handle - Only visible on desktop in fullscreen */}
+        {isFullscreen && onPanelResize && (
+          <button
+            className="hidden w-1 flex-none cursor-col-resize bg-slate-300 transition-colors hover:bg-blue-500 lg:block"
+            onMouseDown={onPanelResize}
+            title="Drag to resize panels"
+          />
+        )}
+
         {/* Code Editor Panel */}
         <div
-          className={`lg:w-1/2 lg:bg-white lg:dark:bg-slate-900 ${mobileActiveTab === "code" ? "block h-[calc(100vh-6rem)]" : "hidden lg:block"} `}
+          className={`lg:bg-white lg:dark:bg-slate-900 ${mobileActiveTab === "code" ? "block min-h-[calc(100vh-6rem)]" : "hidden lg:block"} ${!isFullscreen ? "lg:w-1/2" : "lg:flex-1"}`}
+          style={
+            isFullscreen ? { width: `calc(${100 - panelWidth}% - 4px)` } : {}
+          }
         >
           <UnifiedCodeEditor
             exercise={exercise}

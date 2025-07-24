@@ -23,6 +23,9 @@ function generateSlug(post: Post): string {
 
 export async function generateStaticParams() {
   const posts = await fetchAllPosts()
+  if (!posts || !Array.isArray(posts)) {
+    return []
+  }
   return posts.map((post: Post) => ({
     slug: generateSlug(post),
   }))
@@ -34,6 +37,9 @@ export async function generateMetadata({
   params: { slug: string }
 }): Promise<Metadata> {
   const posts = await fetchAllPosts()
+  if (!posts || !Array.isArray(posts)) {
+    return {}
+  }
   const documentId = params.slug?.split("-").pop()
   const post = posts.find((p: Post) => p?.documentId === documentId)
 
@@ -78,6 +84,9 @@ export default async function ExercisePage({
   if (!slug) return notFound()
 
   const posts = await fetchAllPosts()
+  if (!posts || !Array.isArray(posts)) {
+    return <p className="text-red-500">Failed to load posts.</p>
+  }
   const documentId = slug.split("-").pop()
   const post = posts.find((p: Post) => p?.documentId === documentId)
 
@@ -87,13 +96,14 @@ export default async function ExercisePage({
   const language = post.programming_languages?.[0]?.Name?.toLowerCase() || "c"
 
   // Fetch all posts here to find related posts
-  const relatedPosts = posts.filter((arrpost) =>
-    arrpost.topics?.some((topic) =>
-      post.topics?.some(
-        (postTopic) => postTopic.documentId === topic.documentId
+  const relatedPosts =
+    posts.filter((arrpost) =>
+      arrpost.topics?.some((topic) =>
+        post.topics?.some(
+          (postTopic) => postTopic.documentId === topic.documentId
+        )
       )
-    )
-  )
+    ) || []
 
   return (
     <div className="md: relative bg-white pb-[5vh] text-black dark:bg-[#09090B] dark:text-white md:px-[30vh] md:py-[10vh]">

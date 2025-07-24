@@ -23,10 +23,15 @@ import MermaidViewer from "../SolutionView/MermaidViewer"
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
+
 interface SolutionViewProps {
   exercise: any
   language: any
   onComplete: () => void
+  isFullscreen?: boolean
+  panelWidth?: number
+  onPanelResize?: (e: React.MouseEvent) => void
 }
 
 type TabType = "explanation" | "flowchart" | "memory" | "execution" | "concepts"
@@ -35,6 +40,9 @@ const SolutionView: React.FC<SolutionViewProps> = ({
   exercise,
   language,
   onComplete,
+  isFullscreen = false,
+  panelWidth = 50,
+  onPanelResize,
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>("explanation")
   const [mobileActiveTab, setMobileActiveTab] = useState<
@@ -154,10 +162,13 @@ const SolutionView: React.FC<SolutionViewProps> = ({
       </div>
 
       {/* Responsive Layout */}
-      <div className="lg:flex lg:h-[calc(100vh-10rem)]">
+      <div
+        className={`lg:flex ${isFullscreen ? "h-screen" : "lg:min-h-[calc(100vh-10rem)]"}`}
+      >
         {/* Explanation Panel */}
         <div
-          className={`lg:w-1/2 lg:border-r lg:border-slate-200 lg:bg-white lg:dark:border-slate-700 lg:dark:bg-slate-900 ${mobileActiveTab === "explanation" ? "block h-[calc(100vh-6rem)]" : "hidden lg:block"} `}
+          className={`lg:border-r lg:border-slate-200 lg:bg-white lg:dark:border-slate-700 lg:dark:bg-slate-900 ${mobileActiveTab === "explanation" ? "block min-h-[calc(100vh-6rem)]" : "hidden lg:block"} ${!isFullscreen ? "lg:w-1/2" : "lg:flex-none"}`}
+          style={isFullscreen ? { width: `${panelWidth}%` } : {}}
         >
           <div className="flex h-full flex-col">
             {/* Compact Header - Always visible */}
@@ -192,9 +203,21 @@ const SolutionView: React.FC<SolutionViewProps> = ({
           </div>
         </div>
 
+        {/* Resize Handle - Only visible on desktop in fullscreen */}
+        {isFullscreen && onPanelResize && (
+          <button
+            className="hidden w-1 flex-none cursor-col-resize bg-slate-300 transition-colors hover:bg-blue-500 lg:block"
+            onMouseDown={onPanelResize}
+            title="Drag to resize panels"
+          />
+        )}
+
         {/* Solution Code Panel */}
         <div
-          className={`lg:w-1/2 lg:bg-slate-900 ${mobileActiveTab === "code" ? "block h-[calc(100vh-6rem)]" : "hidden lg:block"} `}
+          className={`lg:bg-slate-900 ${mobileActiveTab === "code" ? "block min-h-[calc(100vh-6rem)]" : "hidden lg:block"} ${!isFullscreen ? "lg:w-1/2" : "lg:flex-1"}`}
+          style={
+            isFullscreen ? { width: `calc(${100 - panelWidth}% - 4px)` } : {}
+          }
         >
           <UnifiedCodeEditor
             exercise={exercise}

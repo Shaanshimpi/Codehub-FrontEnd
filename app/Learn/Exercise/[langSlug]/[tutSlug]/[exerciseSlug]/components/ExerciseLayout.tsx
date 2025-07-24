@@ -2,11 +2,14 @@
 "use client"
 
 import React, { useCallback, useEffect, useState } from "react"
+import { Maximize2, Minimize2 } from "lucide-react"
 import ExerciseHeader from "./ExerciseHeader"
 import ProblemView from "./ExerciseViews/ProblemView"
 import SolutionView from "./ExerciseViews/SolutionView"
 import ProgressBar from "./Shared/ProgressBar"
 import ViewSwitcher from "./Shared/ViewSwitcher"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseLayout.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseLayout.tsx
 
@@ -37,6 +40,8 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
 }) => {
   const [currentView, setCurrentView] = useState<ViewType>("problem")
   const [progress, setProgress] = useState(0) // 0-100 progress percentage
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [panelWidth, setPanelWidth] = useState(50) // Panel width percentage (50% default)
 
   // Persistent state that survives view switches
   const [persistentCodeState, setPersistentCodeState] =
@@ -108,22 +113,75 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
     // Exercise completed
   }, [handleProgressUpdate])
 
+  // Handle fullscreen toggle
+  const toggleFullscreen = useCallback(() => {
+    setIsFullscreen(!isFullscreen)
+  }, [isFullscreen])
+
+  // Handle panel resize
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      const startX = e.clientX
+      const startWidth = panelWidth
+
+      const handleMouseMove = (e: MouseEvent) => {
+        const containerWidth = window.innerWidth
+        const deltaX = e.clientX - startX
+        const deltaPercent = (deltaX / containerWidth) * 100
+        const newWidth = Math.min(Math.max(startWidth + deltaPercent, 20), 80)
+        setPanelWidth(newWidth)
+      }
+
+      const handleMouseUp = () => {
+        document.removeEventListener("mousemove", handleMouseMove)
+        document.removeEventListener("mouseup", handleMouseUp)
+      }
+
+      document.addEventListener("mousemove", handleMouseMove)
+      document.addEventListener("mouseup", handleMouseUp)
+    },
+    [panelWidth]
+  )
+
   return (
-    <div className="min-h-screen bg-white pt-14 dark:bg-slate-900">
-      {/* Header container - normal flow */}
-      <ExerciseHeader
-        exercise={exercise}
-        language={language}
-        tutorial={tutorial}
-        params={params}
-      />
+    <div
+      className={`min-h-screen bg-white dark:bg-slate-900 ${isFullscreen ? "fixed inset-0 z-50" : "pt-14"}`}
+    >
+      {/* Header container - hidden in fullscreen */}
+      {!isFullscreen && (
+        <>
+          <ExerciseHeader
+            exercise={exercise}
+            language={language}
+            tutorial={tutorial}
+            params={params}
+          />
+          <ViewSwitcher
+            currentView={currentView}
+            onViewChange={handleViewChange}
+          />
+          <ProgressBar progress={progress} currentView={currentView} />
+        </>
+      )}
 
-      <ViewSwitcher currentView={currentView} onViewChange={handleViewChange} />
-
-      <ProgressBar progress={progress} currentView={currentView} />
+      {/* Fullscreen Toggle Button */}
+      <button
+        onClick={toggleFullscreen}
+        className={`fixed right-4 top-4 z-50 rounded-lg bg-blue-600 p-2 text-white shadow-lg transition-all hover:bg-blue-700 ${
+          isFullscreen ? "top-4" : "top-20"
+        }`}
+        title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+      >
+        {isFullscreen ? (
+          <Minimize2 className="h-5 w-5" />
+        ) : (
+          <Maximize2 className="h-5 w-5" />
+        )}
+      </button>
 
       {/* Main content area */}
-      <div>
+      <div className={isFullscreen ? "h-screen" : ""}>
         {currentView === "problem" && (
           <ProblemView
             exercise={exercise}
@@ -132,6 +190,9 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
             onComplete={handleCompleteExercise}
             persistentState={persistentCodeState}
             onStateUpdate={updatePersistentState}
+            isFullscreen={isFullscreen}
+            panelWidth={panelWidth}
+            onPanelResize={handleMouseDown}
           />
         )}
 
@@ -140,6 +201,9 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
             exercise={exercise}
             language={language}
             onComplete={handleCompleteExercise}
+            isFullscreen={isFullscreen}
+            panelWidth={panelWidth}
+            onPanelResize={handleMouseDown}
           />
         )}
       </div>

@@ -269,6 +269,7 @@ export const submitExerciseToPayload = async (
 
     return await response.json();
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Failed to submit exercise to Payload:", error);
     throw error;
   }

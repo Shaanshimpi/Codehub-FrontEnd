@@ -70,7 +70,7 @@ const ExerciseLoading: React.FC<ExerciseLoadingProps> = ({
         </div>
 
         {/* Main Content Skeleton */}
-        <div className="flex h-[calc(100vh-250px)]">
+        <div className="flex min-h-[calc(100vh-250px)]">
           {/* Left Panel */}
           <div className="w-1/2 border-r border-slate-200 bg-sky-50 p-6 dark:border-slate-700 dark:bg-slate-800">
             <div className="space-y-6">
