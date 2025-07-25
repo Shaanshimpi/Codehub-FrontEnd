@@ -13,6 +13,8 @@ import ViewSwitcher from "./Shared/ViewSwitcher"
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseLayout.tsx
 
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseLayout.tsx
+
 interface ExerciseLayoutProps {
   exercise: any // Exercise object from your data
   language: any // Language object
@@ -168,8 +170,8 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
       {/* Fullscreen Toggle Button */}
       <button
         onClick={toggleFullscreen}
-        className={`fixed right-4 top-4 z-50 rounded-lg bg-blue-600 p-2 text-white shadow-lg transition-all hover:bg-blue-700 ${
-          isFullscreen ? "top-4" : "top-20"
+        className={`fixed right-4 z-50 rounded-lg bg-blue-600 p-2 text-white shadow-lg transition-all hover:bg-blue-700 ${
+          isFullscreen ? "top-4" : "bottom-4 lg:bottom-auto lg:top-20"
         }`}
         title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
       >

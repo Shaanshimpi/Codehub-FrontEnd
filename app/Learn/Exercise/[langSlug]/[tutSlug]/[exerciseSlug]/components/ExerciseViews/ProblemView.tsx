@@ -10,6 +10,8 @@ import UnifiedCodeEditor from "../Shared/UnifiedCodeEditor"
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/ProblemView.tsx
 
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/ProblemView.tsx
+
 interface PersistentCodeState {
   userCode: string
   isBoilerplateLoaded: boolean
@@ -186,11 +188,11 @@ main();`
 
       {/* Responsive Layout */}
       <div
-        className={`lg:flex ${isFullscreen ? "h-screen" : "lg:min-h-[calc(100vh-10rem)]"}`}
+        className={`lg:flex ${isFullscreen ? "h-screen" : "lg:h-[calc(100vh-10rem)]"}`}
       >
         {/* Question Panel */}
         <div
-          className={`lg:border-r lg:border-slate-200 lg:bg-sky-50 lg:dark:border-slate-700 lg:dark:bg-slate-800 ${mobileActiveTab === "question" ? "block min-h-[calc(100vh-6rem)]" : "hidden lg:block"} ${!isFullscreen ? "lg:w-1/2" : "lg:flex-none"}`}
+          className={`lg:border-r lg:border-slate-200 lg:bg-sky-50 lg:dark:border-slate-700 lg:dark:bg-slate-800 ${mobileActiveTab === "question" ? `block ${isFullscreen ? "h-screen" : "h-[calc(100vh-6rem)]"} overflow-y-auto` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2 lg:overflow-y-auto" : "lg:flex-none"}`}
           style={isFullscreen ? { width: `${panelWidth}%` } : {}}
         >
           <QuestionPanel exercise={exercise} language={language} />
@@ -207,7 +209,7 @@ main();`
 
         {/* Code Editor Panel */}
         <div
-          className={`lg:bg-white lg:dark:bg-slate-900 ${mobileActiveTab === "code" ? "block min-h-[calc(100vh-6rem)]" : "hidden lg:block"} ${!isFullscreen ? "lg:w-1/2" : "lg:flex-1"}`}
+          className={`lg:bg-white lg:dark:bg-slate-900 ${mobileActiveTab === "code" ? `block ${isFullscreen ? "h-screen" : "h-[calc(100vh-6rem)]"}` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2 lg:overflow-y-auto" : "lg:flex-1"}`}
           style={
             isFullscreen ? { width: `calc(${100 - panelWidth}% - 4px)` } : {}
           }

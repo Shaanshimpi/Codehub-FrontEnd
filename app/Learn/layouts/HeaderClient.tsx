@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import {
   BookOpen,
   ChevronDown,
+  Code2,
   Home,
   LogIn,
   Menu,
@@ -34,6 +35,7 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
   const baseSegment = pathname?.split("/")[1] || "learn"
 
   const [isTutorialsOpen, setIsTutorialsOpen] = useState(false)
+  const [isExercisesOpen, setIsExercisesOpen] = useState(false)
   const [isInteractiveOpen, setIsInteractiveOpen] = useState(false)
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -49,6 +51,7 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
         // Scrolling down
         setIsShrunk(true)
         setIsTutorialsOpen(false)
+        setIsExercisesOpen(false)
         setIsInteractiveOpen(false)
         setIsMobileMenuOpen(false)
       } else {
@@ -64,10 +67,15 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
   }, [])
 
   useEffect(() => {
-    if (isTutorialsOpen || isInteractiveOpen || isMobileMenuOpen) {
+    if (
+      isTutorialsOpen ||
+      isExercisesOpen ||
+      isInteractiveOpen ||
+      isMobileMenuOpen
+    ) {
       setIsShrunk(false)
     }
-  }, [isTutorialsOpen, isInteractiveOpen, isMobileMenuOpen])
+  }, [isTutorialsOpen, isExercisesOpen, isInteractiveOpen, isMobileMenuOpen])
 
   return (
     <header
@@ -137,6 +145,7 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                 <button
                   onClick={() => {
                     setIsTutorialsOpen(!isTutorialsOpen)
+                    setIsExercisesOpen(false)
                     setIsInteractiveOpen(false)
                   }}
                   className={cn(
@@ -195,6 +204,89 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                 )}
               </div>
 
+              {/* Exercises Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setIsExercisesOpen(!isExercisesOpen)
+                    setIsTutorialsOpen(false)
+                    setIsInteractiveOpen(false)
+                  }}
+                  className={cn(
+                    "group flex items-center space-x-2 rounded-lg text-slate-100 transition-all duration-200 hover:bg-white/10 hover:text-white dark:text-slate-300 dark:hover:text-white",
+                    isShrunk ? "rounded-sm px-4 py-0" : "rounded-lg px-4 py-4"
+                  )}
+                >
+                  <Code2 className="h-4 w-4" />
+                  <span className="font-medium">Exercises</span>
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 transition-transform duration-200",
+                      isExercisesOpen ? "rotate-180" : "rotate-0"
+                    )}
+                  />
+                </button>
+
+                {isExercisesOpen && (
+                  <div className="absolute left-0 top-full z-50 mt-2 w-64 rounded-xl border border-slate-200/50 bg-white/95 shadow-2xl backdrop-blur-md dark:border-slate-700/50 dark:bg-slate-800/95">
+                    <div className="p-2">
+                      <div className="mb-2 px-3 py-2">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                          Practice by Language
+                        </p>
+                      </div>
+                      {languages.map((language) => (
+                        <Link
+                          key={language.slug}
+                          href={`/${baseSegment}/Exercise/${language.slug}`}
+                          className="group flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-blue-50 dark:text-slate-300 dark:hover:bg-slate-700/50"
+                          onClick={() => setIsExercisesOpen(false)}
+                        >
+                          {language.logo && (
+                            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 p-1 dark:bg-slate-700">
+                              <img
+                                src={language.logo.url}
+                                alt={
+                                  language.logo.alt || `${language.title} logo`
+                                }
+                                className="h-5 w-5 object-contain"
+                              />
+                            </div>
+                          )}
+                          <div className="flex-1">
+                            <div className="font-medium text-slate-900 group-hover:text-blue-600 dark:text-slate-100 dark:group-hover:text-blue-400">
+                              {language.title} Exercises
+                            </div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                              Practice problems & solutions
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                      <div className="mt-2 border-t border-slate-200/50 pt-2 dark:border-slate-700/50">
+                        <Link
+                          href={`/${baseSegment}/Exercise`}
+                          className="group flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-blue-50 dark:text-slate-300 dark:hover:bg-slate-700/50"
+                          onClick={() => setIsExercisesOpen(false)}
+                        >
+                          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-100 dark:bg-blue-900/50">
+                            <Code2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium text-slate-900 group-hover:text-blue-600 dark:text-slate-100 dark:group-hover:text-blue-400">
+                              All Exercises
+                            </div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                              Browse all available exercises
+                            </div>
+                          </div>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Interactive Dropdown */}
               {false && (
                 <div className="relative">
@@ -202,6 +294,7 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                     onClick={() => {
                       setIsInteractiveOpen(!isInteractiveOpen)
                       setIsTutorialsOpen(false)
+                      setIsExercisesOpen(false)
                     }}
                     className={cn(
                       "group flex items-center space-x-2 rounded-lg text-slate-100 transition-all duration-200 hover:bg-white/10 hover:text-white dark:text-slate-300 dark:hover:text-white",
@@ -365,6 +458,45 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                 ))}
               </div>
 
+              <div className="space-y-2">
+                <div className="px-4 py-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    Exercises
+                  </p>
+                </div>
+                <Link
+                  href={`/${baseSegment}/Exercise`}
+                  className="flex items-center space-x-3 rounded-lg px-4 py-3 text-slate-100 transition-all duration-200 hover:bg-white/10"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <div className="flex h-6 w-6 items-center justify-center rounded bg-blue-600">
+                    <Code2 className="h-4 w-4 text-white" />
+                  </div>
+                  <span className="font-medium">All Exercises</span>
+                </Link>
+                {languages.map((language) => (
+                  <Link
+                    key={`exercise-${language.slug}`}
+                    href={`/${baseSegment}/Exercise/${language.slug}`}
+                    className="flex items-center space-x-3 rounded-lg px-4 py-3 text-slate-100 transition-all duration-200 hover:bg-white/10"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {language.logo && (
+                      <div className="flex h-6 w-6 items-center justify-center rounded bg-slate-700 p-1">
+                        <img
+                          src={language.logo.url}
+                          alt={language.logo.alt || `${language.title} logo`}
+                          className="h-4 w-4 object-contain"
+                        />
+                      </div>
+                    )}
+                    <span className="font-medium">
+                      {language.title} Exercises
+                    </span>
+                  </Link>
+                ))}
+              </div>
+
               {/* Mobile Auth Section */}
               <div className="border-t border-slate-700/50 pt-3">
                 <div className="px-4 py-2">
@@ -400,11 +532,12 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
       </div>
 
       {/* Dropdown Overlay */}
-      {(isTutorialsOpen || isInteractiveOpen) && (
+      {(isTutorialsOpen || isExercisesOpen || isInteractiveOpen) && (
         <button
           className="fixed inset-0 z-40"
           onClick={() => {
             setIsTutorialsOpen(false)
+            setIsExercisesOpen(false)
             setIsInteractiveOpen(false)
           }}
         />

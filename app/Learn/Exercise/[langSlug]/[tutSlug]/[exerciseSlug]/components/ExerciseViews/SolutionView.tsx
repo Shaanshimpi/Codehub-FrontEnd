@@ -25,6 +25,8 @@ import MermaidViewer from "../SolutionView/MermaidViewer"
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
+
 interface SolutionViewProps {
   exercise: any
   language: any
@@ -163,11 +165,11 @@ const SolutionView: React.FC<SolutionViewProps> = ({
 
       {/* Responsive Layout */}
       <div
-        className={`lg:flex ${isFullscreen ? "h-screen" : "lg:min-h-[calc(100vh-10rem)]"}`}
+        className={`lg:flex ${isFullscreen ? "h-screen" : "lg:h-[calc(100vh-10rem)]"}`}
       >
         {/* Explanation Panel */}
         <div
-          className={`lg:border-r lg:border-slate-200 lg:bg-white lg:dark:border-slate-700 lg:dark:bg-slate-900 ${mobileActiveTab === "explanation" ? "block min-h-[calc(100vh-6rem)]" : "hidden lg:block"} ${!isFullscreen ? "lg:w-1/2" : "lg:flex-none"}`}
+          className={`lg:border-r lg:border-slate-200 lg:bg-white lg:dark:border-slate-700 lg:dark:bg-slate-900 ${mobileActiveTab === "explanation" ? `block ${isFullscreen ? "h-screen" : "h-[calc(100vh-6rem)]"} overflow-y-auto` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2 lg:overflow-y-auto" : "lg:flex-none"}`}
           style={isFullscreen ? { width: `${panelWidth}%` } : {}}
         >
           <div className="flex h-full flex-col">
@@ -214,7 +216,7 @@ const SolutionView: React.FC<SolutionViewProps> = ({
 
         {/* Solution Code Panel */}
         <div
-          className={`lg:bg-slate-900 ${mobileActiveTab === "code" ? "block min-h-[calc(100vh-6rem)]" : "hidden lg:block"} ${!isFullscreen ? "lg:w-1/2" : "lg:flex-1"}`}
+          className={`lg:bg-slate-900 ${mobileActiveTab === "code" ? `block ${isFullscreen ? "h-screen" : "h-[calc(100vh-6rem)]"}` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2 lg:overflow-y-auto" : "lg:flex-1"}`}
           style={
             isFullscreen ? { width: `calc(${100 - panelWidth}% - 4px)` } : {}
           }
