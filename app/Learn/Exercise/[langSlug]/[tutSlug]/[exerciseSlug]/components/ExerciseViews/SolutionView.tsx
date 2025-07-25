@@ -1,7 +1,7 @@
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useLanguage } from "@/app/contexts/LanguageContext"
 import { getLocalizedContent } from "@/app/utils/exerciseHelpers"
 import {
@@ -18,6 +18,8 @@ import ExplanationTabs from "../SolutionView/ExplanationTabs"
 import KeyConceptsPanel from "../SolutionView/KeyConceptsPanel"
 import MemoryStatesPanel from "../SolutionView/MemoryStatesPanel"
 import MermaidViewer from "../SolutionView/MermaidViewer"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
@@ -50,7 +52,13 @@ const SolutionView: React.FC<SolutionViewProps> = ({
   const [mobileActiveTab, setMobileActiveTab] = useState<
     "explanation" | "code"
   >("explanation")
+  const [currentCode, setCurrentCode] = useState(exercise.solution_code)
   const { language: currentLanguage } = useLanguage()
+
+  // Reset code when exercise changes
+  useEffect(() => {
+    setCurrentCode(exercise.solution_code)
+  }, [exercise.solution_code])
 
   // Get localized content based on selected language
   const content = getLocalizedContent(exercise, currentLanguage)
@@ -224,7 +232,8 @@ const SolutionView: React.FC<SolutionViewProps> = ({
           <UnifiedCodeEditor
             exercise={exercise}
             language={language}
-            code={exercise.solution_code}
+            code={currentCode}
+            onCodeChange={setCurrentCode}
             mode="solution"
           />
         </div>

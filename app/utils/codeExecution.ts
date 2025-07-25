@@ -57,7 +57,20 @@ export async function executeCode({
     const result: OneCompilerResponse = await response.json()
 
     // Handle OneCompiler response format
-    if (result.status === "success" || result.stdout) {
+    // Show stderr/exception as output even if there's also stdout
+    if (result.stderr || result.exception) {
+      // Code had compilation or runtime errors
+      return {
+        success: false,
+        output: result.stdout || "",
+        error: result.exception || result.stderr || "Execution failed",
+        stderr: result.stderr,
+        executionTime: result.executionTime
+          ? parseFloat(result.executionTime)
+          : undefined,
+      }
+    } else if (result.status === "success" || result.stdout) {
+      // Code executed successfully
       return {
         success: true,
         output: result.stdout || "",
@@ -66,10 +79,11 @@ export async function executeCode({
           : undefined,
       }
     } else {
+      // No output and no explicit errors
       return {
         success: false,
         output: "",
-        error: result.exception || result.stderr || "Execution failed",
+        error: "No output generated",
         stderr: result.stderr,
       }
     }

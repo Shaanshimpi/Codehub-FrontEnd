@@ -2,8 +2,11 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from "react"
+import { executeCode, supportsInput } from "@/app/utils/codeExecution"
 import { Editor } from "@monaco-editor/react"
 import { Code2, Copy, Play, RotateCcw, Settings } from "lucide-react"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ProblemView/CodeEditor.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ProblemView/CodeEditor.tsx
 
@@ -43,40 +46,52 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     setLocalBoilerplateLoaded(isBoilerplateLoaded)
   }, [isBoilerplateLoaded])
 
-  const handleRunCode = () => {
+  const handleRunCode = async () => {
+    if (!userCode.trim() || isRunning) return
+
     setIsRunning(true)
     setOutput("")
 
-    // Simulate code execution with setTimeout instead of async/await
-    setTimeout(() => {
-      try {
-        // Mock output based on the content and language
-        if (
-          userCode.includes("printf") ||
-          userCode.includes("cout") ||
-          userCode.includes("print")
-        ) {
-          if (userCode.includes("scanf") && userCode.includes("if")) {
-            setOutput("Enter your age: 25\nYou are eligible to vote.")
-          } else if (userCode.includes("Hello") || userCode.includes("hello")) {
-            setOutput("Hello, World!")
-          } else {
-            setOutput(
-              "Program executed successfully!\nOutput: [Your program output would appear here]"
-            )
-          }
-        } else {
-          setOutput(
-            "Code executed successfully!\n\nNote: Add print statements to see output."
-          )
+    try {
+      const result = await executeCode({
+        code: userCode,
+        language: language.slug,
+        input: input,
+      })
+
+      if (result.success) {
+        let outputText = result.output
+
+        // Add execution info if available
+        if (result.executionTime) {
+          outputText += `\n\n─────────────────────\nExecution time: ${result.executionTime}ms`
         }
-      } catch (error) {
-        setOutput("Error: " + (error as Error).message)
-      } finally {
-        setIsRunning(false)
+
+        setOutput(outputText)
+
+        // Call parent callback for progress tracking
         onRunCode()
+      } else {
+        // Handle execution errors
+        let errorText = "❌ Execution Failed\n\n"
+
+        if (result.error) {
+          errorText += `Error: ${result.error}\n`
+        }
+
+        if (result.stderr) {
+          errorText += `\nDetails:\n${result.stderr}`
+        }
+
+        setOutput(errorText)
       }
-    }, 1500)
+    } catch (error) {
+      setOutput(
+        `❌ Network Error\n\nFailed to execute code: ${error instanceof Error ? error.message : "Unknown error"}\n\nPlease check your connection and try again.`
+      )
+    } finally {
+      setIsRunning(false)
+    }
   }
 
   const handleCopyCode = () => {
@@ -259,17 +274,26 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
       {/* Compact Bottom Section - Input + Actions */}
       <div className="border-t border-slate-200 bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-800">
-        {/* Input Row */}
-        <div className="mb-2">
-          <input
-            id="input"
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="w-full rounded border border-slate-300 bg-white px-2 py-1 text-sm focus:border-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-            placeholder="Program input (if needed)"
-          />
-        </div>
+        {/* Input Row - Only show for languages that support input */}
+        {supportsInput(language.slug) && (
+          <div className="mb-2">
+            <label
+              htmlFor="input"
+              className="mb-1 block text-xs text-slate-600 dark:text-slate-400"
+            >
+              Program Input:
+            </label>
+            <textarea
+              id="input"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              rows={2}
+              className="w-full rounded border border-slate-300 bg-white px-2 py-1 text-sm focus:border-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+              placeholder="Enter input for your program (each line will be passed as input)"
+              disabled={isRunning}
+            />
+          </div>
+        )}
 
         {/* Action Row */}
         <div className="flex gap-2">
@@ -356,7 +380,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
               </button>
             )}
           </div>
-          <div className="max-h-32 overflow-y-auto p-2">
+          <div className="max-h-40 overflow-y-auto p-2">
             {isRunning ? (
               <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
                 <div className="h-3 w-3 animate-spin rounded-full border border-blue-600 border-t-transparent" />

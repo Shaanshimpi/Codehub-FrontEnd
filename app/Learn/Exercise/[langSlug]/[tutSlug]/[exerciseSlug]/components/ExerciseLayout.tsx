@@ -2,12 +2,19 @@
 "use client"
 
 import React, { useCallback, useEffect, useState } from "react"
+import {
+  hasViewedSolution,
+  markSolutionViewed,
+} from "@/app/Learn/Exercise/utils/localStorage"
 import { Maximize2, Minimize2 } from "lucide-react"
 import ExerciseHeader from "./ExerciseHeader"
 import ProblemView from "./ExerciseViews/ProblemView"
 import SolutionView from "./ExerciseViews/SolutionView"
 import ProgressBar from "./Shared/ProgressBar"
+import SolutionConfirmModal from "./Shared/SolutionConfirmModal"
 import ViewSwitcher from "./Shared/ViewSwitcher"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseLayout.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseLayout.tsx
 
@@ -44,6 +51,7 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
   const [progress, setProgress] = useState(0) // 0-100 progress percentage
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [panelWidth, setPanelWidth] = useState(50) // Panel width percentage (50% default)
+  const [showSolutionModal, setShowSolutionModal] = useState(false)
 
   // Persistent state that survives view switches
   const [persistentCodeState, setPersistentCodeState] =
@@ -99,6 +107,16 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
 
   const handleViewChange = useCallback(
     (view: ViewType) => {
+      if (view === "solution") {
+        // Check if user has viewed this solution before
+        const exerciseSlug = params.exerciseSlug
+        if (!hasViewedSolution(exerciseSlug)) {
+          // Show confirmation modal for first-time solution viewing
+          setShowSolutionModal(true)
+          return
+        }
+      }
+
       setCurrentView(view)
 
       // Update progress when switching to solution view
@@ -106,7 +124,7 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
         handleProgressUpdate(50)
       }
     },
-    [progress, handleProgressUpdate]
+    [progress, handleProgressUpdate, params.exerciseSlug]
   )
 
   const handleCompleteExercise = useCallback(() => {
@@ -114,6 +132,24 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
     // Here you would typically save completion status to backend
     // Exercise completed
   }, [handleProgressUpdate])
+
+  // Handle solution modal confirmation
+  const handleSolutionConfirm = useCallback(() => {
+    const exerciseSlug = params.exerciseSlug
+    markSolutionViewed(exerciseSlug)
+    setShowSolutionModal(false)
+    setCurrentView("solution")
+
+    // Update progress when switching to solution view
+    if (progress < 50) {
+      handleProgressUpdate(50)
+    }
+  }, [params.exerciseSlug, progress, handleProgressUpdate])
+
+  // Handle solution modal cancellation
+  const handleSolutionCancel = useCallback(() => {
+    setShowSolutionModal(false)
+  }, [])
 
   // Handle fullscreen toggle
   const toggleFullscreen = useCallback(() => {
@@ -209,6 +245,13 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
           />
         )}
       </div>
+
+      {/* Solution confirmation modal */}
+      <SolutionConfirmModal
+        isOpen={showSolutionModal}
+        onConfirm={handleSolutionConfirm}
+        onCancel={handleSolutionCancel}
+      />
     </div>
   )
 }
