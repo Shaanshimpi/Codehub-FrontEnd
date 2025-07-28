@@ -9,6 +9,8 @@ import ExercisePreview from "./ExercisePreview"
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
+/* eslint-disable jsx-a11y/label-has-associated-control */
+
 interface Language {
   id: number
   title: string
@@ -636,7 +638,7 @@ const ManualExerciseForm: React.FC<ManualExerciseFormProps> = ({
                   onChange={(e) =>
                     handleInputChange("title_hi", e.target.value)
                   }
-                  placeholder="हिंदी में शीर्षक"
+                  placeholder="Hindi Title"
                   className={`w-full rounded-lg border px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white ${
                     validationErrors.title_hi
                       ? "border-red-500 dark:border-red-500"
@@ -661,7 +663,7 @@ const ManualExerciseForm: React.FC<ManualExerciseFormProps> = ({
                   onChange={(e) =>
                     handleInputChange("title_mr", e.target.value)
                   }
-                  placeholder="मराठीतील शीर्षक"
+                  placeholder="Marathi Title"
                   className={`w-full rounded-lg border px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white ${
                     validationErrors.title_mr
                       ? "border-red-500 dark:border-red-500"
@@ -800,45 +802,6 @@ const ManualExerciseForm: React.FC<ManualExerciseFormProps> = ({
         {/* Content Section */}
         {activeSection === "content" && (
           <div className="space-y-6">
-            {/* Language Tabs for Hints and Explanations */}
-            <div className="mb-6 border-b border-slate-200 dark:border-slate-700">
-              <div className="flex space-x-4">
-                <button
-                  type="button"
-                  onClick={() => setActiveLanguageTab("en")}
-                  className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
-                    activeLanguageTab === "en"
-                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                      : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
-                  }`}
-                >
-                  English
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveLanguageTab("hi")}
-                  className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
-                    activeLanguageTab === "hi"
-                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                      : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
-                  }`}
-                >
-                  हिंदी (Hindi)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveLanguageTab("mr")}
-                  className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
-                    activeLanguageTab === "mr"
-                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                      : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
-                  }`}
-                >
-                  मराठी (Marathi)
-                </button>
-              </div>
-            </div>
-
             {/* Learning Objectives */}
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -927,6 +890,44 @@ const ManualExerciseForm: React.FC<ManualExerciseFormProps> = ({
                 <Plus className="h-4 w-4" />
                 Add Tag
               </button>
+            </div>
+            {/* Language Tabs for Hints and Explanations */}
+            <div className="mb-6 border-b border-slate-200 dark:border-slate-700">
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setActiveLanguageTab("en")}
+                  className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+                    activeLanguageTab === "en"
+                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                      : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+                  }`}
+                >
+                  English
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveLanguageTab("hi")}
+                  className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+                    activeLanguageTab === "hi"
+                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                      : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+                  }`}
+                >
+                  Hindi
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveLanguageTab("mr")}
+                  className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+                    activeLanguageTab === "mr"
+                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                      : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+                  }`}
+                >
+                  Marathi
+                </button>
+              </div>
             </div>
 
             {/* Language-specific Hints and Explanations */}
@@ -1071,7 +1072,7 @@ const ManualExerciseForm: React.FC<ManualExerciseFormProps> = ({
                 {/* Hints (Hindi) */}
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Hints (हिंदी) *
+                    Hints (Hindi) *
                   </label>
                   {formData.hints_hi.map((hint, index) => (
                     <div
@@ -1087,7 +1088,7 @@ const ManualExerciseForm: React.FC<ManualExerciseFormProps> = ({
                               text: e.target.value,
                             })
                           }
-                          placeholder="छात्रों के लिए उपयोगी संकेत..."
+                          placeholder="Useful hints for students..."
                           className="flex-1 rounded-lg border border-slate-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                           rows={2}
                         />
@@ -1123,14 +1124,14 @@ const ManualExerciseForm: React.FC<ManualExerciseFormProps> = ({
                     className="flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                   >
                     <Plus className="h-4 w-4" />
-                    संकेत जोड़ें
+                    Add Hint
                   </button>
                 </div>
 
                 {/* Explanations (Hindi) */}
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Explanations (हिंदी) *
+                    Explanations (Hindi) *
                   </label>
                   {formData.explanation_hi.map((explanation, index) => (
                     <div
@@ -1146,7 +1147,7 @@ const ManualExerciseForm: React.FC<ManualExerciseFormProps> = ({
                               text: e.target.value,
                             })
                           }
-                          placeholder="चरणबद्ध व्याख्या..."
+                          placeholder="Step-by-step explanation..."
                           className="flex-1 rounded-lg border border-slate-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                           rows={3}
                         />
@@ -1193,7 +1194,7 @@ const ManualExerciseForm: React.FC<ManualExerciseFormProps> = ({
                     className="flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                   >
                     <Plus className="h-4 w-4" />
-                    व्याख्या जोड़ें
+                    Add Explanation
                   </button>
                 </div>
               </div>
@@ -1205,7 +1206,7 @@ const ManualExerciseForm: React.FC<ManualExerciseFormProps> = ({
                 {/* Hints (Marathi) */}
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Hints (मराठी) *
+                    Hints (Marathi) *
                   </label>
                   {formData.hints_mr.map((hint, index) => (
                     <div
@@ -1221,7 +1222,7 @@ const ManualExerciseForm: React.FC<ManualExerciseFormProps> = ({
                               text: e.target.value,
                             })
                           }
-                          placeholder="विद्यार्थ्यांसाठी उपयुक्त इशारे..."
+                          placeholder="Useful hints for students..."
                           className="flex-1 rounded-lg border border-slate-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                           rows={2}
                         />
@@ -1257,14 +1258,14 @@ const ManualExerciseForm: React.FC<ManualExerciseFormProps> = ({
                     className="flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                   >
                     <Plus className="h-4 w-4" />
-                    इशारा जोडा
+                    Add Hint
                   </button>
                 </div>
 
                 {/* Explanations (Marathi) */}
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Explanations (मराठी) *
+                    Explanations (Marathi) *
                   </label>
                   {formData.explanation_mr.map((explanation, index) => (
                     <div
@@ -1280,7 +1281,7 @@ const ManualExerciseForm: React.FC<ManualExerciseFormProps> = ({
                               text: e.target.value,
                             })
                           }
-                          placeholder="टप्प्याटप्प्याने स्पष्टीकरण..."
+                          placeholder="Step-by-step explanation..."
                           className="flex-1 rounded-lg border border-slate-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                           rows={3}
                         />
@@ -1327,7 +1328,7 @@ const ManualExerciseForm: React.FC<ManualExerciseFormProps> = ({
                     className="flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                   >
                     <Plus className="h-4 w-4" />
-                    स्पष्टीकरण जोडा
+                    Add Explanation
                   </button>
                 </div>
               </div>
