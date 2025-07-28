@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import { BookOpen } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -64,11 +65,17 @@ const LanguageCard = ({ language }: LanguageCardProps) => {
             )}
           </div>
 
-          {language.category && (
-            <span className="inline-block rounded-full bg-blue-600 px-2 py-1 text-xs text-white dark:bg-blue-500">
-              {language.category}
+          <div className="flex items-center justify-center gap-2">
+            {language.category && (
+              <span className="inline-block rounded-full bg-blue-600 px-2 py-1 text-xs text-white dark:bg-blue-500">
+                {language.category}
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+              <BookOpen className="h-3 w-3" />
+              Tutorials
             </span>
-          )}
+          </div>
         </div>
       </div>
     </Link>

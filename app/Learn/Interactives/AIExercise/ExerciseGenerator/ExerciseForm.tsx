@@ -20,6 +20,7 @@ const ExerciseForm: React.FC<ExerciseFormProps> = ({ onGenerate }) => {
   const [questionInput, setQuestionInput] = useState("")
   const [selectedLanguage, setSelectedLanguage] = useState("")
   const [difficulty, setDifficulty] = useState(1)
+  const [exclusions, setExclusions] = useState("")
   const [loading, setLoading] = useState(false)
   const [languages, setLanguages] = useState<Language[]>([])
   const [languagesLoading, setLanguagesLoading] = useState(true)
@@ -31,8 +32,8 @@ const ExerciseForm: React.FC<ExerciseFormProps> = ({ onGenerate }) => {
       try {
         const languagesData = await getLanguages()
         setLanguages(languagesData)
-      } catch (error) {
-        console.error("Error fetching languages:", error)
+      } catch {
+        // Error fetching languages
       } finally {
         setLanguagesLoading(false)
       }
@@ -63,7 +64,8 @@ const ExerciseForm: React.FC<ExerciseFormProps> = ({ onGenerate }) => {
         questionInput,
         langSlug,
         difficulty,
-        selectedModel
+        selectedModel,
+        exclusions
       )
 
       const formData = {
@@ -71,12 +73,13 @@ const ExerciseForm: React.FC<ExerciseFormProps> = ({ onGenerate }) => {
         selectedLangObj,
         difficulty,
         selectedModel,
+        exclusions,
         slug: generateSlug(exerciseResponse.title_en),
       }
 
       onGenerate(exerciseResponse, formData)
-    } catch (err) {
-      console.error("Error generating exercise:", err)
+    } catch {
+      // Error generating exercise
       alert("Error generating exercise. Please try again.")
     } finally {
       setLoading(false)
@@ -186,6 +189,27 @@ const ExerciseForm: React.FC<ExerciseFormProps> = ({ onGenerate }) => {
             rows={4}
             required
           />
+        </div>
+
+        <div>
+          <label
+            htmlFor="exercise-exclusions"
+            className="mb-2 block text-sm font-medium text-sky-100"
+          >
+            Concept Exclusions (Optional)
+          </label>
+          <textarea
+            id="exercise-exclusions"
+            value={exclusions}
+            onChange={(e) => setExclusions(e.target.value)}
+            placeholder="List concepts to avoid (e.g., functions, arrays, pointers, objects, loops, etc.). Separate multiple concepts with commas."
+            className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows={3}
+          />
+          <p className="mt-1 text-xs text-slate-400">
+            Specify programming concepts that shouldn&apos;t be used because
+            they haven&apos;t been taught yet in the syllabus.
+          </p>
         </div>
 
         <button

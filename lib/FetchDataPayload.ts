@@ -84,9 +84,12 @@ export async function fetchCollection(
 
   try {
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-    const languages = await res.json();
-    return languages;
+    if (!res.ok) {
+      console.error(`❌ API Error: ${res.status} ${res.statusText} for ${url}`);
+      throw new Error(`HTTP error ${res.status}`);
+    }
+    const data = await res.json();
+    return data; // The API route already returns data.docs, so we return directly
   } catch (error) {
     console.error(`❌ Failed to fetch ${collectionSlug}:`, error);
     return [];

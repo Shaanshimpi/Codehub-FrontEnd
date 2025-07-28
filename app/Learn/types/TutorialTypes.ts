@@ -146,9 +146,16 @@ export interface MemoryState {
 
 export interface ExecutionStep {
   step: number
+  line_number?: number
   line: string
   description: string
   output: string
+  memory_state?: {
+    name: string
+    value: string
+    type: string
+    changed?: boolean
+  }[]
 }
 
 export interface Concept {

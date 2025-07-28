@@ -23,11 +23,11 @@ const ExerciseAIGenerator = () => {
 
     try {
       // Add your submission logic here
-      const response = await submitExercise({
+      await submitExercise({
         ...exerciseData,
         ...submissionData,
       })
-      console.log("Exercise submitted successfully:", response)
+      // Exercise submitted successfully
 
       // Reset to step 1 after successful submission
       setStep(1)
@@ -35,14 +35,14 @@ const ExerciseAIGenerator = () => {
       setFormData(null)
 
       alert("Exercise submitted successfully!")
-    } catch (error) {
-      console.error("Error submitting exercise:", error)
+    } catch {
+      // Error submitting exercise
       alert("Error submitting exercise. Please try again.")
     }
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 p-4 dark:bg-slate-950 sm:p-6 md:p-8">
+    <div className="bg-slate-900 p-4 dark:bg-slate-950 sm:p-6 md:p-8">
       <div className="mx-auto max-w-4xl">
         {step === 1 && <ExerciseForm onGenerate={handleGenerate} />}
         {step === 2 && exerciseData && (

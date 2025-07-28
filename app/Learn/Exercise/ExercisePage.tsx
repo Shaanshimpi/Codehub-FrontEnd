@@ -11,7 +11,7 @@ interface ExercisePageProps {
 
 const ExercisePage = ({ languages }: ExercisePageProps) => {
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="bg-slate-900">
       <HeaderClient languages={languages} />
       <ExerciseIntroSection />
       <ExerciseLanguageGrid languages={languages} />

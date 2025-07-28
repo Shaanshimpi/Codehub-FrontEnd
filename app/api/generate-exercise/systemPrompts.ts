@@ -46,6 +46,14 @@ export const CODE_FORMATTING = `CODE FORMATTING RULES:
 1. For the main "solution_code" field: Use PLAIN TEXT code with numbered comments [1], [2], etc.
 2. For hints/explanations: Use backticks \`code\` for inline code (frontend will format)
 
+CRITICAL CODE COMPLETENESS REQUIREMENTS:
+- ALWAYS generate COMPLETE, WORKING code that compiles and runs correctly
+- Include ALL necessary headers, function definitions, and main function
+- Ensure the code is FULLY FUNCTIONAL from beginning to end
+- Never truncate or leave incomplete sections
+- Include proper variable declarations, input/output, and return statements
+- The code should be ready to copy-paste and execute immediately
+
 MAIN CODE FIELD (Plain text with numbered comments):
 Provide clean, executable code with numbered comments for educational reference.
 
@@ -72,14 +80,106 @@ int main() {
     // [8] Call factorial function and print result
     printf("Factorial of %d is %d\\n", number, factorial(number));
     return 0;
-}`
+}
+
+MANDATORY CODE COMPLETENESS CHECKLIST:
+✓ All necessary headers included
+✓ All functions fully defined with complete logic
+✓ Main function present and complete
+✓ All variables properly declared and initialized
+✓ All input/output operations included
+✓ No truncated or incomplete sections
+✓ Code can be compiled and executed immediately`
 
 export const VISUAL_ELEMENTS_RULES = `VISUAL ELEMENTS REQUIREMENTS:
 Every exercise MUST include comprehensive visual learning elements:
 
-1. MEMORY STATES: Show variable values at different execution points
-2. EXECUTION STEPS: Step-by-step trace of code execution
-3. CONCEPTS: Key programming concepts with real-world metaphors`
+1. ENHANCED EXECUTION STEPS: Step-by-step trace that includes BOTH code execution AND memory states at each step
+2. CONCEPTS: Key programming concepts with real-world metaphors
+
+CRITICAL EXECUTION ORDER REQUIREMENTS:
+- Follow ACTUAL PROGRAM EXECUTION ORDER like a real compiler/interpreter
+- For C/C++/Java: Start execution from main() function, even if other functions are defined above
+- Show function definitions when they are encountered during execution (called), not when declared
+- Trace the actual flow: main() calls function → jump to function → return to main()
+- Include header/import statements as initial steps if they affect execution
+- Show variable initialization, function calls, control flow, and returns in chronological order
+
+ENHANCED EXECUTION STEPS FORMAT:
+Each execution step must include:
+- step: Sequential step number
+- line_number: Line number in code (optional, for reference)
+- line: The actual code line being executed
+- description: What happens in this step
+- output: Any output produced (empty string if none)
+- memory_state: Array of ALL variables and their current values at this step
+
+EXPLANATION SCHEMA REQUIREMENTS:
+Each explanation section must include proper type formatting for frontend rendering:
+- type: Must be one of ["text", "concept", "warning", "tip"]
+- content: The actual explanation text
+
+EXPLANATION TYPE USAGE:
+- "text": Regular explanatory content, step-by-step instructions
+- "concept": Important programming concepts that need highlighting
+- "warning": Common mistakes, pitfalls, or things to be careful about
+- "tip": Helpful hints, best practices, or pro tips
+
+EXPLANATION FORMATTING EXAMPLE:
+[
+  {
+    "type": "text",
+    "content": "This algorithm checks if a number is prime by testing divisibility..."
+  },
+  {
+    "type": "concept", 
+    "content": "A prime number is a natural number greater than 1 that has no positive divisors other than 1 and itself."
+  },
+  {
+    "type": "warning",
+    "content": "Remember to handle edge cases like numbers less than 2, which are not prime by definition."
+  },
+  {
+    "type": "tip",
+    "content": "For better performance with large numbers, you only need to check divisors up to the square root of n."
+  }
+]
+
+MEMORY STATE TRACKING:
+- Include ALL variables that exist at each execution step
+- Show current value of each variable
+- Mark variables that changed in this step with "changed": true
+- Include variable type (int, string, boolean, etc.)
+- Even if variable doesn't change, include it in memory_state for continuity
+- Track variables in their proper scope (global, main function, other functions)
+
+EXECUTION ORDER EXAMPLES:
+
+For C Program with Functions:
+1. Step 1: "#include <stdio.h>" - Include header files
+2. Step 2: "int main() {" - Program execution starts at main function
+3. Step 3: "int num = 5;" - Declare and initialize variable in main
+4. Step 4: "result = factorial(num);" - Call factorial function
+5. Step 5: "int factorial(int n) {" - Jump to factorial function definition
+6. Step 6: "int result = 1;" - Initialize local variable in factorial
+7. Step 7-N: Execute factorial function logic
+8. Step N+1: "return result;" - Return from factorial function
+9. Step N+2: Back in main, continue with remaining statements
+10. Step N+3: "return 0;" - End main function
+
+EXAMPLE ENHANCED EXECUTION STEP:
+{
+  "step": 3,
+  "line_number": 8,
+  "line": "int result = a + b;",
+  "description": "Calculate sum of a and b, store in result variable",
+  "output": "",
+  "memory_state": [
+    {"name": "a", "value": "5", "type": "int", "changed": false},
+    {"name": "b", "value": "3", "type": "int", "changed": false},
+    {"name": "result", "value": "8", "type": "int", "changed": true}
+  ]
+}`
 
 export const MERMAID_RULES = `MERMAID DIAGRAM REQUIREMENTS:
 Create educational diagrams that explain the code logic:
@@ -171,6 +271,16 @@ MERMAID TEXT CONVERSION RULES:
 
 export const BOILERPLATE_RULES = `BOILERPLATE CODE REQUIREMENTS:
 Provide starter code template that represents 20-30% of the complete solution:
+
+CRITICAL BOILERPLATE COMPLETENESS REQUIREMENTS:
+- ALWAYS generate COMPLETE structural code (headers, function signatures, main function)
+- Include ALL necessary imports, headers, and basic declarations
+- Provide complete input/output structure
+- Add clear TODO comments to guide core algorithm implementation
+- Leave only the main algorithm logic empty for students to implement
+- Code should COMPILE without errors but not produce correct results
+- Never truncate or leave incomplete structural elements
+- Include all necessary variable declarations and return statements
 
 KEY PRINCIPLES:
 - Include basic structure (headers, function signatures, main function)
@@ -377,12 +487,28 @@ ${LEARNING_STRUCTURE_REQUIREMENTS}
 export const buildPrompt = (
   questionInput: string,
   selectedLanguage: string,
-  difficulty: number
+  difficulty: number,
+  exclusions?: string
 ): string => {
   const difficultyContext =
     SYSTEM_PROMPTS.DIFFICULTY_CONTEXTS[
       difficulty as keyof typeof SYSTEM_PROMPTS.DIFFICULTY_CONTEXTS
     ]
+
+  const exclusionsSection =
+    exclusions && exclusions.trim()
+      ? `\n\nCONCEPT EXCLUSIONS - CRITICAL:
+The following programming concepts MUST NOT be used anywhere in the exercise (title, code, explanations, hints, or any content):
+${exclusions.trim()}
+
+IMPORTANT: These concepts have not been taught yet in the syllabus. The exercise must be solvable WITHOUT using any of these excluded concepts. Do not mention them at all.
+
+EXAMPLES OF EXCLUSION HANDLING:
+- If "functions" is excluded: Use only main() function, implement all logic inline
+- If "arrays" is excluded: Use individual variables (num1, num2, num3) instead of arrays
+- If "loops" is excluded: Use only sequential statements and simple conditionals
+- If "pointers" is excluded: Use only basic variables and pass by value`
+      : ""
 
   return `${SYSTEM_PROMPTS.EXERCISE_GENERATOR}
 
@@ -390,7 +516,7 @@ DIFFICULTY LEVEL: ${difficulty} - ${difficultyContext}
 
 LANGUAGE: ${selectedLanguage}
 
-EXERCISE REQUEST: "${questionInput}"
+EXERCISE REQUEST: "${questionInput}"${exclusionsSection}
 
 CRITICAL INSTRUCTIONS:
 1. Generate comprehensive educational content with visual learning aids
@@ -404,8 +530,27 @@ CRITICAL INSTRUCTIONS:
 9. Include practical hints for student understanding
 10. Make visual elements comprehensive and educational
 11. Strictly use ROMAN script, non-english text should be mostly in English just enough grammar of that language. Enough for non-english primary speaker to understand.
+12. CONCEPT EXCLUSIONS: If any concepts are listed as excluded, NEVER use them anywhere in the exercise. These concepts haven't been taught yet.
+13. EXPLANATION SCHEMA: Use proper type field for all explanation arrays - each object must have "type" (text/concept/warning/tip) and "content" fields
+
+ABSOLUTE REQUIREMENTS FOR CODE COMPLETENESS:
+- NEVER generate incomplete, truncated, or partial code
+- ALWAYS include complete main() function and all necessary functions
+- ALWAYS include all headers, imports, and declarations
+- ALWAYS include complete input/output operations
+- ALWAYS include proper return statements and program termination
+- Both solution_code AND boilerplate_code must be structurally complete
+- Code must be ready to compile immediately without missing parts
+
+EXECUTION STEPS MUST FOLLOW REAL PROGRAM EXECUTION:
+- Start from main() function entry point (not from top of file)
+- Follow actual function call sequence: main() → function calls → returns
+- Show execution flow as a compiler/interpreter would execute
+- Include all variable initializations, function calls, and control flow
+- Track memory states at each actual execution step
 
 REMEMBER: For beginners, SIMPLE is better than PERFECT. Focus on learning, not optimization.
+BUT ALWAYS GENERATE COMPLETE, WORKING CODE - never partial or truncated.
 
 Generate a complete programming exercise with all required educational components.`
 }

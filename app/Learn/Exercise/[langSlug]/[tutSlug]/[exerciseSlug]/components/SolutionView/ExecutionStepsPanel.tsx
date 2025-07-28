@@ -1,7 +1,7 @@
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/ExecutionStepsPanel.tsx
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import {
   Code,
   Pause,
@@ -11,6 +11,8 @@ import {
   SkipForward,
   Terminal,
 } from "lucide-react"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/ExecutionStepsPanel.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/ExecutionStepsPanel.tsx
 
@@ -26,6 +28,52 @@ const ExecutionStepsPanel: React.FC<ExecutionStepsPanelProps> = ({
   const [currentStep, setCurrentStep] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [playSpeed, setPlaySpeed] = useState(2000) // milliseconds
+
+  // Create a consistent memory state structure across all steps
+  const allVariables = useMemo(() => {
+    if (!executionSteps || !Array.isArray(executionSteps)) return []
+
+    const variableSet = new Set<string>()
+    executionSteps.forEach((step) => {
+      if (step.memory_state && Array.isArray(step.memory_state)) {
+        step.memory_state.forEach((variable: any) => {
+          variableSet.add(variable.name)
+        })
+      }
+    })
+    return Array.from(variableSet).sort()
+  }, [executionSteps])
+
+  // Get the current memory state with all variables, filling missing ones
+  const getCurrentMemoryState = useMemo(() => {
+    if (
+      !executionSteps ||
+      !Array.isArray(executionSteps) ||
+      !executionSteps[currentStep]
+    )
+      return []
+
+    const currentExecution = executionSteps[currentStep]
+    if (!currentExecution?.memory_state) return []
+
+    const currentVariables = new Map()
+    currentExecution.memory_state.forEach((variable: any) => {
+      currentVariables.set(variable.name, variable)
+    })
+
+    return allVariables.map((varName) => {
+      if (currentVariables.has(varName)) {
+        return currentVariables.get(varName)
+      } else {
+        return {
+          name: varName,
+          value: "undefined",
+          type: "undefined",
+          changed: false,
+        }
+      }
+    })
+  }, [currentStep, executionSteps, allVariables])
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -85,7 +133,7 @@ const ExecutionStepsPanel: React.FC<ExecutionStepsPanelProps> = ({
     setIsPlaying(false)
   }
 
-  const currentExecution = executionSteps[currentStep]
+  const currentExecution = executionSteps && executionSteps[currentStep]
 
   return (
     <div className="space-y-6">
@@ -95,9 +143,146 @@ const ExecutionStepsPanel: React.FC<ExecutionStepsPanelProps> = ({
           {title}
         </h3>
         <p className="text-sm text-slate-600 dark:text-slate-400">
-          Follow the program execution line by line
+          Follow the program execution with line-by-line memory state tracking
         </p>
       </div>
+
+      {/* Current Step Highlight */}
+      {currentExecution && (
+        <div className="rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 p-6 dark:from-green-900/20 dark:to-emerald-900/20">
+          <div className="flex items-start gap-4">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-sm font-bold text-white">
+              {currentExecution.step}
+            </div>
+            <div className="flex-1">
+              <div className="mb-2 flex items-center gap-2">
+                <Code className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <span className="text-sm font-medium text-green-800 dark:text-green-200">
+                  Executing Line:
+                </span>
+                {currentExecution.line_number && (
+                  <span className="text-xs text-green-600 dark:text-green-400">
+                    (Line {currentExecution.line_number})
+                  </span>
+                )}
+              </div>
+              <code className="block rounded bg-slate-800 px-3 py-2 text-sm text-slate-200">
+                {currentExecution.line}
+              </code>
+              <p className="mt-3 text-sm text-green-700 dark:text-green-300">
+                {currentExecution.description}
+              </p>
+
+              {/* Memory State Display - Fixed Structure */}
+              {allVariables.length > 0 && (
+                <div className="mt-4">
+                  <div className="mb-3 flex items-center gap-2">
+                    <span className="text-lg">💾</span>
+                    <span className="text-sm font-medium text-green-800 dark:text-green-200">
+                      Memory State:
+                    </span>
+                  </div>
+                  <div className="overflow-hidden rounded-lg border border-green-200 dark:border-green-700">
+                    <table className="w-full text-sm">
+                      <thead className="bg-green-100 dark:bg-green-800/30">
+                        <tr>
+                          <th className="px-3 py-2 text-left font-medium text-green-800 dark:text-green-200">
+                            Variable
+                          </th>
+                          <th className="px-3 py-2 text-left font-medium text-green-800 dark:text-green-200">
+                            Value
+                          </th>
+                          <th className="px-3 py-2 text-left font-medium text-green-800 dark:text-green-200">
+                            Type
+                          </th>
+                          <th className="px-3 py-2 text-center font-medium text-green-800 dark:text-green-200">
+                            Changed
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white dark:bg-slate-800">
+                        {getCurrentMemoryState.map(
+                          (variable: any, vIndex: number) => (
+                            <tr
+                              key={variable.name}
+                              className={`transition-colors duration-300 ${
+                                variable.changed
+                                  ? "bg-amber-50 dark:bg-amber-900/20"
+                                  : variable.value === "undefined"
+                                    ? "bg-slate-100 opacity-60 dark:bg-slate-800/50"
+                                    : vIndex % 2 === 0
+                                      ? "bg-slate-50 dark:bg-slate-700/50"
+                                      : "bg-white dark:bg-slate-800"
+                              }`}
+                            >
+                              <td
+                                className={`px-3 py-2 font-mono transition-colors duration-300 ${
+                                  variable.changed
+                                    ? "font-bold text-amber-800 dark:text-amber-200"
+                                    : variable.value === "undefined"
+                                      ? "text-slate-400 dark:text-slate-500"
+                                      : "text-slate-700 dark:text-slate-300"
+                                }`}
+                              >
+                                {variable.name}
+                              </td>
+                              <td
+                                className={`px-3 py-2 font-mono transition-colors duration-300 ${
+                                  variable.changed
+                                    ? "font-bold text-amber-800 dark:text-amber-200"
+                                    : variable.value === "undefined"
+                                      ? "italic text-slate-400 dark:text-slate-500"
+                                      : "text-slate-700 dark:text-slate-300"
+                                }`}
+                              >
+                                {variable.value}
+                              </td>
+                              <td
+                                className={`px-3 py-2 transition-colors duration-300 ${
+                                  variable.value === "undefined"
+                                    ? "italic text-slate-400 dark:text-slate-500"
+                                    : "text-slate-600 dark:text-slate-400"
+                                }`}
+                              >
+                                {variable.type}
+                              </td>
+                              <td className="px-3 py-2 text-center">
+                                {variable.changed ? (
+                                  <span className="animate-pulse font-bold text-amber-600 dark:text-amber-400">
+                                    ✓
+                                  </span>
+                                ) : (
+                                  <span className="text-slate-400">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          )
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {currentExecution.output && (
+                <div className="mt-3">
+                  <div className="mb-2 flex items-center gap-2">
+                    <Terminal className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                      Output:
+                    </span>
+                  </div>
+                  <div className="rounded bg-slate-900 px-3 py-2">
+                    <pre className="text-sm text-green-400">
+                      {currentExecution.output}
+                    </pre>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Controls */}
       <div className="rounded-lg bg-slate-50 p-4 dark:bg-slate-800">
@@ -181,49 +366,10 @@ const ExecutionStepsPanel: React.FC<ExecutionStepsPanelProps> = ({
         </div>
       </div>
 
-      {/* Current Step Highlight */}
-      <div className="rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 p-6 dark:from-green-900/20 dark:to-emerald-900/20">
-        <div className="flex items-start gap-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-sm font-bold text-white">
-            {currentExecution.step}
-          </div>
-          <div className="flex-1">
-            <div className="mb-2 flex items-center gap-2">
-              <Code className="h-4 w-4 text-green-600 dark:text-green-400" />
-              <span className="text-sm font-medium text-green-800 dark:text-green-200">
-                Executing Line:
-              </span>
-            </div>
-            <code className="block rounded bg-slate-800 px-3 py-2 text-sm text-slate-200">
-              {currentExecution.line}
-            </code>
-            <p className="mt-3 text-sm text-green-700 dark:text-green-300">
-              {currentExecution.description}
-            </p>
-
-            {currentExecution.output && (
-              <div className="mt-3">
-                <div className="mb-2 flex items-center gap-2">
-                  <Terminal className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                    Output:
-                  </span>
-                </div>
-                <div className="rounded bg-slate-900 px-3 py-2">
-                  <pre className="text-sm text-green-400">
-                    {currentExecution.output}
-                  </pre>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Execution Timeline */}
       <div className="space-y-3">
         <h4 className="font-semibold text-slate-900 dark:text-white">
-          Execution Timeline
+          Execution Timeline with Memory States
         </h4>
         <div className="space-y-2">
           {executionSteps.map((step: any, index: number) => (
@@ -251,17 +397,24 @@ const ExecutionStepsPanel: React.FC<ExecutionStepsPanelProps> = ({
                   {step.step}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <code
-                    className={`block font-mono text-sm ${
-                      index === currentStep
-                        ? "text-green-800 dark:text-green-200"
-                        : "text-slate-600 dark:text-slate-400"
-                    }`}
-                  >
-                    {step.line}
-                  </code>
+                  <div className="mb-1 flex items-center gap-2">
+                    <code
+                      className={`font-mono text-sm ${
+                        index === currentStep
+                          ? "text-green-800 dark:text-green-200"
+                          : "text-slate-600 dark:text-slate-400"
+                      }`}
+                    >
+                      {step.line}
+                    </code>
+                    {step.line_number && (
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                        (L{step.line_number})
+                      </span>
+                    )}
+                  </div>
                   <p
-                    className={`mt-1 text-xs ${
+                    className={`text-xs ${
                       index === currentStep
                         ? "text-green-700 dark:text-green-300"
                         : "text-slate-500 dark:text-slate-500"
@@ -276,6 +429,40 @@ const ExecutionStepsPanel: React.FC<ExecutionStepsPanelProps> = ({
                       </span>
                       <span className="ml-1 font-mono text-xs text-slate-700 dark:text-slate-300">
                         {step.output}
+                      </span>
+                    </div>
+                  )}
+                  {/* Mini Memory State Indicator */}
+                  {step.memory_state && step.memory_state.length > 0 && (
+                    <div className="mt-2 flex items-center gap-1">
+                      <span className="text-xs">💾</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
+                        {step.memory_state.filter((v: any) => v.changed)
+                          .length > 0 ? (
+                          <>
+                            <span className="font-medium text-amber-600 dark:text-amber-400">
+                              {
+                                step.memory_state.filter((v: any) => v.changed)
+                                  .length
+                              }{" "}
+                              changed
+                            </span>
+                            {step.memory_state.filter((v: any) => !v.changed)
+                              .length > 0 && (
+                              <span>
+                                ,{" "}
+                                {
+                                  step.memory_state.filter(
+                                    (v: any) => !v.changed
+                                  ).length
+                                }{" "}
+                                unchanged
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          `${step.memory_state.length} variables`
+                        )}
                       </span>
                     </div>
                   )}

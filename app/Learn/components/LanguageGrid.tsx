@@ -7,15 +7,18 @@ interface LearnPageProps {
 }
 const LanguageGrid = ({ languages }: LearnPageProps) => {
   return (
-    <section className="bg-slate-900 px-6 py-16 dark:bg-slate-950">
+    <section
+      id="language-grid"
+      className="bg-slate-900 px-6 py-16 dark:bg-slate-950"
+    >
       <div className="mx-auto max-w-7xl">
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-4xl font-bold text-white">
-            Programming Languages
+            Browse Tutorials by Language
           </h2>
           <p className="mx-auto max-w-2xl text-xl text-sky-100 dark:text-slate-300">
-            Explore different programming languages and find the one that suits
-            your interests and goals
+            Choose a programming language to explore comprehensive tutorials,
+            examples, and step-by-step learning guides
           </p>
         </div>
 

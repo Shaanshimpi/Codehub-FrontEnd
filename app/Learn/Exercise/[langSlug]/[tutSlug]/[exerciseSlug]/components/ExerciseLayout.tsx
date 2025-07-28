@@ -2,17 +2,21 @@
 "use client"
 
 import React, { useCallback, useEffect, useState } from "react"
+import { useUser } from "@/app/(payload)/_providers/UserProvider"
 import {
   hasViewedSolution,
   markSolutionViewed,
 } from "@/app/Learn/Exercise/utils/localStorage"
-import { Maximize2, Minimize2 } from "lucide-react"
+import { ArrowRight, Lock, Maximize2, Minimize2, User } from "lucide-react"
+import Link from "next/link"
 import ExerciseHeader from "./ExerciseHeader"
 import ProblemView from "./ExerciseViews/ProblemView"
 import SolutionView from "./ExerciseViews/SolutionView"
 import ProgressBar from "./Shared/ProgressBar"
 import SolutionConfirmModal from "./Shared/SolutionConfirmModal"
 import ViewSwitcher from "./Shared/ViewSwitcher"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseLayout.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseLayout.tsx
 
@@ -47,6 +51,7 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
   tutorial,
   params,
 }) => {
+  const { user, isLoading } = useUser()
   const [currentView, setCurrentView] = useState<ViewType>("problem")
   const [progress, setProgress] = useState(0) // 0-100 progress percentage
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -72,8 +77,8 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
       try {
         const parsedState = JSON.parse(savedState)
         setPersistentCodeState(parsedState)
-      } catch (error) {
-        console.error("Failed to parse saved state:", error)
+      } catch {
+        // Failed to parse saved state, using defaults
       }
     }
 
@@ -181,6 +186,93 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
     },
     [panelWidth]
   )
+
+  // Check if exercise is locked and user is not authenticated
+  const isExerciseLocked = exercise.isLocked && !user
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-900">
+        <div className="text-center text-white">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+          <p className="mt-4 text-slate-400">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show locked exercise page if exercise is locked and user is not authenticated
+  if (isExerciseLocked) {
+    return (
+      <div className="min-h-screen bg-slate-900">
+        <ExerciseHeader
+          exercise={exercise}
+          language={language}
+          tutorial={tutorial}
+          params={params}
+        />
+
+        <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-6">
+          <div className="w-full max-w-md text-center">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30">
+              <Lock className="h-10 w-10 text-amber-600 dark:text-amber-400" />
+            </div>
+
+            <h1 className="mb-4 text-3xl font-bold text-white">
+              Premium Exercise
+            </h1>
+            <p className="mb-8 text-lg text-slate-300">
+              This exercise is part of our premium content. Sign in to unlock
+              advanced coding challenges and comprehensive learning materials.
+            </p>
+
+            <div className="mb-8 space-y-3">
+              <div className="flex items-center gap-3 text-left text-slate-300">
+                <div className="h-2 w-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
+                <span>Access to premium exercises</span>
+              </div>
+              <div className="flex items-center gap-3 text-left text-slate-300">
+                <div className="h-2 w-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
+                <span>Detailed step-by-step solutions</span>
+              </div>
+              <div className="flex items-center gap-3 text-left text-slate-300">
+                <div className="h-2 w-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
+                <span>Advanced coding challenges</span>
+              </div>
+              <div className="flex items-center gap-3 text-left text-slate-300">
+                <div className="h-2 w-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
+                <span>Progress tracking</span>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Link
+                href="/login"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 font-medium text-white transition-all hover:from-blue-700 hover:to-purple-700 hover:shadow-lg"
+              >
+                <User className="h-5 w-5" />
+                Sign In to Continue
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+
+              <div className="text-center">
+                <span className="text-sm text-slate-400">
+                  Don&apos;t have an account?{" "}
+                </span>
+                <Link
+                  href="/signup"
+                  className="text-sm font-medium text-blue-400 hover:text-blue-300"
+                >
+                  Sign up here
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div

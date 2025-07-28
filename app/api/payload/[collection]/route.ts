@@ -35,7 +35,19 @@ export async function GET(
     encode: false,
   })
 
-  const url = `${process.env.PAYLOAD_API_URL}/${collection}${queryString.replace(`where=`, `where`)}`
+  const payloadApiUrl = process.env.PAYLOAD_API_URL
+
+  if (!payloadApiUrl) {
+    console.error("❌ PAYLOAD_API_URL environment variable not configured")
+    return NextResponse.json(
+      { error: "API configuration error" },
+      { status: 500 }
+    )
+  }
+
+  const url = `${payloadApiUrl}/${collection}${queryString.replace(`where=`, `where`)}`
+
+  console.log(`🔄 Fetching ${collection} from:`, url)
 
   try {
     const res = await fetch(url, {
@@ -45,11 +57,23 @@ export async function GET(
       },
     })
 
-    if (!res.ok) throw new Error(`HTTP error ${res.status}`)
+    if (!res.ok) {
+      console.error(`❌ Payload API Error: ${res.status} ${res.statusText}`)
+      throw new Error(`HTTP error ${res.status}`)
+    }
+
     const data = await res.json()
-    return NextResponse.json(data.docs)
+    console.log(
+      `✅ Successfully fetched ${collection}:`,
+      data?.docs?.length || 0,
+      "items"
+    )
+    return NextResponse.json(data.docs || [])
   } catch (error) {
     console.error(`❌ Failed to fetch ${collection}:`, error)
-    return NextResponse.json([], { status: 500 })
+    return NextResponse.json(
+      { error: `Failed to fetch ${collection}` },
+      { status: 500 }
+    )
   }
 }

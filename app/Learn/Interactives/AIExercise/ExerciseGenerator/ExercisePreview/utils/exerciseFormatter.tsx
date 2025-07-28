@@ -320,7 +320,7 @@ export const formatExplanation = (explanationText: string): JSX.Element => {
         // Check if this is a code block
         if (section.startsWith("```") && section.endsWith("```")) {
           const codeContent = section.slice(3, -3).trim()
-          const [lang, ...codeLines] = codeContent.split("\n")
+          const [, ...codeLines] = codeContent.split("\n")
           const code = codeLines.join("\n")
 
           return (
@@ -363,7 +363,7 @@ export const formatExplanation = (explanationText: string): JSX.Element => {
   )
 }
 
-// Format visual elements (memory states, execution steps, etc.)
+// Format visual elements (enhanced execution steps with memory states, etc.)
 export const formatVisualElements = (
   visualElements: any
 ): JSX.Element | null => {
@@ -371,105 +371,7 @@ export const formatVisualElements = (
 
   return (
     <div className="visual-elements" style={{ marginTop: "2rem" }}>
-      {/* Memory States Visualization */}
-      {visualElements.memory_states && (
-        <div
-          className="memory-visualization"
-          style={{
-            background: "rgba(16, 185, 129, 0.05)",
-            borderRadius: "12px",
-            padding: "1.5rem",
-            marginBottom: "1rem",
-            border: "1px solid rgba(16, 185, 129, 0.2)",
-          }}
-        >
-          <h4
-            style={{
-              color: "#10B981",
-              marginBottom: "1rem",
-              fontSize: "1.125rem",
-            }}
-          >
-            💾 Memory States
-          </h4>
-          {visualElements.memory_states.map((state: any, index: number) => (
-            <div key={index} style={{ marginBottom: "1rem" }}>
-              <h5 style={{ color: "#60A5FA", marginBottom: "0.5rem" }}>
-                Step: {state.step}
-              </h5>
-              <table
-                style={{
-                  borderCollapse: "collapse",
-                  width: "100%",
-                  background: "rgba(0, 0, 0, 0.2)",
-                  borderRadius: "8px",
-                  overflow: "hidden",
-                }}
-              >
-                <thead>
-                  <tr style={{ background: "rgba(59, 130, 246, 0.2)" }}>
-                    <th
-                      style={{
-                        padding: "0.75rem",
-                        textAlign: "left",
-                        color: "#60A5FA",
-                      }}
-                    >
-                      Variable
-                    </th>
-                    <th
-                      style={{
-                        padding: "0.75rem",
-                        textAlign: "left",
-                        color: "#60A5FA",
-                      }}
-                    >
-                      Value
-                    </th>
-                    <th
-                      style={{
-                        padding: "0.75rem",
-                        textAlign: "left",
-                        color: "#60A5FA",
-                      }}
-                    >
-                      Type
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {state.variables?.map((variable: any, vIndex: number) => (
-                    <tr
-                      key={vIndex}
-                      style={{
-                        borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-                      }}
-                    >
-                      <td
-                        style={{
-                          padding: "0.75rem",
-                          fontFamily: "monospace",
-                          color: "#F59E0B",
-                        }}
-                      >
-                        {variable.name}
-                      </td>
-                      <td style={{ padding: "0.75rem", color: "#10B981" }}>
-                        {variable.value}
-                      </td>
-                      <td style={{ padding: "0.75rem", color: "#9CA3AF" }}>
-                        {variable.type}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Execution Steps Visualization */}
+      {/* Enhanced Execution Steps with Memory States */}
       {visualElements.execution_steps && (
         <div
           className="execution-visualization"
@@ -488,7 +390,7 @@ export const formatVisualElements = (
               fontSize: "1.125rem",
             }}
           >
-            🔄 Execution Trace
+            🔄 Execution Steps with Memory States
           </h4>
           {visualElements.execution_steps.map((step: any, index: number) => (
             <div
@@ -497,15 +399,16 @@ export const formatVisualElements = (
                 background: "rgba(0, 0, 0, 0.2)",
                 padding: "1rem",
                 borderRadius: "8px",
-                marginBottom: "0.75rem",
+                marginBottom: "1rem",
                 borderLeft: "3px solid #F59E0B",
               }}
             >
+              {/* Step Header */}
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  marginBottom: "0.5rem",
+                  marginBottom: "0.75rem",
                 }}
               >
                 <span
@@ -520,13 +423,31 @@ export const formatVisualElements = (
                 >
                   Step {step.step}
                 </span>
+                {step.line_number && (
+                  <span
+                    style={{
+                      background: "rgba(59, 130, 246, 0.3)",
+                      color: "#60A5FA",
+                      padding: "2px 8px",
+                      borderRadius: "4px",
+                      fontSize: "0.75rem",
+                      marginRight: "1rem",
+                    }}
+                  >
+                    Line {step.line_number}
+                  </span>
+                )}
                 <code style={{ color: "#60A5FA", fontFamily: "monospace" }}>
                   {step.line}
                 </code>
               </div>
-              <p style={{ color: "#E5E7EB", marginBottom: "0.5rem" }}>
+
+              {/* Description */}
+              <p style={{ color: "#E5E7EB", marginBottom: "0.75rem" }}>
                 {step.description}
               </p>
+
+              {/* Output */}
               {step.output && (
                 <div
                   style={{
@@ -535,9 +456,139 @@ export const formatVisualElements = (
                     borderRadius: "4px",
                     fontFamily: "monospace",
                     color: "#10B981",
+                    marginBottom: "0.75rem",
                   }}
                 >
                   Output: {step.output}
+                </div>
+              )}
+
+              {/* Memory State Table */}
+              {step.memory_state && step.memory_state.length > 0 && (
+                <div style={{ marginTop: "0.75rem" }}>
+                  <h6
+                    style={{
+                      color: "#10B981",
+                      marginBottom: "0.5rem",
+                      fontSize: "0.9rem",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    💾 Memory State:
+                  </h6>
+                  <table
+                    style={{
+                      borderCollapse: "collapse",
+                      width: "100%",
+                      background: "rgba(16, 185, 129, 0.05)",
+                      borderRadius: "6px",
+                      overflow: "hidden",
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    <thead>
+                      <tr style={{ background: "rgba(16, 185, 129, 0.15)" }}>
+                        <th
+                          style={{
+                            padding: "0.5rem",
+                            textAlign: "left",
+                            color: "#10B981",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          Variable
+                        </th>
+                        <th
+                          style={{
+                            padding: "0.5rem",
+                            textAlign: "left",
+                            color: "#10B981",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          Value
+                        </th>
+                        <th
+                          style={{
+                            padding: "0.5rem",
+                            textAlign: "left",
+                            color: "#10B981",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          Type
+                        </th>
+                        <th
+                          style={{
+                            padding: "0.5rem",
+                            textAlign: "center",
+                            color: "#10B981",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          Changed
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {step.memory_state.map(
+                        (variable: any, vIndex: number) => (
+                          <tr
+                            key={vIndex}
+                            style={{
+                              borderTop: "1px solid rgba(16, 185, 129, 0.1)",
+                              background: variable.changed
+                                ? "rgba(245, 158, 11, 0.1)"
+                                : "transparent",
+                            }}
+                          >
+                            <td
+                              style={{
+                                padding: "0.5rem",
+                                fontFamily: "monospace",
+                                color: variable.changed ? "#F59E0B" : "#10B981",
+                                fontWeight: variable.changed
+                                  ? "bold"
+                                  : "normal",
+                              }}
+                            >
+                              {variable.name}
+                            </td>
+                            <td
+                              style={{
+                                padding: "0.5rem",
+                                color: variable.changed ? "#F59E0B" : "#10B981",
+                                fontWeight: variable.changed
+                                  ? "bold"
+                                  : "normal",
+                              }}
+                            >
+                              {variable.value}
+                            </td>
+                            <td style={{ padding: "0.5rem", color: "#9CA3AF" }}>
+                              {variable.type}
+                            </td>
+                            <td
+                              style={{ padding: "0.5rem", textAlign: "center" }}
+                            >
+                              {variable.changed ? (
+                                <span
+                                  style={{
+                                    color: "#F59E0B",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  ✓
+                                </span>
+                              ) : (
+                                <span style={{ color: "#6B7280" }}>-</span>
+                              )}
+                            </td>
+                          </tr>
+                        )
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>

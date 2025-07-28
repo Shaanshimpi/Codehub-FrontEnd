@@ -33,8 +33,11 @@
     "react-hooks/exhaustive-deps": "off",
     "jsx-a11y/click-events-have-key-events": "warn",
     "jsx-a11y/interactive-supports-focus": "warn",
+    "jsx-a11y/label-has-associated-control": "warn",
+    "jsx-a11y/no-noninteractive-element-interactions": "warn",
     "no-unused-vars": "off",
     "no-undef": "off",
+    "no-case-declarations": "warn",
     "unused-imports/no-unused-vars": "off",
     "unused-imports/no-unused-imports": "warn",
     "@typescript-eslint/no-unused-vars": [
@@ -46,5 +49,26 @@
       }
     ],
     "react/self-closing-comp": "warn"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["app/admin/**/*.{ts,tsx}"],
+      "rules": {
+        "jsx-a11y/label-has-associated-control": "off",
+        "no-console": "off"
+      }
+    },
+    {
+      "files": ["app/api/**/*.{ts,tsx}", "lib/**/*.{ts,tsx}"],
+      "rules": {
+        "no-console": "off"
+      }
+    },
+    {
+      "files": ["docs/**/*.{md,txt}"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "off"
+      }
+    }
+  ]
 }

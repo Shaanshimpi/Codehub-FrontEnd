@@ -8,8 +8,8 @@ const IntroSection = () => {
           Learn Programming
         </h1>
         <p className="mb-8 text-xl leading-relaxed text-sky-100 dark:text-slate-300 md:text-2xl">
-          Embark on your coding journey and discover the world of programming
-          languages
+          Master programming through comprehensive tutorials and hands-on
+          exercises
         </p>
         <div className="mx-auto max-w-3xl space-y-6 text-left">
           <div className="rounded-lg border border-white/20 bg-white/10 p-6 backdrop-blur-sm dark:border-white/10 dark:bg-white/5">

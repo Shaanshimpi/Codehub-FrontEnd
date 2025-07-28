@@ -66,7 +66,7 @@ const EXPLANATION_SCHEMA = {
       },
       type: {
         type: "string",
-        enum: ["text", "solution_code", "concept", "warning", "tip"],
+        enum: ["text", "concept", "warning", "tip"],
         description: "Type of explanation for proper formatting",
       },
       code_ref: {
@@ -80,18 +80,35 @@ const EXPLANATION_SCHEMA = {
   },
 }
 
-const MEMORY_STATES_SCHEMA = {
+const EXECUTION_STEPS_SCHEMA = {
   type: "array",
-  description: "Memory state visualization",
+  description: "Step-by-step execution trace with memory states",
   items: {
     type: "object",
     properties: {
       step: {
-        type: "string",
-        description: "Step identifier",
+        type: "number",
+        description: "Sequential step number",
       },
-      variables: {
+      line_number: {
+        type: "number",
+        description: "Line number in the code (optional for reference)",
+      },
+      line: {
+        type: "string",
+        description: "Code line being executed",
+      },
+      description: {
+        type: "string",
+        description: "What happens in this step",
+      },
+      output: {
+        type: "string",
+        description: "Any output produced",
+      },
+      memory_state: {
         type: "array",
+        description: "Current state of all variables at this execution step",
         items: {
           type: "object",
           properties: {
@@ -107,41 +124,17 @@ const MEMORY_STATES_SCHEMA = {
               type: "string",
               description: "Data type",
             },
+            changed: {
+              type: "boolean",
+              description: "Whether this variable changed in this step",
+            },
           },
           required: ["name", "value", "type"],
           additionalProperties: false,
         },
       },
     },
-    required: ["step", "variables"],
-    additionalProperties: false,
-  },
-}
-
-const EXECUTION_STEPS_SCHEMA = {
-  type: "array",
-  description: "Step-by-step execution trace",
-  items: {
-    type: "object",
-    properties: {
-      step: {
-        type: "number",
-        description: "Sequential step number",
-      },
-      line: {
-        type: "string",
-        description: "Code line being executed",
-      },
-      description: {
-        type: "string",
-        description: "What happens in this step",
-      },
-      output: {
-        type: "string",
-        description: "Any output produced",
-      },
-    },
-    required: ["step", "line", "description", "output"],
+    required: ["step", "line", "description", "output", "memory_state"],
     additionalProperties: false,
   },
 }
@@ -174,11 +167,10 @@ const VISUAL_ELEMENTS_SCHEMA = {
   type: "object",
   description: "Required visual learning elements",
   properties: {
-    memory_states: MEMORY_STATES_SCHEMA,
     execution_steps: EXECUTION_STEPS_SCHEMA,
     concepts: CONCEPTS_SCHEMA,
   },
-  required: ["memory_states", "execution_steps", "concepts"],
+  required: ["execution_steps", "concepts"],
   additionalProperties: false,
 }
 
@@ -212,10 +204,20 @@ const TAGS_SCHEMA = {
 
 export async function POST(request: Request) {
   try {
-    const { questionInput, selectedLanguage, difficulty, selectedModel } =
-      await request.json()
+    const {
+      questionInput,
+      selectedLanguage,
+      difficulty,
+      selectedModel,
+      exclusions,
+    } = await request.json()
 
-    const prompt = buildPrompt(questionInput, selectedLanguage, difficulty)
+    const prompt = buildPrompt(
+      questionInput,
+      selectedLanguage,
+      difficulty,
+      exclusions
+    )
 
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
@@ -227,7 +229,7 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           model: selectedModel,
-          max_tokens: 8000,
+          max_tokens: 12000,
           temperature: 0.3,
           top_p: 0.9,
           frequency_penalty: 0.1,
@@ -343,23 +345,15 @@ export async function POST(request: Request) {
 
       // Check for required visual elements with simplified validation
       if (
-        !visualElements.memory_states ||
-        !Array.isArray(visualElements.memory_states)
-      ) {
-        console.error("Missing or invalid memory_states")
-        return NextResponse.json(
-          { error: "Response missing required memory states visualization" },
-          { status: 500 }
-        )
-      }
-
-      if (
         !visualElements.execution_steps ||
         !Array.isArray(visualElements.execution_steps)
       ) {
         console.error("Missing or invalid execution_steps")
         return NextResponse.json(
-          { error: "Response missing required execution steps" },
+          {
+            error:
+              "Response missing required execution steps with memory states",
+          },
           { status: 500 }
         )
       }
@@ -394,6 +388,47 @@ export async function POST(request: Request) {
         )
       }
 
+      // Validate code completeness
+      if (parsedContent.solution_code) {
+        const codeLength = parsedContent.solution_code.length
+        const hasMain =
+          parsedContent.solution_code.includes("main(") ||
+          parsedContent.solution_code.includes("main ")
+        const hasReturn = parsedContent.solution_code.includes("return")
+
+        if (codeLength < 50) {
+          console.warn("⚠️ Solution code seems too short - may be incomplete")
+        }
+
+        const language = (selectedLanguage || "").toLowerCase()
+        if (!hasMain && (language.includes("c") || language.includes("java"))) {
+          console.warn(
+            "⚠️ Solution code missing main function for compiled language"
+          )
+        }
+
+        if (!hasReturn) {
+          console.warn("⚠️ Solution code missing return statements")
+        }
+      }
+
+      if (parsedContent.boilerplate_code) {
+        const boilerplateLength = parsedContent.boilerplate_code.length
+        const hasStructure =
+          parsedContent.boilerplate_code.includes("TODO") ||
+          parsedContent.boilerplate_code.includes("todo")
+
+        if (boilerplateLength < 30) {
+          console.warn(
+            "⚠️ Boilerplate code seems too short - may be incomplete"
+          )
+        }
+
+        if (!hasStructure) {
+          console.warn("⚠️ Boilerplate code missing TODO comments for guidance")
+        }
+      }
+
       // Validate Mermaid diagram for double quotes
       if (parsedContent.mermaid_diagram) {
         const mermaidContent = parsedContent.mermaid_diagram
@@ -406,8 +441,7 @@ export async function POST(request: Request) {
       }
 
       console.log("✅ All validations passed:", {
-        memoryStates: visualElements.memory_states.length,
-        executionSteps: visualElements.execution_steps.length,
+        executionStepsWithMemory: visualElements.execution_steps.length,
         concepts: visualElements.concepts.length,
         hasBoilerplate: !!parsedContent.boilerplate_code,
         codeFormat: parsedContent.solution_code?.includes("<")

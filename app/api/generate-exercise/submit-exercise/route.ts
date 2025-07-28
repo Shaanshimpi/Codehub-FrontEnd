@@ -6,6 +6,7 @@ export async function POST(request: NextRequest) {
     const exerciseData = await request.json()
 
     console.log("📥 Received exercise submission:")
+    console.log("elements structure:", JSON.stringify(exerciseData, null, 5))
 
     // Validate required fields
     const requiredFields = [
@@ -55,10 +56,26 @@ export async function POST(request: NextRequest) {
       explanation_hi: exerciseData.explanation_hi || [],
       explanation_mr: exerciseData.explanation_mr || [],
 
-      // Visual elements as separate arrays
-      memory_states: exerciseData.memory_states || [],
-      execution_steps: exerciseData.execution_steps || [],
-      concepts: exerciseData.concepts || [],
+      // Visual elements as grouped object matching Exercise.ts schema
+      visual_elements: {
+        execution_steps: (
+          exerciseData.visual_elements?.execution_steps ||
+          exerciseData.execution_steps ||
+          []
+        ).map((step: any) => {
+          const outputValue =
+            step.output && step.output.trim() !== ""
+              ? step.output.trim()
+              : "No output produced"
+          return {
+            ...step,
+            output: outputValue, // Use actual output or default
+            memory_state: step.memory_state || [], // Now optional, can be empty array
+          }
+        }),
+        concepts:
+          exerciseData.visual_elements?.concepts || exerciseData.concepts || [],
+      },
 
       // Relationships (ensure they're numbers)
       programmingLanguage: Number(exerciseData.programmingLanguage),

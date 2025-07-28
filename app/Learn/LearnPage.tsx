@@ -2,6 +2,7 @@
 
 import IntroSection from "./components/IntroSection"
 import LanguageGrid from "./components/LanguageGrid"
+import LearningPathsSection from "./components/LearningPathsSection"
 import { Language } from "./types/TutorialTypes"
 
 interface LearnPageProps {
@@ -9,8 +10,9 @@ interface LearnPageProps {
 }
 const LearnPage = ({ languages }: LearnPageProps) => {
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="bg-slate-900">
       <IntroSection />
+      <LearningPathsSection />
       <LanguageGrid languages={languages} />
     </div>
   )

@@ -106,6 +106,22 @@ export async function getExercisesByTutorialId(
   }
 }
 
+// Get all exercises for admin dashboard
+export async function getAllExercises(): Promise<any[]> {
+  try {
+    const exercises = await fetchCollection("exercises", {
+      limit: 100,
+      sort: "-createdAt", // Most recent first
+      depth: 2, // Include related data (programming language, tutorial)
+    });
+
+    return exercises;
+  } catch (error) {
+    console.error("Error fetching all exercises:", error);
+    return [];
+  }
+}
+
 // Get single exercise by slug and tutorial
 export async function getExerciseBySlug(
   exerciseSlug: string,
@@ -134,6 +150,7 @@ export async function generateExercise(
   selectedLanguage: string,
   difficulty: number,
   selectedModel: string,
+  exclusions?: string,
 ) {
   try {
     const response = await fetch("/api/generate-exercise", {
@@ -146,6 +163,7 @@ export async function generateExercise(
         selectedLanguage,
         difficulty,
         selectedModel,
+        exclusions,
       }),
     });
 

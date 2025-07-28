@@ -2,48 +2,32 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
+import { useUser } from "@/app/(payload)/_providers/UserProvider"
+import LoginModal from "@/app/Learn/components/LoginModal"
 import { useLanguage } from "@/app/contexts/LanguageContext"
 import { getLocalizedContent } from "@/app/utils/exerciseHelpers"
-import {
-  Code,
-  Database,
-  FileText,
-  Lightbulb,
-  Network,
-  Play,
-} from "lucide-react"
+import { Code, FileText, Lightbulb, Lock, Network, Play } from "lucide-react"
 import UnifiedCodeEditor from "../Shared/UnifiedCodeEditor"
 import ExecutionStepsPanel from "../SolutionView/ExecutionStepsPanel"
 import ExplanationTabs from "../SolutionView/ExplanationTabs"
 import KeyConceptsPanel from "../SolutionView/KeyConceptsPanel"
-import MemoryStatesPanel from "../SolutionView/MemoryStatesPanel"
 import MermaidViewer from "../SolutionView/MermaidViewer"
-
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
-
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
-
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
-
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
 interface SolutionViewProps {
   exercise: any
   language: any
-  onComplete: () => void
   isFullscreen?: boolean
   panelWidth?: number
   onPanelResize?: (e: React.MouseEvent) => void
 }
 
-type TabType = "explanation" | "flowchart" | "memory" | "execution" | "concepts"
+type TabType = "explanation" | "flowchart" | "execution" | "concepts"
 
 const SolutionView: React.FC<SolutionViewProps> = ({
   exercise,
   language,
-  onComplete,
   isFullscreen = false,
   panelWidth = 50,
   onPanelResize,
@@ -53,7 +37,10 @@ const SolutionView: React.FC<SolutionViewProps> = ({
     "explanation" | "code"
   >("explanation")
   const [currentCode, setCurrentCode] = useState(exercise.solution_code)
+  const [showLoginModal, setShowLoginModal] = useState(false)
+  const [lockedFeature, setLockedFeature] = useState("")
   const { language: currentLanguage } = useLanguage()
+  const { user } = useUser()
 
   // Reset code when exercise changes
   useEffect(() => {
@@ -62,6 +49,25 @@ const SolutionView: React.FC<SolutionViewProps> = ({
 
   // Get localized content based on selected language
   const content = getLocalizedContent(exercise, currentLanguage)
+
+  // Check if premium features are locked
+  const isPremiumLocked = !user
+
+  // Premium feature names mapping
+  const premiumFeatures = {
+    flowchart: "Mermaid Diagram",
+    execution: "Execution Steps with Memory States",
+  }
+
+  // Handle tab click with premium feature check
+  const handleTabClick = (tabId: TabType) => {
+    if (isPremiumLocked && (tabId === "flowchart" || tabId === "execution")) {
+      setLockedFeature(premiumFeatures[tabId])
+      setShowLoginModal(true)
+      return
+    }
+    setActiveTab(tabId)
+  }
 
   const tabs = [
     {
@@ -77,16 +83,10 @@ const SolutionView: React.FC<SolutionViewProps> = ({
       description: "Visual program flow",
     },
     {
-      id: "memory" as TabType,
-      label: "Memory States",
-      icon: Database,
-      description: "Variable states during execution",
-    },
-    {
       id: "execution" as TabType,
-      label: "Execution Steps",
+      label: "Execution & Memory",
       icon: Play,
-      description: "Line-by-line execution trace",
+      description: "Line-by-line execution with memory states",
     },
     {
       id: "concepts" as TabType,
@@ -112,26 +112,18 @@ const SolutionView: React.FC<SolutionViewProps> = ({
           />
         </div>
 
-        {/* Memory Tab */}
-        <div className={activeTab === "memory" ? "block" : "hidden"}>
-          <MemoryStatesPanel
-            memoryStates={exercise.memory_states}
-            title="Memory State Changes"
-          />
-        </div>
-
-        {/* Execution Tab */}
+        {/* Execution Tab with Memory States */}
         <div className={activeTab === "execution" ? "block" : "hidden"}>
           <ExecutionStepsPanel
-            executionSteps={exercise.execution_steps}
-            title="Step-by-Step Execution"
+            executionSteps={exercise.visual_elements?.execution_steps || []}
+            title="Execution Steps with Memory States"
           />
         </div>
 
         {/* Concepts Tab */}
         <div className={activeTab === "concepts" ? "block" : "hidden"}>
           <KeyConceptsPanel
-            concepts={exercise.concepts}
+            concepts={exercise.visual_elements?.concepts || []}
             tags={exercise.tags}
             objectives={exercise.learning_objectives}
             title="Programming Concepts"
@@ -187,19 +179,33 @@ const SolutionView: React.FC<SolutionViewProps> = ({
               <div className="flex space-x-1 overflow-x-auto">
                 {tabs.map((tab) => {
                   const Icon = tab.icon
+                  const isLocked =
+                    isPremiumLocked &&
+                    (tab.id === "flowchart" || tab.id === "execution")
                   return (
                     <button
                       key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
+                      onClick={() => handleTabClick(tab.id)}
                       className={`flex items-center gap-1 rounded px-2 py-1 text-xs font-medium transition-all ${
                         activeTab === tab.id
                           ? "bg-blue-600 text-white"
-                          : "text-slate-600 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700"
-                      }`}
-                      title={tab.description}
+                          : isLocked
+                            ? "text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-900/20"
+                            : "text-slate-600 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700"
+                      } ${isLocked ? "cursor-pointer" : ""}`}
+                      title={
+                        isLocked
+                          ? `${tab.description} (Premium Feature)`
+                          : tab.description
+                      }
                     >
-                      <Icon className="h-3 w-3" />
+                      {isLocked ? (
+                        <Lock className="h-3 w-3" />
+                      ) : (
+                        <Icon className="h-3 w-3" />
+                      )}
                       <span className="hidden sm:inline">{tab.label}</span>
+                      {isLocked && <Lock className="ml-1 h-2 w-2" />}
                     </button>
                   )
                 })}
@@ -238,6 +244,14 @@ const SolutionView: React.FC<SolutionViewProps> = ({
           />
         </div>
       </div>
+
+      {/* Login Modal for Premium Features */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        featureType="premium-feature"
+        featureName={lockedFeature}
+      />
     </>
   )
 }

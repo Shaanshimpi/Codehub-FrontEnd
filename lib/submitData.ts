@@ -62,28 +62,27 @@ export interface ExerciseSubmissionPayload {
     }>;
   }>;
 
-  // Visual elements as separate array fields
-  memory_states?: Array<{
-    step: string;
-    variables: Array<{
-      name: string;
-      value: string;
-      type: string;
+  // Visual elements as grouped object
+  visual_elements?: {
+    execution_steps?: Array<{
+      step: number;
+      line_number?: number;
+      line: string;
+      description: string;
+      output: string;
+      memory_state: Array<{
+        name: string;
+        value: string;
+        type: string;
+        changed?: boolean;
+      }>;
     }>;
-  }>;
-
-  execution_steps?: Array<{
-    step: number;
-    line: string;
-    description: string;
-    output: string;
-  }>;
-
-  concepts?: Array<{
-    name: string;
-    description: string;
-    visual_metaphor: string;
-  }>;
+    concepts?: Array<{
+      name: string;
+      description: string;
+      visual_metaphor: string;
+    }>;
+  };
 
   // Relationships (as IDs)
   programmingLanguage: number;
@@ -96,17 +95,27 @@ export interface ExerciseSubmissionPayload {
 
 // Helper function to transform AI data to Payload structure
 const transformToPayloadFormat = (exerciseData: any) => {
-  // Transform learning objectives from string array to object array
+  // Transform learning objectives - handle both string arrays (AI) and object arrays (manual form)
   const learning_objectives =
-    exerciseData.learning_objectives?.map((obj: string) => ({
-      objective: obj,
-    })) || [];
+    exerciseData.learning_objectives?.map((obj: any) => {
+      // If it's already an object with objective property, return as-is
+      if (typeof obj === "object" && obj.objective !== undefined) {
+        return obj;
+      }
+      // If it's a string, wrap it in an object
+      return { objective: obj };
+    }) || [];
 
-  // Transform tags from string array to object array
+  // Transform tags - handle both string arrays (AI) and object arrays (manual form)
   const tags =
-    exerciseData.tags?.map((tag: string) => ({
-      tag: tag,
-    })) || [];
+    exerciseData.tags?.map((tag: any) => {
+      // If it's already an object with tag property, return as-is
+      if (typeof tag === "object" && tag.tag !== undefined) {
+        return tag;
+      }
+      // If it's a string, wrap it in an object
+      return { tag: tag };
+    }) || [];
 
   // Transform hints arrays (they should already be in correct format from AI)
   const hints_en = exerciseData.hints_en || [];
@@ -119,8 +128,11 @@ const transformToPayloadFormat = (exerciseData: any) => {
       explanations?.map((exp: any) => ({
         text: exp.text,
         type: exp.type || "text",
-        code_ref:
-          exp.code_ref?.map((ref: number) => ({ ref_number: ref })) || [],
+        code_ref: Array.isArray(exp.code_ref)
+          ? exp.code_ref.map((ref: any) =>
+              typeof ref === "number" ? { ref_number: ref } : ref,
+            )
+          : [],
       })) || []
     );
   };
@@ -129,10 +141,23 @@ const transformToPayloadFormat = (exerciseData: any) => {
   const explanation_hi = transformExplanations(exerciseData.explanation_hi);
   const explanation_mr = transformExplanations(exerciseData.explanation_mr);
 
-  // Transform visual elements from nested object to separate arrays
-  const memory_states = exerciseData.visual_elements?.memory_states || [];
-  const execution_steps = exerciseData.visual_elements?.execution_steps || [];
-  const concepts = exerciseData.visual_elements?.concepts || [];
+  // Keep visual elements as grouped object for backend compatibility
+  const visual_elements = {
+    execution_steps: (exerciseData.visual_elements?.execution_steps || []).map(
+      (step: any) => {
+        const outputValue =
+          step.output && step.output.trim() !== ""
+            ? step.output.trim()
+            : "No output produced";
+        return {
+          ...step,
+          output: outputValue, // Use actual output or meaningful default
+          memory_state: step.memory_state || [], // Now optional, can be empty array
+        };
+      },
+    ),
+    concepts: exerciseData.visual_elements?.concepts || [],
+  };
 
   return {
     learning_objectives,
@@ -143,9 +168,7 @@ const transformToPayloadFormat = (exerciseData: any) => {
     explanation_en,
     explanation_hi,
     explanation_mr,
-    memory_states,
-    execution_steps,
-    concepts,
+    visual_elements,
   };
 };
 
@@ -201,10 +224,8 @@ export const submitExercise = async (exerciseData: any): Promise<any> => {
       explanation_hi: transformedData.explanation_hi,
       explanation_mr: transformedData.explanation_mr,
 
-      // Visual elements as separate arrays
-      memory_states: transformedData.memory_states,
-      execution_steps: transformedData.execution_steps,
-      concepts: transformedData.concepts,
+      // Visual elements as grouped object matching backend schema
+      visual_elements: transformedData.visual_elements,
 
       // Relationships (ensure they're numbers)
       programmingLanguage: Number(exerciseData.programmingLanguage),
