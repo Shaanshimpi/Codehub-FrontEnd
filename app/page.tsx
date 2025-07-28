@@ -14,7 +14,7 @@ import SliderSection from "./sections/SliderSection"
 import SpaceSection from "./sections/SpaceSection"
 
 export const metadata = {
-  title: "CodeHub – Learn Programming & Get Job-Ready in Nashik",
+  title: "CodeHub – Learn Programming & Get Job-Ready in Nashik ",
   description:
     "CodeHub is Nashik’s leading coding institute offering C, C++, Full Stack, and MERN Stack training with job assistance, daily challenges, and real-world projects.",
   keywords:
