@@ -17,7 +17,7 @@ export default function AdminLayout({
       href: "/admin/exercises",
       label: "Exercises",
       icon: Code2,
-      description: "Manage programming exercises",
+      description: "Manage programming exercise",
     },
     {
       href: "/admin/tutorials",
