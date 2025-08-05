@@ -2,15 +2,20 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { Eye, Save, X } from "lucide-react"
+import { updateExercise } from "@/lib/updateData"
+import { ChevronDown, Eye, Save, X } from "lucide-react"
+import { useLanguagesAndTutorials } from "../hooks/useLanguagesAndTutorials"
+import { AdminExercise } from "../types"
 import ExercisePreview from "./ExercisePreview"
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
+/* eslint-disable jsx-a11y/label-has-associated-control */
+
 interface EditExerciseModalProps {
-  exercise: any
+  exercise: AdminExercise
   onClose: () => void
-  onSave: (updatedExercise: any) => void
+  onSave: (updatedExercise: AdminExercise) => void
 }
 
 interface FormData {
@@ -63,6 +68,10 @@ const EditExerciseModal: React.FC<EditExerciseModalProps> = ({
   const [showPreview, setShowPreview] = useState(false)
   const [loading, setLoading] = useState(false)
 
+  const { languages, tutorials, languagesLoading, tutorialsLoading } =
+    useLanguagesAndTutorials(formData.programmingLanguage)
+
+  // Initialize form data with exercise values
   useEffect(() => {
     if (exercise) {
       setFormData({
@@ -165,36 +174,41 @@ const EditExerciseModal: React.FC<EditExerciseModalProps> = ({
   const handleSave = async () => {
     setLoading(true)
     try {
-      // Transform data for submission
-      const validObjectives = formData.learning_objectives.filter(
-        (obj) => obj.trim() !== ""
-      )
-      const validTags = formData.tags.filter((tag) => tag.trim() !== "")
+      console.log("💾 Saving exercise:", exercise.id, formData)
 
-      const transformedData = {
-        ...formData,
-        learning_objectives: validObjectives.map((obj) => ({ objective: obj })),
-        tags: validTags.map((tag) => ({ tag: tag })),
-        hints_en: formData.hints_en.filter((hint) => hint.text.trim() !== ""),
-        hints_hi: formData.hints_hi.filter((hint) => hint.text.trim() !== ""),
-        hints_mr: formData.hints_mr.filter((hint) => hint.text.trim() !== ""),
-      }
+      // Make API call to update the exercise
+      const updatedExercise = await updateExercise(exercise.id, formData)
 
-      await onSave({ ...exercise, ...transformedData })
+      console.log("✅ Exercise updated successfully:", updatedExercise)
+
+      // Pass the updated exercise back to parent
+      await onSave(updatedExercise)
     } catch (error) {
-      console.error("Error saving exercise:", error)
+      console.error("❌ Error saving exercise:", error)
+      alert(
+        `Failed to save exercise: ${error instanceof Error ? error.message : "Unknown error occurred"}`
+      )
     } finally {
       setLoading(false)
     }
   }
 
-  const getPreviewData = () => ({
-    ...exercise,
-    ...formData,
-    programmingLanguageTitle:
-      exercise.programmingLanguage?.title || "Unknown Language",
-    tutorialTitle: exercise.tutorial?.title || "Unknown Tutorial",
-  })
+  const getPreviewData = () => {
+    // Get selected language and tutorial titles for preview
+    const selectedLanguage = languages.find(
+      (lang) => lang.id === formData.programmingLanguage
+    )
+    const selectedTutorial = tutorials.find(
+      (tut) => tut.id === formData.tutorial
+    )
+
+    return {
+      ...exercise,
+      ...formData,
+      programmingLanguageTitle: selectedLanguage?.title || "Unknown Language",
+      tutorialTitle: selectedTutorial?.title || "Unknown Tutorial",
+    }
+  }
 
   if (showPreview) {
     return (
@@ -289,19 +303,35 @@ const EditExerciseModal: React.FC<EditExerciseModalProps> = ({
 
               <div>
                 <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Programming Language ID
+                  Programming Language *
                 </label>
-                <input
-                  type="number"
-                  value={formData.programmingLanguage}
-                  onChange={(e) =>
-                    handleInputChange(
-                      "programmingLanguage",
-                      parseInt(e.target.value)
-                    )
-                  }
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                />
+                {languagesLoading ? (
+                  <div className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-700">
+                    Loading languages...
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <select
+                      value={formData.programmingLanguage}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "programmingLanguage",
+                          parseInt(e.target.value)
+                        )
+                      }
+                      className="w-full appearance-none rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                      required
+                    >
+                      <option value="">Select Language</option>
+                      {languages.map((lang) => (
+                        <option key={lang.id} value={lang.id}>
+                          {lang.title}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-2 top-2.5 h-4 w-4 text-slate-400" />
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center">
@@ -317,6 +347,38 @@ const EditExerciseModal: React.FC<EditExerciseModalProps> = ({
                   Premium Exercise
                 </label>
               </div>
+            </div>
+
+            {/* Tutorial */}
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                Tutorial *
+              </label>
+              {tutorialsLoading ? (
+                <div className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-700">
+                  Loading tutorials...
+                </div>
+              ) : (
+                <div className="relative">
+                  <select
+                    value={formData.tutorial}
+                    onChange={(e) =>
+                      handleInputChange("tutorial", parseInt(e.target.value))
+                    }
+                    className="w-full appearance-none rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                    required
+                    disabled={!formData.programmingLanguage}
+                  >
+                    <option value="">Select Tutorial</option>
+                    {tutorials.map((tutorial) => (
+                      <option key={tutorial.id} value={tutorial.id}>
+                        {tutorial.title}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-2 top-2.5 h-4 w-4 text-slate-400" />
+                </div>
+              )}
             </div>
 
             {/* Learning Objectives */}
@@ -394,6 +456,220 @@ const EditExerciseModal: React.FC<EditExerciseModalProps> = ({
                 className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 + Add Tag
+              </button>
+            </div>
+
+            {/* Multilingual Titles */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Title (Hindi)
+                </label>
+                <input
+                  type="text"
+                  value={formData.title_hi}
+                  onChange={(e) =>
+                    handleInputChange("title_hi", e.target.value)
+                  }
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Title (Marathi)
+                </label>
+                <input
+                  type="text"
+                  value={formData.title_mr}
+                  onChange={(e) =>
+                    handleInputChange("title_mr", e.target.value)
+                  }
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                />
+              </div>
+            </div>
+
+            {/* Problem Statements */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                Problem Statement (English) *
+              </label>
+              <textarea
+                value={formData.problem_statement_en}
+                onChange={(e) =>
+                  handleInputChange("problem_statement_en", e.target.value)
+                }
+                rows={6}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                placeholder="Describe the problem to be solved..."
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                Problem Statement (Hindi)
+              </label>
+              <textarea
+                value={formData.problem_statement_hi}
+                onChange={(e) =>
+                  handleInputChange("problem_statement_hi", e.target.value)
+                }
+                rows={6}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                placeholder="Samasya ka varnan karein..."
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                Problem Statement (Marathi)
+              </label>
+              <textarea
+                value={formData.problem_statement_mr}
+                onChange={(e) =>
+                  handleInputChange("problem_statement_mr", e.target.value)
+                }
+                rows={6}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                placeholder="Samasyeche varnan kara..."
+              />
+            </div>
+
+            {/* Code Sections */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                Boilerplate Code
+              </label>
+              <textarea
+                value={formData.boilerplate_code}
+                onChange={(e) =>
+                  handleInputChange("boilerplate_code", e.target.value)
+                }
+                rows={8}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                placeholder="// Starting code template for students..."
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                Solution Code
+              </label>
+              <textarea
+                value={formData.solution_code}
+                onChange={(e) =>
+                  handleInputChange("solution_code", e.target.value)
+                }
+                rows={8}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                placeholder="// Complete solution code..."
+              />
+            </div>
+
+            {/* Hints Sections */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                Hints (English)
+              </label>
+              {formData.hints_en.map((hint, index) => (
+                <div key={index} className="mb-2 flex gap-2">
+                  <textarea
+                    value={hint.text}
+                    onChange={(e) =>
+                      handleHintUpdate("en", index, e.target.value)
+                    }
+                    rows={2}
+                    placeholder="Provide a helpful hint..."
+                    className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  />
+                  {formData.hints_en.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleHintRemove("en", index)}
+                      className="px-3 py-2 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => handleHintAdd("en")}
+                className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                + Add Hint
+              </button>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                Hints (Hindi)
+              </label>
+              {formData.hints_hi.map((hint, index) => (
+                <div key={index} className="mb-2 flex gap-2">
+                  <textarea
+                    value={hint.text}
+                    onChange={(e) =>
+                      handleHintUpdate("hi", index, e.target.value)
+                    }
+                    rows={2}
+                    placeholder="Sahayak sanket pradan karein..."
+                    className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  />
+                  {formData.hints_hi.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleHintRemove("hi", index)}
+                      className="px-3 py-2 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => handleHintAdd("hi")}
+                className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                + Add Hint
+              </button>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                Hints (Marathi)
+              </label>
+              {formData.hints_mr.map((hint, index) => (
+                <div key={index} className="mb-2 flex gap-2">
+                  <textarea
+                    value={hint.text}
+                    onChange={(e) =>
+                      handleHintUpdate("mr", index, e.target.value)
+                    }
+                    rows={2}
+                    placeholder="Upayukt suchna dya..."
+                    className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  />
+                  {formData.hints_mr.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleHintRemove("mr", index)}
+                      className="px-3 py-2 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => handleHintAdd("mr")}
+                className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                + Add Hint
               </button>
             </div>
           </div>

@@ -12,15 +12,9 @@ import Link from "next/link"
 import ExerciseHeader from "./ExerciseHeader"
 import ProblemView from "./ExerciseViews/ProblemView"
 import SolutionView from "./ExerciseViews/SolutionView"
-import ProgressBar from "./Shared/ProgressBar"
+// import ProgressBar from "./Shared/ProgressBar"
 import SolutionConfirmModal from "./Shared/SolutionConfirmModal"
 import ViewSwitcher from "./Shared/ViewSwitcher"
-
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseLayout.tsx
-
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseLayout.tsx
-
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseLayout.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseLayout.tsx
 
@@ -291,7 +285,7 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
             currentView={currentView}
             onViewChange={handleViewChange}
           />
-          <ProgressBar progress={progress} currentView={currentView} />
+          {/* <ProgressBar progress={progress} currentView={currentView} /> */}
         </>
       )}
 

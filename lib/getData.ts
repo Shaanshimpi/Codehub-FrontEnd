@@ -1,6 +1,23 @@
 import { fetchCollection } from "@/lib/FetchDataPayload";
 import { Language, Tutorial } from "@/app/Learn/types/TutorialTypes";
 
+// Re-export delete functions for convenience
+export {
+  deleteExercise,
+  deleteMultipleExercises,
+  softDeleteExercise,
+  restoreExercise,
+  exerciseExists,
+} from "@/lib/deleteData";
+
+// Re-export update functions for convenience
+export {
+  updateExercise,
+  partialUpdateExercise,
+  toggleExerciseLock,
+  updateExerciseDifficulty,
+} from "@/lib/updateData";
+
 export async function getLanguages(): Promise<Language[]> {
   try {
     const languages = await fetchCollection("programming-languages", {
@@ -202,6 +219,83 @@ export async function generateExercise(
       throw new Error(`Exercise generation failed: ${error.message}`);
     } else {
       throw new Error(`Exercise generation failed: ${String(error)}`);
+    }
+  }
+}
+
+export async function generateTutorial(
+  topic: string,
+  language: string,
+  difficulty: number,
+  numLessons: number,
+  selectedModel: string,
+  focusAreas?: string,
+  exclusions?: string,
+  customPrompts?: {
+    coreRequirements: string;
+    lessonProgression: string;
+    contentQuality: string;
+    jsonStructure: string;
+  },
+) {
+  try {
+    const response = await fetch("/api/generate-tutorial", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        topic,
+        language,
+        difficulty,
+        numLessons,
+        focusAreas,
+        exclusions,
+        selectedModel,
+        customPrompts,
+      }),
+    });
+
+    console.log("📡 Tutorial API Response status:", response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        "❌ Tutorial API Response Error:",
+        response.status,
+        response.statusText,
+      );
+      console.error("❌ Error details:", errorText);
+
+      let errorObj;
+      try {
+        errorObj = JSON.parse(errorText);
+      } catch {
+        errorObj = { error: errorText };
+      }
+
+      throw new Error(
+        `Tutorial API Error ${response.status}: ${errorObj.error || errorText}`,
+      );
+    }
+
+    const data = await response.json();
+    console.log("✅ Tutorial generated successfully:", data);
+
+    // Check if the response contains an error field
+    if (data.error) {
+      throw new Error(`Tutorial API Error: ${data.error}`);
+    }
+
+    return data;
+  } catch (error) {
+    console.error("❌ Error in generateTutorial:", error);
+
+    // Re-throw with more specific error message
+    if (error instanceof Error) {
+      throw new Error(`Tutorial generation failed: ${error.message}`);
+    } else {
+      throw new Error(`Tutorial generation failed: ${String(error)}`);
     }
   }
 }

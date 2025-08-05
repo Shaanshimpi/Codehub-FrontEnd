@@ -1,10 +1,10 @@
 "use client"
 
 import React from "react"
-import ExerciseManagement from "./components/ExerciseManagement"
+import ExerciseManagementView from "./views/ExerciseManagementView"
 
 const ExercisesPage = () => {
-  return <ExerciseManagement />
+  return <ExerciseManagementView />
 }
 
 export default ExercisesPage

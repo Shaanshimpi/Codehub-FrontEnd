@@ -326,3 +326,94 @@ export const validateExerciseData = (data: any): string[] => {
 
   return errors;
 };
+
+// Tutorial submission interfaces and functions
+export interface TutorialSubmissionPayload {
+  title: string;
+  slug: string;
+  index?: number;
+  content?: string;
+  description?: string;
+  learningObjectives?: Array<{ objective: string }>;
+  keyTopics?: Array<{ topic: string }>;
+  practicalApplications?: Array<{ application: string }>;
+  tags?: Array<{ tag: string }>;
+  prerequisites?: Array<{ prerequisite: string }>;
+  difficulty?: string;
+  focusAreas?: string;
+  tutorialData?: any;
+  programmingLanguage: number;
+  isLocked?: boolean;
+}
+
+// Main tutorial submission function
+export const submitTutorial = async (tutorialData: any): Promise<any> => {
+  try {
+    console.log("📤 Submitting tutorial:", tutorialData);
+
+    // Validate required fields
+    if (!tutorialData.title) {
+      throw new Error("Tutorial title is required");
+    }
+
+    if (!tutorialData.programmingLanguage) {
+      throw new Error("Programming language is required");
+    }
+
+    if (!tutorialData.slug) {
+      throw new Error("Slug is required");
+    }
+
+    // Use our internal API endpoint which handles the transformation
+    const response = await fetch("/api/generate-tutorial/submit-tutorial", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(tutorialData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error("❌ Tutorial Submission Error:", errorData);
+      throw new Error(
+        `Failed to submit tutorial: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    const result = await response.json();
+    console.log("✅ Tutorial submitted successfully:", result);
+
+    return result;
+  } catch (error) {
+    console.error("❌ Error in submitTutorial:", error);
+    throw error;
+  }
+};
+
+// Utility function to validate tutorial data before submission
+export const validateTutorialData = (data: any): string[] => {
+  const errors: string[] = [];
+
+  if (!data.title) {
+    errors.push("Tutorial title is required");
+  }
+
+  if (!data.slug) {
+    errors.push("Slug is required");
+  }
+
+  if (!data.programmingLanguage) {
+    errors.push("Programming language must be selected");
+  }
+
+  if (!data.lessons || data.lessons.length < 5) {
+    errors.push("Tutorial must have at least 5 lessons");
+  }
+
+  if (data.lessons && data.lessons.length > 20) {
+    errors.push("Tutorial cannot have more than 20 lessons");
+  }
+
+  return errors;
+};
