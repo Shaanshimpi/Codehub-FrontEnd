@@ -1,0 +1,155 @@
+{
+  "id": "variables-in-python-tutorial",
+  "title": "Understanding Variables in Python",
+  "description": "This tutorial introduces Python variables, covering their creation, usage, and best practices. Students will learn through concept explanations, interactive exercises, and practical coding examples.",
+  "learningObjectives": [
+    "Understand the concept of variables and their role in Python programming",
+    "Learn how to create and assign values to variables",
+    "Identify variable naming rules and conventions",
+    "Practice using variables in real-world Python programs"
+  ],
+  "keyTopics": ["variables", "data types", "naming conventions", "assignment"],
+  "difficulty": 1,
+  "lessons": [
+    {
+      "id": "lesson-1-intro-to-variables",
+      "title": "Introduction to Variables in Python",
+      "type": "concept",
+      "content": {
+        "explanation": "In Python, a variable is a container for storing data values. Variables allow you to store information in memory and use it later in your program. They are fundamental to programming and enable dynamic data handling.",
+        "keyPoints": [
+          "Variables are used to store data in memory.",
+          "You can assign a value to a variable using the equals sign (=).",
+          "Variable names must follow specific naming rules and conventions.",
+          "Python is dynamically typed, meaning you don't need to declare the variable's type explicitly."
+        ],
+        "codeExamples": [
+          {
+            "title": "Creating and Assigning Variables",
+            "code": "# Assigning values to variables\nname = \"Alice\"  # String variable\nage = 25         # Integer variable\nheight = 5.6     # Float variable\n\n# Printing the variables\nprint(name)      # Output: Alice\nprint(age)       # Output: 25\nprint(height)    # Output: 5.6",
+            "explanation": "In this example, we create three variables (`name`, `age`, and `height`) and assign them different types of values: string, integer, and float. The `print()` function displays their values.",
+            "mermaid_diagram": "flowchart TD\n    A[Start] --> B[Create variable name with value \"Alice\"]\n    B --> C[Create variable age with value 25]\n    C --> D[Create variable height with value 5.6]\n    D --> E[Print variables]"
+          },
+          {
+            "title": "Updating a Variable's Value",
+            "code": "# Initial assignment\ncounter = 10\nprint(counter)  # Output: 10\n\n# Updating the value\ncounter = counter + 5\nprint(counter)  # Output: 15",
+            "explanation": "Here, we assign an initial value to the `counter` variable. Later, we update its value by adding 5 to the current value. This demonstrates how variables can store dynamic data.",
+            "mermaid_diagram": "flowchart TD\n    A[Start] --> B[Assign counter = 10]\n    B --> C[Print counter: Output 10]\n    C --> D[Update counter = counter + 5]\n    D --> E[Print counter: Output 15]"
+          }
+        ],
+        "practiceHints": [
+          "Start with simple variable assignments before moving on to more complex operations.",
+          "Experiment with different data types to see how Python handles them.",
+          "Use descriptive variable names to improve code readability."
+        ],
+        "commonMistakes": [
+          "Using invalid characters in variable names (e.g., spaces or special symbols).",
+          "Forgetting to initialize a variable before using it.",
+          "Confusing case sensitivity (e.g., `Name` and `name` are different variables)."
+        ],
+        "bestPractices": [
+          "Always use meaningful names for your variables.",
+          "Follow Python's naming conventions (e.g., snake_case).",
+          "Avoid overwriting built-in function names (e.g., don't use `list` as a variable name)."
+        ]
+      },
+      "learningObjectives": [
+        "Understand what variables are and their purpose in Python.",
+        "Learn how to create and assign values to variables.",
+        "Identify common mistakes when working with variables."
+      ],
+      "order": 1
+    },
+    {
+      "id": "lesson-2-variable-mcq",
+      "title": "Assessing Your Understanding of Variables",
+      "type": "mcq",
+      "content": {
+        "questions": [
+          {
+            "id": "mcq1",
+            "question": "What is the correct way to assign a string value to a variable in Python?",
+            "options": [
+              { "id": "a", "text": "`name = 'Alice'`", "isCorrect": true },
+              {
+                "id": "b",
+                "text": "`string name = 'Alice';`",
+                "isCorrect": false
+              },
+              { "id": "c", "text": "`name <- 'Alice'`", "isCorrect": false },
+              { "id": "d", "text": "`var name = 'Alice'`", "isCorrect": false }
+            ],
+            "explanation": "`name = 'Alice'` is correct because Python uses `=` for assignment without declaring data types explicitly.",
+            "difficulty": 1
+          },
+          {
+            "id": "mcq2",
+            "question": "Which of the following is NOT a valid Python variable name?",
+            "options": [
+              { "id": "a", "text": "`_var`", "isCorrect": false },
+              { "id": "b", "text": "`2ndVar`", "isCorrect": true },
+              { "id": "c", "text": "`var_name`", "isCorrect": false },
+              { "id": "d", "text": "`VAR123`", "isCorrect": false }
+            ],
+            "explanation": "`2ndVar` is invalid because variable names cannot start with a number.",
+            "difficulty": 2
+          }
+        ]
+      },
+      "learningObjectives": [
+        "Reinforce knowledge of variable syntax and rules.",
+        "Test understanding of valid and invalid variable names."
+      ],
+      "order": 2
+    },
+    {
+      "id": "lesson-3-rearranging-variables",
+      "title": "Building Code with Variables",
+      "type": "codeblock_rearranging",
+      "content": {
+        "questions": [
+          {
+            "id": "rearrange1",
+            "scenario": "Write code that creates two variables, swaps their values, and prints the result.",
+            "targetCode": "# Initial values\na = 5\nb = 10\n\n# Swap values\ntemp = a\na = b\nb = temp\n\n# Print results\nprint(a)  # Output: 10\nprint(b)  # Output: 5",
+            "mermaid_diagram": null,
+            "codeBlocks": [
+              {
+                "id": "block1",
+                "content": "# Swap values\ntemp = a\na = b\nb = temp"
+              },
+              { "id": "block2", "content": "# Initial values\na = 5\nb = 10" },
+              {
+                "id": "block3",
+                "content": "# Print results\nprint(a)  # Output: 10\nprint(b)  # Output: 5"
+              }
+            ],
+            "correctOrder": ["block2", "block1", "block3"],
+            "hints": [
+              "'temp' is often used as an intermediary when swapping values.",
+              "'a' should hold 'b's original value after the swap."
+            ],
+            "difficulty": 2
+          }
+        ]
+      },
+      "learningObjectives": [
+        "Practice building functional code using rearranged blocks.",
+        "Understand how to use temporary variables for swapping."
+      ],
+      "order": 3
+    }
+  ],
+  "practicalApplications": [
+    "Using variables to store user input in applications.",
+    "Applying variables in mathematical calculations or data transformations.",
+    "'Dynamic updates' like scores in a game or counters in loops."
+  ],
+  "tags": [
+    "variables",
+    "'python'",
+    "'beginner'",
+    "'assignments'",
+    "'syntaxRules'"
+  ]
+}

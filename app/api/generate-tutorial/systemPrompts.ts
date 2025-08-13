@@ -9,6 +9,7 @@ CORE REQUIREMENTS:
 5. Provide clear explanations with visual elements
 6. Create educational Mermaid diagrams for concept visualization
 7. ALL content must be in English script (no Hindi/Marathi script, only Roman/English alphabet)
+8. Whatever fields are optional in json format should mostly return data, they should contain data as many times as possible, avoid only if They are absolutely impossible. 
 
 TUTORIAL COMPLEXITY GUIDELINES:
 For BEGINNER (Level 1) tutorials - Keep content SIMPLE and PROGRESSIVE:
@@ -417,6 +418,7 @@ CRITICAL GENERATION REQUIREMENTS:
 10. Generate content in 3 languages (English, Hindi Roman, Marathi Roman)
 11. Ensure time estimates are realistic (10-30 minutes per lesson)
 12. Create engaging, interactive content that promotes active learning
+13.Whatever fields are optional in json format should mostly return data, they should contain data as many times as possible, avoid only if They are absolutely impossible.
 
 LESSON TYPE DISTRIBUTION:
 - Include at least 1 concept lesson for foundational knowledge

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { ConceptLessonData } from "@/app/Learn/types/TutorialTypes"
+import { MermaidDiagram } from "@lightenna/react-mermaid-diagram"
 import { Code, Lightbulb, Plus, Trash2 } from "lucide-react"
 
 interface ConceptLessonFormProps {
@@ -15,6 +16,7 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
 }) => {
   const [formData, setFormData] = useState<ConceptLessonData>({
     explanation: data?.explanation || "",
+    videoUrl: data?.videoUrl || "",
     keyPoints: data?.keyPoints || [""],
     codeExamples: data?.codeExamples || [],
     practiceHints: data?.practiceHints || [""],
@@ -70,7 +72,6 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
           id: crypto.randomUUID(),
           title: "",
           code: "",
-          language: "javascript",
           explanation: "",
           mermaid_diagram: "",
         },
@@ -124,6 +125,24 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
           placeholder="Provide a comprehensive explanation of the concept..."
         />
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+          Video URL (Optional)
+        </label>
+        <input
+          type="url"
+          value={formData.videoUrl}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, videoUrl: e.target.value }))
+          }
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+          placeholder="e.g., https://youtube.com/watch?v=example"
+        />
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          Add a video to supplement the concept explanation
+        </p>
       </div>
 
       <div>
@@ -196,39 +215,19 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-                    Title
-                  </label>
-                  <input
-                    type="text"
-                    value={example.title}
-                    onChange={(e) =>
-                      updateCodeExample(index, "title", e.target.value)
-                    }
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                    placeholder="Example title..."
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-                    Language
-                  </label>
-                  <select
-                    value={example.language}
-                    onChange={(e) =>
-                      updateCodeExample(index, "language", e.target.value)
-                    }
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                  >
-                    <option value="javascript">JavaScript</option>
-                    <option value="python">Python</option>
-                    <option value="java">Java</option>
-                    <option value="cpp">C++</option>
-                    <option value="c">C</option>
-                  </select>
-                </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  value={example.title}
+                  onChange={(e) =>
+                    updateCodeExample(index, "title", e.target.value)
+                  }
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  placeholder="Example title..."
+                />
               </div>
               <div className="mt-3">
                 <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
@@ -271,6 +270,12 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                   placeholder={`flowchart TD\n  A["Start"] --> B["Process"]\n  B --> C["End"]`}
                 />
+
+                {example.mermaid_diagram && (
+                  <div>
+                    <MermaidDiagram>{example.mermaid_diagram}</MermaidDiagram>
+                  </div>
+                )}
                 <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                   Use Mermaid syntax to visualize code flow. Use DOUBLE QUOTES
                   for labels.
@@ -334,6 +339,12 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
           className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
           placeholder={`flowchart TD\n  A["Concept Overview"] --> B["Key Component"]\n  B --> C["Implementation"]`}
         />
+
+        {formData.mermaid && (
+          <div>
+            <MermaidDiagram>{formData.mermaid}</MermaidDiagram>
+          </div>
+        )}
         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
           Use Mermaid syntax to visualize the overall concept. Use DOUBLE QUOTES
           for labels.

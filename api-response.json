@@ -1,0 +1,125 @@
+{
+  "id": "variables-python-tutorial",
+  "title": "Mastering Variables in Python",
+  "description": "A beginner-friendly tutorial on understanding and using variables in Python, complete with concept explanations, interactive exercises, and real-world examples.",
+  "learningObjectives": [
+    "Understand the concept of variables in Python.",
+    "Learn to declare and assign values to variables.",
+    "Identify common mistakes when working with variables.",
+    "Apply variables in practical programming scenarios."
+  ],
+  "keyTopics": ["variables", "assignment", "data types", "naming conventions"],
+  "difficulty": 1,
+  "lessons": [
+    {
+      "id": "lesson-1-concept",
+      "title": "Introduction to Variables in Python",
+      "type": "concept",
+      "content": {
+        "explanation": "Variables are named storage locations in a program that hold data. They act as placeholders for values and allow developers to work with data dynamically. In Python, variables do not require explicit declaration of type, as Python is dynamically typed.",
+        "keyPoints": [
+          "Variables store data that can be used and manipulated throughout a program.",
+          "Python is dynamically typed, meaning you don't need to specify the data type when declaring a variable.",
+          "Variable names should follow Python's naming conventions and should not conflict with reserved keywords.",
+          "Variables can store different data types such as numbers, strings, lists, etc.",
+          "The value of a variable can be updated at any time during the program."
+        ],
+        "codeExamples": [
+          {
+            "title": "Declaring and Assigning Variables",
+            "code": "# Declare and assign a variable\nname = \"Alice\"\nage = 25\nis_student = True\n\n# Print the variables\nprint(\"Name:\", name)\nprint(\"Age:\", age)\nprint(\"Is Student:\", is_student)",
+            "explanation": "In this example, we declare three variables: `name` (a string), `age` (an integer), and `is_student` (a boolean). We then print their values using the `print()` function.",
+            "mermaid_diagram": "flowchart TD\n    A[Start] --> B[Declare Variables]\n    B --> C[Assign Values]\n    C --> D[Print Values]\n    D --> E[End]"
+          },
+          {
+            "title": "Updating Variable Values",
+            "code": "# Initial assignment\ncounter = 10\nprint(\"Initial counter:\", counter)\n\n# Updating the value\ncounter = counter + 5\nprint(\"Updated counter:\", counter)",
+            "explanation": "Here, the variable `counter` is first assigned the value `10`. Later, it is updated by adding `5` to its current value. This demonstrates how variable values can change during a program.",
+            "mermaid_diagram": "flowchart TD\n    A[Start] --> B[Initialize counter = 10]\n    B --> C[Print Initial Value]\n    C --> D[Update counter]\n    D --> E[Print Updated Value]\n    E --> F[End]"
+          },
+          {
+            "title": "Dynamic Typing in Python",
+            "code": "# Assign different types to the same variable\ndata = 42\nprint(\"Data as integer:\", data)\ndata = \"Hello\"\nprint(\"Data as string:\", data)",
+            "explanation": "Python allows reassignment of variables to different data types. In this example, `data` is first assigned an integer and later reassigned a string.",
+            "mermaid_diagram": "flowchart TD\n    A[Start] --> B[Assign Integer to data]\n    B --> C[Print Integer]\n    C --> D[Reassign String to data]\n    D --> E[Print String]\n    E --> F[End]"
+          }
+        ],
+        "practiceHints": [
+          "Use meaningful names for your variables to make your code more readable.",
+          "Avoid using Python keywords (e.g., 'if', 'while') as variable names.",
+          "Always initialize variables before using them in operations."
+        ],
+        "commonMistakes": [
+          {
+            "mistake": "Using uninitialized variables.",
+            "why_wrong": "Trying to use a variable before assigning it a value will result in a NameError.",
+            "correct_approach": "Always assign a value to a variable before using it."
+          },
+          {
+            "mistake": "Using invalid variable names.",
+            "why_wrong": "Variable names cannot start with a number or contain special characters (except underscores).",
+            "correct_approach": "Follow Python's naming rules: start with a letter or underscore and avoid special characters."
+          }
+        ],
+        "bestPractices": [
+          "Use descriptive variable names for clarity.",
+          "Follow naming conventions like snake_case for better readability.",
+          "Avoid reassigning variables to unrelated data types unless necessary."
+        ]
+      },
+      "learningObjectives": [
+        "Understand what variables are and how they work in Python.",
+        "Learn to declare and assign values to variables.",
+        "Identify and avoid common mistakes when using variables."
+      ],
+      "order": 1
+    },
+    {
+      "id": "lesson-2-mcq",
+      "title": "Quiz: Understanding Variables",
+      "type": "mcq",
+      "content": {
+        "questions": [
+          {
+            "id": "mcq1",
+            "question": "What is the purpose of a variable in programming?",
+            "options": [
+              {
+                "id": "a",
+                "text": "To store data that can be used later",
+                "isCorrect": true
+              },
+              {
+                "id": "b",
+                "text": "To perform calculations",
+                "isCorrect": false
+              },
+              { "id": "c", "text": "To define functions", "isCorrect": false },
+              { "id": "d", "text": "To control loops", "isCorrect": false }
+            ],
+            "explanation": "\"Variables\" are used to store data that can be accessed and modified later in the program.",
+            "difficulty": 1
+          },
+          {
+            "id": "mcq2",
+            "question": "Which of the following is a valid variable name in Python?",
+            "options": [
+              { "id": "a", "text": "_variable1", "isCorrect": true },
+              { "id": "b", "text": "@variable1", "isCorrect": false },
+              { "id": "c", "text": "#variable1", "isCorrect": false },
+              { "id": "d", "text": "&variable1", "isCorrect": false }
+            ],
+            "explanation": "\"_variable1\" follows Python's naming rules: it starts with an underscore and contains no special characters except underscores.",
+            "difficulty": 2
+          },
+          {
+            "id": "mcq3",
+            "question": "\"What happens when you try to use a variable that hasn’t been initialized?\"",
+            "options": [{ "id": "-", "}NameError occurs. (Correct)": "" }]
+          }
+        ]
+      },
+      "}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]},}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}},}}": "}]}]}"
+    }
+  ]
+}

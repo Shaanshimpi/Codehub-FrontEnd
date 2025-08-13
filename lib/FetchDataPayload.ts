@@ -78,7 +78,7 @@ export async function fetchCollection(
   const baseUrl =
     typeof window !== "undefined"
       ? window.location.origin
-      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3003";
 
   const url = `${baseUrl}/api/payload/${collectionSlug}${queryString}`;
 
@@ -89,7 +89,15 @@ export async function fetchCollection(
       throw new Error(`HTTP error ${res.status}`);
     }
     const data = await res.json();
-    return data; // The API route already returns data.docs, so we return directly
+
+    // Handle both formats - direct docs array or nested data.docs
+    if (Array.isArray(data)) {
+      return data;
+    } else if (data && data.docs) {
+      return data.docs;
+    }
+
+    return data || [];
   } catch (error) {
     console.error(`❌ Failed to fetch ${collectionSlug}:`, error);
     return [];

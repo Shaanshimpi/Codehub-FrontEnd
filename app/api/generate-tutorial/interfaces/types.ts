@@ -111,6 +111,33 @@ export interface ProgrammingTutorial {
   tags: string[]
   estimatedTime?: number // Total time in minutes
   mermaid_diagram?: string // Optional overview diagram
+  // Reference tutorial (W3Schools-style)
+  reference: {
+    title: string
+    subtitle: string
+    introduction: string
+    examples: {
+      title: string
+      description: string
+      code: string
+      explanation: string
+      output?: string
+    }[]
+    key_points: string[]
+    common_mistakes: {
+      mistake: string
+      why_wrong: string
+      correct_approach: string
+    }[]
+    syntax_guide: {
+      basic_syntax: string
+      parameters: {
+        name: string
+        description: string
+        required: boolean
+      }[]
+    }
+  }
 }
 
 // ==================== API RESPONSE INTERFACES ====================

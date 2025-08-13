@@ -169,6 +169,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, index }) => {
           className="group block cursor-pointer"
           role="button"
           tabIndex={0}
+          aria-label={`Unlock ${getCleanTitle(exercise.title_en || exercise.title)} exercise`}
         >
           <CardContent />
         </div>

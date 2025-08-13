@@ -25,9 +25,9 @@ const AI_MODELS = [
     name: "Google: Gemini 2.5 Flash Lite",
     slug: "google/gemini-2.5-flash-lite",
   },
-  { name: "Google: Gemini 2.0 Flash", slug: "google/gemini-2.0-flash-001" },
-  { name: "Mistral: Devstral Small 1.1", slug: "mistralai/devstral-small" },
-  { name: "GPT-4 Mini", slug: "openai/gpt-4o-mini" },
+  { name: "Qwen3 Coder", slug: "qwen/qwen3-coder" },
+  { name: "Mistral: Codestral", slug: "mistralai/codestral-2508" },
+  { name: "GPT-5 Nano", slug: "openai/gpt-5-nano" },
 ]
 
 interface AITutorialFormProps {
@@ -42,7 +42,7 @@ const AITutorialForm: React.FC<AITutorialFormProps> = ({
   const [topic, setTopic] = useState("")
   const [selectedLanguage, setSelectedLanguage] = useState("")
   const [difficulty, setDifficulty] = useState(1)
-  const [numLessons, setNumLessons] = useState(10)
+  const [numLessons, setNumLessons] = useState(7)
   const [focusAreas, setFocusAreas] = useState("")
   const [exclusions, setExclusions] = useState("")
   const [selectedModel, setSelectedModel] = useState(AI_MODELS[0].slug)
@@ -236,9 +236,7 @@ const AITutorialForm: React.FC<AITutorialFormProps> = ({
                 <input
                   type="number"
                   value={numLessons}
-                  onChange={(e) =>
-                    setNumLessons(parseInt(e.target.value) || 10)
-                  }
+                  onChange={(e) => setNumLessons(parseInt(e.target.value) || 7)}
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                   min="5"
                   max="20"

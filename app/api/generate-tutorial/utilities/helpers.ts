@@ -223,6 +223,41 @@ export const parseJsonWithFallbacks = (content: string): any => {
     // Strategy 1: Try parsing as-is
     (json: string) => JSON.parse(json),
 
+    // Strategy 0.5: Try fixing unterminated strings at the end
+    (json: string) => {
+      let fixed = json.trim()
+
+      // If it ends with an unterminated string, try to close it
+      if (fixed.endsWith('"lesso') || fixed.match(/"[^"]*$/)) {
+        // Find the last quote and truncate there
+        const lastQuoteIndex = fixed.lastIndexOf('"')
+        if (lastQuoteIndex > 0) {
+          fixed = fixed.substring(0, lastQuoteIndex)
+          // Add closing braces to make it valid JSON
+          let openBraces = 0
+          let openBrackets = 0
+          for (let i = 0; i < fixed.length; i++) {
+            const char = fixed[i]
+            if (char === "{") openBraces++
+            else if (char === "}") openBraces--
+            else if (char === "[") openBrackets++
+            else if (char === "]") openBrackets--
+          }
+          // Close open structures
+          while (openBrackets > 0) {
+            fixed += "]"
+            openBrackets--
+          }
+          while (openBraces > 0) {
+            fixed += "}"
+            openBraces--
+          }
+        }
+      }
+
+      return JSON.parse(fixed)
+    },
+
     // Strategy 2: Try with basic cleaning
     (json: string) => JSON.parse(cleanJsonContent(json)),
 
@@ -592,8 +627,76 @@ const extractEnglishArray = (arr: any[]): string[] => {
   return arr.map(extractEnglishText)
 }
 
+// Generate a default reference structure if missing from AI response
+const generateDefaultReference = (
+  title: string,
+  language: string,
+  keyTopics: string[]
+): any => {
+  return {
+    title: title || "Programming Concept Reference",
+    subtitle: `Comprehensive ${language} Reference Guide`,
+    introduction: `This reference guide provides a complete overview of ${title.toLowerCase()} in ${language}, including syntax, examples, and best practices.`,
+    examples: [
+      {
+        title: "Basic Example",
+        description: `A simple example demonstrating ${title.toLowerCase()} usage.`,
+        code: `// Example ${language} code will be provided here\n// This is a placeholder for the basic concept`,
+        explanation: `This example shows the fundamental usage of ${title.toLowerCase()} in ${language}.`,
+        output: "// Expected output will be shown here",
+      },
+      {
+        title: "Practical Example",
+        description: `A real-world example of ${title.toLowerCase()}.`,
+        code: `// Practical ${language} implementation\n// This demonstrates common use cases`,
+        explanation: `This example illustrates how ${title.toLowerCase()} is used in practical scenarios.`,
+      },
+    ],
+    key_points: [
+      `${title} is a fundamental concept in ${language} programming`,
+      "Understanding this concept is essential for writing effective code",
+      "Practice with different examples to master this concept",
+    ],
+    common_mistakes: [
+      {
+        mistake: "Not following proper syntax rules",
+        why_wrong:
+          "Incorrect syntax leads to errors and prevents code execution",
+        correct_approach:
+          "Always follow the language-specific syntax guidelines",
+      },
+      {
+        mistake: "Not understanding the basic concept",
+        why_wrong:
+          "Without proper understanding, it's difficult to apply the concept correctly",
+        correct_approach:
+          "Study the fundamentals and practice with simple examples first",
+      },
+    ],
+    syntax_guide: {
+      basic_syntax: `// Basic ${language} syntax for ${title.toLowerCase()}\n// Replace this with actual syntax`,
+      parameters: [
+        {
+          name: "concept",
+          description: "The main programming concept being demonstrated",
+          required: true,
+        },
+      ],
+    },
+  }
+}
+
 // Convert to modern English-only format matching updated schema structure
 export const convertToModernFormat = (tutorial: any): any => {
+  // Generate default reference if missing from AI response
+  const reference =
+    tutorial.reference ||
+    generateDefaultReference(
+      tutorial.title || "Programming Concept",
+      "Programming Language", // You might want to extract this from context
+      tutorial.keyTopics || []
+    )
+
   return {
     id: tutorial.id || `tutorial-${Date.now()}`,
     title: extractEnglishText(tutorial.title),
@@ -616,6 +719,7 @@ export const convertToModernFormat = (tutorial: any): any => {
       tutorial.practicalApplications || []
     ),
     tags: tutorial.tags || [],
+    reference: reference,
   }
 }
 

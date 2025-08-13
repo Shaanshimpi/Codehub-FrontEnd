@@ -2,11 +2,20 @@
 
 import React, { useEffect, useState } from "react"
 import {
+  Language,
   MultiLessonTutorial,
   TutorialData,
   TutorialLesson,
 } from "@/app/Learn/types/TutorialTypes"
-import { ArrowLeft, BookOpen, Plus, Target } from "lucide-react"
+import { getLanguages } from "@/lib/getData"
+import {
+  ArrowLeft,
+  BookOpen,
+  ChevronDown,
+  Loader2,
+  Plus,
+  Target,
+} from "lucide-react"
 import LessonForm from "./LessonForm"
 
 interface MultiLessonTutorialFormProps {
@@ -27,35 +36,177 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
 
   const [basicInfo, setBasicInfo] = useState({
     title: "",
+    slug: "",
     description: "",
+    videoUrl: "",
     programmingLanguage: "",
     difficulty: 1,
     focusAreas: "",
     keyTopics: [""],
     practicalApplications: [""],
     tags: [""],
+    index: 1,
+    isLocked: true,
+    reference: {
+      title: "",
+      subtitle: "",
+      introduction: "",
+      examples: [
+        {
+          title: "",
+          description: "",
+          code: "",
+          explanation: "",
+          output: "",
+        },
+      ],
+      key_points: [""],
+      common_mistakes: [
+        {
+          mistake: "",
+          why_wrong: "",
+          correct_approach: "",
+        },
+      ],
+      syntax_guide: {
+        basic_syntax: "",
+        parameters: [
+          {
+            name: "",
+            description: "",
+            required: false,
+          },
+        ],
+      },
+    },
   })
 
   const [showLessonForm, setShowLessonForm] = useState(false)
   const [editingLesson, setEditingLesson] = useState<TutorialLesson | null>(
     null
   )
+  const [languages, setLanguages] = useState<Language[]>([])
+  const [languagesLoading, setLanguagesLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+
+  // Auto-generate slug from title
+  const generateSlug = (title: string): string => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .trim()
+  }
+
+  // Load languages on component mount
+  useEffect(() => {
+    const fetchLanguages = async () => {
+      try {
+        const languagesData = await getLanguages()
+        setLanguages(languagesData)
+      } catch {
+        // Error fetching languages
+      } finally {
+        setLanguagesLoading(false)
+      }
+    }
+    fetchLanguages()
+  }, [])
 
   // Populate form with AI-generated data when initialData is provided
   useEffect(() => {
-    if (initialData) {
+    if (initialData && !languagesLoading) {
       console.log("🤖 Populating manual form with AI data:", initialData)
 
+      // Convert programming language to slug if it's an ID
+      let programmingLanguageSlug =
+        initialData.programmingLanguage?.toString() || ""
+
+      // If the programming language is a number (ID), find the corresponding slug
+      if (
+        initialData.programmingLanguage &&
+        !isNaN(Number(initialData.programmingLanguage))
+      ) {
+        const languageId = Number(initialData.programmingLanguage)
+        const foundLanguage = languages.find((lang) => lang.id === languageId)
+        if (foundLanguage) {
+          programmingLanguageSlug = foundLanguage.slug
+        }
+      }
+
+      console.log("🔄 Programming language mapping:", {
+        original: initialData.programmingLanguage,
+        converted: programmingLanguageSlug,
+        availableLanguages: languages.map((l) => ({
+          id: l.id,
+          slug: l.slug,
+          title: l.title,
+        })),
+      })
+
+      console.log("🔍 Reference field in AI data:", {
+        hasReference: !!initialData.reference,
+        referenceData: initialData.reference,
+        referenceKeys: initialData.reference
+          ? Object.keys(initialData.reference)
+          : "None",
+      })
+
       // Populate basic info from AI data
+      const title = initialData.title || ""
       setBasicInfo({
-        title: initialData.title || "",
+        title: title,
+        slug: initialData.slug || generateSlug(title),
         description: initialData.description || "",
-        programmingLanguage: initialData.programmingLanguage?.toString() || "",
+        videoUrl: initialData.videoUrl || "",
+        programmingLanguage: programmingLanguageSlug,
         difficulty: initialData.difficulty || 1,
         focusAreas: initialData.focusAreas || "",
         keyTopics: initialData.keyTopics || [""],
         practicalApplications: initialData.practicalApplications || [""],
         tags: initialData.tags || [""],
+        index: initialData.index || 1,
+        isLocked:
+          initialData.isLocked !== undefined ? initialData.isLocked : true,
+        reference: initialData.reference || {
+          title: "",
+          subtitle: "",
+          introduction: "",
+          examples: [
+            {
+              title: "",
+              description: "",
+              code: "",
+              explanation: "",
+              output: "",
+            },
+          ],
+          key_points: [""],
+          common_mistakes: [
+            {
+              mistake: "",
+              why_wrong: "",
+              correct_approach: "",
+            },
+          ],
+          syntax_guide: {
+            basic_syntax: "",
+            parameters: [
+              {
+                name: "",
+                description: "",
+                required: false,
+              },
+            ],
+          },
+        },
+      })
+
+      console.log("✅ Basic info set with reference:", {
+        hasReference: !!initialData.reference,
+        referenceTitle: initialData.reference?.title || "No title",
+        referenceExamplesCount: initialData.reference?.examples?.length || 0,
       })
 
       // Populate tutorial data from AI data
@@ -79,8 +230,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                   id: example.id || `example-${idx}`,
                   title: example.title || `Example ${idx + 1}`,
                   code: example.code || "",
-                  language:
-                    initialData.programmingLanguage?.toString() || "javascript",
+                  language: programmingLanguageSlug || "javascript",
                   explanation: example.explanation || "",
                   mermaid_diagram: example.mermaid_diagram || "",
                 })
@@ -297,7 +447,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
         learningObjectives: initialData.learningObjectives || [""],
       })
     }
-  }, [initialData])
+  }, [initialData, languagesLoading])
 
   const handleAddLesson = () => {
     setEditingLesson(null)
@@ -390,43 +540,58 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
     }))
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (
       !basicInfo.title ||
       tutorialData.lessons.length < 5 ||
-      tutorialData.lessons.length > 20
+      tutorialData.lessons.length > 20 ||
+      isSaving
     ) {
       return
     }
 
-    const completeTutorialData: TutorialData = {
-      id: crypto.randomUUID(),
-      title: basicInfo.title,
-      description: basicInfo.description || "",
-      learningObjectives: tutorialData.learningObjectives.filter(
-        (obj) => obj.trim() !== ""
-      ),
-      keyTopics:
-        basicInfo.keyTopics?.filter((topic) => topic.trim() !== "") || [],
-      difficulty: basicInfo.difficulty || 1,
-      lessons: tutorialData.lessons.map((lesson) => ({
-        ...lesson,
-        type: lesson.type as
-          | "concept"
-          | "mcq"
-          | "codeblock_rearranging"
-          | "fill_in_blanks",
-      })),
-      practicalApplications:
-        basicInfo.practicalApplications?.filter((app) => app.trim() !== "") ||
-        [],
-      tags: basicInfo.tags?.filter((tag) => tag.trim() !== "") || [],
-      programmingLanguage: basicInfo.programmingLanguage,
-      focusAreas: basicInfo.focusAreas,
-    }
+    setIsSaving(true)
 
-    if (onSave) {
-      onSave(completeTutorialData)
+    try {
+      const completeTutorialData: TutorialData = {
+        id: crypto.randomUUID(),
+        title: basicInfo.title,
+        slug: basicInfo.slug || generateSlug(basicInfo.title),
+        description: basicInfo.description || "",
+        videoUrl: basicInfo.videoUrl || "",
+        learningObjectives: tutorialData.learningObjectives.filter(
+          (obj) => obj.trim() !== ""
+        ),
+        keyTopics:
+          basicInfo.keyTopics?.filter((topic) => topic.trim() !== "") || [],
+        difficulty: basicInfo.difficulty || 1,
+        lessons: tutorialData.lessons.map((lesson) => ({
+          ...lesson,
+          type: lesson.type as
+            | "concept"
+            | "mcq"
+            | "codeblock_rearranging"
+            | "fill_in_blanks",
+        })),
+        practicalApplications:
+          basicInfo.practicalApplications?.filter((app) => app.trim() !== "") ||
+          [],
+        tags: basicInfo.tags?.filter((tag) => tag.trim() !== "") || [],
+        programmingLanguage: basicInfo.programmingLanguage,
+        focusAreas: basicInfo.focusAreas,
+        index: basicInfo.index,
+        isLocked: basicInfo.isLocked,
+        reference: basicInfo.reference,
+      }
+
+      if (onSave) {
+        await onSave(completeTutorialData)
+      }
+    } catch (error) {
+      console.error("Error saving tutorial:", error)
+      // You could add error handling here, like showing a toast notification
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -485,7 +650,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
           Basic Information
         </h3>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Tutorial Title
@@ -493,9 +658,14 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             <input
               type="text"
               value={basicInfo.title}
-              onChange={(e) =>
-                setBasicInfo((prev) => ({ ...prev, title: e.target.value }))
-              }
+              onChange={(e) => {
+                const newTitle = e.target.value
+                setBasicInfo((prev) => ({
+                  ...prev,
+                  title: newTitle,
+                  slug: generateSlug(newTitle),
+                }))
+              }}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
               placeholder="e.g., Introduction to Variables"
             />
@@ -503,24 +673,53 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
 
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Programming Language
+              Slug
             </label>
-            <select
-              value={basicInfo.programmingLanguage}
+            <input
+              type="text"
+              value={basicInfo.slug}
               onChange={(e) =>
-                setBasicInfo((prev) => ({
-                  ...prev,
-                  programmingLanguage: e.target.value,
-                }))
+                setBasicInfo((prev) => ({ ...prev, slug: e.target.value }))
               }
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-            >
-              <option value="">Select Language</option>
-              <option value="python">Python</option>
-              <option value="javascript">JavaScript</option>
-              <option value="java">Java</option>
-              <option value="cpp">C++</option>
-            </select>
+              placeholder="e.g., introduction-to-variables"
+            />
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Auto-generated from title, but can be customized
+            </p>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+              Programming Language
+            </label>
+            {languagesLoading ? (
+              <div className="flex items-center justify-center py-2 text-slate-600 dark:text-slate-400">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="ml-2">Loading languages...</span>
+              </div>
+            ) : (
+              <div className="relative">
+                <select
+                  value={basicInfo.programmingLanguage}
+                  onChange={(e) =>
+                    setBasicInfo((prev) => ({
+                      ...prev,
+                      programmingLanguage: e.target.value,
+                    }))
+                  }
+                  className="w-full appearance-none rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                >
+                  <option value="">Select Language</option>
+                  {languages.map((lang) => (
+                    <option key={lang.id} value={lang.slug}>
+                      {lang.title}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-2 top-2.5 h-4 w-4 text-slate-400" />
+              </div>
+            )}
           </div>
 
           <div>
@@ -544,6 +743,54 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
           </div>
         </div>
 
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+              Index (Order)
+            </label>
+            <input
+              type="number"
+              min="1"
+              value={basicInfo.index}
+              onChange={(e) =>
+                setBasicInfo((prev) => ({
+                  ...prev,
+                  index: parseInt(e.target.value) || 1,
+                }))
+              }
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+              placeholder="1"
+            />
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Display order in the tutorial list
+            </p>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+              Tutorial Status
+            </label>
+            <div className="flex items-center gap-3">
+              <label className="flex cursor-pointer items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={basicInfo.isLocked}
+                  onChange={(e) =>
+                    setBasicInfo((prev) => ({
+                      ...prev,
+                      isLocked: e.target.checked,
+                    }))
+                  }
+                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700"
+                />
+                <span className="text-sm text-slate-700 dark:text-slate-300">
+                  Locked
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
         <div className="mt-4">
           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             Description
@@ -557,6 +804,25 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
             placeholder="Describe what students will learn in this tutorial..."
           />
+        </div>
+
+        <div className="mt-4">
+          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+            Video URL (Optional)
+          </label>
+          <input
+            type="url"
+            value={basicInfo.videoUrl}
+            onChange={(e) =>
+              setBasicInfo((prev) => ({ ...prev, videoUrl: e.target.value }))
+            }
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+            placeholder="e.g., https://youtube.com/watch?v=example or https://vimeo.com/123456"
+          />
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            Add a video link to supplement the tutorial content (YouTube, Vimeo,
+            etc.)
+          </p>
         </div>
 
         <div className="mt-4">
@@ -735,6 +1001,262 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
         </button>
       </div>
 
+      {/* Tutorial Reference */}
+      <div className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+        <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
+          <BookOpen className="h-5 w-5" />
+          Tutorial Reference (W3Schools-style)
+        </h3>
+        <p className="mb-4 text-sm text-slate-600 dark:text-slate-400">
+          Create a comprehensive reference page that teaches the complete
+          concept with examples, explanations, and syntax guides.
+        </p>
+
+        <div className="space-y-4">
+          {/* Reference Title & Subtitle */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                Reference Title
+              </label>
+              <input
+                type="text"
+                value={basicInfo.reference.title}
+                onChange={(e) =>
+                  setBasicInfo((prev) => ({
+                    ...prev,
+                    reference: {
+                      ...prev.reference,
+                      title: e.target.value,
+                    },
+                  }))
+                }
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                placeholder="e.g., If Statements"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                Subtitle
+              </label>
+              <input
+                type="text"
+                value={basicInfo.reference.subtitle}
+                onChange={(e) =>
+                  setBasicInfo((prev) => ({
+                    ...prev,
+                    reference: {
+                      ...prev.reference,
+                      subtitle: e.target.value,
+                    },
+                  }))
+                }
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                placeholder="e.g., Using the if Statement in C"
+              />
+            </div>
+          </div>
+
+          {/* Introduction */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+              Introduction
+            </label>
+            <textarea
+              rows={3}
+              value={basicInfo.reference.introduction}
+              onChange={(e) =>
+                setBasicInfo((prev) => ({
+                  ...prev,
+                  reference: {
+                    ...prev.reference,
+                    introduction: e.target.value,
+                  },
+                }))
+              }
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+              placeholder="Explain the concept and its importance in programming..."
+            />
+          </div>
+
+          {/* Examples */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+              Code Examples (3-4 recommended)
+            </label>
+            {basicInfo.reference.examples.map((example, index) => (
+              <div
+                key={index}
+                className="mb-4 rounded-lg border border-slate-200 p-4 dark:border-slate-600"
+              >
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                      Example Title
+                    </label>
+                    <input
+                      type="text"
+                      value={example.title}
+                      onChange={(e) =>
+                        setBasicInfo((prev) => ({
+                          ...prev,
+                          reference: {
+                            ...prev.reference,
+                            examples: prev.reference.examples.map((ex, i) =>
+                              i === index
+                                ? { ...ex, title: e.target.value }
+                                : ex
+                            ),
+                          },
+                        }))
+                      }
+                      className="w-full rounded border border-slate-300 px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                      placeholder="e.g., Basic Example: When Condition is False"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                      Expected Output (optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={example.output}
+                      onChange={(e) =>
+                        setBasicInfo((prev) => ({
+                          ...prev,
+                          reference: {
+                            ...prev.reference,
+                            examples: prev.reference.examples.map((ex, i) =>
+                              i === index
+                                ? { ...ex, output: e.target.value }
+                                : ex
+                            ),
+                          },
+                        }))
+                      }
+                      className="w-full rounded border border-slate-300 px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                      placeholder="Expected output..."
+                    />
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                    Description
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={example.description}
+                    onChange={(e) =>
+                      setBasicInfo((prev) => ({
+                        ...prev,
+                        reference: {
+                          ...prev.reference,
+                          examples: prev.reference.examples.map((ex, i) =>
+                            i === index
+                              ? { ...ex, description: e.target.value }
+                              : ex
+                          ),
+                        },
+                      }))
+                    }
+                    className="w-full rounded border border-slate-300 px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                    placeholder="Brief description of what this example demonstrates..."
+                  />
+                </div>
+                <div className="mt-3">
+                  <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                    Code
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={example.code}
+                    onChange={(e) =>
+                      setBasicInfo((prev) => ({
+                        ...prev,
+                        reference: {
+                          ...prev.reference,
+                          examples: prev.reference.examples.map((ex, i) =>
+                            i === index ? { ...ex, code: e.target.value } : ex
+                          ),
+                        },
+                      }))
+                    }
+                    className="w-full rounded border border-slate-300 px-2 py-1 font-mono text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                    placeholder="Complete, working code example..."
+                  />
+                </div>
+                <div className="mt-3">
+                  <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                    Explanation
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={example.explanation}
+                    onChange={(e) =>
+                      setBasicInfo((prev) => ({
+                        ...prev,
+                        reference: {
+                          ...prev.reference,
+                          examples: prev.reference.examples.map((ex, i) =>
+                            i === index
+                              ? { ...ex, explanation: e.target.value }
+                              : ex
+                          ),
+                        },
+                      }))
+                    }
+                    className="w-full rounded border border-slate-300 px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                    placeholder="Detailed explanation of how the code works..."
+                  />
+                </div>
+                {basicInfo.reference.examples.length > 1 && (
+                  <button
+                    onClick={() =>
+                      setBasicInfo((prev) => ({
+                        ...prev,
+                        reference: {
+                          ...prev.reference,
+                          examples: prev.reference.examples.filter(
+                            (_, i) => i !== index
+                          ),
+                        },
+                      }))
+                    }
+                    className="mt-2 text-xs text-red-600 hover:text-red-700 dark:text-red-400"
+                  >
+                    Remove Example
+                  </button>
+                )}
+              </div>
+            ))}
+            <button
+              onClick={() =>
+                setBasicInfo((prev) => ({
+                  ...prev,
+                  reference: {
+                    ...prev.reference,
+                    examples: [
+                      ...prev.reference.examples,
+                      {
+                        title: "",
+                        description: "",
+                        code: "",
+                        explanation: "",
+                        output: "",
+                      },
+                    ],
+                  },
+                }))
+              }
+              className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
+            >
+              <Plus className="h-4 w-4" />
+              Add Example
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Lessons */}
       <div className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
         <div className="mb-4 flex items-center justify-between">
@@ -842,11 +1364,13 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
           disabled={
             !basicInfo.title ||
             tutorialData.lessons.length < 5 ||
-            tutorialData.lessons.length > 20
+            tutorialData.lessons.length > 20 ||
+            isSaving
           }
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Save Tutorial
+          {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
+          {isSaving ? "Saving Tutorial..." : "Save Tutorial"}
         </button>
       </div>
     </div>

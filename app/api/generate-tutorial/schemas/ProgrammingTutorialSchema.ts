@@ -55,7 +55,7 @@ export const CONCEPT_CONTENT_SCHEMA = {
           mermaid_diagram: {
             type: "string",
             description:
-              "Optional Mermaid diagram visualizing the code flow, logic, or data structure. Use DOUBLE QUOTES for all labels. use as many times as possible",
+              "HIGHLY RECOMMENDED: Mermaid diagram visualizing the code flow, logic, or data structure. Use DOUBLE QUOTES for all labels. Include this in 80% of code examples for better learning visualization.",
           },
         },
         required: ["title", "code", "explanation"],
@@ -76,17 +76,23 @@ export const CONCEPT_CONTENT_SCHEMA = {
     mermaid: {
       type: "string",
       description:
-        "Optional Mermaid diagram for concepts. Use DOUBLE QUOTES for all labels. use as many times as possible",
+        "RECOMMENDED: Overall concept Mermaid diagram for complex topics. Use DOUBLE QUOTES for all labels. Include this in 70% of concept lessons to enhance understanding.",
     },
     commonMistakes: {
       type: "array",
       items: { type: "string" },
-      description: "Common student mistakes to avoid",
+      description:
+        "IMPORTANT: Common student mistakes to avoid. Include 2-4 mistakes in 80% of concept lessons for better learning outcomes.",
+      minItems: 2,
+      maxItems: 4,
     },
     bestPractices: {
       type: "array",
       items: { type: "string" },
-      description: "Programming best practices related to this concept",
+      description:
+        "VALUABLE: Programming best practices related to this concept. Include 2-4 practices in 75% of concept lessons.",
+      minItems: 2,
+      maxItems: 4,
     },
   },
   required: ["explanation", "keyPoints", "codeExamples", "practiceHints"],
@@ -138,11 +144,15 @@ export const MCQ_CONTENT_SCHEMA = {
             enum: [1, 2, 3],
             description: "Question difficulty",
           },
-          codeSnippet: { type: "string", description: "Optional code context" },
+          codeSnippet: {
+            type: "string",
+            description:
+              "ENCOURAGED: Code context to make the question more practical. Include in 60% of MCQ questions for better engagement.",
+          },
           mermaid_diagram: {
             type: "string",
             description:
-              "Optional Mermaid diagram to visualize the code snippet or concept being tested. Use DOUBLE QUOTES for all labels.",
+              "RECOMMENDED: Mermaid diagram to visualize the code snippet or concept being tested. Use DOUBLE QUOTES for all labels. Include in 50% of MCQ questions with code snippets.",
           },
         },
         required: ["id", "question", "options", "explanation", "difficulty"],
@@ -176,7 +186,7 @@ export const CODE_BLOCK_REARRANGING_SCHEMA = {
           mermaid_diagram: {
             type: "string",
             description:
-              "Optional Mermaid diagram showing the expected code flow or logic structure. Use DOUBLE QUOTES for all labels.",
+              "HIGHLY VALUABLE: Mermaid diagram showing the expected code flow or logic structure. Use DOUBLE QUOTES for all labels. Include in 70% of code rearranging questions for better visualization.",
           },
           codeBlocks: {
             type: "array",
@@ -253,7 +263,7 @@ export const FILL_IN_BLANKS_SCHEMA = {
           mermaid_diagram: {
             type: "string",
             description:
-              "Optional Mermaid diagram showing the code structure or flow with blanks highlighted. Use DOUBLE QUOTES for all labels.",
+              "STRONGLY RECOMMENDED: Mermaid diagram showing the code structure or flow with blanks highlighted. Use DOUBLE QUOTES for all labels. Include in 75% of fill-in-blank questions for enhanced learning.",
           },
           blanks: {
             type: "array",
@@ -271,7 +281,11 @@ export const FILL_IN_BLANKS_SCHEMA = {
                   items: { type: "string" },
                   description: "Options for dropdown type",
                 },
-                hint: { type: "string" },
+                hint: {
+                  type: "string",
+                  description:
+                    "HELPFUL: Specific hint for this blank. Include in 70% of blanks to guide students.",
+                },
                 explanation: {
                   type: "string",
                   description: "Why this is correct",
@@ -304,7 +318,7 @@ export const FILL_IN_BLANKS_SCHEMA = {
               mermaid_diagram: {
                 type: "string",
                 description:
-                  "Optional Mermaid diagram showing the complete solution flow or structure. Use DOUBLE QUOTES for all labels.",
+                  "ENCOURAGED: Mermaid diagram showing the complete solution flow or structure. Use DOUBLE QUOTES for all labels. Include in 60% of fill-in-blank solutions for complete understanding.",
               },
             },
             required: ["completeCode", "explanation"],
@@ -421,13 +435,147 @@ export const TUTORIAL_TAGS_SCHEMA = {
   maxItems: 10,
 }
 
+export const TUTORIAL_REFERENCE_SCHEMA = {
+  type: "object",
+  description:
+    "W3Schools-style comprehensive reference tutorial page teaching the complete concept",
+  properties: {
+    title: {
+      type: "string",
+      description: "Main concept title (e.g., 'If Statements', 'While Loops')",
+    },
+    subtitle: {
+      type: "string",
+      description:
+        "Brief subtitle explaining what will be learned (e.g., 'Using the `if` Statement in C')",
+    },
+    introduction: {
+      type: "string",
+      description:
+        "Opening paragraph explaining the concept and its importance in programming",
+    },
+    examples: {
+      type: "array",
+      description: "5-10 complete examples with full code and explanations",
+      items: {
+        type: "object",
+        properties: {
+          title: {
+            type: "string",
+            description:
+              "Example title (e.g., 'Basic Example: When Condition is False')",
+          },
+          description: {
+            type: "string",
+            description: "Brief description of what this example demonstrates",
+          },
+          code: {
+            type: "string",
+            description:
+              "Complete, working PLAIN TEXT code example that can be executed",
+          },
+          explanation: {
+            type: "string",
+            description:
+              "Detailed explanation of how the code works, referencing specific lines and outcomes",
+          },
+          output: {
+            type: "string",
+            description: "Expected output when the code is run (optional)",
+          },
+        },
+        required: ["title", "description", "code", "explanation"],
+        additionalProperties: false,
+      },
+      minItems: 3,
+      maxItems: 4,
+    },
+    key_points: {
+      type: "array",
+      description: "Important points to remember about this concept",
+      items: {
+        type: "string",
+        description: "Key point or rule about the concept",
+      },
+      minItems: 3,
+      maxItems: 6,
+    },
+    common_mistakes: {
+      type: "array",
+      description: "Common mistakes beginners make with this concept",
+      items: {
+        type: "object",
+        properties: {
+          mistake: {
+            type: "string",
+            description: "Description of the common mistake",
+          },
+          why_wrong: {
+            type: "string",
+            description: "Why this approach is incorrect",
+          },
+          correct_approach: {
+            type: "string",
+            description: "The correct way to handle this situation",
+          },
+        },
+        required: ["mistake", "why_wrong", "correct_approach"],
+        additionalProperties: false,
+      },
+      minItems: 2,
+      maxItems: 4,
+    },
+    syntax_guide: {
+      type: "object",
+      description: "Syntax reference for the concept",
+      properties: {
+        basic_syntax: {
+          type: "string",
+          description: "Basic syntax template in plain text",
+        },
+        parameters: {
+          type: "array",
+          description: "Explanation of syntax components",
+          items: {
+            type: "object",
+            properties: {
+              name: {
+                type: "string",
+                description: "Parameter or component name",
+              },
+              description: {
+                type: "string",
+                description: "What this component does",
+              },
+              required: {
+                type: "boolean",
+                description: "Whether this component is required",
+              },
+            },
+            required: ["name", "description", "required"],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: ["basic_syntax", "parameters"],
+      additionalProperties: false,
+    },
+  },
+  required: [
+    "title",
+    "subtitle",
+    "introduction",
+    "examples",
+    "key_points",
+    "common_mistakes",
+    "syntax_guide",
+  ],
+  additionalProperties: false,
+}
+
 // ==================== MAIN PROGRAMMING TUTORIAL SCHEMA ====================
 
 export const ProgrammingTutorialSchema = {
-  id: {
-    type: "string",
-    description: "Unique tutorial identifier",
-  },
   title: TUTORIAL_TITLE_SCHEMA,
   description: TUTORIAL_DESCRIPTION_SCHEMA,
   learningObjectives: TUTORIAL_LEARNING_OBJECTIVES_SCHEMA,
@@ -448,6 +596,7 @@ export const ProgrammingTutorialSchema = {
   },
   practicalApplications: TUTORIAL_PRACTICAL_APPLICATIONS_SCHEMA,
   tags: TUTORIAL_TAGS_SCHEMA,
+  reference: TUTORIAL_REFERENCE_SCHEMA,
 }
 
 // ==================== LESSON CONTENT TYPE MAPPING ====================
@@ -465,7 +614,6 @@ export const COMPLETE_TUTORIAL_SCHEMA = {
   type: "object",
   properties: ProgrammingTutorialSchema,
   required: [
-    "id",
     "title",
     "description",
     "learningObjectives",
@@ -474,6 +622,7 @@ export const COMPLETE_TUTORIAL_SCHEMA = {
     "lessons",
     "practicalApplications",
     "tags",
+    "reference",
   ],
   additionalProperties: false,
 }

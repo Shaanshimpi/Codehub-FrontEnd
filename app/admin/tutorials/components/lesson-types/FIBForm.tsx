@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { FillInTheBlankData } from "@/app/Learn/types/TutorialTypes"
+import { MermaidDiagram } from "@lightenna/react-mermaid-diagram"
 import { ChevronDown, ChevronUp, Code, Plus, Trash2 } from "lucide-react"
 
 interface FIBFormProps {
@@ -10,6 +11,8 @@ interface FIBFormProps {
 }
 
 const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
+  const [videoUrl, setVideoUrl] = useState<string>(data?.videoUrl || "")
+
   const [questions, setQuestions] = useState(
     data?.questions || [
       {
@@ -45,9 +48,10 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
 
   useEffect(() => {
     onChange({
+      videoUrl,
       questions: questions.filter((q) => q.code.trim() || q.scenario.trim()),
     })
-  }, [questions, onChange])
+  }, [questions, videoUrl, onChange])
 
   const addQuestion = () => {
     const newQuestion = {
@@ -191,12 +195,30 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
         </button>
       </div>
 
+      {/* Video URL */}
+      <div>
+        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+          Video URL (Optional)
+        </label>
+        <input
+          type="url"
+          value={videoUrl}
+          onChange={(e) => setVideoUrl(e.target.value)}
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+          placeholder="e.g., https://youtube.com/watch?v=example"
+        />
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          Add a video to introduce the fill-in-the-blank exercises
+        </p>
+      </div>
+
       <div className="space-y-4">
         {questions.map((question, questionIndex) => (
           <div
             key={question.id}
             className="rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800"
           >
+            {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
             <div
               className="flex cursor-pointer items-center justify-between p-4"
               onClick={() => toggleQuestion(question.id)}
@@ -315,6 +337,13 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
                       className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                       placeholder={`flowchart TD\n  A["Start"] --> B["Process"]\n  B --> C["End"]`}
                     />
+                    {question.mermaid_diagram && (
+                      <div>
+                        <MermaidDiagram>
+                          {question.mermaid_diagram}
+                        </MermaidDiagram>
+                      </div>
+                    )}
                   </div>
 
                   <div>

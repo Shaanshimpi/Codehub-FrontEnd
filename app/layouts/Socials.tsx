@@ -38,7 +38,6 @@ export default function Socials() {
   // }, [])
   const links = [
     { href: "/", label: "Home.", showMd: false },
-    { href: "/Exercise", label: "Exercise.", showMd: true },
     { href: "/Learn", label: "Learn.", showMd: true },
     {
       href: "https://www.instagram.com/code.hub.india/",

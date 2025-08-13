@@ -78,6 +78,42 @@ export async function getTutorialsByLanguageId(
   }
 }
 
+// Get all tutorials for a specific language by slug
+export async function getTutorialsByLanguage(
+  langSlug: string,
+): Promise<Tutorial[]> {
+  try {
+    // First get the language by slug
+    const language = await getLanguageBySlug(langSlug);
+    if (!language) {
+      console.error("Language not found for slug:", langSlug);
+      return [];
+    }
+
+    // Then get tutorials for that language
+    return await getTutorialsByLanguageId(language.id);
+  } catch (error) {
+    console.error("Error fetching tutorials by language slug:", error);
+    return [];
+  }
+}
+
+// Get all tutorials for admin dashboard
+export async function getAllTutorials(): Promise<Tutorial[]> {
+  try {
+    const tutorials = await fetchCollection("tutorials", {
+      limit: 100,
+      sort: "-createdAt",
+      depth: 2,
+    });
+
+    return tutorials;
+  } catch (error) {
+    console.error("Error fetching all tutorials:", error);
+    return [];
+  }
+}
+
 // Get a specific tutorial by slug and language
 export async function getTutorialBySlug(
   tutSlug: string,

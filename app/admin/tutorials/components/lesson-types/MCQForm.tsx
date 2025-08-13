@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { MCQOption } from "@/app/Learn/types/TutorialTypes"
+import { MermaidDiagram } from "@lightenna/react-mermaid-diagram"
 import { CheckCircle, ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react"
 
 interface MCQQuestion {
@@ -15,6 +16,7 @@ interface MCQQuestion {
 }
 
 interface MCQData {
+  videoUrl?: string
   questions: MCQQuestion[]
 }
 
@@ -61,15 +63,21 @@ const MCQForm: React.FC<MCQFormProps> = ({ data, onChange }) => {
     }
   })
 
+  const [videoUrl, setVideoUrl] = useState<string>(
+    data && typeof data === "object" && "videoUrl" in data
+      ? (data as MCQData).videoUrl || ""
+      : ""
+  )
+
   const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(
     new Set()
   )
 
   useEffect(() => {
     if (questions.length > 0) {
-      onChange({ questions })
+      onChange({ videoUrl, questions })
     }
-  }, [questions, onChange])
+  }, [questions, videoUrl, onChange])
 
   const addQuestion = () => {
     const newQuestion: MCQQuestion = {
@@ -190,6 +198,23 @@ const MCQForm: React.FC<MCQFormProps> = ({ data, onChange }) => {
           <Plus className="h-4 w-4" />
           Add Question
         </button>
+      </div>
+
+      {/* Video URL */}
+      <div>
+        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+          Video URL (Optional)
+        </label>
+        <input
+          type="url"
+          value={videoUrl}
+          onChange={(e) => setVideoUrl(e.target.value)}
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+          placeholder="e.g., https://youtube.com/watch?v=example"
+        />
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          Add a video to introduce the MCQ section
+        </p>
       </div>
 
       {/* Questions List */}
@@ -318,6 +343,13 @@ const MCQForm: React.FC<MCQFormProps> = ({ data, onChange }) => {
                       className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                       placeholder={`flowchart TD\n  A["Question Logic"] --> B["Answer Choice"]\n  B --> C["Result"]`}
                     />
+                    {question.mermaid_diagram && (
+                      <div>
+                        <MermaidDiagram>
+                          {question.mermaid_diagram}
+                        </MermaidDiagram>
+                      </div>
+                    )}
                     <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                       Use Mermaid syntax to visualize the code snippet or
                       concept being tested. Use DOUBLE QUOTES for labels.

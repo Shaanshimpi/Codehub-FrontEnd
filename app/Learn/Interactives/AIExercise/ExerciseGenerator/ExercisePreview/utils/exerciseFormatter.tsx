@@ -27,6 +27,7 @@ export const formatHintsArray = (
   return (
     <div className="hints-container space-y-3">
       {hints.map((hint, index) => (
+        /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
         <div
           key={index}
           className="hint-item group"
@@ -244,6 +245,7 @@ export const formatHints = (hintsText: string): JSX.Element => {
       }}
     >
       {hints.map((hint, index) => (
+        //eslint-disable-next-line jsx-a11y/no-static-element-interactions
         <div
           key={index}
           className="hint-item"

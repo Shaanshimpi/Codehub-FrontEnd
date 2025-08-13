@@ -471,6 +471,32 @@ export interface TutorialData {
   prerequisites?: string[]
   programmingLanguage?: string
   focusAreas?: string
+  reference?: {
+    title: string
+    subtitle: string
+    introduction: string
+    examples: {
+      title: string
+      description: string
+      code: string
+      explanation: string
+      output?: string
+    }[]
+    key_points: string[]
+    common_mistakes: {
+      mistake: string
+      why_wrong: string
+      correct_approach: string
+    }[]
+    syntax_guide: {
+      basic_syntax: string
+      parameters: {
+        name: string
+        description: string
+        required: boolean
+      }[]
+    }
+  }
 }
 
 // Legacy alias for backward compatibility

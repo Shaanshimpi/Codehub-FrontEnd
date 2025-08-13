@@ -52,6 +52,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
       <div
         className="absolute inset-0"
         onClick={onClose}

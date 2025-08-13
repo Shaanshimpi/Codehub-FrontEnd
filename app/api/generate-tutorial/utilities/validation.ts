@@ -18,6 +18,48 @@ export const validateTutorial = (
     errors.push("Tutorial title is required")
   }
 
+  // Validate reference field (required)
+  if (!tutorial.reference) {
+    errors.push("Tutorial reference field is required")
+  } else {
+    if (
+      !tutorial.reference.title ||
+      tutorial.reference.title.trim().length === 0
+    ) {
+      errors.push("Reference title is required")
+    }
+    if (
+      !tutorial.reference.subtitle ||
+      tutorial.reference.subtitle.trim().length === 0
+    ) {
+      errors.push("Reference subtitle is required")
+    }
+    if (
+      !tutorial.reference.introduction ||
+      tutorial.reference.introduction.trim().length === 0
+    ) {
+      errors.push("Reference introduction is required")
+    }
+    if (
+      !tutorial.reference.examples ||
+      tutorial.reference.examples.length < 3
+    ) {
+      errors.push("Reference must have at least 3 examples")
+    }
+    if (
+      !tutorial.reference.key_points ||
+      tutorial.reference.key_points.length < 3
+    ) {
+      errors.push("Reference must have at least 3 key points")
+    }
+    if (
+      !tutorial.reference.common_mistakes ||
+      tutorial.reference.common_mistakes.length < 2
+    ) {
+      errors.push("Reference must have at least 2 common mistakes")
+    }
+  }
+
   if (!tutorial.lessons || tutorial.lessons.length < 5) {
     errors.push("Tutorial must have at least 5 lessons")
   }

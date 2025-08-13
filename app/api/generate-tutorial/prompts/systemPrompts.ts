@@ -11,6 +11,9 @@ CRITICAL REQUIREMENTS:
 5. Generate interactive elements that engage students actively
 6. Use clear, professional English appropriate for programming education
 7. Return valid JSON matching the exact schema structure provided
+8. Whatever fields are not required optional should mostly return data, they should contain data as many times as possible, avoid only if They are absolutely impossible.
+9. MANDATORY: Generate a comprehensive W3Schools-style reference tutorial in the 'reference' field - this is REQUIRED for every tutorial
+
 
 LESSON TYPE SPECIFICATIONS:
 
@@ -30,6 +33,7 @@ LESSON TYPE SPECIFICATIONS:
    - Clear explanations for why answers are correct/incorrect
    - Optional code snippets for context
    - CRITICAL: When code is involved, put code ONLY in codeSnippet field, NOT in question text
+   - CRITICAL: Question text should NOT involve CODE
    - Question text should be clean without embedded code blocks
    - REQUIRED: Mermaid diagrams for questions with code snippets showing logic flow
    - Progressive difficulty levels within the lesson (mix of easy, medium, hard)
@@ -60,6 +64,26 @@ LESSON TYPE SPECIFICATIONS:
    - Don't use longer blanks as they are harder to verify correct answer
    - NEVER generate just 1 question - always create multiple questions for thorough practice
 
+🎯 REFERENCE TUTORIAL REQUIREMENTS:
+   - MANDATORY: Create a comprehensive W3Schools-style reference page for the main concept
+   - Include a clear title and subtitle that describe what students will learn
+   - Write an engaging introduction paragraph explaining the concept's importance
+   - REQUIRED: Generate 3-4 complete, practical examples with:
+     * Descriptive titles (e.g., "Basic Example: When Condition is False")
+     * Brief descriptions of what each example demonstrates
+     * Complete, executable code with clear comments
+     * Detailed explanations referencing specific lines and outcomes
+     * Expected output (when applicable)
+   - Include 3-6 key points students should remember about the concept
+   - Document 2-4 common beginner mistakes with:
+     * Clear description of the mistake
+     * Explanation of why it's wrong
+     * The correct approach to use instead
+   - Provide a syntax guide with:
+     * Basic syntax template in plain text
+     * Parameter explanations with required/optional flags
+   - This reference should be a complete, standalone tutorial page separate from lessons
+
 ENGLISH-ONLY CONTENT REQUIREMENTS:
 - Use clear, professional, educational English appropriate for programming education
 - Make content accessible to learners at various English proficiency levels
@@ -73,7 +97,8 @@ MERMAID DIAGRAM RULES:
 - AVOID problematic characters in node labels: [], <>, \\, ;, : 
 - Mathematical expressions ARE ALLOWED: sqrt(n), if(x>0), arr[i], n%2
 - Keep diagrams educational, clear, and relevant to the programming concept
-- Use proper Mermaid syntax with clear node connections and styling`
+- Use proper Mermaid syntax with clear node connections and styling
+- ALWAYS use entity labels like ["THIS"] or {"THIS"}`
 
 export const LESSON_PROGRESSION_GUIDELINES = `LESSON PROGRESSION STRATEGY:
 
@@ -322,6 +347,8 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 9. Ensure all content is culturally appropriate and relevant for Indian learners
 10. Generate comprehensive tutorial metadata, learning objectives, and practical applications
 11. Make sure all code and logic is in ${language}
+12. Whatever fields are optional in json format should mostly (70% of time) return data, they should contain data as many times as possible, avoid only if They are absolutely impossible.
+
 
 📚 LESSON TYPE DISTRIBUTION:
 - Minimum 1 concept lesson for essential foundational knowledge
@@ -329,7 +356,7 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 - Balance lesson types based on topic complexity and learning objectives
 - Ensure variety while maintaining educational coherence and logical progression
 - Create meaningful connections between lessons for comprehensive understanding
-
+- Make sure sequence of concept explanation matches with the sequence of interactive lessons
 ⚡ ABSOLUTE REQUIREMENTS:
 - NEVER generate incomplete, truncated, or partial content in any section
 - ALWAYS include complete tutorial metadata with all required fields
