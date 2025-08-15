@@ -275,9 +275,11 @@ export interface ConceptLessonData {
     language: string
     explanation: string
     mermaid_diagram?: string
+    plantuml_code?: string
   }[]
   practiceHints: string[]
   mermaid?: string
+  plantuml_code?: string
   commonMistakes?: string[]
   bestPractices?: string[]
   visualElements?: {

@@ -3,7 +3,6 @@
 import React, { useState } from "react"
 import type { TutorialData } from "@/app/Learn/types/TutorialTypes"
 import { submitTutorial } from "@/lib/submitData"
-import { MermaidDiagram } from "@lightenna/react-mermaid-diagram"
 import {
   BookOpen,
   CheckCircle,
@@ -20,6 +19,7 @@ import {
   Target,
   X,
 } from "lucide-react"
+import PlantUMLDiagram from "./PlantUMLDiagram"
 
 interface TutorialPreviewProps {
   tutorial: TutorialData
@@ -482,16 +482,17 @@ const TutorialPreview: React.FC<TutorialPreviewProps> = ({
                                   </div>
                                 )}
 
-                              {/* Mermaid Diagram */}
-                              {lesson.content.mermaid && (
+                              {/* PlantUML Diagram */}
+                              {lesson.content.diagram_data && (
                                 <div>
                                   <h6 className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">
                                     Concept Diagram:
                                   </h6>
                                   <div className="rounded border bg-gray-50 p-3 dark:bg-gray-800">
-                                    <MermaidDiagram>
-                                      {lesson.content.mermaid}
-                                    </MermaidDiagram>
+                                    <PlantUMLDiagram
+                                      diagramData={lesson.content.diagram_data}
+                                      showDebugInfo={true}
+                                    />
                                   </div>
                                 </div>
                               )}

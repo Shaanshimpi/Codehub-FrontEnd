@@ -17,7 +17,7 @@ export interface ConceptContent {
     explanation: string
   }[]
   practiceHints: string[] // 2-4 practical hints
-  mermaid?: string
+  diagram_data?: string
   commonMistakes?: string[] // Common student mistakes
   bestPractices?: string[] // Programming best practices
 }
@@ -110,7 +110,7 @@ export interface ProgrammingTutorial {
   // Metadata
   tags: string[]
   estimatedTime?: number // Total time in minutes
-  mermaid_diagram?: string // Optional overview diagram
+  diagram_data_diagram?: string // Optional overview diagram
   // Reference tutorial (W3Schools-style)
   reference: {
     title: string
@@ -155,7 +155,7 @@ export interface TutorialAPIResponse {
   practicalApplications: string[] // English applications
   tags: string[]
   estimatedTime: number
-  mermaid_diagram?: string
+  diagram_data_diagram?: string
 }
 
 // For backward compatibility with existing API structure
@@ -183,5 +183,5 @@ export interface LegacyTutorialAPIResponse {
   estimatedTime: number
   prerequisites?: string[]
   assessmentSuggestions?: string[]
-  mermaid_diagram?: string
+  diagram_data_diagram?: string
 }

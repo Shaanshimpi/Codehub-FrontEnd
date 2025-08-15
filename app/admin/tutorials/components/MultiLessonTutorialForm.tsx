@@ -226,22 +226,34 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
               explanation: lesson.content.explanation || "",
               keyPoints: lesson.content.keyPoints || [],
               codeExamples: (lesson.content.codeExamples || []).map(
-                (example: any, idx: number) => ({
-                  id: example.id || `example-${idx}`,
-                  title: example.title || `Example ${idx + 1}`,
-                  code: example.code || "",
-                  language: programmingLanguageSlug || "javascript",
-                  explanation: example.explanation || "",
-                  mermaid_diagram: example.mermaid_diagram || "",
-                })
+                (example: any, idx: number) => {
+                  console.log(
+                    `🔍 Processing code example ${idx + 1} diagram_data:`,
+                    example.diagram_data
+                  )
+                  return {
+                    id: example.id || `example-${idx}`,
+                    title: example.title || `Example ${idx + 1}`,
+                    code: example.code || "",
+                    language: programmingLanguageSlug || "javascript",
+                    explanation: example.explanation || "",
+                    diagram_data: example.diagram_data || "",
+                  }
+                }
               ),
               practiceHints: lesson.content.practiceHints || [],
-              mermaid: lesson.content.mermaid || "",
+              diagram_data: (() => {
+                console.log(
+                  `🔍 Processing concept lesson diagram_data:`,
+                  lesson.content.diagram_data
+                )
+                return lesson.content.diagram_data || null
+              })(),
               commonMistakes: lesson.content.commonMistakes || [],
               bestPractices: lesson.content.bestPractices || [],
               visualElements: {
-                diagrams: lesson.content.mermaid
-                  ? [lesson.content.mermaid]
+                diagrams: lesson.content.plantuml
+                  ? [lesson.content.plantuml]
                   : [],
                 concepts: [],
               },
@@ -256,15 +268,21 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
               lesson.content.questions.length > 0
             ) {
               convertedData = {
-                questions: lesson.content.questions.map((q: any) => ({
-                  id: q.id || crypto.randomUUID(),
-                  question: q.question || "",
-                  options: q.options || [],
-                  explanation: q.explanation || "",
-                  difficulty: q.difficulty || 1,
-                  codeSnippet: q.codeSnippet || "",
-                  mermaid_diagram: q.mermaid_diagram || "",
-                })),
+                questions: lesson.content.questions.map((q: any) => {
+                  console.log(
+                    `🔍 Processing MCQ question diagram_data:`,
+                    q.diagram_data
+                  )
+                  return {
+                    id: q.id || crypto.randomUUID(),
+                    question: q.question || "",
+                    options: q.options || [],
+                    explanation: q.explanation || "",
+                    difficulty: q.difficulty || 1,
+                    codeSnippet: q.codeSnippet || "",
+                    diagram_data: q.diagram_data || "",
+                  }
+                }),
               }
               // Set lesson description to first question for summary
               lessonDescription =
@@ -283,7 +301,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     explanation: "",
                     difficulty: 1,
                     codeSnippet: "",
-                    mermaid_diagram: "",
+                    diagram_data: "",
                   },
                 ],
               }
@@ -298,6 +316,10 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             ) {
               convertedData = {
                 questions: lesson.content.questions.map((q: any) => {
+                  console.log(
+                    `🔍 Processing code rearrange question diagram_data:`,
+                    q.diagram_data
+                  )
                   const aiCodeBlocks = q.codeBlocks || []
                   const aiCorrectOrder = q.correctOrder || []
 
@@ -305,7 +327,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     id: q.id || crypto.randomUUID(),
                     scenario: q.scenario || "",
                     targetCode: q.targetCode || "",
-                    mermaid_diagram: q.mermaid_diagram || "",
+                    diagram_data: q.diagram_data || "",
                     blocks: aiCodeBlocks.map((block: any, index: number) => {
                       // Find the correct order for this block
                       const orderIndex = aiCorrectOrder.indexOf(block.id)
@@ -335,7 +357,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     id: crypto.randomUUID(),
                     scenario: lesson.content.scenario || "",
                     targetCode: lesson.content.targetCode || "",
-                    mermaid_diagram: lesson.content.mermaid_diagram || "",
+                    diagram_data: lesson.content.diagram_data || "",
                     blocks: aiCodeBlocks.map((block: any, index: number) => {
                       const orderIndex = aiCorrectOrder.indexOf(block.id)
                       return {
@@ -360,30 +382,38 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
               lesson.content.questions.length > 0
             ) {
               convertedData = {
-                questions: lesson.content.questions.map((q: any) => ({
-                  id: q.id || crypto.randomUUID(),
-                  scenario: q.scenario || "",
-                  code: q.codeTemplate || "",
-                  mermaid_diagram: q.mermaid_diagram || "",
-                  blanks: (q.blanks || []).map((blank: any, index: number) => ({
-                    id: blank.id || `blank-${index}`,
-                    position: blank.position || index,
-                    type: blank.type || "text",
-                    correctAnswer: blank.correctAnswer || "",
-                    options: blank.options || [],
-                    hint: blank.hint || "",
-                    explanation: blank.explanation || "",
-                  })),
-                  hints: q.hints || [],
-                  solution: q.solution
-                    ? {
-                        completeCode: q.solution.completeCode || "",
-                        explanation: q.solution.explanation || "",
-                        mermaid_diagram: q.solution.mermaid_diagram || "",
-                      }
-                    : undefined,
-                  difficulty: q.difficulty || 1,
-                })),
+                questions: lesson.content.questions.map((q: any) => {
+                  console.log(
+                    `🔍 Processing fill-in-blanks question diagram_data:`,
+                    q.diagram_data
+                  )
+                  return {
+                    id: q.id || crypto.randomUUID(),
+                    scenario: q.scenario || "",
+                    code: q.codeTemplate || "",
+                    diagram_data: q.diagram_data || "",
+                    blanks: (q.blanks || []).map(
+                      (blank: any, index: number) => ({
+                        id: blank.id || `blank-${index}`,
+                        position: blank.position || index,
+                        type: blank.type || "text",
+                        correctAnswer: blank.correctAnswer || "",
+                        options: blank.options || [],
+                        hint: blank.hint || "",
+                        explanation: blank.explanation || "",
+                      })
+                    ),
+                    hints: q.hints || [],
+                    solution: q.solution
+                      ? {
+                          completeCode: q.solution.completeCode || "",
+                          explanation: q.solution.explanation || "",
+                          diagram_data: q.solution.diagram_data || "",
+                        }
+                      : undefined,
+                    difficulty: q.difficulty || 1,
+                  }
+                }),
               }
               // Set lesson description to first question's scenario for summary
               lessonDescription =
@@ -396,7 +426,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     id: crypto.randomUUID(),
                     scenario: lesson.content.scenario || "",
                     code: lesson.content.codeTemplate || "",
-                    mermaid_diagram: lesson.content.mermaid_diagram || "",
+                    diagram_data: lesson.content.diagram_data || "",
                     blanks: (lesson.content.blanks || []).map(
                       (blank: any, index: number) => ({
                         id: blank.id || `blank-${index}`,
@@ -415,8 +445,8 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                             lesson.content.solution.completeCode || "",
                           explanation:
                             lesson.content.solution.explanation || "",
-                          mermaid_diagram:
-                            lesson.content.solution.mermaid_diagram || "",
+                          diagram_data:
+                            lesson.content.solution.diagram_data || "",
                         }
                       : undefined,
                     difficulty: 1,

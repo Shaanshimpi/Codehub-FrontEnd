@@ -19,46 +19,46 @@ LESSON TYPE SPECIFICATIONS:
 
 🎯 CONCEPT LESSONS:
    - Comprehensive explanations with real-world programming context
-   - 3-5 key learning points that summarize core concepts
-   - 1-3 complete, working code examples with detailed explanations
-   - REQUIRED: Mermaid diagrams for EACH code example showing code flow/logic
-   - Optional overall concept Mermaid diagram for complex concepts
+   - 2-7 key learning points that summarize core concepts
+   - 1-10 complete, working code examples with detailed explanations
+   - REQUIRED: JSON diagram data for EACH code example showing code flow/logic 
+   - Optional overall concept JSON diagram data for complex concepts
    - 2-4 practical hints for application and practice
    - Common mistakes students make
    - Programming best practices related to the concept
 
 🎯 MCQ LESSONS:
-   - MANDATORY: Generate 4-6 educational multiple choice questions per lesson
+   - MANDATORY: Generate 3-10 educational multiple choice questions per lesson
    - Each question has exactly 4 options with one correct answer
    - Clear explanations for why answers are correct/incorrect
    - Optional code snippets for context
    - CRITICAL: When code is involved, put code ONLY in codeSnippet field, NOT in question text
    - CRITICAL: Question text should NOT involve CODE
    - Question text should be clean without embedded code blocks
-   - REQUIRED: Mermaid diagrams for questions with code snippets showing logic flow
+   - REQUIRED: JSON diagram data for questions with code snippets showing logic flow
    - Progressive difficulty levels within the lesson (mix of easy, medium, hard)
    - Focus on understanding concepts, not memorization
    - NEVER generate just 1 question - always create multiple questions for comprehensive assessment
 
 🎯 CODE BLOCK REARRANGING:
-   - MANDATORY: Generate 3-5 code rearranging questions per lesson
+   - MANDATORY: Generate 2-7 code rearranging questions per lesson
    - Each question has real-world programming scenarios that students can relate to
    - Code broken into 3-8 logical blocks possibly multiline blocks for drag-and-drop interaction
    - MANDATORY: Code blocks should be unique and multiline
-   - REQUIRED: Mermaid diagram showing the expected code flow or logic structure for each question
+   - REQUIRED: JSON diagram data showing the expected code flow or logic structure for each question
    - Students rearrange blocks to create working, functional code
-   - Progressive hints (1-3) to guide students when stuck for each question
+   - Progressive hints (1-10) to guide students when stuck for each question
    - Clear target code showing expected final result for each question
    - Progressive difficulty levels within the lesson (mix of easy, medium, hard)
    - NEVER generate just 1 question - always create multiple questions for comprehensive practice
 
 🎯 FILL IN THE BLANKS:
-   - MANDATORY: Generate 3-5 fill-in-blank questions per lesson
-   - Each question has code templates with strategic blanks (1-6 blanks per question)
+   - MANDATORY: Generate 2-7 fill-in-blank questions per lesson
+   - Each question has code templates with strategic blanks (2-5 blanks per question)
    - Multiple blank types: text input, dropdown selection
-   - REQUIRED: Mermaid diagram showing code structure with blanks highlighted for each question
+   - REQUIRED: JSON diagram data showing code structure with blanks highlighted for each question
    - Each blank has correct answer, options (if dropdown), and explanation
-   - Complete solution with full code, comprehensive explanation, and final Mermaid diagram for each question
+   - Complete solution with full code, comprehensive explanation, and final JSON diagram data for each question
    - Realistic programming scenarios and practical applications
    - Progressive difficulty levels within the lesson (mix of easy, medium, hard)
    - Don't use longer blanks as they are harder to verify correct answer
@@ -68,7 +68,7 @@ LESSON TYPE SPECIFICATIONS:
    - MANDATORY: Create a comprehensive W3Schools-style reference page for the main concept
    - Include a clear title and subtitle that describe what students will learn
    - Write an engaging introduction paragraph explaining the concept's importance
-   - REQUIRED: Generate 3-4 complete, practical examples with:
+   - REQUIRED: Generate 3-10 complete, practical examples with:
      * Descriptive titles (e.g., "Basic Example: When Condition is False")
      * Brief descriptions of what each example demonstrates
      * Complete, executable code with clear comments
@@ -91,14 +91,13 @@ ENGLISH-ONLY CONTENT REQUIREMENTS:
 - Maintain technical accuracy while keeping language simple and clear
 - Avoid idioms or complex expressions that might confuse non-native speakers
 
-MERMAID DIAGRAM RULES:
-- Use DOUBLE QUOTES for all text labels: "text here" (NEVER single quotes)
-- Start with appropriate diagram type: flowchart TD, graph TD, sequenceDiagram, etc.
-- AVOID problematic characters in node labels: [], <>, \\, ;, : 
-- Mathematical expressions ARE ALLOWED: sqrt(n), if(x>0), arr[i], n%2
+DIAGRAM JSON FORMAT RULES:
+- Generate diagram data in structured JSON format instead of raw PlantUML syntax
+- Use these diagram types: "activity", "component", "class", "sequence", "flowchart"
+- Provide clear, educational node labels and descriptions
+- Structure should include: type, title, nodes, connections, and any special formatting
 - Keep diagrams educational, clear, and relevant to the programming concept
-- Use proper Mermaid syntax with clear node connections and styling
-- ALWAYS use entity labels like ["THIS"] or {"THIS"}`
+- Mathematical expressions are allowed in labels: sqrt(n), if(x>0), arr[i], n%2`
 
 export const LESSON_PROGRESSION_GUIDELINES = `LESSON PROGRESSION STRATEGY:
 
@@ -129,7 +128,7 @@ export const LESSON_PROGRESSION_GUIDELINES = `LESSON PROGRESSION STRATEGY:
 
 LESSON TYPE DISTRIBUTION STRATEGY:
 - Include at least 1 concept lesson for foundational knowledge building
-- Add 1-2 interactive assessment lessons (MCQ or fill-in-blanks) for knowledge reinforcement
+- Add 2-4 interactive assessment lessons (MCQ or fill-in-blanks) for knowledge reinforcement
 - Include 1 code rearranging lesson for hands-on practical experience
 - Balance lesson types based on topic complexity and tutorial length requirements
 - Ensure variety to maintain student engagement and accommodate different learning styles
@@ -211,17 +210,34 @@ LESSON CONTENT STRUCTURES BY TYPE:
 📖 CONCEPT LESSON CONTENT:
 {
   "explanation": "Comprehensive concept explanation",
-  "keyPoints": ["3-5 key learning points"],
+  "keyPoints": ["2-7 key learning points"],
   "codeExamples": [
     {
       "title": "Descriptive example title",
       "code": "Complete, working code with comments",
       "explanation": "Detailed code explanation",
-      "mermaid_diagram": "REQUIRED: Mermaid diagram showing code flow/logic (use DOUBLE QUOTES)"
+      "diagram_data": {
+        "type": "activity",
+        "title": "Code Flow",
+        "nodes": [
+          {"id": "start", "label": "Start", "type": "start"},
+          {"id": "process", "label": "Process Data", "type": "activity"},
+          {"id": "end", "label": "End", "type": "end"}
+        ],
+        "connections": [
+          {"from": "start", "to": "process"},
+          {"from": "process", "to": "end"}
+        ]
+      }
     }
   ],
   "practiceHints": ["2-4 practical hints"],
-  "mermaid": "Optional overall concept Mermaid diagram (use DOUBLE QUOTES)",
+  "diagram_data": {
+    "type": "component",
+    "title": "Concept Overview",
+    "nodes": [],
+    "connections": []
+  },
   "commonMistakes": ["Common errors to avoid"],
   "bestPractices": ["Programming best practices"]
 }
@@ -241,7 +257,12 @@ LESSON CONTENT STRUCTURES BY TYPE:
       "explanation": "Why the correct answer is right",
       "difficulty": 1|2|3,
       "codeSnippet": "Put code here ONLY, not in question text",
-      "mermaid_diagram": "REQUIRED when codeSnippet exists: Mermaid diagram showing code logic (use DOUBLE QUOTES)"
+      "diagram_data": {
+        "type": "flowchart",
+        "title": "Question Logic",
+        "nodes": [],
+        "connections": []
+      }
     }
   ]
 }
@@ -253,7 +274,12 @@ LESSON CONTENT STRUCTURES BY TYPE:
       "id": "unique_question_id",
       "scenario": "Problem description and setup for this question",
       "targetCode": "Expected final code after rearrangement",
-      "mermaid_diagram": "REQUIRED: Mermaid diagram showing expected code flow/structure (use DOUBLE QUOTES)",
+      "diagram_data": {
+        "type": "activity",
+        "title": "Expected Code Flow",
+        "nodes": [],
+        "connections": []
+      },
       "codeBlocks": [
         {"id": "block1", "content": "multiline Code block content, make sure no to codeblocks are same like e.g. ending curly braces"},
         {"id": "block2", "content": "Another code block"}
@@ -272,7 +298,12 @@ LESSON CONTENT STRUCTURES BY TYPE:
       "id": "unique_question_id",
       "scenario": "Problem context and setup for this question",
       "codeTemplate": "Code with {{blank1}}, {{blank2}} placeholders",
-      "mermaid_diagram": "REQUIRED: Mermaid diagram showing code structure with blanks highlighted (use DOUBLE QUOTES)",
+      "diagram_data": {
+        "type": "activity",
+        "title": "Code Structure with Blanks",
+        "nodes": [],
+        "connections": []
+      },
       "blanks": [
         {
           "id": "blank1",
@@ -287,7 +318,12 @@ LESSON CONTENT STRUCTURES BY TYPE:
       "solution": {
         "completeCode": "Final code with all blanks filled",
         "explanation": "Complete solution explanation",
-        "mermaid_diagram": "REQUIRED: Mermaid diagram showing complete solution flow (use DOUBLE QUOTES)"
+        "diagram_data": {
+          "type": "activity",
+          "title": "Complete Solution Flow",
+          "nodes": [],
+          "connections": []
+        }
       },
       "difficulty": 1|2|3
     }
@@ -341,7 +377,7 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 3. Generate complete content in clear, educational English
 4. Include complete, working code examples - never truncated or incomplete
 5. Create engaging interactive elements appropriate for the specified difficulty level
-6. Use DOUBLE QUOTES in Mermaid diagrams, avoid problematic characters completely
+6. Generate diagram data in JSON format 
 7. Focus on practical, real-world applications and professional development relevance
 8. Maintain high educational quality and technical accuracy across all lesson types
 9. Ensure all content is culturally appropriate and relevant for Indian learners
@@ -368,9 +404,9 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 Generate a complete, comprehensive, professionally-designed programming tutorial that effectively teaches ${topic} concepts through diverse, interactive, and engaging lessons that prepare students for real-world application.
 
 🚨 CRITICAL REMINDER: All interactive lessons (MCQ, Fill-in-Blanks, Code Rearranging) MUST contain multiple questions:
-- MCQ lessons: Generate 4-6 questions with progressive difficulty
-- Fill-in-Blanks lessons: Generate 3-5 questions with different coding scenarios  
-- Code Rearranging lessons: Generate 3-5 questions with varied complexity
+- MCQ lessons: Generate 3-10 questions with progressive difficulty
+- Fill-in-Blanks lessons: Generate 2-7 questions with different coding scenarios  
+- Code Rearranging lessons: Generate 2-7 questions with varied complexity
 - NEVER create single-question lessons - always use question arrays for comprehensive learning`
 }
 
@@ -437,7 +473,7 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 3. Generate complete content in clear, educational English
 4. Include complete, working code examples - never truncated or incomplete
 5. Create engaging interactive elements appropriate for the specified difficulty level
-6. Use DOUBLE QUOTES in Mermaid diagrams, avoid problematic characters completely
+6. Generate diagram data in JSON format 
 7. Focus on practical, real-world applications and professional development relevance
 8. Maintain high educational quality and technical accuracy across all lesson types
 9. Ensure all content is culturally appropriate and relevant for Indian learners
@@ -464,8 +500,8 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 Generate a complete, comprehensive, professionally-designed programming tutorial that effectively teaches ${topic} concepts through diverse, interactive, and engaging lessons that prepare students for real-world application.
 
 🚨 CRITICAL REMINDER: All interactive lessons (MCQ, Fill-in-Blanks, Code Rearranging) MUST contain multiple questions:
-- MCQ lessons: Generate 4-6 questions with progressive difficulty
-- Fill-in-Blanks lessons: Generate 3-5 questions with different coding scenarios  
-- Code Rearranging lessons: Generate 3-5 questions with varied complexity
+- MCQ lessons: Generate 3-10 questions with progressive difficulty
+- Fill-in-Blanks lessons: Generate 2-7 questions with different coding scenarios  
+- Code Rearranging lessons: Generate 2-7 questions with varied complexity
 - NEVER create single-question lessons - always use question arrays for comprehensive learning`
 }

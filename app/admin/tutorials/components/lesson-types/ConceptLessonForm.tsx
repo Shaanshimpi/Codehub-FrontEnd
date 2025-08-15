@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from "react"
 import { ConceptLessonData } from "@/app/Learn/types/TutorialTypes"
-import { MermaidDiagram } from "@lightenna/react-mermaid-diagram"
 import { Code, Lightbulb, Plus, Trash2 } from "lucide-react"
+import PlantUMLDiagram from "../PlantUMLDiagram"
 
 interface ConceptLessonFormProps {
   data: ConceptLessonData | any
@@ -20,7 +20,8 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
     keyPoints: data?.keyPoints || [""],
     codeExamples: data?.codeExamples || [],
     practiceHints: data?.practiceHints || [""],
-    mermaid: data?.mermaid || "",
+    diagram_data: data?.diagram_data || "",
+    plantuml_code: data?.plantuml_code || "",
     commonMistakes: data?.commonMistakes || [""],
     bestPractices: data?.bestPractices || [""],
     visualElements: data?.visualElements || { diagrams: [], concepts: [] },
@@ -73,7 +74,8 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
           title: "",
           code: "",
           explanation: "",
-          mermaid_diagram: "",
+          diagram_data_diagram: "",
+          plantuml_code: "",
         },
       ],
     }))
@@ -257,30 +259,20 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
                   placeholder="Explain what this code does..."
                 />
               </div>
-              <div className="mt-3">
-                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-                  Mermaid Diagram (Optional)
-                </label>
-                <textarea
-                  value={example.mermaid_diagram || ""}
-                  onChange={(e) =>
-                    updateCodeExample(index, "mermaid_diagram", e.target.value)
-                  }
-                  rows={3}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                  placeholder={`flowchart TD\n  A["Start"] --> B["Process"]\n  B --> C["End"]`}
-                />
-
-                {example.mermaid_diagram && (
-                  <div>
-                    <MermaidDiagram>{example.mermaid_diagram}</MermaidDiagram>
-                  </div>
-                )}
-                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                  Use Mermaid syntax to visualize code flow. Use DOUBLE QUOTES
-                  for labels.
-                </p>
-              </div>
+              {example.diagram_data && (
+                <div className="mt-3">
+                  <h6 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Example Diagram Preview:
+                  </h6>
+                  <PlantUMLDiagram
+                    diagramData={example.diagram_data}
+                    showDebugInfo={true}
+                    onPlantUMLChange={(code) =>
+                      updateCodeExample(index, "plantuml_code", code)
+                    }
+                  />
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -326,30 +318,20 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
         </div>
       </div>
 
-      <div>
-        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-          Overall Concept Diagram (Optional)
-        </label>
-        <textarea
-          value={formData.mermaid || ""}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, mermaid: e.target.value }))
-          }
-          rows={4}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-          placeholder={`flowchart TD\n  A["Concept Overview"] --> B["Key Component"]\n  B --> C["Implementation"]`}
-        />
-
-        {formData.mermaid && (
-          <div>
-            <MermaidDiagram>{formData.mermaid}</MermaidDiagram>
-          </div>
-        )}
-        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-          Use Mermaid syntax to visualize the overall concept. Use DOUBLE QUOTES
-          for labels.
-        </p>
-      </div>
+      {formData.diagram_data && (
+        <div>
+          <h6 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            Overall Concept Diagram Preview:
+          </h6>
+          <PlantUMLDiagram
+            diagramData={formData.diagram_data}
+            showDebugInfo={true}
+            onPlantUMLChange={(code) =>
+              setFormData((prev) => ({ ...prev, plantuml_code: code }))
+            }
+          />
+        </div>
+      )}
 
       <div>
         <div className="mb-3 flex items-center justify-between">

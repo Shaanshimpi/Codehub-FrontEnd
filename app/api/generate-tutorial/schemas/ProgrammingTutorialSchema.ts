@@ -10,10 +10,19 @@ export const TUTORIAL_DESCRIPTION_SCHEMA = {
     "Comprehensive tutorial description in English explaining what students will learn, why it's important, and what they'll be able to do after completion.",
 }
 
-export const TUTORIAL_MERMAID_SCHEMA = {
-  type: "string",
+export const TUTORIAL_DIAGRAM_SCHEMA = {
+  type: "object",
   description:
-    "Optional overall tutorial flow diagram in Mermaid format showing lesson progression and concept relationships. Must start with diagram type (flowchart TD, graph TD, etc.). CRITICAL: Use DOUBLE QUOTES for ALL text labels. Mathematical expressions like arr[i], if(x>0) are allowed. AVOID: [], <>, \\, ;, : in node labels.",
+    "Optional overall tutorial flow diagram data showing lesson progression and concept relationships.Use appropriate diagram types like activity, component, class, sequence.",
+  properties: {
+    type: {
+      type: "string",
+      enum: ["activity", "component", "class", "sequence", "flowchart"],
+    },
+    title: { type: "string" },
+    nodes: { type: "array", items: { type: "object" } },
+    connections: { type: "array", items: { type: "object" } },
+  },
 }
 
 // ==================== LESSON CONTENT SCHEMAS ====================
@@ -52,10 +61,25 @@ export const CONCEPT_CONTENT_SCHEMA = {
             type: "string",
             description: "Detailed explanation of what the code does and why",
           },
-          mermaid_diagram: {
-            type: "string",
+          diagram_data: {
+            type: "object",
             description:
-              "HIGHLY RECOMMENDED: Mermaid diagram visualizing the code flow, logic, or data structure. Use DOUBLE QUOTES for all labels. Include this in 80% of code examples for better learning visualization.",
+              "HIGHLY RECOMMENDED: JSON diagram data for visualizing code flow, logic, or data structure.Include this in 80% of code examples for better learning visualization.",
+            properties: {
+              type: {
+                type: "string",
+                enum: [
+                  "activity",
+                  "component",
+                  "class",
+                  "sequence",
+                  "flowchart",
+                ],
+              },
+              title: { type: "string" },
+              nodes: { type: "array", items: { type: "object" } },
+              connections: { type: "array", items: { type: "object" } },
+            },
           },
         },
         required: ["title", "code", "explanation"],
@@ -73,10 +97,19 @@ export const CONCEPT_CONTENT_SCHEMA = {
       minItems: 2,
       maxItems: 4,
     },
-    mermaid: {
-      type: "string",
+    diagram_data: {
+      type: "object",
       description:
-        "RECOMMENDED: Overall concept Mermaid diagram for complex topics. Use DOUBLE QUOTES for all labels. Include this in 70% of concept lessons to enhance understanding.",
+        "RECOMMENDED: Overall concept diagram data for complex topics.Include this in 70% of concept lessons to enhance understanding.",
+      properties: {
+        type: {
+          type: "string",
+          enum: ["activity", "component", "class", "sequence", "flowchart"],
+        },
+        title: { type: "string" },
+        nodes: { type: "array", items: { type: "object" } },
+        connections: { type: "array", items: { type: "object" } },
+      },
     },
     commonMistakes: {
       type: "array",
@@ -149,10 +182,25 @@ export const MCQ_CONTENT_SCHEMA = {
             description:
               "ENCOURAGED: Code context to make the question more practical. Include in 60% of MCQ questions for better engagement.",
           },
-          mermaid_diagram: {
-            type: "string",
+          diagram_data: {
+            type: "object",
             description:
-              "RECOMMENDED: Mermaid diagram to visualize the code snippet or concept being tested. Use DOUBLE QUOTES for all labels. Include in 50% of MCQ questions with code snippets.",
+              "RECOMMENDED: JSON diagram data to visualize the code snippet or concept being tested.Include in 50% of MCQ questions with code snippets.",
+            properties: {
+              type: {
+                type: "string",
+                enum: [
+                  "activity",
+                  "component",
+                  "class",
+                  "sequence",
+                  "flowchart",
+                ],
+              },
+              title: { type: "string" },
+              nodes: { type: "array", items: { type: "object" } },
+              connections: { type: "array", items: { type: "object" } },
+            },
           },
         },
         required: ["id", "question", "options", "explanation", "difficulty"],
@@ -183,10 +231,25 @@ export const CODE_BLOCK_REARRANGING_SCHEMA = {
             type: "string",
             description: "Expected final code after rearranging",
           },
-          mermaid_diagram: {
-            type: "string",
+          diagram_data: {
+            type: "object",
             description:
-              "HIGHLY VALUABLE: Mermaid diagram showing the expected code flow or logic structure. Use DOUBLE QUOTES for all labels. Include in 70% of code rearranging questions for better visualization.",
+              "HIGHLY VALUABLE: JSON diagram data showing the expected code flow or logic structure.Include in 70% of code rearranging questions for better visualization.",
+            properties: {
+              type: {
+                type: "string",
+                enum: [
+                  "activity",
+                  "component",
+                  "class",
+                  "sequence",
+                  "flowchart",
+                ],
+              },
+              title: { type: "string" },
+              nodes: { type: "array", items: { type: "object" } },
+              connections: { type: "array", items: { type: "object" } },
+            },
           },
           codeBlocks: {
             type: "array",
@@ -260,10 +323,25 @@ export const FILL_IN_BLANKS_SCHEMA = {
             type: "string",
             description: "Code with blanks marked as {{blank_id}}",
           },
-          mermaid_diagram: {
-            type: "string",
+          diagram_data: {
+            type: "object",
             description:
-              "STRONGLY RECOMMENDED: Mermaid diagram showing the code structure or flow with blanks highlighted. Use DOUBLE QUOTES for all labels. Include in 75% of fill-in-blank questions for enhanced learning.",
+              "STRONGLY RECOMMENDED: JSON diagram data showing the code structure or flow with blanks highlighted.Include in 75% of fill-in-blank questions for enhanced learning.",
+            properties: {
+              type: {
+                type: "string",
+                enum: [
+                  "activity",
+                  "component",
+                  "class",
+                  "sequence",
+                  "flowchart",
+                ],
+              },
+              title: { type: "string" },
+              nodes: { type: "array", items: { type: "object" } },
+              connections: { type: "array", items: { type: "object" } },
+            },
           },
           blanks: {
             type: "array",
@@ -315,10 +393,25 @@ export const FILL_IN_BLANKS_SCHEMA = {
                 type: "string",
                 description: "Overall solution explanation",
               },
-              mermaid_diagram: {
-                type: "string",
+              diagram_data: {
+                type: "object",
                 description:
-                  "ENCOURAGED: Mermaid diagram showing the complete solution flow or structure. Use DOUBLE QUOTES for all labels. Include in 60% of fill-in-blank solutions for complete understanding.",
+                  "ENCOURAGED: JSON diagram data showing the complete solution flow or structure.Include in 60% of fill-in-blank solutions for complete understanding.",
+                properties: {
+                  type: {
+                    type: "string",
+                    enum: [
+                      "activity",
+                      "component",
+                      "class",
+                      "sequence",
+                      "flowchart",
+                    ],
+                  },
+                  title: { type: "string" },
+                  nodes: { type: "array", items: { type: "object" } },
+                  connections: { type: "array", items: { type: "object" } },
+                },
               },
             },
             required: ["completeCode", "explanation"],

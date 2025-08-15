@@ -124,6 +124,31 @@ export async function POST(request: Request) {
               role: "system",
               content: `You are an expert programming instructor. Create comprehensive, well-structured tutorials with diverse lesson types and engaging content in English only. CRITICAL: ALL CODE EXAMPLES AND PROGRAMMING CONTENT MUST BE IN ${language.toUpperCase()} - use ${language} syntax, ${language} conventions, and ${language}-specific features.
 
+VISUAL DIAGRAM REQUIREMENTS:
+- Generate diagram data in structured JSON format for all visualizations
+- Use diagram types: "activity", "component", "class", "sequence", "flowchart"
+- Provide diagram data as JSON objects with type, title, nodes, and connections
+- Create educational diagrams showing concept relationships and flow
+
+DIAGRAM JSON FORMAT EXAMPLE:
+{
+  "diagram_data": {
+    "type": "activity",
+    "title": "Code Flow",
+    "nodes": [
+      {"id": "start", "label": "Start", "type": "start"},
+      {"id": "process", "label": "Process Data", "type": "activity"},
+      {"id": "end", "label": "End", "type": "end"}
+    ],
+    "connections": [
+      {"from": "start", "to": "process"},
+      {"from": "process", "to": "end"}
+    ]
+  }
+}
+
+CRITICAL: Use "diagram_data" field name with JSON object structure, NOT "plantuml_diagram" or raw PlantUML syntax.
+
 The response MUST contain exactly these top-level fields:
 1. title: Tutorial title
 2. description: Tutorial description
@@ -143,8 +168,7 @@ The reference field is ABSOLUTELY REQUIRED and must contain:
 - key_points: Array of 3-6 important points to remember
 - common_mistakes: Array of 2-4 common mistakes with mistake, why_wrong, and correct_approach
 - syntax_guide: Object with basic_syntax string and parameters array
-
-Each lesson content MUST match its lesson type exactly. Return valid JSON with ALL required fields including the reference field.`,
+`,
             },
             {
               role: "user",

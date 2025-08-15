@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from "react"
 import { FillInTheBlankData } from "@/app/Learn/types/TutorialTypes"
-import { MermaidDiagram } from "@lightenna/react-mermaid-diagram"
 import { ChevronDown, ChevronUp, Code, Plus, Trash2 } from "lucide-react"
+import PlantUMLDiagram from "../PlantUMLDiagram"
 
 interface FIBFormProps {
   data: FillInTheBlankData | any
@@ -19,7 +19,7 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
         id: crypto.randomUUID(),
         scenario: "",
         code: "",
-        mermaid_diagram: "",
+        diagram_data: "",
         blanks: [
           {
             id: crypto.randomUUID(),
@@ -35,7 +35,7 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
         solution: {
           completeCode: "",
           explanation: "",
-          mermaid_diagram: "",
+          diagram_data: "",
         },
         difficulty: 1,
       },
@@ -58,7 +58,7 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
       id: crypto.randomUUID(),
       scenario: "",
       code: "",
-      mermaid_diagram: "",
+      diagram_data: "",
       blanks: [
         {
           id: crypto.randomUUID(),
@@ -74,7 +74,7 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
       solution: {
         completeCode: "",
         explanation: "",
-        mermaid_diagram: "",
+        diagram_data: "",
       },
       difficulty: 1,
     }
@@ -320,31 +320,20 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
                     </p>
                   </div>
 
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                      Mermaid Diagram (Optional)
-                    </label>
-                    <textarea
-                      value={question.mermaid_diagram}
-                      onChange={(e) =>
-                        updateQuestion(
-                          question.id,
-                          "mermaid_diagram",
-                          e.target.value
-                        )
-                      }
-                      rows={4}
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                      placeholder={`flowchart TD\n  A["Start"] --> B["Process"]\n  B --> C["End"]`}
-                    />
-                    {question.mermaid_diagram && (
-                      <div>
-                        <MermaidDiagram>
-                          {question.mermaid_diagram}
-                        </MermaidDiagram>
-                      </div>
-                    )}
-                  </div>
+                  {question.diagram_data && (
+                    <div>
+                      <h6 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Question Diagram Preview:
+                      </h6>
+                      <PlantUMLDiagram
+                        diagramData={question.diagram_data}
+                        showDebugInfo={true}
+                        onPlantUMLChange={(code) =>
+                          updateQuestion(question.id, "plantuml_code", code)
+                        }
+                      />
+                    </div>
+                  )}
 
                   <div>
                     <div className="mb-4 flex items-center justify-between">

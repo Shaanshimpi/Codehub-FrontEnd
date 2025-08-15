@@ -25,6 +25,7 @@ const AI_MODELS = [
     name: "Google: Gemini 2.5 Flash Lite",
     slug: "google/gemini-2.5-flash-lite",
   },
+  { name: "Z.AI: GLM 4.5 Air", slug: "z-ai/glm-4.5-air" },
   { name: "Qwen3 Coder", slug: "qwen/qwen3-coder" },
   { name: "Mistral: Codestral", slug: "mistralai/codestral-2508" },
   { name: "GPT-5 Nano", slug: "openai/gpt-5-nano" },
@@ -467,7 +468,7 @@ const AITutorialForm: React.FC<AITutorialFormProps> = ({
               Hindi (Roman), and Marathi (Roman)
             </li>
             <li>
-              • <strong>Visual Elements:</strong> Mermaid diagrams for concept
+              • <strong>Visual Elements:</strong> PlantUML diagrams for concept
               visualization
             </li>
             <li>

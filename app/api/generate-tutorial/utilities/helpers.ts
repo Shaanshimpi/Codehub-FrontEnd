@@ -468,9 +468,9 @@ export const parseJsonWithFallbacks = (content: string): any => {
   throw lastError || new Error("All JSON parsing strategies failed")
 }
 
-// ==================== MERMAID HELPERS ====================
+// ==================== PLANTUML HELPERS ====================
 
-export const validateMermaidDiagram = (
+export const validatePlantUMLDiagram = (
   diagram: string
 ): { isValid: boolean; errors: string[] } => {
   const errors: string[] = []
@@ -479,73 +479,67 @@ export const validateMermaidDiagram = (
     return { isValid: true, errors } // Empty is valid (optional)
   }
 
-  // Check for diagram type
-  const diagramTypes = [
-    "graph",
-    "flowchart",
-    "sequenceDiagram",
-    "classDiagram",
-    "stateDiagram",
-  ]
-  const hasValidType = diagramTypes.some((type) =>
-    diagram.toLowerCase().includes(type.toLowerCase())
-  )
+  // Check for @startuml and @enduml tags
+  if (!diagram.includes("@startuml")) {
+    errors.push("PlantUML diagram must start with @startuml tag")
+  }
 
-  if (!hasValidType) {
+  if (!diagram.includes("@enduml")) {
+    errors.push("PlantUML diagram must end with @enduml tag")
+  }
+
+  // Check for blue-gray theme
+  if (!diagram.includes("!theme blue-gray")) {
     errors.push(
-      "Mermaid diagram should start with a valid diagram type (graph, flowchart, etc.)"
+      "PlantUML diagram should include !theme blue-gray directive for consistent theming"
     )
   }
 
-  // Check for problematic characters in labels
-  const problematicPatterns = [
-    /\[[^\]]*;[^\]]*\]/g, // Semicolons in brackets
-    /\[[^\]]*<[^\]]*\]/g, // Angle brackets in brackets
-    /\[[^\]]*\\[^\]]*\]/g, // Backslashes in brackets
+  // Check for valid PlantUML diagram types
+  const diagramKeywords = [
+    "activity",
+    "component",
+    "class",
+    "sequence",
+    "usecase",
+    "state",
+    "object",
+    "start",
+    "participant",
+    "actor",
   ]
 
-  for (const pattern of problematicPatterns) {
-    if (pattern.test(diagram)) {
-      errors.push(
-        "Mermaid diagram contains problematic characters in node labels"
-      )
-      break
-    }
-  }
+  const hasValidContent = diagramKeywords.some((keyword) =>
+    diagram.toLowerCase().includes(keyword.toLowerCase())
+  )
 
-  // Check for single quotes (should use double quotes)
-  if (diagram.includes("'") && !diagram.includes('"')) {
+  if (!hasValidContent) {
     errors.push(
-      "Mermaid diagram should use double quotes for text labels, not single quotes"
+      "PlantUML diagram should contain valid PlantUML elements (activity, component, class, sequence, etc.)"
     )
   }
 
   return { isValid: errors.length === 0, errors }
 }
 
-export const generateDefaultMermaidDiagram = (
+export const generateDefaultPlantUMLDiagram = (
   lessons: TutorialLesson[]
 ): string => {
-  const lessonNodes = lessons
+  const lessonSteps = lessons
     .slice(0, 6)
-    .map((lesson, index) => {
-      const id = String.fromCharCode(65 + index) // A, B, C, etc.
+    .map((lesson) => {
       const title =
-        lesson.title.substring(0, 20) + (lesson.title.length > 20 ? "..." : "")
-      return `  ${id}["${title}"]`
+        lesson.title.substring(0, 30) + (lesson.title.length > 30 ? "..." : "")
+      return `:${title};`
     })
     .join("\n")
 
-  const connections = lessons
-    .slice(0, 5)
-    .map((_, index) => {
-      const current = String.fromCharCode(65 + index)
-      const next = String.fromCharCode(65 + index + 1)
-      return `  ${current} --> ${next}`
-    })
-    .join("\n")
-
-  return `flowchart TD\n${lessonNodes}\n${connections}`
+  return `@startuml
+!theme blue-gray
+start
+${lessonSteps}
+stop
+@enduml`
 }
 
 // ==================== ERROR HANDLING HELPERS ====================

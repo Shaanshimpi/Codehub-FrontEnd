@@ -198,13 +198,12 @@ const InteractiveContentForm: React.FC<InteractiveContentFormProps> = ({
                 ? "Enter the code content..."
                 : formData.contentType === "quiz"
                   ? "Enter quiz instructions..."
-                  : "Enter diagram description or mermaid code..."
+                  : "Enter diagram description or plantuml code..."
           }
         />
         {formData.contentType === "diagram" && (
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            You can use Mermaid syntax for diagrams. Example: graph TD; A--{">"}
-            B; B--{">"}C;
+            {`You can use PlantUML syntax for diagrams. Example: @startuml; A --> B; B --> C; @enduml`}
           </p>
         )}
       </div>
