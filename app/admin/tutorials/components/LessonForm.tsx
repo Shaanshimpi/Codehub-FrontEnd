@@ -8,16 +8,37 @@ import ConceptLessonForm from "./lesson-types/ConceptLessonForm"
 import FIBForm from "./lesson-types/FIBForm"
 import MCQForm from "./lesson-types/MCQForm"
 
+export interface PlantUMLSetters {
+  setLessonPlantUML: (lessonId: string, code: string) => void
+  setCodeExamplePlantUML: (
+    lessonId: string,
+    exampleIndex: number,
+    code: string
+  ) => void
+  setQuestionPlantUML: (
+    lessonId: string,
+    questionIndex: number,
+    code: string
+  ) => void
+  setSolutionPlantUML: (
+    lessonId: string,
+    questionIndex: number,
+    code: string
+  ) => void
+}
+
 interface LessonFormProps {
   lesson: TutorialLesson | null
   onSave: (lesson: TutorialLesson) => void
   onCancel: () => void
+  plantUMLSetters?: PlantUMLSetters
 }
 
 const LessonForm: React.FC<LessonFormProps> = ({
   lesson,
   onSave,
   onCancel,
+  plantUMLSetters,
 }) => {
   const [formData, setFormData] = useState({
     id: lesson?.id || crypto.randomUUID(),
@@ -27,6 +48,7 @@ const LessonForm: React.FC<LessonFormProps> = ({
     videoUrl: lesson?.videoUrl || "",
     order: lesson?.order || 1,
     learningObjectives: lesson?.learningObjectives || [""],
+    keyTopics: lesson?.keyTopics || [""],
     difficulty: lesson?.difficulty || (1 as 1 | 2 | 3),
   })
 
@@ -53,13 +75,41 @@ const LessonForm: React.FC<LessonFormProps> = ({
   const renderLessonTypeForm = () => {
     switch (formData.type) {
       case "concept":
-        return <ConceptLessonForm data={lessonData} onChange={setLessonData} />
+        return (
+          <ConceptLessonForm
+            data={lessonData}
+            onChange={setLessonData}
+            lessonId={formData.id}
+            plantUMLSetters={plantUMLSetters}
+          />
+        )
       case "mcq":
-        return <MCQForm data={lessonData} onChange={setLessonData} />
+        return (
+          <MCQForm
+            data={lessonData}
+            onChange={setLessonData}
+            lessonId={formData.id}
+            plantUMLSetters={plantUMLSetters}
+          />
+        )
       case "codeblock_rearranging":
-        return <CodeRearrangeForm data={lessonData} onChange={setLessonData} />
+        return (
+          <CodeRearrangeForm
+            data={lessonData}
+            onChange={setLessonData}
+            lessonId={formData.id}
+            plantUMLSetters={plantUMLSetters}
+          />
+        )
       case "fill_in_blanks":
-        return <FIBForm data={lessonData} onChange={setLessonData} />
+        return (
+          <FIBForm
+            data={lessonData}
+            onChange={setLessonData}
+            lessonId={formData.id}
+            plantUMLSetters={plantUMLSetters}
+          />
+        )
       default:
         return null
     }
@@ -236,6 +286,65 @@ const LessonForm: React.FC<LessonFormProps> = ({
                       setFormData((prev) => ({
                         ...prev,
                         learningObjectives: newObjectives,
+                      }))
+                    }}
+                    className="rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Key Topics */}
+        <div className="mt-4">
+          <div className="mb-3 flex items-center justify-between">
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Key Topics
+            </label>
+            <button
+              type="button"
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  keyTopics: [...prev.keyTopics, ""],
+                }))
+              }
+              className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
+            >
+              <Plus className="h-4 w-4" />
+              Add Topic
+            </button>
+          </div>
+          <div className="space-y-2">
+            {formData.keyTopics.map((topic, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={topic}
+                  onChange={(e) => {
+                    const newTopics = [...formData.keyTopics]
+                    newTopics[index] = e.target.value
+                    setFormData((prev) => ({
+                      ...prev,
+                      keyTopics: newTopics,
+                    }))
+                  }}
+                  className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  placeholder="Key topic..."
+                />
+                {formData.keyTopics.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newTopics = formData.keyTopics.filter(
+                        (_, i) => i !== index
+                      )
+                      setFormData((prev) => ({
+                        ...prev,
+                        keyTopics: newTopics,
                       }))
                     }}
                     className="rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"

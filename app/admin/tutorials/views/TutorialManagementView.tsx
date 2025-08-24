@@ -53,6 +53,7 @@ const TutorialManagementView: React.FC = () => {
 
   const handleEditTutorial = (tutorial: Tutorial) => {
     console.log("🔍 Editing tutorial with ID:", tutorial.id)
+    console.log("🔍 Full tutorial data:", tutorial)
 
     // Convert Tutorial to TutorialData format for editing
     const tutorialData: TutorialData = {
@@ -60,19 +61,220 @@ const TutorialManagementView: React.FC = () => {
       title: tutorial.title,
       slug: tutorial.slug,
       description: tutorial.description || "",
+      videoUrl: tutorial.videoUrl || "",
       programmingLanguage: tutorial.programmingLanguage.id.toString(),
       difficulty: parseInt(tutorial.difficulty) || 1,
       index: tutorial.index,
       isLocked: tutorial.isLocked,
       learningObjectives:
         tutorial.learningObjectives?.map((obj) => obj.objective) || [],
-      keyTopics: tutorial.keyTopics?.map((topic) => topic.topic) || [],
+      keyTopics: Array.isArray(tutorial.keyTopics)
+        ? tutorial.keyTopics.map((topic) =>
+            typeof topic === "string" ? topic : topic.topic || ""
+          )
+        : [],
       practicalApplications:
         tutorial.practicalApplications?.map((app) => app.application) || [],
       tags: tutorial.tags?.map((tag) => tag.tag) || [],
-      lessons: tutorial.lessons || [],
+
+      // Fix lesson data mapping - extract actual lesson content
+      lessons: (tutorial.lessons || []).map((lesson: any) => {
+        console.log(`🔍 Processing lesson ${lesson.id}:`, lesson)
+
+        // Extract lesson data based on lesson type
+        let lessonData = null
+
+        switch (lesson.type) {
+          case "concept":
+            if (lesson.conceptData) {
+              lessonData = {
+                explanation: lesson.conceptData.explanation || "",
+                keyPoints: (lesson.conceptData.keyPoints || []).map(
+                  (kp: any) => (typeof kp === "string" ? kp : kp.point || "")
+                ),
+                codeExamples: (lesson.conceptData.codeExamples || []).map(
+                  (ex: any) => ({
+                    id: ex.id || crypto.randomUUID(),
+                    title: ex.title || "",
+                    code: ex.code || "",
+                    language: "javascript", // Default or detect from context
+                    explanation: ex.explanation || "",
+                    plantuml_code: ex.plantuml_code || "",
+                    diagram_data: null, // Will be populated if needed
+                  })
+                ),
+                practiceHints: (lesson.conceptData.practiceHints || []).map(
+                  (hint: any) =>
+                    typeof hint === "string" ? hint : hint.hint || ""
+                ),
+                plantuml_code: lesson.conceptData.plantuml_code || "",
+                commonMistakes: (lesson.conceptData.commonMistakes || []).map(
+                  (mistake: any) =>
+                    typeof mistake === "string"
+                      ? mistake
+                      : mistake.mistake || ""
+                ),
+                bestPractices: (lesson.conceptData.bestPractices || []).map(
+                  (practice: any) =>
+                    typeof practice === "string"
+                      ? practice
+                      : practice.practice || ""
+                ),
+                visualElements: lesson.conceptData.visualElements || {
+                  diagrams: [],
+                  concepts: [],
+                },
+              }
+            }
+            break
+
+          case "mcq":
+            if (lesson.mcqData) {
+              lessonData = {
+                questions: (lesson.mcqData.questions || []).map((q: any) => ({
+                  id: q.id || crypto.randomUUID(),
+                  question: q.question || "",
+                  options: q.options || [],
+                  explanation: q.explanation || "",
+                  difficulty: q.difficulty || 1,
+                  codeSnippet: q.codeSnippet || "",
+                  plantuml_code: q.plantuml_code || "",
+                  diagram_data: null,
+                })),
+              }
+            }
+            break
+
+          case "codeblock_rearranging":
+            if (lesson.codeRearrangeData) {
+              lessonData = {
+                questions: (lesson.codeRearrangeData.questions || []).map(
+                  (q: any) => ({
+                    id: q.id || crypto.randomUUID(),
+                    scenario: q.scenario || "",
+                    targetCode: q.targetCode || "",
+                    plantuml_code: q.plantuml_code || "",
+                    blocks: q.blocks || [],
+                    hints: (q.hints || []).map((hint: any) =>
+                      typeof hint === "string" ? hint : hint.hint || ""
+                    ),
+                    difficulty: q.difficulty || 1,
+                    diagram_data: null,
+                  })
+                ),
+              }
+            }
+            break
+
+          case "fill_in_blanks":
+            if (lesson.fibData) {
+              lessonData = {
+                questions: (lesson.fibData.questions || []).map((q: any) => ({
+                  id: q.id || crypto.randomUUID(),
+                  scenario: q.scenario || "",
+                  code: q.code || "",
+                  plantuml_code: q.plantuml_code || "",
+                  blanks: (q.blanks || []).map((blank: any) => ({
+                    id: blank.id || crypto.randomUUID(),
+                    position: blank.position || 0,
+                    type: blank.type || "text",
+                    correctAnswer: blank.correctAnswer || "",
+                    options: Array.isArray(blank.options)
+                      ? blank.options.map((opt: any) =>
+                          typeof opt === "string"
+                            ? opt
+                            : opt.option || opt.text || ""
+                        )
+                      : [],
+                    hint: blank.hint || "",
+                    explanation: blank.explanation || "",
+                  })),
+                  hints: (q.hints || []).map((hint: any) =>
+                    typeof hint === "string" ? hint : hint.hint || ""
+                  ),
+                  solution: q.solution
+                    ? {
+                        completeCode: q.solution.completeCode || "",
+                        explanation: q.solution.explanation || "",
+                        plantuml_code: q.solution.plantuml_code || "",
+                      }
+                    : undefined,
+                  difficulty: q.difficulty || 1,
+                  diagram_data: null,
+                })),
+              }
+            }
+            break
+        }
+
+        return {
+          id: lesson.id,
+          title: lesson.title,
+          type: lesson.type,
+          order: lesson.order,
+          description: lesson.description || "",
+          learningObjectives: (lesson.learningObjectives || []).map(
+            (obj: any) => (typeof obj === "string" ? obj : obj.objective || "")
+          ),
+          keyTopics: (lesson.keyTopics || []).map((topic: any) =>
+            typeof topic === "string" ? topic : topic.topic || ""
+          ),
+          difficulty: lesson.difficulty || 1,
+          data: lessonData,
+        }
+      }),
+
       focusAreas: "", // This field might not be in the API response
+
+      // Map reference data properly
+      reference: tutorial.reference
+        ? {
+            title: tutorial.reference.title || "",
+            subtitle: tutorial.reference.subtitle || "",
+            introduction: tutorial.reference.introduction || "",
+            examples: (tutorial.reference.examples || []).map((ex: any) => ({
+              title: ex.title || "",
+              description: ex.description || "",
+              code: ex.code || "",
+              explanation: ex.explanation || "",
+              output: ex.output || "",
+            })),
+            key_points:
+              typeof tutorial.reference.key_points === "string"
+                ? tutorial.reference.key_points
+                    .split("\n")
+                    .filter((p) => p.trim())
+                : (tutorial.reference.key_points || []).map((kp: any) =>
+                    typeof kp === "string" ? kp : kp.point || ""
+                  ),
+            common_mistakes: (tutorial.reference.common_mistakes || []).map(
+              (mistake: any) => ({
+                mistake: mistake.mistake || "",
+                why_wrong: mistake.why_wrong || "",
+                correct_approach: mistake.correct_approach || "",
+              })
+            ),
+            syntax_guide: tutorial.reference.syntax_guide
+              ? {
+                  basic_syntax:
+                    tutorial.reference.syntax_guide.basic_syntax || "",
+                  parameters: (
+                    tutorial.reference.syntax_guide.parameters || []
+                  ).map((param: any) => ({
+                    name: param.name || "",
+                    description: param.description || "",
+                    required: Boolean(param.required),
+                  })),
+                }
+              : {
+                  basic_syntax: "",
+                  parameters: [],
+                },
+          }
+        : undefined,
     }
+
+    console.log("✅ Converted tutorial data for editing:", tutorialData)
 
     setEditingTutorial(tutorial)
     setAiGeneratedData(tutorialData)

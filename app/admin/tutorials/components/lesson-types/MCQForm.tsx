@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react"
 import { MCQOption } from "@/app/Learn/types/TutorialTypes"
 import { CheckCircle, ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react"
+import { PlantUMLSetters } from "../LessonForm"
 import PlantUMLDiagram from "../PlantUMLDiagram"
 
 interface MCQQuestion {
@@ -24,9 +25,16 @@ interface MCQData {
 interface MCQFormProps {
   data: MCQData | MCQOption[] | any
   onChange: (data: MCQData) => void
+  lessonId?: string
+  plantUMLSetters?: PlantUMLSetters
 }
 
-const MCQForm: React.FC<MCQFormProps> = ({ data, onChange }) => {
+const MCQForm: React.FC<MCQFormProps> = ({
+  data,
+  onChange,
+  lessonId,
+  plantUMLSetters,
+}) => {
   // Initialize questions from different data structures
   const [questions, setQuestions] = useState<MCQQuestion[]>(() => {
     if (data && typeof data === "object" && "questions" in data) {
@@ -335,9 +343,20 @@ const MCQForm: React.FC<MCQFormProps> = ({ data, onChange }) => {
                       <PlantUMLDiagram
                         diagramData={question.diagram_data}
                         showDebugInfo={true}
-                        onPlantUMLChange={(code) =>
+                        onPlantUMLChange={(code) => {
                           updateQuestion(question.id, "plantuml_code", code)
-                        }
+                          // Use the new PlantUML setter
+                          if (plantUMLSetters && lessonId) {
+                            const questionIndex = questions.findIndex(
+                              (q) => q.id === question.id
+                            )
+                            plantUMLSetters.setQuestionPlantUML(
+                              lessonId,
+                              questionIndex,
+                              code
+                            )
+                          }
+                        }}
                       />
                     </div>
                   )}

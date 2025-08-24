@@ -15,6 +15,7 @@ import {
   Loader2,
   Plus,
   Target,
+  Trash2,
 } from "lucide-react"
 import LessonForm from "./LessonForm"
 
@@ -33,6 +34,73 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
     lessons: [],
     learningObjectives: [""],
   })
+
+  // PlantUML state management for all lessons and components
+  const [plantUMLCodes, setPlantUMLCodes] = useState<{ [key: string]: string }>(
+    {}
+  )
+
+  // Helper functions for PlantUML state management
+  const setLessonPlantUML = (lessonId: string, code: string) => {
+    setPlantUMLCodes((prev) => ({
+      ...prev,
+      [`lesson_${lessonId}`]: code,
+    }))
+    console.log(
+      `🌱 Set PlantUML for lesson ${lessonId}:`,
+      code.length,
+      "characters"
+    )
+    console.log(`🌱 PlantUML content preview:`, code.substring(0, 100) + "...")
+  }
+
+  const setCodeExamplePlantUML = (
+    lessonId: string,
+    exampleIndex: number,
+    code: string
+  ) => {
+    setPlantUMLCodes((prev) => ({
+      ...prev,
+      [`lesson_${lessonId}_example_${exampleIndex}`]: code,
+    }))
+    console.log(
+      `🌱 Set PlantUML for lesson ${lessonId} example ${exampleIndex}:`,
+      code.length,
+      "characters"
+    )
+  }
+
+  const setQuestionPlantUML = (
+    lessonId: string,
+    questionIndex: number,
+    code: string
+  ) => {
+    setPlantUMLCodes((prev) => ({
+      ...prev,
+      [`lesson_${lessonId}_question_${questionIndex}`]: code,
+    }))
+    console.log(
+      `🌱 Set PlantUML for lesson ${lessonId} question ${questionIndex}:`,
+      code.length,
+      "characters"
+    )
+  }
+
+  const setSolutionPlantUML = (
+    lessonId: string,
+    questionIndex: number,
+    code: string
+  ) => {
+    setPlantUMLCodes((prev) => ({
+      ...prev,
+      [`lesson_${lessonId}_question_${questionIndex}_solution`]: code,
+    }))
+    console.log(
+      `🌱 Set PlantUML for lesson ${lessonId} question ${questionIndex} solution:`,
+      code.length,
+      "characters"
+    )
+  }
 
   const [basicInfo, setBasicInfo] = useState({
     title: "",
@@ -583,6 +651,8 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
     setIsSaving(true)
 
     try {
+      console.log("🌱 Final PlantUML state before submission:", plantUMLCodes)
+
       const completeTutorialData: TutorialData = {
         id: crypto.randomUUID(),
         title: basicInfo.title,
@@ -595,14 +665,123 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
         keyTopics:
           basicInfo.keyTopics?.filter((topic) => topic.trim() !== "") || [],
         difficulty: basicInfo.difficulty || 1,
-        lessons: tutorialData.lessons.map((lesson) => ({
-          ...lesson,
-          type: lesson.type as
-            | "concept"
-            | "mcq"
-            | "codeblock_rearranging"
-            | "fill_in_blanks",
-        })),
+        lessons: tutorialData.lessons.map((lesson) => {
+          const enrichedLesson = {
+            ...lesson,
+            type: lesson.type as
+              | "concept"
+              | "mcq"
+              | "codeblock_rearranging"
+              | "fill_in_blanks",
+          }
+
+          // Inject PlantUML codes into lesson data based on type
+          if (lesson.data) {
+            const lessonData = { ...lesson.data }
+
+            // Add main lesson PlantUML code
+            const mainPlantUML = plantUMLCodes[`lesson_${lesson.id}`]
+            if (mainPlantUML) {
+              lessonData.plantuml_code = mainPlantUML
+            }
+
+            switch (lesson.type) {
+              case "concept":
+                // Add PlantUML to code examples
+                if (lessonData.codeExamples) {
+                  lessonData.codeExamples = lessonData.codeExamples.map(
+                    (example: any, index: number) => ({
+                      ...example,
+                      plantuml_code:
+                        plantUMLCodes[`lesson_${lesson.id}_example_${index}`] ||
+                        example.plantuml_code ||
+                        "",
+                    })
+                  )
+                }
+                break
+
+              case "mcq":
+                // Add PlantUML to questions
+                if (lessonData.questions) {
+                  lessonData.questions = lessonData.questions.map(
+                    (question: any, index: number) => ({
+                      ...question,
+                      plantuml_code:
+                        plantUMLCodes[
+                          `lesson_${lesson.id}_question_${index}`
+                        ] ||
+                        question.plantuml_code ||
+                        "",
+                    })
+                  )
+                }
+                break
+
+              case "codeblock_rearranging":
+                // Add PlantUML to questions
+                if (lessonData.questions) {
+                  lessonData.questions = lessonData.questions.map(
+                    (question: any, index: number) => ({
+                      ...question,
+                      plantuml_code:
+                        plantUMLCodes[
+                          `lesson_${lesson.id}_question_${index}`
+                        ] ||
+                        question.plantuml_code ||
+                        "",
+                    })
+                  )
+                }
+                break
+
+              case "fill_in_blanks":
+                // Add PlantUML to questions and solutions
+                if (lessonData.questions) {
+                  lessonData.questions = lessonData.questions.map(
+                    (question: any, index: number) => {
+                      const enrichedQuestion = {
+                        ...question,
+                        plantuml_code:
+                          plantUMLCodes[
+                            `lesson_${lesson.id}_question_${index}`
+                          ] ||
+                          question.plantuml_code ||
+                          "",
+                      }
+
+                      // Add PlantUML to solution if it exists
+                      if (enrichedQuestion.solution) {
+                        enrichedQuestion.solution = {
+                          ...enrichedQuestion.solution,
+                          plantuml_code:
+                            plantUMLCodes[
+                              `lesson_${lesson.id}_question_${index}_solution`
+                            ] ||
+                            enrichedQuestion.solution.plantuml_code ||
+                            "",
+                        }
+                      }
+
+                      return enrichedQuestion
+                    }
+                  )
+                }
+                break
+            }
+
+            enrichedLesson.data = lessonData
+          }
+
+          console.log(`🚀 Enriched lesson ${lesson.id} with PlantUML codes:`, {
+            mainPlantUML: !!plantUMLCodes[`lesson_${lesson.id}`],
+            totalPlantUMLFields: Object.keys(plantUMLCodes).filter((key) =>
+              key.includes(lesson.id)
+            ).length,
+          })
+
+          return enrichedLesson
+        }),
         practicalApplications:
           basicInfo.practicalApplications?.filter((app) => app.trim() !== "") ||
           [],
@@ -633,6 +812,12 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
         onCancel={() => {
           setShowLessonForm(false)
           setEditingLesson(null)
+        }}
+        plantUMLSetters={{
+          setLessonPlantUML,
+          setCodeExamplePlantUML,
+          setQuestionPlantUML,
+          setSolutionPlantUML,
         }}
       />
     )
@@ -1283,6 +1468,400 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
               <Plus className="h-4 w-4" />
               Add Example
             </button>
+          </div>
+
+          {/* Key Points */}
+          <div>
+            <div className="mb-3 flex items-center justify-between">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                Key Points (Optional)
+              </label>
+              <button
+                onClick={() =>
+                  setBasicInfo((prev) => ({
+                    ...prev,
+                    reference: {
+                      ...prev.reference,
+                      key_points: [...prev.reference.key_points, ""],
+                    },
+                  }))
+                }
+                className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
+              >
+                <Plus className="h-4 w-4" />
+                Add Point
+              </button>
+            </div>
+            <div className="space-y-2">
+              {basicInfo.reference.key_points.map((point, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
+                    {index + 1}
+                  </div>
+                  <input
+                    type="text"
+                    value={point}
+                    onChange={(e) =>
+                      setBasicInfo((prev) => ({
+                        ...prev,
+                        reference: {
+                          ...prev.reference,
+                          key_points: prev.reference.key_points.map((p, i) =>
+                            i === index ? e.target.value : p
+                          ),
+                        },
+                      }))
+                    }
+                    className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                    placeholder="Important point to remember..."
+                  />
+                  {basicInfo.reference.key_points.length > 1 && (
+                    <button
+                      onClick={() =>
+                        setBasicInfo((prev) => ({
+                          ...prev,
+                          reference: {
+                            ...prev.reference,
+                            key_points: prev.reference.key_points.filter(
+                              (_, i) => i !== index
+                            ),
+                          },
+                        }))
+                      }
+                      className="rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Common Mistakes */}
+          <div>
+            <div className="mb-3 flex items-center justify-between">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                Common Mistakes (Optional)
+              </label>
+              <button
+                onClick={() =>
+                  setBasicInfo((prev) => ({
+                    ...prev,
+                    reference: {
+                      ...prev.reference,
+                      common_mistakes: [
+                        ...prev.reference.common_mistakes,
+                        {
+                          mistake: "",
+                          why_wrong: "",
+                          correct_approach: "",
+                        },
+                      ],
+                    },
+                  }))
+                }
+                className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
+              >
+                <Plus className="h-4 w-4" />
+                Add Mistake
+              </button>
+            </div>
+            <div className="space-y-4">
+              {basicInfo.reference.common_mistakes.map((mistake, index) => (
+                <div
+                  key={index}
+                  className="rounded-lg border border-slate-200 p-4 dark:border-slate-600"
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    <h4 className="font-medium text-slate-900 dark:text-white">
+                      Common Mistake {index + 1}
+                    </h4>
+                    {basicInfo.reference.common_mistakes.length > 1 && (
+                      <button
+                        onClick={() =>
+                          setBasicInfo((prev) => ({
+                            ...prev,
+                            reference: {
+                              ...prev.reference,
+                              common_mistakes:
+                                prev.reference.common_mistakes.filter(
+                                  (_, i) => i !== index
+                                ),
+                            },
+                          }))
+                        }
+                        className="text-xs text-red-600 hover:text-red-700 dark:text-red-400"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                        Mistake Description
+                      </label>
+                      <input
+                        type="text"
+                        value={mistake.mistake}
+                        onChange={(e) =>
+                          setBasicInfo((prev) => ({
+                            ...prev,
+                            reference: {
+                              ...prev.reference,
+                              common_mistakes:
+                                prev.reference.common_mistakes.map((m, i) =>
+                                  i === index
+                                    ? { ...m, mistake: e.target.value }
+                                    : m
+                                ),
+                            },
+                          }))
+                        }
+                        className="w-full rounded border border-slate-300 px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                        placeholder="What mistake do students commonly make?"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                        {`Why It's Wrong`}
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={mistake.why_wrong}
+                        onChange={(e) =>
+                          setBasicInfo((prev) => ({
+                            ...prev,
+                            reference: {
+                              ...prev.reference,
+                              common_mistakes:
+                                prev.reference.common_mistakes.map((m, i) =>
+                                  i === index
+                                    ? { ...m, why_wrong: e.target.value }
+                                    : m
+                                ),
+                            },
+                          }))
+                        }
+                        className="w-full rounded border border-slate-300 px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                        placeholder="Explain why this approach is incorrect..."
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                        Correct Approach
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={mistake.correct_approach}
+                        onChange={(e) =>
+                          setBasicInfo((prev) => ({
+                            ...prev,
+                            reference: {
+                              ...prev.reference,
+                              common_mistakes:
+                                prev.reference.common_mistakes.map((m, i) =>
+                                  i === index
+                                    ? { ...m, correct_approach: e.target.value }
+                                    : m
+                                ),
+                            },
+                          }))
+                        }
+                        className="w-full rounded border border-slate-300 px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                        placeholder="The correct way to handle this situation..."
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Syntax Guide */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+              Syntax Guide (Optional)
+            </label>
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                  Basic Syntax Template
+                </label>
+                <textarea
+                  rows={3}
+                  value={basicInfo.reference.syntax_guide.basic_syntax}
+                  onChange={(e) =>
+                    setBasicInfo((prev) => ({
+                      ...prev,
+                      reference: {
+                        ...prev.reference,
+                        syntax_guide: {
+                          ...prev.reference.syntax_guide,
+                          basic_syntax: e.target.value,
+                        },
+                      },
+                    }))
+                  }
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  placeholder="if (condition) {
+    // code to execute
+}"
+                />
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                    Parameters/Components
+                  </label>
+                  <button
+                    onClick={() =>
+                      setBasicInfo((prev) => ({
+                        ...prev,
+                        reference: {
+                          ...prev.reference,
+                          syntax_guide: {
+                            ...prev.reference.syntax_guide,
+                            parameters: [
+                              ...prev.reference.syntax_guide.parameters,
+                              {
+                                name: "",
+                                description: "",
+                                required: false,
+                              },
+                            ],
+                          },
+                        },
+                      }))
+                    }
+                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                  >
+                    <Plus className="h-3 w-3" />
+                    Add Parameter
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {basicInfo.reference.syntax_guide.parameters.map(
+                    (param, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start gap-2 rounded border border-slate-200 p-2 dark:border-slate-600"
+                      >
+                        <div className="flex-1 space-y-2">
+                          <input
+                            type="text"
+                            value={param.name}
+                            onChange={(e) =>
+                              setBasicInfo((prev) => ({
+                                ...prev,
+                                reference: {
+                                  ...prev.reference,
+                                  syntax_guide: {
+                                    ...prev.reference.syntax_guide,
+                                    parameters:
+                                      prev.reference.syntax_guide.parameters.map(
+                                        (p, i) =>
+                                          i === index
+                                            ? { ...p, name: e.target.value }
+                                            : p
+                                      ),
+                                  },
+                                },
+                              }))
+                            }
+                            className="w-full rounded border border-slate-300 px-2 py-1 text-xs dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                            placeholder="Parameter name (e.g., condition)"
+                          />
+                          <textarea
+                            rows={2}
+                            value={param.description}
+                            onChange={(e) =>
+                              setBasicInfo((prev) => ({
+                                ...prev,
+                                reference: {
+                                  ...prev.reference,
+                                  syntax_guide: {
+                                    ...prev.reference.syntax_guide,
+                                    parameters:
+                                      prev.reference.syntax_guide.parameters.map(
+                                        (p, i) =>
+                                          i === index
+                                            ? {
+                                                ...p,
+                                                description: e.target.value,
+                                              }
+                                            : p
+                                      ),
+                                  },
+                                },
+                              }))
+                            }
+                            className="w-full rounded border border-slate-300 px-2 py-1 text-xs dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                            placeholder="What this parameter/component does..."
+                          />
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={param.required}
+                              onChange={(e) =>
+                                setBasicInfo((prev) => ({
+                                  ...prev,
+                                  reference: {
+                                    ...prev.reference,
+                                    syntax_guide: {
+                                      ...prev.reference.syntax_guide,
+                                      parameters:
+                                        prev.reference.syntax_guide.parameters.map(
+                                          (p, i) =>
+                                            i === index
+                                              ? {
+                                                  ...p,
+                                                  required: e.target.checked,
+                                                }
+                                              : p
+                                        ),
+                                    },
+                                  },
+                                }))
+                              }
+                              className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700"
+                            />
+                            <span className="text-xs text-slate-700 dark:text-slate-300">
+                              Required
+                            </span>
+                          </label>
+                        </div>
+                        {basicInfo.reference.syntax_guide.parameters.length >
+                          1 && (
+                          <button
+                            onClick={() =>
+                              setBasicInfo((prev) => ({
+                                ...prev,
+                                reference: {
+                                  ...prev.reference,
+                                  syntax_guide: {
+                                    ...prev.reference.syntax_guide,
+                                    parameters:
+                                      prev.reference.syntax_guide.parameters.filter(
+                                        (_, i) => i !== index
+                                      ),
+                                  },
+                                },
+                              }))
+                            }
+                            className="mt-1 text-xs text-red-600 hover:text-red-700 dark:text-red-400"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

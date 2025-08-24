@@ -93,9 +93,50 @@ export async function PATCH(
       }))
     }
 
-    // Handle reference field
+    // Handle reference field - format according to server schema
     if (tutorialData.reference !== undefined) {
       transformedData.reference = tutorialData.reference
+        ? {
+            title: tutorialData.reference.title || "",
+            subtitle: tutorialData.reference.subtitle || "",
+            introduction: tutorialData.reference.introduction || "",
+            examples: (tutorialData.reference.examples || []).map(
+              (example: any) => ({
+                title: example.title || "",
+                description: example.description || "",
+                code: example.code || "",
+                explanation: example.explanation || "",
+                output: example.output || "",
+              })
+            ),
+            key_points: Array.isArray(tutorialData.reference.key_points)
+              ? tutorialData.reference.key_points.join("\n")
+              : tutorialData.reference.key_points || "",
+            common_mistakes: (tutorialData.reference.common_mistakes || []).map(
+              (mistake: any) => ({
+                mistake: mistake.mistake || "",
+                why_wrong: mistake.why_wrong || "",
+                correct_approach: mistake.correct_approach || "",
+              })
+            ),
+            syntax_guide: tutorialData.reference.syntax_guide
+              ? {
+                  basic_syntax:
+                    tutorialData.reference.syntax_guide.basic_syntax || "",
+                  parameters: (
+                    tutorialData.reference.syntax_guide.parameters || []
+                  ).map((param: any) => ({
+                    name: param.name || "",
+                    description: param.description || "",
+                    required: Boolean(param.required),
+                  })),
+                }
+              : {
+                  basic_syntax: "",
+                  parameters: [],
+                },
+          }
+        : null
     }
 
     // Handle programming language conversion
@@ -115,6 +156,10 @@ export async function PATCH(
 
     // Handle lessons transformation if provided
     if (tutorialData.lessons !== undefined) {
+      console.log(
+        "🔍 Edit route - Raw lesson data:",
+        JSON.stringify(tutorialData.lessons, null, 2)
+      )
       transformedData.lessons = tutorialData.lessons.map((lesson: any) => {
         const baseLesson = {
           id: lesson.id || crypto.randomUUID(),
@@ -136,26 +181,28 @@ export async function PATCH(
               ...baseLesson,
               conceptData: {
                 explanation: lessonData.explanation || "",
-                keyPoints: (lessonData.keyPoints || []).map(
-                  (point: string) => ({ point })
+                keyPoints: (lessonData.keyPoints || []).map((point: any) =>
+                  typeof point === "string" ? { point } : point
                 ),
                 codeExamples: (lessonData.codeExamples || []).map(
                   (example: any) => ({
                     title: example.title || "",
                     code: example.code || "",
                     explanation: example.explanation || "",
-                    mermaid_diagram: example.mermaid_diagram || "",
+                    plantuml_code: example.plantuml_code || "",
                   })
                 ),
                 practiceHints: (lessonData.practiceHints || []).map(
-                  (hint: string) => ({ hint })
+                  (hint: any) => (typeof hint === "string" ? { hint } : hint)
                 ),
-                mermaid: lessonData.mermaid || "",
+                plantuml_code: lessonData.plantuml_code || "",
                 commonMistakes: (lessonData.commonMistakes || []).map(
-                  (mistake: string) => ({ mistake })
+                  (mistake: any) =>
+                    typeof mistake === "string" ? { mistake } : mistake
                 ),
                 bestPractices: (lessonData.bestPractices || []).map(
-                  (practice: string) => ({ practice })
+                  (practice: any) =>
+                    typeof practice === "string" ? { practice } : practice
                 ),
                 visualElements: {
                   diagrams: (lessonData.visualElements?.diagrams || []).map(
@@ -180,7 +227,7 @@ export async function PATCH(
                   explanation: q.explanation || "",
                   difficulty: q.difficulty?.toString() || "1",
                   codeSnippet: q.codeSnippet || "",
-                  mermaid_diagram: q.mermaid_diagram || "",
+                  plantuml_code: q.plantuml_code || "",
                 })),
               },
             }
@@ -191,12 +238,14 @@ export async function PATCH(
                 questions: (lessonData.questions || []).map((q: any) => ({
                   scenario: q.scenario || "",
                   targetCode: q.targetCode || "",
-                  mermaid_diagram: q.mermaid_diagram || "",
+                  plantuml_code: q.plantuml_code || "",
                   blocks: (q.blocks || []).map((block: any) => ({
                     code: block.code || "",
                     correctOrder: block.correctOrder || 1,
                   })),
-                  hints: (q.hints || []).map((hint: string) => ({ hint })),
+                  hints: (q.hints || []).map((hint: any) =>
+                    typeof hint === "string" ? { hint } : hint
+                  ),
                   difficulty: q.difficulty?.toString() || "1",
                 })),
               },
@@ -208,7 +257,7 @@ export async function PATCH(
                 questions: (lessonData.questions || []).map((q: any) => ({
                   scenario: q.scenario || "",
                   code: q.code || "",
-                  mermaid_diagram: q.mermaid_diagram || "",
+                  plantuml_code: q.plantuml_code || "",
                   blanks: (q.blanks || []).map((blank: any) => ({
                     position: blank.position || 0,
                     type: blank.type || "text",
@@ -219,12 +268,14 @@ export async function PATCH(
                     hint: blank.hint || "",
                     explanation: blank.explanation || "",
                   })),
-                  hints: (q.hints || []).map((hint: string) => ({ hint })),
+                  hints: (q.hints || []).map((hint: any) =>
+                    typeof hint === "string" ? { hint } : hint
+                  ),
                   solution: q.solution
                     ? {
                         completeCode: q.solution.completeCode || "",
                         explanation: q.solution.explanation || "",
-                        mermaid_diagram: q.solution.mermaid_diagram || "",
+                        plantuml_code: q.solution.plantuml_code || "",
                       }
                     : undefined,
                   difficulty: q.difficulty?.toString() || "1",

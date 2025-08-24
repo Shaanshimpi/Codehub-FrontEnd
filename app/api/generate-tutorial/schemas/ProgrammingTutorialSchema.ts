@@ -113,7 +113,11 @@ export const CONCEPT_CONTENT_SCHEMA = {
     },
     commonMistakes: {
       type: "array",
-      items: { type: "string" },
+      items: {
+        type: "string",
+        description:
+          "IMPORTANT: Don't make it an object Strictly make it string",
+      },
       description:
         "IMPORTANT: Common student mistakes to avoid. Include 2-4 mistakes in 80% of concept lessons for better learning outcomes.",
       minItems: 2,

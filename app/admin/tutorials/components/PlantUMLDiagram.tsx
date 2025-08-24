@@ -31,6 +31,7 @@ const PlantUMLDiagram: React.FC<PlantUMLDiagramProps> = ({
   const [imageError, setImageError] = useState(false)
   const [showPlantUMLCode, setShowPlantUMLCode] = useState(false)
   const [manualPlantUMLCode, setManualPlantUMLCode] = useState("")
+  const [hasNotifiedParent, setHasNotifiedParent] = useState(false)
 
   // Generate PlantUML URL for rendering
   const generatePlantUMLUrl = (plantUmlCode: string): string => {
@@ -109,6 +110,9 @@ const PlantUMLDiagram: React.FC<PlantUMLDiagramProps> = ({
 
   // Auto-populate the manual code field when diagram data changes
   useEffect(() => {
+    // Reset notification flag when diagram data changes
+    setHasNotifiedParent(false)
+
     if (!manualPlantUMLCode) {
       let generatedCode = ""
 
@@ -126,10 +130,24 @@ const PlantUMLDiagram: React.FC<PlantUMLDiagramProps> = ({
 
       if (generatedCode && generatedCode.trim()) {
         setManualPlantUMLCode(generatedCode)
-        console.log("🔄 Auto-populated PlantUML editor with generated code")
+        // CRITICAL FIX: Notify parent form of the generated PlantUML code
+        if (onPlantUMLChange && !hasNotifiedParent) {
+          onPlantUMLChange(generatedCode)
+          setHasNotifiedParent(true)
+          console.log(
+            "🔄 Auto-populated PlantUML editor and notified parent with:",
+            generatedCode.length,
+            "characters"
+          )
+        } else {
+          console.log(
+            "🔄 Auto-populated PlantUML editor with generated code",
+            onPlantUMLChange ? "(already notified)" : "(no callback)"
+          )
+        }
       }
     }
-  }, [diagramData, children, manualPlantUMLCode])
+  }, [diagramData, children, manualPlantUMLCode, onPlantUMLChange])
 
   // Handle manual PlantUML code changes
   const handlePlantUMLChange = (newCode: string) => {

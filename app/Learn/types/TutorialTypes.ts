@@ -215,6 +215,8 @@ export interface FillInTheBlankData {
     scenario?: string
     code: string
     mermaid_diagram?: string
+    plantuml_code?: string
+    diagram_data?: any // For runtime conversion only
     blanks: {
       id: string
       position: number
@@ -229,6 +231,8 @@ export interface FillInTheBlankData {
       completeCode: string
       explanation: string
       mermaid_diagram?: string
+      plantuml_code?: string
+      diagram_data?: any // For runtime conversion only
     }
     difficulty?: 1 | 2 | 3
   }[]
@@ -240,6 +244,8 @@ export interface CodeRearrangeData {
     scenario?: string
     targetCode?: string
     mermaid_diagram?: string
+    plantuml_code?: string
+    diagram_data?: any // For runtime conversion only
     blocks: {
       id: string
       code: string
@@ -276,10 +282,12 @@ export interface ConceptLessonData {
     explanation: string
     mermaid_diagram?: string
     plantuml_code?: string
+    diagram_data?: any // For runtime conversion only
   }[]
   practiceHints: string[]
   mermaid?: string
   plantuml_code?: string
+  diagram_data?: any // For runtime conversion only
   commonMistakes?: string[]
   bestPractices?: string[]
   visualElements?: {
@@ -331,6 +339,7 @@ export interface TutorialLesson {
   order: number
   description?: string
   learningObjectives?: string[]
+  keyTopics?: string[]
   estimatedTime?: number // in minutes
   difficulty?: 1 | 2 | 3
   data:
@@ -379,6 +388,9 @@ export interface MCQQuestion {
   explanation: string
   difficulty: 1 | 2 | 3
   codeSnippet?: string
+  mermaid_diagram?: string
+  plantuml_code?: string
+  diagram_data?: any // For runtime conversion only
 }
 
 // Code example interface for API schema

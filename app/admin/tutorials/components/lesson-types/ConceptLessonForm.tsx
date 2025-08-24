@@ -3,16 +3,21 @@
 import React, { useEffect, useState } from "react"
 import { ConceptLessonData } from "@/app/Learn/types/TutorialTypes"
 import { Code, Lightbulb, Plus, Trash2 } from "lucide-react"
+import { PlantUMLSetters } from "../LessonForm"
 import PlantUMLDiagram from "../PlantUMLDiagram"
 
 interface ConceptLessonFormProps {
   data: ConceptLessonData | any
   onChange: (data: ConceptLessonData) => void
+  lessonId?: string
+  plantUMLSetters?: PlantUMLSetters
 }
 
 const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
   data,
   onChange,
+  lessonId,
+  plantUMLSetters,
 }) => {
   const [formData, setFormData] = useState<ConceptLessonData>({
     explanation: data?.explanation || "",
@@ -267,9 +272,17 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
                   <PlantUMLDiagram
                     diagramData={example.diagram_data}
                     showDebugInfo={true}
-                    onPlantUMLChange={(code) =>
+                    onPlantUMLChange={(code) => {
                       updateCodeExample(index, "plantuml_code", code)
-                    }
+                      // Use the new PlantUML setter
+                      if (plantUMLSetters && lessonId) {
+                        plantUMLSetters.setCodeExamplePlantUML(
+                          lessonId,
+                          index,
+                          code
+                        )
+                      }
+                    }}
                   />
                 </div>
               )}
@@ -326,9 +339,13 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
           <PlantUMLDiagram
             diagramData={formData.diagram_data}
             showDebugInfo={true}
-            onPlantUMLChange={(code) =>
+            onPlantUMLChange={(code) => {
               setFormData((prev) => ({ ...prev, plantuml_code: code }))
-            }
+              // Use the new PlantUML setter
+              if (plantUMLSetters && lessonId) {
+                plantUMLSetters.setLessonPlantUML(lessonId, code)
+              }
+            }}
           />
         </div>
       )}
