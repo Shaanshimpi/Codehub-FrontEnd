@@ -17,6 +17,7 @@ import {
   Target,
   Trash2,
 } from "lucide-react"
+import { convertJSONToMermaid } from "../utils/mermaidConverter"
 import LessonForm from "./LessonForm"
 
 interface MultiLessonTutorialFormProps {
@@ -35,68 +36,68 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
     learningObjectives: [""],
   })
 
-  // PlantUML state management for all lessons and components
-  const [plantUMLCodes, setPlantUMLCodes] = useState<{ [key: string]: string }>(
+  // Mermaid state management for all lessons and components
+  const [mermaidCodes, setMermaidCodes] = useState<{ [key: string]: string }>(
     {}
   )
 
-  // Helper functions for PlantUML state management
-  const setLessonPlantUML = (lessonId: string, code: string) => {
-    setPlantUMLCodes((prev) => ({
+  // Helper functions for Mermaid state management
+  const setLessonMermaid = (lessonId: string, code: string) => {
+    setMermaidCodes((prev) => ({
       ...prev,
       [`lesson_${lessonId}`]: code,
     }))
     console.log(
-      `🌱 Set PlantUML for lesson ${lessonId}:`,
+      `🎨 Set Mermaid for lesson ${lessonId}:`,
       code.length,
       "characters"
     )
-    console.log(`🌱 PlantUML content preview:`, code.substring(0, 100) + "...")
+    console.log(`🎨 Mermaid content preview:`, code.substring(0, 100) + "...")
   }
 
-  const setCodeExamplePlantUML = (
+  const setCodeExampleMermaid = (
     lessonId: string,
     exampleIndex: number,
     code: string
   ) => {
-    setPlantUMLCodes((prev) => ({
+    setMermaidCodes((prev) => ({
       ...prev,
       [`lesson_${lessonId}_example_${exampleIndex}`]: code,
     }))
     console.log(
-      `🌱 Set PlantUML for lesson ${lessonId} example ${exampleIndex}:`,
+      `🎨 Set Mermaid for lesson ${lessonId} example ${exampleIndex}:`,
       code.length,
       "characters"
     )
   }
 
-  const setQuestionPlantUML = (
+  const setQuestionMermaid = (
     lessonId: string,
     questionIndex: number,
     code: string
   ) => {
-    setPlantUMLCodes((prev) => ({
+    setMermaidCodes((prev) => ({
       ...prev,
       [`lesson_${lessonId}_question_${questionIndex}`]: code,
     }))
     console.log(
-      `🌱 Set PlantUML for lesson ${lessonId} question ${questionIndex}:`,
+      `🎨 Set Mermaid for lesson ${lessonId} question ${questionIndex}:`,
       code.length,
       "characters"
     )
   }
 
-  const setSolutionPlantUML = (
+  const setSolutionMermaid = (
     lessonId: string,
     questionIndex: number,
     code: string
   ) => {
-    setPlantUMLCodes((prev) => ({
+    setMermaidCodes((prev) => ({
       ...prev,
       [`lesson_${lessonId}_question_${questionIndex}_solution`]: code,
     }))
     console.log(
-      `🌱 Set PlantUML for lesson ${lessonId} question ${questionIndex} solution:`,
+      `🎨 Set Mermaid for lesson ${lessonId} question ${questionIndex} solution:`,
       code.length,
       "characters"
     )
@@ -279,6 +280,27 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
 
       // Populate tutorial data from AI data
       // Convert AI lesson structure (content) to manual form structure (data)
+
+      // Helper function to generate mermaid code from diagram data
+      const generateMermaidCodeFromDiagramData = (diagramData: any): string => {
+        if (!diagramData) return ""
+        try {
+          if (typeof diagramData === "string") {
+            // If already a string, assume it's mermaid code
+            return diagramData
+          }
+          // Convert JSON diagram data to mermaid using our converter
+          return convertJSONToMermaid(diagramData)
+        } catch (error) {
+          console.log("🔧 DIAGRAM CONVERSION ERROR:", {
+            originalData: diagramData,
+            error: error.message,
+            type: diagramData?.type || "unknown",
+          })
+          return ""
+        }
+      }
+
       const convertAILessonToManualForm = (lesson: any): any => {
         if (!lesson.content) {
           // Already in manual form or no content
@@ -295,10 +317,21 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
               keyPoints: lesson.content.keyPoints || [],
               codeExamples: (lesson.content.codeExamples || []).map(
                 (example: any, idx: number) => {
-                  console.log(
-                    `🔍 Processing code example ${idx + 1} diagram_data:`,
-                    example.diagram_data
-                  )
+                  // Log diagram conversion for verification
+                  if (example.diagram_data) {
+                    console.log(
+                      `🎯 DIAGRAM CONVERSION - Code Example ${idx + 1}:`
+                    )
+                    console.log(
+                      "📊 Original JSON:",
+                      JSON.stringify(example.diagram_data, null, 2)
+                    )
+                    const mermaidCode =
+                      example.mermaid_code ||
+                      generateMermaidCodeFromDiagramData(example.diagram_data)
+                    console.log("🎨 Converted Mermaid:", mermaidCode)
+                    console.log("---")
+                  }
                   return {
                     id: example.id || `example-${idx}`,
                     title: example.title || `Example ${idx + 1}`,
@@ -306,17 +339,34 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     language: programmingLanguageSlug || "javascript",
                     explanation: example.explanation || "",
                     diagram_data: example.diagram_data || "",
+                    mermaid_code:
+                      example.mermaid_code ||
+                      generateMermaidCodeFromDiagramData(example.diagram_data),
                   }
                 }
               ),
               practiceHints: lesson.content.practiceHints || [],
               diagram_data: (() => {
-                console.log(
-                  `🔍 Processing concept lesson diagram_data:`,
-                  lesson.content.diagram_data
-                )
+                // Log diagram conversion for verification
+                if (lesson.content.diagram_data) {
+                  console.log("🎯 DIAGRAM CONVERSION - Concept Lesson:")
+                  console.log(
+                    "📊 Original JSON:",
+                    JSON.stringify(lesson.content.diagram_data, null, 2)
+                  )
+                  const mermaidCode =
+                    lesson.content.mermaid_code ||
+                    generateMermaidCodeFromDiagramData(
+                      lesson.content.diagram_data
+                    )
+                  console.log("🎨 Converted Mermaid:", mermaidCode)
+                  console.log("---")
+                }
                 return lesson.content.diagram_data || null
               })(),
+              mermaid_code:
+                lesson.content.mermaid_code ||
+                generateMermaidCodeFromDiagramData(lesson.content.diagram_data),
               commonMistakes: lesson.content.commonMistakes || [],
               bestPractices: lesson.content.bestPractices || [],
               visualElements: {
@@ -337,10 +387,19 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             ) {
               convertedData = {
                 questions: lesson.content.questions.map((q: any) => {
-                  console.log(
-                    `🔍 Processing MCQ question diagram_data:`,
-                    q.diagram_data
-                  )
+                  // Log diagram conversion for verification
+                  if (q.diagram_data) {
+                    console.log("🎯 DIAGRAM CONVERSION - MCQ Question:")
+                    console.log(
+                      "📊 Original JSON:",
+                      JSON.stringify(q.diagram_data, null, 2)
+                    )
+                    const mermaidCode =
+                      q.mermaid_code ||
+                      generateMermaidCodeFromDiagramData(q.diagram_data)
+                    console.log("🎨 Converted Mermaid:", mermaidCode)
+                    console.log("---")
+                  }
                   return {
                     id: q.id || crypto.randomUUID(),
                     question: q.question || "",
@@ -349,6 +408,9 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     difficulty: q.difficulty || 1,
                     codeSnippet: q.codeSnippet || "",
                     diagram_data: q.diagram_data || "",
+                    mermaid_code:
+                      q.mermaid_code ||
+                      generateMermaidCodeFromDiagramData(q.diagram_data),
                   }
                 }),
               }
@@ -384,10 +446,21 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             ) {
               convertedData = {
                 questions: lesson.content.questions.map((q: any) => {
-                  console.log(
-                    `🔍 Processing code rearrange question diagram_data:`,
-                    q.diagram_data
-                  )
+                  // Log diagram conversion for verification
+                  if (q.diagram_data) {
+                    console.log(
+                      "🎯 DIAGRAM CONVERSION - Code Rearrange Question:"
+                    )
+                    console.log(
+                      "📊 Original JSON:",
+                      JSON.stringify(q.diagram_data, null, 2)
+                    )
+                    const mermaidCode =
+                      q.mermaid_code ||
+                      generateMermaidCodeFromDiagramData(q.diagram_data)
+                    console.log("🎨 Converted Mermaid:", mermaidCode)
+                    console.log("---")
+                  }
                   const aiCodeBlocks = q.codeBlocks || []
                   const aiCorrectOrder = q.correctOrder || []
 
@@ -396,6 +469,9 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     scenario: q.scenario || "",
                     targetCode: q.targetCode || "",
                     diagram_data: q.diagram_data || "",
+                    mermaid_code:
+                      q.mermaid_code ||
+                      generateMermaidCodeFromDiagramData(q.diagram_data),
                     blocks: aiCodeBlocks.map((block: any, index: number) => {
                       // Find the correct order for this block
                       const orderIndex = aiCorrectOrder.indexOf(block.id)
@@ -426,6 +502,11 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     scenario: lesson.content.scenario || "",
                     targetCode: lesson.content.targetCode || "",
                     diagram_data: lesson.content.diagram_data || "",
+                    mermaid_code:
+                      lesson.content.mermaid_code ||
+                      generateMermaidCodeFromDiagramData(
+                        lesson.content.diagram_data
+                      ),
                     blocks: aiCodeBlocks.map((block: any, index: number) => {
                       const orderIndex = aiCorrectOrder.indexOf(block.id)
                       return {
@@ -451,15 +532,47 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             ) {
               convertedData = {
                 questions: lesson.content.questions.map((q: any) => {
-                  console.log(
-                    `🔍 Processing fill-in-blanks question diagram_data:`,
-                    q.diagram_data
-                  )
+                  // Log diagram conversion for verification
+                  if (q.diagram_data) {
+                    console.log(
+                      "🎯 DIAGRAM CONVERSION - Fill-in-Blanks Question:"
+                    )
+                    console.log(
+                      "📊 Original JSON:",
+                      JSON.stringify(q.diagram_data, null, 2)
+                    )
+                    const mermaidCode =
+                      q.mermaid_code ||
+                      generateMermaidCodeFromDiagramData(q.diagram_data)
+                    console.log("🎨 Converted Mermaid:", mermaidCode)
+                    console.log("---")
+                  }
+
+                  // Log solution diagram conversion if exists
+                  if (q.solution?.diagram_data) {
+                    console.log(
+                      "🎯 DIAGRAM CONVERSION - Fill-in-Blanks Solution:"
+                    )
+                    console.log(
+                      "📊 Original JSON:",
+                      JSON.stringify(q.solution.diagram_data, null, 2)
+                    )
+                    const solutionMermaidCode =
+                      q.solution.mermaid_code ||
+                      generateMermaidCodeFromDiagramData(
+                        q.solution.diagram_data
+                      )
+                    console.log("🎨 Converted Mermaid:", solutionMermaidCode)
+                    console.log("---")
+                  }
                   return {
                     id: q.id || crypto.randomUUID(),
                     scenario: q.scenario || "",
                     code: q.codeTemplate || "",
                     diagram_data: q.diagram_data || "",
+                    mermaid_code:
+                      q.mermaid_code ||
+                      generateMermaidCodeFromDiagramData(q.diagram_data),
                     blanks: (q.blanks || []).map(
                       (blank: any, index: number) => ({
                         id: blank.id || `blank-${index}`,
@@ -477,6 +590,11 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                           completeCode: q.solution.completeCode || "",
                           explanation: q.solution.explanation || "",
                           diagram_data: q.solution.diagram_data || "",
+                          mermaid_code:
+                            q.solution.mermaid_code ||
+                            generateMermaidCodeFromDiagramData(
+                              q.solution.diagram_data
+                            ),
                         }
                       : undefined,
                     difficulty: q.difficulty || 1,
@@ -495,6 +613,11 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     scenario: lesson.content.scenario || "",
                     code: lesson.content.codeTemplate || "",
                     diagram_data: lesson.content.diagram_data || "",
+                    mermaid_code:
+                      lesson.content.mermaid_code ||
+                      generateMermaidCodeFromDiagramData(
+                        lesson.content.diagram_data
+                      ),
                     blanks: (lesson.content.blanks || []).map(
                       (blank: any, index: number) => ({
                         id: blank.id || `blank-${index}`,
@@ -515,6 +638,11 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                             lesson.content.solution.explanation || "",
                           diagram_data:
                             lesson.content.solution.diagram_data || "",
+                          mermaid_code:
+                            lesson.content.solution.mermaid_code ||
+                            generateMermaidCodeFromDiagramData(
+                              lesson.content.solution.diagram_data
+                            ),
                         }
                       : undefined,
                     difficulty: 1,
@@ -651,7 +779,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
     setIsSaving(true)
 
     try {
-      console.log("🌱 Final PlantUML state before submission:", plantUMLCodes)
+      console.log("🎨 Final Mermaid state before submission:", mermaidCodes)
 
       const completeTutorialData: TutorialData = {
         id: crypto.randomUUID(),
@@ -675,26 +803,26 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
               | "fill_in_blanks",
           }
 
-          // Inject PlantUML codes into lesson data based on type
+          // Inject Mermaid codes into lesson data based on type
           if (lesson.data) {
             const lessonData = { ...lesson.data }
 
-            // Add main lesson PlantUML code
-            const mainPlantUML = plantUMLCodes[`lesson_${lesson.id}`]
-            if (mainPlantUML) {
-              lessonData.plantuml_code = mainPlantUML
+            // Add main lesson Mermaid code
+            const mainMermaid = mermaidCodes[`lesson_${lesson.id}`]
+            if (mainMermaid) {
+              lessonData.mermaid_code = mainMermaid
             }
 
             switch (lesson.type) {
               case "concept":
-                // Add PlantUML to code examples
+                // Add Mermaid to code examples
                 if (lessonData.codeExamples) {
                   lessonData.codeExamples = lessonData.codeExamples.map(
                     (example: any, index: number) => ({
                       ...example,
-                      plantuml_code:
-                        plantUMLCodes[`lesson_${lesson.id}_example_${index}`] ||
-                        example.plantuml_code ||
+                      mermaid_code:
+                        mermaidCodes[`lesson_${lesson.id}_example_${index}`] ||
+                        example.mermaid_code ||
                         "",
                     })
                   )
@@ -702,16 +830,14 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                 break
 
               case "mcq":
-                // Add PlantUML to questions
+                // Add Mermaid to questions
                 if (lessonData.questions) {
                   lessonData.questions = lessonData.questions.map(
                     (question: any, index: number) => ({
                       ...question,
-                      plantuml_code:
-                        plantUMLCodes[
-                          `lesson_${lesson.id}_question_${index}`
-                        ] ||
-                        question.plantuml_code ||
+                      mermaid_code:
+                        mermaidCodes[`lesson_${lesson.id}_question_${index}`] ||
+                        question.mermaid_code ||
                         "",
                     })
                   )
@@ -719,16 +845,14 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                 break
 
               case "codeblock_rearranging":
-                // Add PlantUML to questions
+                // Add Mermaid to questions
                 if (lessonData.questions) {
                   lessonData.questions = lessonData.questions.map(
                     (question: any, index: number) => ({
                       ...question,
-                      plantuml_code:
-                        plantUMLCodes[
-                          `lesson_${lesson.id}_question_${index}`
-                        ] ||
-                        question.plantuml_code ||
+                      mermaid_code:
+                        mermaidCodes[`lesson_${lesson.id}_question_${index}`] ||
+                        question.mermaid_code ||
                         "",
                     })
                   )
@@ -736,29 +860,29 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                 break
 
               case "fill_in_blanks":
-                // Add PlantUML to questions and solutions
+                // Add Mermaid to questions and solutions
                 if (lessonData.questions) {
                   lessonData.questions = lessonData.questions.map(
                     (question: any, index: number) => {
                       const enrichedQuestion = {
                         ...question,
-                        plantuml_code:
-                          plantUMLCodes[
+                        mermaid_code:
+                          mermaidCodes[
                             `lesson_${lesson.id}_question_${index}`
                           ] ||
-                          question.plantuml_code ||
+                          question.mermaid_code ||
                           "",
                       }
 
-                      // Add PlantUML to solution if it exists
+                      // Add Mermaid to solution if it exists
                       if (enrichedQuestion.solution) {
                         enrichedQuestion.solution = {
                           ...enrichedQuestion.solution,
-                          plantuml_code:
-                            plantUMLCodes[
+                          mermaid_code:
+                            mermaidCodes[
                               `lesson_${lesson.id}_question_${index}_solution`
                             ] ||
-                            enrichedQuestion.solution.plantuml_code ||
+                            enrichedQuestion.solution.mermaid_code ||
                             "",
                         }
                       }
@@ -773,9 +897,9 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             enrichedLesson.data = lessonData
           }
 
-          console.log(`🚀 Enriched lesson ${lesson.id} with PlantUML codes:`, {
-            mainPlantUML: !!plantUMLCodes[`lesson_${lesson.id}`],
-            totalPlantUMLFields: Object.keys(plantUMLCodes).filter((key) =>
+          console.log(`🚀 Enriched lesson ${lesson.id} with Mermaid codes:`, {
+            mainMermaid: !!mermaidCodes[`lesson_${lesson.id}`],
+            totalMermaidFields: Object.keys(mermaidCodes).filter((key) =>
               key.includes(lesson.id)
             ).length,
           })
@@ -813,11 +937,11 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
           setShowLessonForm(false)
           setEditingLesson(null)
         }}
-        plantUMLSetters={{
-          setLessonPlantUML,
-          setCodeExamplePlantUML,
-          setQuestionPlantUML,
-          setSolutionPlantUML,
+        mermaidSetters={{
+          setLessonMermaid,
+          setCodeExampleMermaid,
+          setQuestionMermaid,
+          setSolutionMermaid,
         }}
       />
     )

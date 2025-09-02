@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react"
 import { FillInTheBlankData } from "@/app/Learn/types/TutorialTypes"
 import { ChevronDown, ChevronUp, Code, Plus, Trash2 } from "lucide-react"
-import PlantUMLDiagram from "../PlantUMLDiagram"
+import MermaidDiagram from "../MermaidDiagram"
 
 interface FIBFormProps {
   data: FillInTheBlankData | any
@@ -325,11 +325,13 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
                       <h6 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                         Question Diagram Preview:
                       </h6>
-                      <PlantUMLDiagram
-                        diagramData={question.diagram_data}
-                        showDebugInfo={true}
-                        onPlantUMLChange={(code) =>
-                          updateQuestion(question.id, "plantuml_code", code)
+                      <MermaidDiagram
+                        diagramData={
+                          question.diagram_data || question.mermaid_code
+                        }
+                        showDebugInfo={false}
+                        onMermaidChange={(code) =>
+                          updateQuestion(question.id, "mermaid_code", code)
                         }
                       />
                     </div>

@@ -19,7 +19,7 @@ import {
   Target,
   X,
 } from "lucide-react"
-import PlantUMLDiagram from "./PlantUMLDiagram"
+import MermaidDiagram from "./MermaidDiagram"
 
 interface TutorialPreviewProps {
   tutorial: TutorialData
@@ -482,14 +482,14 @@ const TutorialPreview: React.FC<TutorialPreviewProps> = ({
                                   </div>
                                 )}
 
-                              {/* PlantUML Diagram */}
+                              {/* Mermaid Diagram */}
                               {lesson.content.diagram_data && (
                                 <div>
                                   <h6 className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">
                                     Concept Diagram:
                                   </h6>
                                   <div className="rounded border bg-gray-50 p-3 dark:bg-gray-800">
-                                    <PlantUMLDiagram
+                                    <MermaidDiagram
                                       diagramData={lesson.content.diagram_data}
                                       showDebugInfo={true}
                                     />

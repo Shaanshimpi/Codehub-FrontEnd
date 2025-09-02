@@ -424,8 +424,6 @@ export const parseJsonWithFallbacks = (content: string): any => {
 
   for (let i = 0; i < strategies.length; i++) {
     try {
-      console.log(`🔧 Trying JSON parsing strategy ${i + 1}...`)
-
       // Show what each strategy is working with
       let strategyInput = content
       if (i === 1) {

@@ -25,16 +25,6 @@ export async function POST(request: Request) {
       customPrompts,
     } = await request.json()
 
-    console.log("🚀 Generating tutorial:", {
-      topic,
-      language,
-      difficulty,
-      numLessons,
-    })
-    if (customPrompts) {
-      console.log("🔧 Using custom prompts")
-    }
-
     const prompt = customPrompts
       ? buildCustomTutorialPrompt(
           topic,
@@ -54,33 +44,11 @@ export async function POST(request: Request) {
           exclusions
         )
 
-    console.log("📝 Tutorial Generation Request:")
-    console.log("Topic:", topic)
-    console.log("Language:", language)
-    console.log("Difficulty:", difficulty)
-    console.log("Number of Lessons:", numLessons)
-    console.log("Number of Lessons Type:", typeof numLessons)
-    console.log("Focus Areas:", focusAreas)
-    console.log("Exclusions:", exclusions)
-    console.log("Selected Model:", selectedModel)
-    console.log("Generated Prompt length:", prompt.length)
-
     // Verify numLessons is being passed correctly
     if (!numLessons || numLessons < 1) {
-      console.warn(
-        "⚠️ Invalid numLessons detected:",
-        numLessons,
-        "- defaulting to 5"
-      )
-    } else {
-      console.log("✅ Valid numLessons detected:", numLessons)
+      // Default to 5 lessons if invalid
     }
 
-    // Log the schema structure being sent
-    console.log("📋 Schema being sent to API:")
-    console.log(
-      "Using ProgrammingTutorialSchema with proper multi-language structure"
-    )
     // Try with selected model first, fallback to GPT-4o-mini if needed
     let response
     let attemptedModel = selectedModel || "openai/gpt-4o-mini"
@@ -92,114 +60,35 @@ export async function POST(request: Request) {
       attemptedModel.includes("gpt-3.5-turbo") ||
       attemptedModel.includes("gpt-4")
 
-    console.log("🔧 Model supports json_schema:", jsonSchemaSupported)
-    console.log(
-      "🔧 Using response format:",
-      jsonSchemaSupported ? "json_schema" : "json_object"
-    )
-
-    console.log(
-      "🔧 About to make API call to:",
-      "https://openrouter.ai/api/v1/chat/completions"
-    )
-    console.log("🔧 Using model:", attemptedModel)
-    console.log("🔧 API Key available:", !!process.env.AI_CHATBOT_API_KEY)
-
-    try {
-      response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.AI_CHATBOT_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: attemptedModel,
-          max_tokens: 50000,
-          temperature: 0.7,
-          top_p: 0.9,
-          frequency_penalty: 0.1,
-          presence_penalty: 0.1,
-          messages: [
-            {
-              role: "system",
-              content: `You are an expert programming instructor. Create comprehensive, well-structured tutorials with diverse lesson types and engaging content in English only. CRITICAL: ALL CODE EXAMPLES AND PROGRAMMING CONTENT MUST BE IN ${language.toUpperCase()} - use ${language} syntax, ${language} conventions, and ${language}-specific features.
-
-VISUAL DIAGRAM REQUIREMENTS:
-- Generate diagram data in structured JSON format for all visualizations
-- Use diagram types: "activity", "component", "class", "sequence", "flowchart"
-- Provide diagram data as JSON objects with type, title, nodes, and connections
-- Create educational diagrams showing concept relationships and flow
-
-DIAGRAM JSON FORMAT EXAMPLE:
-{
-  "diagram_data": {
-    "type": "activity",
-    "title": "Code Flow",
-    "nodes": [
-      {"id": "start", "label": "Start", "type": "start"},
-      {"id": "process", "label": "Process Data", "type": "activity"},
-      {"id": "end", "label": "End", "type": "end"}
-    ],
-    "connections": [
-      {"from": "start", "to": "process"},
-      {"from": "process", "to": "end"}
-    ]
-  }
-}
-
-CRITICAL: Use "diagram_data" field name with JSON object structure, NOT "plantuml_diagram" or raw PlantUML syntax.
-
-The response MUST contain exactly these top-level fields:
-1. title: Tutorial title
-2. description: Tutorial description
-3. learningObjectives: Array of learning objectives
-4. keyTopics: Array of key topics
-5. difficulty: Number (1, 2, or 3)
-6. lessons: Array of lesson objects
-7. practicalApplications: Array of practical applications
-8. tags: Array of tags
-9. reference: W3Schools-style reference object (MANDATORY)
-
-The reference field is ABSOLUTELY REQUIRED and must contain:
-- title: Main concept title
-- subtitle: Brief explanatory subtitle  
-- introduction: Opening paragraph explaining the concept
-- examples: Array of 3-4 complete code examples, each with title, description, code, explanation, and optional output
-- key_points: Array of 3-6 important points to remember
-- common_mistakes: Array of 2-4 common mistakes with mistake, why_wrong, and correct_approach
-- syntax_guide: Object with basic_syntax string and parameters array
-`,
-            },
-            {
-              role: "user",
-              content: prompt,
-            },
-          ],
-          response_format: {
-            type: "json_object",
-            json_schema: COMPLETE_TUTORIAL_SCHEMA,
+    response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.AI_CHATBOT_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: attemptedModel,
+        max_tokens: 50000,
+        temperature: 0.7,
+        top_p: 0.9,
+        frequency_penalty: 0.1,
+        presence_penalty: 0.1,
+        messages: [
+          {
+            role: "user",
+            content: prompt,
           },
-        }),
-      })
-    } catch (fetchError) {
-      console.error("❌ Fetch error with model:", attemptedModel)
-      console.error("❌ Fetch error details:", fetchError)
-      console.error("❌ Error message:", fetchError.message)
-      console.error("❌ API Key available:", !!process.env.AI_CHATBOT_API_KEY)
-      console.error(
-        "❌ API Key first 20 chars:",
-        process.env.AI_CHATBOT_API_KEY?.substring(0, 20)
-      )
-      throw fetchError
-    }
-
-    console.log("📡 Response status:", response.status, response.statusText)
-    console.log("📡 Response ok:", response.ok)
+        ],
+        response_format: {
+          type: "json_object",
+          json_schema: COMPLETE_TUTORIAL_SCHEMA,
+        },
+      }),
+    })
 
     const data = await response.json()
 
     if (!response.ok) {
-      console.error("❌ API response not ok:", data)
       logError(
         "OpenRouter API",
         `HTTP ${response.status}: ${response.statusText}`,
@@ -215,35 +104,6 @@ The reference field is ABSOLUTELY REQUIRED and must contain:
 
     const content = data.choices?.[0]?.message?.content
 
-    console.log("✅ API call successful!")
-    console.log("📥 Raw API response data keys:", Object.keys(data))
-    console.log("📥 Choices array length:", data.choices?.length)
-    console.log("📥 Content length:", content?.length)
-
-    // Parse the content to check for reference field
-    try {
-      const parsedContent = JSON.parse(content)
-      console.log("📥 Parsed content keys:", Object.keys(parsedContent))
-      console.log("📥 Has reference field:", !!parsedContent.reference)
-      if (parsedContent.reference) {
-        console.log(
-          "📥 Reference field keys:",
-          Object.keys(parsedContent.reference)
-        )
-      } else {
-        console.log("❌ Reference field is missing from AI response")
-      }
-    } catch (parseError) {
-      console.error(
-        "❌ Failed to parse content for debugging:",
-        parseError.message
-      )
-      console.log(
-        "📥 Raw content (first 1000 chars):",
-        content?.substring(0, 1000)
-      )
-    }
-
     if (!content) {
       logError("API Response", "No content received", data)
       return NextResponse.json(
@@ -257,9 +117,6 @@ The reference field is ABSOLUTELY REQUIRED and must contain:
     try {
       parsedTutorial = parseJsonWithFallbacks(content)
     } catch (parseError) {
-      console.error(
-        "❌ All JSON parsing strategies failed, creating fallback tutorial"
-      )
       // Create a minimal tutorial structure as fallback
       parsedTutorial = {
         id: `${language}-${topic.replace(/\s+/g, "-").toLowerCase()}-tutorial`,
@@ -299,11 +156,6 @@ The reference field is ABSOLUTELY REQUIRED and must contain:
     }
 
     const processedTutorial = convertToModernFormat(parsedTutorial)
-
-    console.log(
-      "📥 Processed tutorial has reference:",
-      !!processedTutorial.reference
-    )
 
     return NextResponse.json(processedTutorial)
   } catch (error) {

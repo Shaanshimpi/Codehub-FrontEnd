@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react"
 import { MCQOption } from "@/app/Learn/types/TutorialTypes"
 import { CheckCircle, ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react"
-import { PlantUMLSetters } from "../LessonForm"
-import PlantUMLDiagram from "../PlantUMLDiagram"
+import { MermaidSetters } from "../LessonForm"
+import MermaidDiagram from "../MermaidDiagram"
 
 interface MCQQuestion {
   id: string
@@ -14,7 +14,7 @@ interface MCQQuestion {
   difficulty: 1 | 2 | 3
   codeSnippet?: string
   diagram_data?: string
-  plantuml_code?: string
+  mermaid_code?: string
 }
 
 interface MCQData {
@@ -26,14 +26,14 @@ interface MCQFormProps {
   data: MCQData | MCQOption[] | any
   onChange: (data: MCQData) => void
   lessonId?: string
-  plantUMLSetters?: PlantUMLSetters
+  mermaidSetters?: MermaidSetters
 }
 
 const MCQForm: React.FC<MCQFormProps> = ({
   data,
   onChange,
   lessonId,
-  plantUMLSetters,
+  mermaidSetters,
 }) => {
   // Initialize questions from different data structures
   const [questions, setQuestions] = useState<MCQQuestion[]>(() => {
@@ -334,23 +334,25 @@ const MCQForm: React.FC<MCQFormProps> = ({
                     />
                   </div>
 
-                  {/* PlantUML Diagram Preview */}
+                  {/* Mermaid Diagram Preview */}
                   {question.diagram_data && (
                     <div>
                       <h6 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                         Question Diagram Preview:
                       </h6>
-                      <PlantUMLDiagram
-                        diagramData={question.diagram_data}
-                        showDebugInfo={true}
-                        onPlantUMLChange={(code) => {
-                          updateQuestion(question.id, "plantuml_code", code)
-                          // Use the new PlantUML setter
-                          if (plantUMLSetters && lessonId) {
+                      <MermaidDiagram
+                        diagramData={
+                          question.diagram_data || question.mermaid_code
+                        }
+                        showDebugInfo={false}
+                        onMermaidChange={(code) => {
+                          updateQuestion(question.id, "mermaid_code", code)
+                          // Use the new Mermaid setter
+                          if (mermaidSetters && lessonId) {
                             const questionIndex = questions.findIndex(
                               (q) => q.id === question.id
                             )
-                            plantUMLSetters.setQuestionPlantUML(
+                            mermaidSetters.setQuestionMermaid(
                               lessonId,
                               questionIndex,
                               code

@@ -91,13 +91,114 @@ ENGLISH-ONLY CONTENT REQUIREMENTS:
 - Maintain technical accuracy while keeping language simple and clear
 - Avoid idioms or complex expressions that might confuse non-native speakers
 
-DIAGRAM JSON FORMAT RULES:
-- Generate diagram data in structured JSON format instead of raw PlantUML syntax
-- Use these diagram types: "activity", "component", "class", "sequence", "flowchart"
-- Provide clear, educational node labels and descriptions
-- Structure should include: type, title, nodes, connections, and any special formatting
-- Keep diagrams educational, clear, and relevant to the programming concept
-- Mathematical expressions are allowed in labels: sqrt(n), if(x>0), arr[i], n%2`
+MERMAID DIAGRAM JSON FORMAT RULES:
+- Generate diagram data in structured JSON format optimized for Mermaid rendering
+- CRITICAL: ONLY use these 2 diagram types: "class", "flowchart"  
+- CLASS DIAGRAMS: For object-oriented concepts, data structures, inheritance, composition, class relationships
+- FLOWCHARTS: For process flows, decision trees, algorithm steps, control flow, data processing
+
+CLASS DIAGRAM REQUIREMENTS:
+- Use "class" type for main classes, "interface" type for interfaces, "abstract" type for abstract classes
+- Include attributes with types and visibility modifiers: +public, -private, #protected, ~package
+- Include methods with parameters and return types where educational
+- Connection types: "inheritance" (<|--), "composition" (*--), "aggregation" (o--), "association" (-->), "dependency" (..>)
+- Include detailed descriptions for every class and relationship explaining their purpose
+- Use clear, educational class names and member names that reflect programming concepts
+
+FLOWCHART DIAGRAM REQUIREMENTS:  
+- Always specify direction: "TD" (top-down), "LR" (left-right), "BT" (bottom-top), "RL" (right-left)
+- Node shapes: "rectangle" (process), "diamond" (decision), "circle" (connector), "stadium" (start/end)
+- Connection types: "arrow" (-->), use "condition" field for decision paths (Yes/No, True/False)
+- Include detailed descriptions for every node and connection explaining their purpose
+- Use clear, educational labels for process steps
+
+CRITICAL REQUIREMENTS FOR AI:
+- EVERY code example MUST include either class OR flowchart diagram_data  
+- Choose diagram type based on content:
+  * USE FLOWCHART for: if-else statements, loops, algorithms, decision trees, process flows, code execution steps
+  * USE CLASS for: inheritance hierarchies, object relationships, data structures, OOP concepts with classes/interfaces
+- FOR CLASS DIAGRAMS: ALL classes must have: id, label, type, description, attributes, methods fields filled with educational content
+- FOR CLASS DIAGRAMS: ALL relationships must have: from, to, label, type, description fields filled with educational content
+- FOR FLOWCHARTS: ALL nodes must have: id, label, type, description fields filled with educational content
+- FOR FLOWCHARTS: ALL connections must have: from, to, label, description fields filled with educational content
+- Use educational language in descriptions that explains programming concepts clearly
+- Maximum 6 classes or 8 nodes and 8 connections per diagram for clarity and focus
+- Mathematical expressions are allowed in labels: sqrt(n), if(x>0), arr[i], n%2
+
+EXAMPLE CLASS DIAGRAM STRUCTURE:
+{
+  "type": "class",
+  "title": "Animal Inheritance Hierarchy", 
+  "classes": [
+    {
+      "id": "animal", "label": "Animal", "type": "class",
+      "description": "Base class representing common animal characteristics",
+      "attributes": [
+        {"name": "age", "type": "int", "visibility": "+", "description": "Animal's age in years"},
+        {"name": "species", "type": "String", "visibility": "+", "description": "Species name"}
+      ],
+      "methods": [
+        {"name": "eat()", "returnType": "void", "visibility": "+", "description": "Method for consuming food"},
+        {"name": "sleep()", "returnType": "void", "visibility": "+", "description": "Method for resting"}
+      ]
+    },
+    {
+      "id": "dog", "label": "Dog", "type": "class",
+      "description": "Specific dog class inheriting from Animal",
+      "attributes": [
+        {"name": "breed", "type": "String", "visibility": "+", "description": "Dog breed specification"}
+      ],
+      "methods": [
+        {"name": "bark()", "returnType": "void", "visibility": "+", "description": "Dog-specific vocalization method"}
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "from": "animal", "to": "dog", "label": "inherits",
+      "type": "inheritance", "description": "Dog class inherits all properties and methods from Animal"
+    }
+  ]
+}
+
+EXAMPLE FLOWCHART STRUCTURE:
+{
+  "type": "flowchart", 
+  "title": "Array Sorting Algorithm",
+  "direction": "TD",
+  "nodes": [
+    {
+      "id": "start", "label": "Start", "type": "start", "shape": "stadium",
+      "description": "Begin the bubble sort algorithm execution"
+    },
+    {
+      "id": "check", "label": "i < array.length?", "type": "decision", "shape": "diamond",
+      "description": "Check if current index is within array bounds" 
+    },
+    {
+      "id": "compare", "label": "Compare adjacent elements", "type": "process", "shape": "rectangle",
+      "description": "Compare arr[i] with arr[i+1] to determine swap necessity"
+    },
+    {
+      "id": "end", "label": "Array Sorted", "type": "end", "shape": "stadium",
+      "description": "Algorithm complete, array is now sorted"
+    }
+  ],
+  "connections": [
+    {
+      "from": "start", "to": "check", "label": "Initialize i=0", "type": "arrow",
+      "description": "Start sorting process with first array index"
+    },
+    {
+      "from": "check", "to": "compare", "label": "Yes", "type": "arrow", 
+      "condition": "true", "description": "Continue processing when more elements remain"
+    },
+    {
+      "from": "check", "to": "end", "label": "No", "type": "arrow",
+      "condition": "false", "description": "Exit loop when all elements are processed"
+    }
+  ]
+}`
 
 export const LESSON_PROGRESSION_GUIDELINES = `LESSON PROGRESSION STRATEGY:
 
@@ -217,26 +318,38 @@ LESSON CONTENT STRUCTURES BY TYPE:
       "code": "Complete, working code with comments",
       "explanation": "Detailed code explanation",
       "diagram_data": {
-        "type": "activity",
+        "type": "flowchart",
         "title": "Code Flow",
+        "direction": "TD",
         "nodes": [
-          {"id": "start", "label": "Start", "type": "start"},
-          {"id": "process", "label": "Process Data", "type": "activity"},
-          {"id": "end", "label": "End", "type": "end"}
+          {"id": "start", "label": "Start", "type": "start", "shape": "stadium", "description": "Begin algorithm execution"},
+          {"id": "process", "label": "Process Data", "type": "process", "shape": "rectangle", "description": "Main data processing step"},
+          {"id": "end", "label": "End", "type": "end", "shape": "stadium", "description": "Complete algorithm execution"}
         ],
         "connections": [
-          {"from": "start", "to": "process"},
-          {"from": "process", "to": "end"}
+          {"from": "start", "to": "process", "label": "Begin", "type": "arrow", "description": "Start processing"},
+          {"from": "process", "to": "end", "label": "Complete", "type": "arrow", "description": "Finish processing"}
         ]
       }
     }
   ],
   "practiceHints": ["2-4 practical hints"],
   "diagram_data": {
-    "type": "component",
+    "type": "class",
     "title": "Concept Overview",
-    "nodes": [],
-    "connections": []
+    "classes": [
+      {
+        "id": "concept", "label": "MainConcept", "type": "class",
+        "description": "Core programming concept being taught",
+        "attributes": [
+          {"name": "property", "type": "String", "visibility": "+", "description": "Key concept property"}
+        ],
+        "methods": [
+          {"name": "demonstrate()", "returnType": "void", "visibility": "+", "description": "Show concept in action"}
+        ]
+      }
+    ],
+    "relationships": []
   },
   "commonMistakes": ["Common errors to avoid"],
   "bestPractices": ["Programming best practices"]
@@ -275,10 +388,16 @@ LESSON CONTENT STRUCTURES BY TYPE:
       "scenario": "Problem description and setup for this question",
       "targetCode": "Expected final code after rearrangement",
       "diagram_data": {
-        "type": "activity",
+        "type": "flowchart",
         "title": "Expected Code Flow",
-        "nodes": [],
-        "connections": []
+        "direction": "TD",
+        "nodes": [
+          {"id": "start", "label": "Start", "type": "start", "shape": "stadium", "description": "Begin code execution"},
+          {"id": "end", "label": "End", "type": "end", "shape": "stadium", "description": "Complete execution"}
+        ],
+        "connections": [
+          {"from": "start", "to": "end", "label": "Execute", "type": "arrow", "description": "Run code blocks in order"}
+        ]
       },
       "codeBlocks": [
         {"id": "block1", "content": "multiline Code block content, make sure no to codeblocks are same like e.g. ending curly braces"},
@@ -299,10 +418,18 @@ LESSON CONTENT STRUCTURES BY TYPE:
       "scenario": "Problem context and setup for this question",
       "codeTemplate": "Code with {{blank1}}, {{blank2}} placeholders",
       "diagram_data": {
-        "type": "activity",
+        "type": "flowchart",
         "title": "Code Structure with Blanks",
-        "nodes": [],
-        "connections": []
+        "direction": "TD",
+        "nodes": [
+          {"id": "start", "label": "Start", "type": "start", "shape": "stadium", "description": "Begin code execution"},
+          {"id": "fill_blanks", "label": "Fill Missing Parts", "type": "process", "shape": "rectangle", "description": "Complete the blanks in code"},
+          {"id": "end", "label": "End", "type": "end", "shape": "stadium", "description": "Complete execution"}
+        ],
+        "connections": [
+          {"from": "start", "to": "fill_blanks", "label": "Start", "type": "arrow", "description": "Begin filling blanks"},
+          {"from": "fill_blanks", "to": "end", "label": "Complete", "type": "arrow", "description": "Finish with complete code"}
+        ]
       },
       "blanks": [
         {
@@ -319,10 +446,18 @@ LESSON CONTENT STRUCTURES BY TYPE:
         "completeCode": "Final code with all blanks filled",
         "explanation": "Complete solution explanation",
         "diagram_data": {
-          "type": "activity",
+          "type": "flowchart",
           "title": "Complete Solution Flow",
-          "nodes": [],
-          "connections": []
+          "direction": "TD",
+          "nodes": [
+            {"id": "start", "label": "Start", "type": "start", "shape": "stadium", "description": "Begin complete solution"},
+            {"id": "solution", "label": "Execute Solution", "type": "process", "shape": "rectangle", "description": "Run complete code with all blanks filled"},
+            {"id": "end", "label": "End", "type": "end", "shape": "stadium", "description": "Complete execution"}
+          ],
+          "connections": [
+            {"from": "start", "to": "solution", "label": "Run", "type": "arrow", "description": "Execute complete solution"},
+            {"from": "solution", "to": "end", "label": "Finish", "type": "arrow", "description": "Complete with results"}
+          ]
         }
       },
       "difficulty": 1|2|3

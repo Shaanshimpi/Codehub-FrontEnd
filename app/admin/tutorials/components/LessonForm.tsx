@@ -8,19 +8,19 @@ import ConceptLessonForm from "./lesson-types/ConceptLessonForm"
 import FIBForm from "./lesson-types/FIBForm"
 import MCQForm from "./lesson-types/MCQForm"
 
-export interface PlantUMLSetters {
-  setLessonPlantUML: (lessonId: string, code: string) => void
-  setCodeExamplePlantUML: (
+export interface MermaidSetters {
+  setLessonMermaid: (lessonId: string, code: string) => void
+  setCodeExampleMermaid: (
     lessonId: string,
     exampleIndex: number,
     code: string
   ) => void
-  setQuestionPlantUML: (
+  setQuestionMermaid: (
     lessonId: string,
     questionIndex: number,
     code: string
   ) => void
-  setSolutionPlantUML: (
+  setSolutionMermaid: (
     lessonId: string,
     questionIndex: number,
     code: string
@@ -31,14 +31,14 @@ interface LessonFormProps {
   lesson: TutorialLesson | null
   onSave: (lesson: TutorialLesson) => void
   onCancel: () => void
-  plantUMLSetters?: PlantUMLSetters
+  mermaidSetters?: MermaidSetters
 }
 
 const LessonForm: React.FC<LessonFormProps> = ({
   lesson,
   onSave,
   onCancel,
-  plantUMLSetters,
+  mermaidSetters,
 }) => {
   const [formData, setFormData] = useState({
     id: lesson?.id || crypto.randomUUID(),
@@ -80,7 +80,7 @@ const LessonForm: React.FC<LessonFormProps> = ({
             data={lessonData}
             onChange={setLessonData}
             lessonId={formData.id}
-            plantUMLSetters={plantUMLSetters}
+            mermaidSetters={mermaidSetters}
           />
         )
       case "mcq":
@@ -89,7 +89,7 @@ const LessonForm: React.FC<LessonFormProps> = ({
             data={lessonData}
             onChange={setLessonData}
             lessonId={formData.id}
-            plantUMLSetters={plantUMLSetters}
+            mermaidSetters={mermaidSetters}
           />
         )
       case "codeblock_rearranging":
@@ -98,7 +98,7 @@ const LessonForm: React.FC<LessonFormProps> = ({
             data={lessonData}
             onChange={setLessonData}
             lessonId={formData.id}
-            plantUMLSetters={plantUMLSetters}
+            mermaidSetters={mermaidSetters}
           />
         )
       case "fill_in_blanks":
@@ -107,7 +107,7 @@ const LessonForm: React.FC<LessonFormProps> = ({
             data={lessonData}
             onChange={setLessonData}
             lessonId={formData.id}
-            plantUMLSetters={plantUMLSetters}
+            mermaidSetters={mermaidSetters}
           />
         )
       default:

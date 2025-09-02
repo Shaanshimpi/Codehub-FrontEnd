@@ -3,21 +3,21 @@
 import React, { useEffect, useState } from "react"
 import { ConceptLessonData } from "@/app/Learn/types/TutorialTypes"
 import { Code, Lightbulb, Plus, Trash2 } from "lucide-react"
-import { PlantUMLSetters } from "../LessonForm"
-import PlantUMLDiagram from "../PlantUMLDiagram"
+import { MermaidSetters } from "../LessonForm"
+import MermaidDiagram from "../MermaidDiagram"
 
 interface ConceptLessonFormProps {
   data: ConceptLessonData | any
   onChange: (data: ConceptLessonData) => void
   lessonId?: string
-  plantUMLSetters?: PlantUMLSetters
+  mermaidSetters?: MermaidSetters
 }
 
 const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
   data,
   onChange,
   lessonId,
-  plantUMLSetters,
+  mermaidSetters,
 }) => {
   const [formData, setFormData] = useState<ConceptLessonData>({
     explanation: data?.explanation || "",
@@ -26,7 +26,7 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
     codeExamples: data?.codeExamples || [],
     practiceHints: data?.practiceHints || [""],
     diagram_data: data?.diagram_data || "",
-    plantuml_code: data?.plantuml_code || "",
+    mermaid_code: data?.mermaid_code || "",
     commonMistakes: data?.commonMistakes || [""],
     bestPractices: data?.bestPractices || [""],
     visualElements: data?.visualElements || { diagrams: [], concepts: [] },
@@ -80,7 +80,7 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
           code: "",
           explanation: "",
           diagram_data_diagram: "",
-          plantuml_code: "",
+          mermaid_code: "",
         },
       ],
     }))
@@ -269,14 +269,14 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
                   <h6 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     Example Diagram Preview:
                   </h6>
-                  <PlantUMLDiagram
-                    diagramData={example.diagram_data}
-                    showDebugInfo={true}
-                    onPlantUMLChange={(code) => {
-                      updateCodeExample(index, "plantuml_code", code)
-                      // Use the new PlantUML setter
-                      if (plantUMLSetters && lessonId) {
-                        plantUMLSetters.setCodeExamplePlantUML(
+                  <MermaidDiagram
+                    diagramData={example.diagram_data || example.mermaid_code}
+                    showDebugInfo={false}
+                    onMermaidChange={(code) => {
+                      updateCodeExample(index, "mermaid_code", code)
+                      // Use the new Mermaid setter
+                      if (mermaidSetters && lessonId) {
+                        mermaidSetters.setCodeExampleMermaid(
                           lessonId,
                           index,
                           code
@@ -336,14 +336,14 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
           <h6 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             Overall Concept Diagram Preview:
           </h6>
-          <PlantUMLDiagram
-            diagramData={formData.diagram_data}
-            showDebugInfo={true}
-            onPlantUMLChange={(code) => {
-              setFormData((prev) => ({ ...prev, plantuml_code: code }))
-              // Use the new PlantUML setter
-              if (plantUMLSetters && lessonId) {
-                plantUMLSetters.setLessonPlantUML(lessonId, code)
+          <MermaidDiagram
+            diagramData={formData.diagram_data || formData.mermaid_code}
+            showDebugInfo={false}
+            onMermaidChange={(code) => {
+              setFormData((prev) => ({ ...prev, mermaid_code: code }))
+              // Use the new Mermaid setter
+              if (mermaidSetters && lessonId) {
+                mermaidSetters.setLessonMermaid(lessonId, code)
               }
             }}
           />

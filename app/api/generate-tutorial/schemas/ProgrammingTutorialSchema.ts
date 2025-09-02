@@ -10,19 +10,220 @@ export const TUTORIAL_DESCRIPTION_SCHEMA = {
     "Comprehensive tutorial description in English explaining what students will learn, why it's important, and what they'll be able to do after completion.",
 }
 
-export const TUTORIAL_DIAGRAM_SCHEMA = {
+export const MERMAID_DIAGRAM_SCHEMA = {
   type: "object",
   description:
-    "Optional overall tutorial flow diagram data showing lesson progression and concept relationships.Use appropriate diagram types like activity, component, class, sequence.",
+    "JSON diagram data structure compatible with Mermaid rendering for class diagrams and flowcharts with detailed educational content",
   properties: {
     type: {
       type: "string",
-      enum: ["activity", "component", "class", "sequence", "flowchart"],
+      enum: ["class", "flowchart"], // CHANGED: class diagrams instead of sequence
+      description:
+        "Diagram type - class for object-oriented concepts, flowchart for processes",
     },
-    title: { type: "string" },
-    nodes: { type: "array", items: { type: "object" } },
-    connections: { type: "array", items: { type: "object" } },
+    title: {
+      type: "string",
+      description: "Descriptive title for the diagram",
+    },
+    direction: {
+      type: "string",
+      enum: ["TD", "LR", "BT", "RL"],
+      description:
+        "Flowchart direction (TD=top-down, LR=left-right). Only for flowcharts.",
+    },
+    // For flowcharts: nodes and connections
+    nodes: {
+      type: "array",
+      description: "Array of detailed node definitions for flowcharts",
+      items: {
+        type: "object",
+        properties: {
+          id: { type: "string", description: "Unique node identifier" },
+          label: { type: "string", description: "Display text for the node" },
+          type: {
+            type: "string",
+            enum: ["start", "end", "process", "decision"],
+            description: "Node type for proper Mermaid rendering",
+          },
+          shape: {
+            type: "string",
+            enum: ["rectangle", "circle", "diamond", "stadium", "rounded"],
+            description: "Visual shape for flowchart nodes",
+          },
+          description: {
+            type: "string",
+            description:
+              "REQUIRED: Detailed explanation of node purpose and function",
+          },
+        },
+        required: ["id", "label", "type", "description"],
+      },
+      minItems: 2,
+      maxItems: 8,
+    },
+    connections: {
+      type: "array",
+      description: "Array of detailed connection definitions for flowcharts",
+      items: {
+        type: "object",
+        properties: {
+          from: { type: "string", description: "Source node ID" },
+          to: { type: "string", description: "Target node ID" },
+          label: {
+            type: "string",
+            description: "Connection label/message text",
+          },
+          type: {
+            type: "string",
+            enum: ["arrow", "dotted"],
+            description: "Connection type for proper Mermaid arrow styling",
+          },
+          condition: {
+            type: "string",
+            description:
+              "Conditional text for decision paths (yes/no/true/false)",
+          },
+          description: {
+            type: "string",
+            description: "REQUIRED: Detailed explanation of connection purpose",
+          },
+        },
+        required: ["from", "to", "label", "description"],
+      },
+      minItems: 1,
+      maxItems: 8,
+    },
+    // For class diagrams: classes and relationships
+    classes: {
+      type: "array",
+      description: "Array of class definitions for class diagrams",
+      items: {
+        type: "object",
+        properties: {
+          id: { type: "string", description: "Unique class identifier" },
+          label: { type: "string", description: "Class name" },
+          type: {
+            type: "string",
+            enum: ["class", "interface", "abstract"],
+            description: "Class type - class, interface, or abstract class",
+          },
+          description: {
+            type: "string",
+            description:
+              "REQUIRED: Detailed explanation of class purpose and role",
+          },
+          attributes: {
+            type: "array",
+            description: "Class attributes/fields",
+            items: {
+              type: "object",
+              properties: {
+                name: { type: "string", description: "Attribute name" },
+                type: { type: "string", description: "Attribute data type" },
+                visibility: {
+                  type: "string",
+                  enum: ["+", "-", "#", "~"],
+                  description:
+                    "Visibility: + public, - private, # protected, ~ package",
+                },
+                description: {
+                  type: "string",
+                  description: "Attribute purpose explanation",
+                },
+              },
+              required: ["name", "type", "visibility", "description"],
+            },
+          },
+          methods: {
+            type: "array",
+            description: "Class methods/operations",
+            items: {
+              type: "object",
+              properties: {
+                name: {
+                  type: "string",
+                  description: "Method name with parameters",
+                },
+                returnType: {
+                  type: "string",
+                  description: "Method return type",
+                },
+                visibility: {
+                  type: "string",
+                  enum: ["+", "-", "#", "~"],
+                  description:
+                    "Visibility: + public, - private, # protected, ~ package",
+                },
+                description: {
+                  type: "string",
+                  description: "Method purpose explanation",
+                },
+              },
+              required: ["name", "returnType", "visibility", "description"],
+            },
+          },
+        },
+        required: [
+          "id",
+          "label",
+          "type",
+          "description",
+          "attributes",
+          "methods",
+        ],
+      },
+      minItems: 2,
+      maxItems: 6,
+    },
+    relationships: {
+      type: "array",
+      description: "Array of class relationship definitions",
+      items: {
+        type: "object",
+        properties: {
+          from: { type: "string", description: "Source class ID" },
+          to: { type: "string", description: "Target class ID" },
+          label: { type: "string", description: "Relationship label" },
+          type: {
+            type: "string",
+            enum: [
+              "inheritance",
+              "composition",
+              "aggregation",
+              "association",
+              "dependency",
+            ],
+            description: "Relationship type for proper Mermaid rendering",
+          },
+          description: {
+            type: "string",
+            description:
+              "REQUIRED: Detailed explanation of relationship meaning",
+          },
+        },
+        required: ["from", "to", "label", "type", "description"],
+      },
+      minItems: 1,
+      maxItems: 8,
+    },
   },
+  required: ["type", "title"],
+  oneOf: [
+    {
+      description: "Flowchart diagram structure",
+      properties: {
+        type: { const: "flowchart" },
+      },
+      required: ["nodes", "connections"],
+    },
+    {
+      description: "Class diagram structure",
+      properties: {
+        type: { const: "class" },
+      },
+      required: ["classes", "relationships"],
+    },
+  ],
 }
 
 // ==================== LESSON CONTENT SCHEMAS ====================
@@ -62,24 +263,9 @@ export const CONCEPT_CONTENT_SCHEMA = {
             description: "Detailed explanation of what the code does and why",
           },
           diagram_data: {
-            type: "object",
+            ...MERMAID_DIAGRAM_SCHEMA,
             description:
-              "HIGHLY RECOMMENDED: JSON diagram data for visualizing code flow, logic, or data structure.Include this in 80% of code examples for better learning visualization.",
-            properties: {
-              type: {
-                type: "string",
-                enum: [
-                  "activity",
-                  "component",
-                  "class",
-                  "sequence",
-                  "flowchart",
-                ],
-              },
-              title: { type: "string" },
-              nodes: { type: "array", items: { type: "object" } },
-              connections: { type: "array", items: { type: "object" } },
-            },
+              "HIGHLY RECOMMENDED: JSON diagram data for visualizing code flow, logic, or data structure. Will be converted to Mermaid diagrams. Use sequence type for interactions, flowchart type for algorithms. Include this in 80% of code examples for better learning visualization.",
           },
         },
         required: ["title", "code", "explanation"],
@@ -98,18 +284,9 @@ export const CONCEPT_CONTENT_SCHEMA = {
       maxItems: 4,
     },
     diagram_data: {
-      type: "object",
+      ...MERMAID_DIAGRAM_SCHEMA,
       description:
-        "RECOMMENDED: Overall concept diagram data for complex topics.Include this in 70% of concept lessons to enhance understanding.",
-      properties: {
-        type: {
-          type: "string",
-          enum: ["activity", "component", "class", "sequence", "flowchart"],
-        },
-        title: { type: "string" },
-        nodes: { type: "array", items: { type: "object" } },
-        connections: { type: "array", items: { type: "object" } },
-      },
+        "RECOMMENDED: JSON diagram data for overall concept visualization. Will be converted to Mermaid diagrams. Use sequence type for interactions, flowchart type for algorithms. Include this in 70% of concept lessons to enhance understanding.",
     },
     commonMistakes: {
       type: "array",
@@ -187,24 +364,9 @@ export const MCQ_CONTENT_SCHEMA = {
               "ENCOURAGED: Code context to make the question more practical. Include in 60% of MCQ questions for better engagement.",
           },
           diagram_data: {
-            type: "object",
+            ...MERMAID_DIAGRAM_SCHEMA,
             description:
-              "RECOMMENDED: JSON diagram data to visualize the code snippet or concept being tested.Include in 50% of MCQ questions with code snippets.",
-            properties: {
-              type: {
-                type: "string",
-                enum: [
-                  "activity",
-                  "component",
-                  "class",
-                  "sequence",
-                  "flowchart",
-                ],
-              },
-              title: { type: "string" },
-              nodes: { type: "array", items: { type: "object" } },
-              connections: { type: "array", items: { type: "object" } },
-            },
+              "RECOMMENDED: JSON diagram data to visualize the code snippet or concept being tested. Will be converted to Mermaid diagrams. Use sequence type for interactions, flowchart type for algorithms. Include in 50% of MCQ questions with code snippets.",
           },
         },
         required: ["id", "question", "options", "explanation", "difficulty"],
@@ -236,24 +398,9 @@ export const CODE_BLOCK_REARRANGING_SCHEMA = {
             description: "Expected final code after rearranging",
           },
           diagram_data: {
-            type: "object",
+            ...MERMAID_DIAGRAM_SCHEMA,
             description:
-              "HIGHLY VALUABLE: JSON diagram data showing the expected code flow or logic structure.Include in 70% of code rearranging questions for better visualization.",
-            properties: {
-              type: {
-                type: "string",
-                enum: [
-                  "activity",
-                  "component",
-                  "class",
-                  "sequence",
-                  "flowchart",
-                ],
-              },
-              title: { type: "string" },
-              nodes: { type: "array", items: { type: "object" } },
-              connections: { type: "array", items: { type: "object" } },
-            },
+              "HIGHLY VALUABLE: JSON diagram data showing the expected code flow or logic structure. Will be converted to Mermaid diagrams. Use sequence type for interactions, flowchart type for algorithms. Include in 70% of code rearranging questions for better visualization.",
           },
           codeBlocks: {
             type: "array",
@@ -328,24 +475,9 @@ export const FILL_IN_BLANKS_SCHEMA = {
             description: "Code with blanks marked as {{blank_id}}",
           },
           diagram_data: {
-            type: "object",
+            ...MERMAID_DIAGRAM_SCHEMA,
             description:
-              "STRONGLY RECOMMENDED: JSON diagram data showing the code structure or flow with blanks highlighted.Include in 75% of fill-in-blank questions for enhanced learning.",
-            properties: {
-              type: {
-                type: "string",
-                enum: [
-                  "activity",
-                  "component",
-                  "class",
-                  "sequence",
-                  "flowchart",
-                ],
-              },
-              title: { type: "string" },
-              nodes: { type: "array", items: { type: "object" } },
-              connections: { type: "array", items: { type: "object" } },
-            },
+              "STRONGLY RECOMMENDED: JSON diagram data showing the code structure or flow with blanks highlighted. Will be converted to Mermaid diagrams. Use sequence type for interactions, flowchart type for algorithms. Include in 75% of fill-in-blank questions for enhanced learning.",
           },
           blanks: {
             type: "array",
@@ -398,24 +530,9 @@ export const FILL_IN_BLANKS_SCHEMA = {
                 description: "Overall solution explanation",
               },
               diagram_data: {
-                type: "object",
+                ...MERMAID_DIAGRAM_SCHEMA,
                 description:
-                  "ENCOURAGED: JSON diagram data showing the complete solution flow or structure.Include in 60% of fill-in-blank solutions for complete understanding.",
-                properties: {
-                  type: {
-                    type: "string",
-                    enum: [
-                      "activity",
-                      "component",
-                      "class",
-                      "sequence",
-                      "flowchart",
-                    ],
-                  },
-                  title: { type: "string" },
-                  nodes: { type: "array", items: { type: "object" } },
-                  connections: { type: "array", items: { type: "object" } },
-                },
+                  "ENCOURAGED: JSON diagram data showing the complete solution flow or structure. Will be converted to Mermaid diagrams. Use sequence type for interactions, flowchart type for algorithms. Include in 60% of fill-in-blank solutions for complete understanding.",
               },
             },
             required: ["completeCode", "explanation"],

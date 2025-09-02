@@ -17,25 +17,21 @@ async function convertLanguageToId(
   }
 
   // If it's a slug, fetch the language to get the ID
-  try {
-    const response = await fetch(
-      `${process.env.PAYLOAD_API_URL || "http://localhost:3001/api"}/programming-languages?where[slug][equals]=${programmingLanguage}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
-
-    if (response.ok) {
-      const data = await response.json()
-      if (data.docs && data.docs.length > 0) {
-        return data.docs[0].id
-      }
+  const response = await fetch(
+    `${process.env.PAYLOAD_API_URL || "http://localhost:3001/api"}/programming-languages?where[slug][equals]=${programmingLanguage}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
     }
-  } catch (error) {
-    console.error("Error fetching language by slug:", error)
+  )
+
+  if (response.ok) {
+    const data = await response.json()
+    if (data.docs && data.docs.length > 0) {
+      return data.docs[0].id
+    }
   }
 
   // Default fallback
@@ -45,9 +41,6 @@ async function convertLanguageToId(
 export async function POST(request: NextRequest) {
   try {
     const tutorialData = await request.json()
-
-    console.log("📥 Received tutorial submission:")
-    console.log("Tutorial structure:", JSON.stringify(tutorialData, null, 2))
 
     // Generate slug if not provided
     if (!tutorialData.slug && tutorialData.title) {
