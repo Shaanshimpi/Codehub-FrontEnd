@@ -26,6 +26,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+.env
+.env.local
 .env*.local
 
 # vercel
@@ -35,7 +37,27 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# project specific
 certificates
 Existing_System_Architecture.md
 exercise_section_documentation.md
 mobile_responsiveness_guide.md
+console_objects.txt
+test-openrouter.js
+
+# logs and temporary files
+*.log
+temp/
+tmp/
+.cache/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
