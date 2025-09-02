@@ -21,8 +21,9 @@ LESSON TYPE SPECIFICATIONS:
    - Comprehensive explanations with real-world programming context
    - 2-7 key learning points that summarize core concepts
    - 1-10 complete, working code examples with detailed explanations
-   - REQUIRED: JSON diagram data for EACH code example showing code flow/logic 
-   - Optional overall concept JSON diagram data for complex concepts
+   - RECOMMENDED: JSON diagram data for code examples with logical flow (loops, conditions, multi-step processes)
+   - SKIP diagrams only for very simple examples (basic syntax, single variable declarations)
+   - Optional overall concept JSON diagram data for complex multi-step concepts
    - 2-4 practical hints for application and practice
    - Common mistakes students make
    - Programming best practices related to the concept
@@ -31,11 +32,12 @@ LESSON TYPE SPECIFICATIONS:
    - MANDATORY: Generate 3-10 educational multiple choice questions per lesson
    - Each question has exactly 4 options with one correct answer
    - Clear explanations for why answers are correct/incorrect
-   - Optional code snippets for context
+   - STRONGLY RECOMMENDED: Include code snippets for context in most questions
    - CRITICAL: When code is involved, put code ONLY in codeSnippet field, NOT in question text
    - CRITICAL: Question text should NOT involve CODE
    - Question text should be clean without embedded code blocks
-   - REQUIRED: JSON diagram data for questions with code snippets showing logic flow
+   - MANDATORY: JSON diagram data for questions with code snippets (loops, conditions, multi-step logic)
+   - Include diagrams for code flow, algorithm steps, and logical processes
    - Progressive difficulty levels within the lesson (mix of easy, medium, hard)
    - Focus on understanding concepts, not memorization
    - NEVER generate just 1 question - always create multiple questions for comprehensive assessment
@@ -45,7 +47,8 @@ LESSON TYPE SPECIFICATIONS:
    - Each question has real-world programming scenarios that students can relate to
    - Code broken into 3-8 logical blocks possibly multiline blocks for drag-and-drop interaction
    - MANDATORY: Code blocks should be unique and multiline
-   - REQUIRED: JSON diagram data showing the expected code flow or logic structure for each question
+   - RECOMMENDED: JSON diagram data for multi-step processes, algorithms, loops, or branching logic
+   - SKIP diagrams only for very simple linear sequences without logical flow
    - Students rearrange blocks to create working, functional code
    - Progressive hints (1-10) to guide students when stuck for each question
    - Clear target code showing expected final result for each question
@@ -56,9 +59,10 @@ LESSON TYPE SPECIFICATIONS:
    - MANDATORY: Generate 2-7 fill-in-blank questions per lesson
    - Each question has code templates with strategic blanks (2-5 blanks per question)
    - Multiple blank types: text input, dropdown selection
-   - REQUIRED: JSON diagram data showing code structure with blanks highlighted for each question
+   - CONDITIONAL: JSON diagram data ONLY for complex algorithmic structures or multi-step logical flows
+   - SKIP diagrams for simple syntax completion, variable declarations, or basic method calls
    - Each blank has correct answer, options (if dropdown), and explanation
-   - Complete solution with full code, comprehensive explanation, and final JSON diagram data for each question
+   - Complete solution with full code, comprehensive explanation, and conditional final JSON diagram data
    - Realistic programming scenarios and practical applications
    - Progressive difficulty levels within the lesson (mix of easy, medium, hard)
    - Don't use longer blanks as they are harder to verify correct answer
@@ -112,15 +116,56 @@ FLOWCHART DIAGRAM REQUIREMENTS:
 - Include detailed descriptions for every node and connection explaining their purpose
 - Use clear, educational labels for process steps
 
+DIAGRAM NECESSITY RULES:
+🎯 ONLY generate diagrams when they ADD SIGNIFICANT EDUCATIONAL VALUE:
+
+✅ WHEN TO INCLUDE DIAGRAMS (Required):
+- Loops and iteration (while, for, do-while) - show execution flow
+- Complex algorithms with 3+ steps (sorting, searching, recursion)
+- Decision trees with multiple branches and conditions
+- Object relationships (inheritance, composition, polymorphism)
+- Process flows with conditional logic and multiple paths
+- Error handling with try-catch-finally patterns
+- State transitions and workflow processes
+- Method overriding and polymorphism demonstrations
+- Data structure operations (array manipulation, tree traversal)
+- Multi-step code examples that involve logic flow
+- Conditional statements with branching (if-else chains)
+- Method calls and parameter passing workflows
+- ALL OOP concepts (classes, objects, inheritance, encapsulation, abstraction)
+- Constructor workflows and object initialization
+- Method interactions between multiple classes
+- Access modifiers and visibility demonstrations
+- Interface implementations and abstract class relationships
+
+❌ WHEN TO SKIP DIAGRAMS (No educational value):
+- Simple variable declarations without logic (int x = 5;)
+- Basic syntax questions about keywords or operators
+- Single print statements or basic output
+- Definition-only concepts that are purely text-based
+- Simple getter/setter methods with just return/assignment
+- Basic arithmetic operations without conditional logic
+- Single-line code completions for syntax practice
+
+🔍 EVALUATION CRITERIA:
+- Generate diagrams for any concept involving logical flow, relationships, or multi-step processes
+- Ask: "Does this diagram help students understand the PROCESS, FLOW, or RELATIONSHIP better than text alone?"
+- Prioritize diagrams for concepts students typically struggle to visualize
+- Focus on LOGICAL FLOW, STRUCTURAL RELATIONSHIPS, and OOP INTERACTIONS that benefit from visual representation
+- When in doubt, include the diagram - visual learning aids comprehension for most programming concepts
+
 CRITICAL REQUIREMENTS FOR AI:
-- EVERY code example MUST include either class OR flowchart diagram_data  
+- Generate diagram_data ONLY when it passes the necessity criteria above
+- For simple concepts, set diagram_data to null or empty object
 - Choose diagram type based on content:
-  * USE FLOWCHART for: if-else statements, loops, algorithms, decision trees, process flows, code execution steps
-  * USE CLASS for: inheritance hierarchies, object relationships, data structures, OOP concepts with classes/interfaces
+  * USE FLOWCHART for: complex algorithms, decision trees, process flows, multi-step code execution
+  * USE CLASS for: inheritance hierarchies, object relationships, data structures, OOP concepts with multiple classes/interfaces
 - FOR CLASS DIAGRAMS: ALL classes must have: id, label, type, description, attributes, methods fields filled with educational content
 - FOR CLASS DIAGRAMS: ALL relationships must have: from, to, label, type, description fields filled with educational content
 - FOR FLOWCHARTS: ALL nodes must have: id, label, type, description fields filled with educational content
 - FOR FLOWCHARTS: ALL connections must have: from, to, label, description fields filled with educational content
+- Every end-type node MUST have at least one incoming connection
+- Every decision node MUST have exactly 2 outgoing connections (True/False or Yes/No paths)
 - Use educational language in descriptions that explains programming concepts clearly
 - Maximum 6 classes or 8 nodes and 8 connections per diagram for clarity and focus
 - Mathematical expressions are allowed in labels: sqrt(n), if(x>0), arr[i], n%2

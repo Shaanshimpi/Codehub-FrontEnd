@@ -283,7 +283,9 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
 
       // Helper function to generate mermaid code from diagram data
       const generateMermaidCodeFromDiagramData = (diagramData: any): string => {
-        if (!diagramData) return ""
+        if (!diagramData || Object.keys(diagramData).length === 0) {
+          return ""
+        }
         try {
           if (typeof diagramData === "string") {
             // If already a string, assume it's mermaid code
@@ -317,8 +319,11 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
               keyPoints: lesson.content.keyPoints || [],
               codeExamples: (lesson.content.codeExamples || []).map(
                 (example: any, idx: number) => {
-                  // Log diagram conversion for verification
-                  if (example.diagram_data) {
+                  // Log diagram conversion for verification (only if meaningful data)
+                  if (
+                    example.diagram_data &&
+                    Object.keys(example.diagram_data).length > 0
+                  ) {
                     console.log(
                       `🎯 DIAGRAM CONVERSION - Code Example ${idx + 1}:`
                     )
@@ -329,7 +334,13 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     const mermaidCode =
                       example.mermaid_code ||
                       generateMermaidCodeFromDiagramData(example.diagram_data)
-                    console.log("🎨 Converted Mermaid:", mermaidCode)
+                    if (mermaidCode) {
+                      console.log("🎨 Converted Mermaid:", mermaidCode)
+                    } else {
+                      console.log(
+                        "⚠️ No diagram generated - likely simple content"
+                      )
+                    }
                     console.log("---")
                   }
                   return {
@@ -347,8 +358,11 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
               ),
               practiceHints: lesson.content.practiceHints || [],
               diagram_data: (() => {
-                // Log diagram conversion for verification
-                if (lesson.content.diagram_data) {
+                // Log diagram conversion for verification (only if meaningful data)
+                if (
+                  lesson.content.diagram_data &&
+                  Object.keys(lesson.content.diagram_data).length > 0
+                ) {
                   console.log("🎯 DIAGRAM CONVERSION - Concept Lesson:")
                   console.log(
                     "📊 Original JSON:",
@@ -359,7 +373,13 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     generateMermaidCodeFromDiagramData(
                       lesson.content.diagram_data
                     )
-                  console.log("🎨 Converted Mermaid:", mermaidCode)
+                  if (mermaidCode) {
+                    console.log("🎨 Converted Mermaid:", mermaidCode)
+                  } else {
+                    console.log(
+                      "⚠️ No diagram generated - likely simple content"
+                    )
+                  }
                   console.log("---")
                 }
                 return lesson.content.diagram_data || null
@@ -387,8 +407,11 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             ) {
               convertedData = {
                 questions: lesson.content.questions.map((q: any) => {
-                  // Log diagram conversion for verification
-                  if (q.diagram_data) {
+                  // Log diagram conversion for verification (only if meaningful data)
+                  if (
+                    q.diagram_data &&
+                    Object.keys(q.diagram_data).length > 0
+                  ) {
                     console.log("🎯 DIAGRAM CONVERSION - MCQ Question:")
                     console.log(
                       "📊 Original JSON:",
@@ -397,7 +420,13 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     const mermaidCode =
                       q.mermaid_code ||
                       generateMermaidCodeFromDiagramData(q.diagram_data)
-                    console.log("🎨 Converted Mermaid:", mermaidCode)
+                    if (mermaidCode) {
+                      console.log("🎨 Converted Mermaid:", mermaidCode)
+                    } else {
+                      console.log(
+                        "⚠️ No diagram generated - likely simple content"
+                      )
+                    }
                     console.log("---")
                   }
                   return {
@@ -446,8 +475,11 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             ) {
               convertedData = {
                 questions: lesson.content.questions.map((q: any) => {
-                  // Log diagram conversion for verification
-                  if (q.diagram_data) {
+                  // Log diagram conversion for verification (only if meaningful data)
+                  if (
+                    q.diagram_data &&
+                    Object.keys(q.diagram_data).length > 0
+                  ) {
                     console.log(
                       "🎯 DIAGRAM CONVERSION - Code Rearrange Question:"
                     )
@@ -458,7 +490,13 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     const mermaidCode =
                       q.mermaid_code ||
                       generateMermaidCodeFromDiagramData(q.diagram_data)
-                    console.log("🎨 Converted Mermaid:", mermaidCode)
+                    if (mermaidCode) {
+                      console.log("🎨 Converted Mermaid:", mermaidCode)
+                    } else {
+                      console.log(
+                        "⚠️ No diagram generated - likely simple content"
+                      )
+                    }
                     console.log("---")
                   }
                   const aiCodeBlocks = q.codeBlocks || []
@@ -532,8 +570,11 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             ) {
               convertedData = {
                 questions: lesson.content.questions.map((q: any) => {
-                  // Log diagram conversion for verification
-                  if (q.diagram_data) {
+                  // Log diagram conversion for verification (only if meaningful data)
+                  if (
+                    q.diagram_data &&
+                    Object.keys(q.diagram_data).length > 0
+                  ) {
                     console.log(
                       "🎯 DIAGRAM CONVERSION - Fill-in-Blanks Question:"
                     )
@@ -544,12 +585,21 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     const mermaidCode =
                       q.mermaid_code ||
                       generateMermaidCodeFromDiagramData(q.diagram_data)
-                    console.log("🎨 Converted Mermaid:", mermaidCode)
+                    if (mermaidCode) {
+                      console.log("🎨 Converted Mermaid:", mermaidCode)
+                    } else {
+                      console.log(
+                        "⚠️ No diagram generated - likely simple content"
+                      )
+                    }
                     console.log("---")
                   }
 
-                  // Log solution diagram conversion if exists
-                  if (q.solution?.diagram_data) {
+                  // Log solution diagram conversion if exists (only if meaningful data)
+                  if (
+                    q.solution?.diagram_data &&
+                    Object.keys(q.solution.diagram_data).length > 0
+                  ) {
                     console.log(
                       "🎯 DIAGRAM CONVERSION - Fill-in-Blanks Solution:"
                     )
@@ -562,7 +612,13 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                       generateMermaidCodeFromDiagramData(
                         q.solution.diagram_data
                       )
-                    console.log("🎨 Converted Mermaid:", solutionMermaidCode)
+                    if (solutionMermaidCode) {
+                      console.log("🎨 Converted Mermaid:", solutionMermaidCode)
+                    } else {
+                      console.log(
+                        "⚠️ No diagram generated - likely simple content"
+                      )
+                    }
                     console.log("---")
                   }
                   return {

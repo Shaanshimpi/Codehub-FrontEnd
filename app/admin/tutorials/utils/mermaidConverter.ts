@@ -177,6 +177,17 @@ const EDUCATIONAL_COLOR_THEMES = {
  */
 export function convertJSONToMermaid(diagramData: MermaidDiagramData): string {
   try {
+    // Handle null, empty, or unnecessary diagram data
+    if (
+      !diagramData ||
+      Object.keys(diagramData).length === 0 ||
+      diagramData === null ||
+      diagramData === undefined
+    ) {
+      // Return empty string for cases where diagram is not needed
+      return ""
+    }
+
     // Validate input structure
     const validation = validateDiagramData(diagramData)
     if (!validation.isValid) {
