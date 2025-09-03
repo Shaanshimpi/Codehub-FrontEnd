@@ -184,10 +184,18 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
 
       try {
         // Validate syntax first
+        console.log("🔍 Validating Mermaid syntax:", {
+          codeLength: code.length,
+          codePreview:
+            code.substring(0, 200) + (code.length > 200 ? "..." : ""),
+        })
+
         const parseResult = await mermaid.parse(code)
         if (!parseResult) {
           throw new Error("Invalid Mermaid syntax")
         }
+
+        console.log("✅ Mermaid syntax validation passed")
 
         // Generate unique ID for this render
         const renderCount = ++renderCountRef.current
@@ -206,6 +214,15 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
           message: err.message || "Failed to render diagram",
           details: err,
         }
+
+        // Console log detailed error information
+        console.error("🚨 Mermaid Render Error:", {
+          type: error.type,
+          message: error.message,
+          mermaidCode: code,
+          originalError: err,
+          stack: err.stack,
+        })
 
         setError(error)
         onError?.(error.message)

@@ -261,24 +261,27 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
                   placeholder="Explain what this code does..."
                 />
               </div>
-              {example.mermaid_code && (
-                <div className="mt-3">
-                  <MermaidDiagram
-                    diagramData={example.mermaid_code}
-                    showDebugInfo={false}
-                    onMermaidChange={(code) => {
-                      updateCodeExample(index, "mermaid_code", code)
-                      if (mermaidSetters && lessonId) {
-                        mermaidSetters.setCodeExampleMermaid(
-                          lessonId,
-                          index,
-                          code
-                        )
-                      }
-                    }}
-                  />
+              <div className="mt-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Code Example Diagram (Optional)
+                  </label>
                 </div>
-              )}
+                <MermaidDiagram
+                  diagramData={example.mermaid_code || ""}
+                  showDebugInfo={false}
+                  onMermaidChange={(code) => {
+                    updateCodeExample(index, "mermaid_code", code)
+                    if (mermaidSetters && lessonId) {
+                      mermaidSetters.setCodeExampleMermaid(
+                        lessonId,
+                        index,
+                        code
+                      )
+                    }
+                  }}
+                />
+              </div>
             </div>
           ))}
         </div>
@@ -324,23 +327,23 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
         </div>
       </div>
 
-      {formData.mermaid_code && (
-        <div>
-          <h6 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-            Overall Concept Diagram:
-          </h6>
-          <MermaidDiagram
-            diagramData={formData.mermaid_code}
-            showDebugInfo={false}
-            onMermaidChange={(code) => {
-              setFormData((prev) => ({ ...prev, mermaid_code: code }))
-              if (mermaidSetters && lessonId) {
-                mermaidSetters.setLessonMermaid(lessonId, code)
-              }
-            }}
-          />
+      <div>
+        <div className="mb-2 flex items-center justify-between">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Overall Concept Diagram (Optional)
+          </label>
         </div>
-      )}
+        <MermaidDiagram
+          diagramData={formData.mermaid_code || ""}
+          showDebugInfo={false}
+          onMermaidChange={(code) => {
+            setFormData((prev) => ({ ...prev, mermaid_code: code }))
+            if (mermaidSetters && lessonId) {
+              mermaidSetters.setLessonMermaid(lessonId, code)
+            }
+          }}
+        />
+      </div>
 
       <div>
         <div className="mb-3 flex items-center justify-between">

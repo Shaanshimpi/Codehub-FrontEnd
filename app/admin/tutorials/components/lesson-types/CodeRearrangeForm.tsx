@@ -390,22 +390,22 @@ const CodeRearrangeForm: React.FC<CodeRearrangeFormProps> = ({
                     </div>
                   </div>
 
-                  {question.diagram_data && (
-                    <div>
-                      <h6 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Question Diagram Preview:
-                      </h6>
-                      <MermaidDiagram
-                        diagramData={
-                          question.diagram_data || question.mermaid_code
-                        }
-                        showDebugInfo={false}
-                        onMermaidChange={(code) =>
-                          updateQuestion(question.id, "mermaid_code", code)
-                        }
-                      />
+                  <div className="mt-3">
+                    <div className="mb-2 flex items-center justify-between">
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Question Diagram (Optional)
+                      </label>
                     </div>
-                  )}
+                    <MermaidDiagram
+                      diagramData={
+                        question.diagram_data || question.mermaid_code || ""
+                      }
+                      showDebugInfo={false}
+                      onMermaidChange={(code) =>
+                        updateQuestion(question.id, "mermaid_code", code)
+                      }
+                    />
+                  </div>
 
                   <div>
                     <div className="mb-4 flex items-center justify-between">

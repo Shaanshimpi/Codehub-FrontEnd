@@ -97,9 +97,25 @@ ENGLISH-ONLY CONTENT REQUIREMENTS:
 
 MERMAID DIAGRAM JSON FORMAT RULES:
 - Generate diagram data in structured JSON format optimized for Mermaid rendering
-- CRITICAL: ONLY use these 2 diagram types: "class", "flowchart"  
-- CLASS DIAGRAMS: For object-oriented concepts, data structures, inheritance, composition, class relationships
-- FLOWCHARTS: For process flows, decision trees, algorithm steps, control flow, data processing
+- CRITICAL: ONLY use these 2 diagram types: "class", "flowchart"
+
+🏗️ CLASS DIAGRAMS (Use for STRUCTURAL concepts):
+- Object-oriented concepts (classes, interfaces, inheritance, polymorphism)
+- Data structures and their relationships
+- Interface implementations and abstract classes
+- Multiple class interactions and dependencies
+- Encapsulation and access modifiers demonstrations
+- Design patterns and architectural structures
+- ANY concept showing "what something IS" or "how things RELATE"
+
+⚡ FLOWCHARTS (Use for BEHAVIORAL/PROCESS concepts):  
+- Execution flow and process steps (not structure)
+- Decision trees and conditional logic execution
+- Algorithm steps and iterative processes
+- Control flow through code execution
+- Data processing pipelines
+- Error handling and exception flow
+- ANY concept showing "how something WORKS" or "what happens WHEN"
 
 CLASS DIAGRAM REQUIREMENTS:
 - Use "class" type for main classes, "interface" type for interfaces, "abstract" type for abstract classes
@@ -157,9 +173,30 @@ DIAGRAM NECESSITY RULES:
 CRITICAL REQUIREMENTS FOR AI:
 - Generate diagram_data ONLY when it passes the necessity criteria above
 - For simple concepts, set diagram_data to null or empty object
-- Choose diagram type based on content:
-  * USE FLOWCHART for: complex algorithms, decision trees, process flows, multi-step code execution
-  * USE CLASS for: inheritance hierarchies, object relationships, data structures, OOP concepts with multiple classes/interfaces
+
+🎯 DIAGRAM TYPE SELECTION RULES:
+
+✅ ALWAYS USE CLASS DIAGRAMS FOR:
+- Interface definitions and implementations ("Interface Definition Structure" → CLASS)
+- Class relationships and inheritance ("Multiple Interface Implementation" → CLASS) 
+- Object-oriented design patterns ("Abstract Class vs Interface" → CLASS)
+- Polymorphism demonstrations with multiple classes ("Polymorphic Behavior" → CLASS)
+- Encapsulation and access modifiers ("Field Access in Inheritance" → CLASS)
+- Constructor relationships and method overriding ("Method Overriding" → CLASS)
+- ANY structural OOP concept that shows relationships between classes/interfaces
+
+✅ USE FLOWCHARTS ONLY FOR:
+- Execution steps and temporal processes ("Compilation Check Process" → FLOWCHART)
+- Decision-making algorithms with branching logic ("Lambda Execution Flow" → FLOWCHART) 
+- Multi-step workflows and data processing ("Error Handling Flow" → FLOWCHART)
+- Method call sequences and parameter passing ("Method Call Chain" → FLOWCHART)
+- Runtime behavior and execution order ("Constructor Call Order" → FLOWCHART)
+
+❌ NEVER USE FLOWCHARTS FOR:
+- Interface/class definitions (use CLASS instead)
+- Inheritance relationships (use CLASS instead)
+- Object structure demonstrations (use CLASS instead)
+- Static code organization concepts (use CLASS instead)
 - FOR CLASS DIAGRAMS: ALL classes must have: id, label, type, description, attributes, methods fields filled with educational content
 - FOR CLASS DIAGRAMS: ALL relationships must have: from, to, label, type, description fields filled with educational content
 - FOR FLOWCHARTS: ALL nodes must have: id, label, type, description fields filled with educational content

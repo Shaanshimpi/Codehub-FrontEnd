@@ -53,13 +53,6 @@ export async function POST(request: Request) {
     let response
     let attemptedModel = selectedModel || "openai/gpt-4o-mini"
 
-    // Some models don't support json_schema, so we'll use json_object for unsupported models
-    const jsonSchemaSupported =
-      attemptedModel.includes("gpt-4o") ||
-      attemptedModel.includes("gpt-4-turbo") ||
-      attemptedModel.includes("gpt-3.5-turbo") ||
-      attemptedModel.includes("gpt-4")
-
     response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {

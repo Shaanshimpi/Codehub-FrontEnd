@@ -41,13 +41,29 @@ export interface MermaidDiagramData {
     attributes: Array<{
       name: string
       type: string
-      visibility: "+" | "-" | "#" | "~"
+      visibility:
+        | "+"
+        | "-"
+        | "#"
+        | "~"
+        | "public"
+        | "private"
+        | "protected"
+        | "package"
       description: string
     }>
     methods: Array<{
       name: string
       returnType: string
-      visibility: "+" | "-" | "#" | "~"
+      visibility:
+        | "+"
+        | "-"
+        | "#"
+        | "~"
+        | "public"
+        | "private"
+        | "protected"
+        | "package"
       description: string
     }>
     color?: string // Optional color theme hint
@@ -245,18 +261,27 @@ function convertToMermaidClass(data: MermaidDiagramData): string {
       cls.attributes.forEach((attr) => {
         const safeAttrName = cleanText(attr.name)
         const safeAttrType = cleanText(attr.type)
-        lines.push(`        ${attr.visibility}${safeAttrType} ${safeAttrName}`)
+        const visibility = formatVisibility(attr.visibility)
+        lines.push(`        ${visibility}${safeAttrType} ${safeAttrName}`)
       })
     }
 
     // Add methods
     if (cls.methods && cls.methods.length > 0) {
       cls.methods.forEach((method) => {
-        const safeMethodName = cleanText(method.name)
+        const safeMethodName = cleanMethodName(method.name)
         const safeReturnType = cleanText(method.returnType)
-        lines.push(
-          `        ${method.visibility}${safeMethodName} ${safeReturnType}`
-        )
+        const visibility = formatVisibility(method.visibility)
+        lines.push(`        ${visibility}${safeMethodName} ${safeReturnType}`)
+      })
+    }
+
+    // Add constructors (if provided separately from methods)
+    if ((cls as any).constructor && Array.isArray((cls as any).constructor)) {
+      ;(cls as any).constructor.forEach((constructor: any) => {
+        const safeConstructorName = cleanMethodName(constructor.name)
+        const visibility = formatVisibility(constructor.visibility)
+        lines.push(`        ${visibility}${safeConstructorName} void`)
       })
     }
 
@@ -295,7 +320,17 @@ function convertToMermaidClass(data: MermaidDiagramData): string {
     lines.push(...styleLines)
   }
 
-  return lines.join("\n")
+  const result = lines.join("\n")
+
+  // Console log the generated Mermaid code for debugging
+  console.log("🎨 Generated Mermaid Class Diagram:", {
+    title: data.title,
+    classCount: data.classes?.length || 0,
+    relationshipCount: data.relationships?.length || 0,
+    generatedCode: result,
+  })
+
+  return result
 }
 
 /**
@@ -342,6 +377,40 @@ function convertToMermaidFlowchart(data: MermaidDiagramData): string {
   }
 
   return lines.join("\n")
+}
+
+/**
+ * Convert visibility string to Mermaid symbol
+ */
+function formatVisibility(visibility: string): string {
+  switch (visibility) {
+    case "public":
+    case "+":
+      return "+"
+    case "private":
+    case "-":
+      return "-"
+    case "protected":
+    case "#":
+      return "#"
+    case "package":
+    case "~":
+      return "~"
+    default:
+      return "+" // Default to public if unknown
+  }
+}
+
+/**
+ * Clean method name for class diagrams (no quotes around parentheses)
+ */
+function cleanMethodName(methodName: string): string {
+  // Just clean whitespace and ensure proper formatting
+  return methodName
+    .replace(/\n/g, " ")
+    .replace(/\r/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
 }
 
 /**
@@ -662,12 +731,16 @@ function generateMermaidStyling(data: MermaidDiagramData): string[] {
   })
 
   // Generate link styles for connections with colors
-  data.connections.forEach((conn, index) => {
-    const color = getConnectionColor(conn)
-    if (color !== EDUCATIONAL_COLOR_THEMES.default.stroke) {
-      styleLines.push(`    linkStyle ${index} stroke:${color},stroke-width:2px`)
-    }
-  })
+  if (data.connections) {
+    data.connections.forEach((conn, index) => {
+      const color = getConnectionColor(conn)
+      if (color !== EDUCATIONAL_COLOR_THEMES.default.stroke) {
+        styleLines.push(
+          `    linkStyle ${index} stroke:${color},stroke-width:2px;`
+        )
+      }
+    })
+  }
 
   return styleLines
 }
@@ -696,17 +769,9 @@ function generateClassStyling(data: MermaidDiagramData): string[] {
     )
   })
 
-  // Generate link styles for relationships with colors
-  if (data.relationships) {
-    data.relationships.forEach((rel, index) => {
-      const color = getRelationshipColor(rel)
-      if (color !== EDUCATIONAL_COLOR_THEMES.default.stroke) {
-        styleLines.push(
-          `    linkStyle ${index} stroke:${color},stroke-width:2px`
-        )
-      }
-    })
-  }
+  // Note: linkStyle is not supported in class diagrams
+  // Class diagram relationships are styled through the relationship arrows themselves
+  // and individual class styling via the style keyword
 
   return styleLines
 }
