@@ -262,10 +262,8 @@ function convertToMermaidClass(data: MermaidDiagramData): string {
 
     lines.push(`    }`)
 
-    // Add class label if different from ID
-    if (cls.label !== cls.id) {
-      lines.push(`    ${safeId} : ${safeLabel}`)
-    }
+    // Skip adding redundant class labels for inheritance examples to keep diagrams clean
+    // Class names will be shown in the class definition itself
   })
 
   // Add empty line for readability
@@ -278,7 +276,14 @@ function convertToMermaidClass(data: MermaidDiagramData): string {
       const toId = getSafeNodeId(rel.to)
       const arrow = getClassDiagramArrow(rel.type)
       const label = rel.label ? ` : ${cleanText(rel.label)}` : ""
-      lines.push(`    ${fromId} ${arrow} ${toId}${label}`)
+
+      // For inheritance, reverse the direction so child inherits from parent
+      // Standard UML: Child <|-- Parent (child inherits from parent)
+      if (rel.type === "inheritance") {
+        lines.push(`    ${toId} ${arrow} ${fromId}${label}`)
+      } else {
+        lines.push(`    ${fromId} ${arrow} ${toId}${label}`)
+      }
     })
   }
 

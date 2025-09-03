@@ -389,12 +389,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                 generateMermaidCodeFromDiagramData(lesson.content.diagram_data),
               commonMistakes: lesson.content.commonMistakes || [],
               bestPractices: lesson.content.bestPractices || [],
-              visualElements: {
-                diagrams: lesson.content.plantuml
-                  ? [lesson.content.plantuml]
-                  : [],
-                concepts: [],
-              },
             }
             break
 
@@ -1662,7 +1656,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     ...prev,
                     reference: {
                       ...prev.reference,
-                      key_points: [...prev.reference.key_points, ""],
+                      key_points: [...(prev.reference?.key_points || []), ""],
                     },
                   }))
                 }
@@ -1673,7 +1667,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
               </button>
             </div>
             <div className="space-y-2">
-              {basicInfo.reference.key_points.map((point, index) => (
+              {(basicInfo.reference?.key_points || []).map((point, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
                     {index + 1}
@@ -1686,8 +1680,8 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                         ...prev,
                         reference: {
                           ...prev.reference,
-                          key_points: prev.reference.key_points.map((p, i) =>
-                            i === index ? e.target.value : p
+                          key_points: (prev.reference?.key_points || []).map(
+                            (p, i) => (i === index ? e.target.value : p)
                           ),
                         },
                       }))
@@ -1695,16 +1689,16 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                     placeholder="Important point to remember..."
                   />
-                  {basicInfo.reference.key_points.length > 1 && (
+                  {(basicInfo.reference?.key_points || []).length > 1 && (
                     <button
                       onClick={() =>
                         setBasicInfo((prev) => ({
                           ...prev,
                           reference: {
                             ...prev.reference,
-                            key_points: prev.reference.key_points.filter(
-                              (_, i) => i !== index
-                            ),
+                            key_points: (
+                              prev.reference?.key_points || []
+                            ).filter((_, i) => i !== index),
                           },
                         }))
                       }
@@ -1731,7 +1725,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     reference: {
                       ...prev.reference,
                       common_mistakes: [
-                        ...prev.reference.common_mistakes,
+                        ...(prev.reference?.common_mistakes || []),
                         {
                           mistake: "",
                           why_wrong: "",
@@ -1748,114 +1742,119 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
               </button>
             </div>
             <div className="space-y-4">
-              {basicInfo.reference.common_mistakes.map((mistake, index) => (
-                <div
-                  key={index}
-                  className="rounded-lg border border-slate-200 p-4 dark:border-slate-600"
-                >
-                  <div className="mb-3 flex items-center justify-between">
-                    <h4 className="font-medium text-slate-900 dark:text-white">
-                      Common Mistake {index + 1}
-                    </h4>
-                    {basicInfo.reference.common_mistakes.length > 1 && (
-                      <button
-                        onClick={() =>
-                          setBasicInfo((prev) => ({
-                            ...prev,
-                            reference: {
-                              ...prev.reference,
-                              common_mistakes:
-                                prev.reference.common_mistakes.filter(
-                                  (_, i) => i !== index
-                                ),
-                            },
-                          }))
-                        }
-                        className="text-xs text-red-600 hover:text-red-700 dark:text-red-400"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-                        Mistake Description
-                      </label>
-                      <input
-                        type="text"
-                        value={mistake.mistake}
-                        onChange={(e) =>
-                          setBasicInfo((prev) => ({
-                            ...prev,
-                            reference: {
-                              ...prev.reference,
-                              common_mistakes:
-                                prev.reference.common_mistakes.map((m, i) =>
+              {(basicInfo.reference?.common_mistakes || []).map(
+                (mistake, index) => (
+                  <div
+                    key={index}
+                    className="rounded-lg border border-slate-200 p-4 dark:border-slate-600"
+                  >
+                    <div className="mb-3 flex items-center justify-between">
+                      <h4 className="font-medium text-slate-900 dark:text-white">
+                        Common Mistake {index + 1}
+                      </h4>
+                      {(basicInfo.reference?.common_mistakes || []).length >
+                        1 && (
+                        <button
+                          onClick={() =>
+                            setBasicInfo((prev) => ({
+                              ...prev,
+                              reference: {
+                                ...prev.reference,
+                                common_mistakes: (
+                                  prev.reference?.common_mistakes || []
+                                ).filter((_, i) => i !== index),
+                              },
+                            }))
+                          }
+                          className="text-xs text-red-600 hover:text-red-700 dark:text-red-400"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                          Mistake Description
+                        </label>
+                        <input
+                          type="text"
+                          value={mistake.mistake}
+                          onChange={(e) =>
+                            setBasicInfo((prev) => ({
+                              ...prev,
+                              reference: {
+                                ...prev.reference,
+                                common_mistakes: (
+                                  prev.reference?.common_mistakes || []
+                                ).map((m, i) =>
                                   i === index
                                     ? { ...m, mistake: e.target.value }
                                     : m
                                 ),
-                            },
-                          }))
-                        }
-                        className="w-full rounded border border-slate-300 px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                        placeholder="What mistake do students commonly make?"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-                        {`Why It's Wrong`}
-                      </label>
-                      <textarea
-                        rows={2}
-                        value={mistake.why_wrong}
-                        onChange={(e) =>
-                          setBasicInfo((prev) => ({
-                            ...prev,
-                            reference: {
-                              ...prev.reference,
-                              common_mistakes:
-                                prev.reference.common_mistakes.map((m, i) =>
+                              },
+                            }))
+                          }
+                          className="w-full rounded border border-slate-300 px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                          placeholder="What mistake do students commonly make?"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                          {`Why It's Wrong`}
+                        </label>
+                        <textarea
+                          rows={2}
+                          value={mistake.why_wrong}
+                          onChange={(e) =>
+                            setBasicInfo((prev) => ({
+                              ...prev,
+                              reference: {
+                                ...prev.reference,
+                                common_mistakes: (
+                                  prev.reference?.common_mistakes || []
+                                ).map((m, i) =>
                                   i === index
                                     ? { ...m, why_wrong: e.target.value }
                                     : m
                                 ),
-                            },
-                          }))
-                        }
-                        className="w-full rounded border border-slate-300 px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                        placeholder="Explain why this approach is incorrect..."
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
-                        Correct Approach
-                      </label>
-                      <textarea
-                        rows={2}
-                        value={mistake.correct_approach}
-                        onChange={(e) =>
-                          setBasicInfo((prev) => ({
-                            ...prev,
-                            reference: {
-                              ...prev.reference,
-                              common_mistakes:
-                                prev.reference.common_mistakes.map((m, i) =>
+                              },
+                            }))
+                          }
+                          className="w-full rounded border border-slate-300 px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                          placeholder="Explain why this approach is incorrect..."
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                          Correct Approach
+                        </label>
+                        <textarea
+                          rows={2}
+                          value={mistake.correct_approach}
+                          onChange={(e) =>
+                            setBasicInfo((prev) => ({
+                              ...prev,
+                              reference: {
+                                ...prev.reference,
+                                common_mistakes: (
+                                  prev.reference?.common_mistakes || []
+                                ).map((m, i) =>
                                   i === index
                                     ? { ...m, correct_approach: e.target.value }
                                     : m
                                 ),
-                            },
-                          }))
-                        }
-                        className="w-full rounded border border-slate-300 px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                        placeholder="The correct way to handle this situation..."
-                      />
+                              },
+                            }))
+                          }
+                          className="w-full rounded border border-slate-300 px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                          placeholder="The correct way to handle this situation..."
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
           </div>
 
@@ -1871,14 +1870,14 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                 </label>
                 <textarea
                   rows={3}
-                  value={basicInfo.reference.syntax_guide.basic_syntax}
+                  value={basicInfo.reference?.syntax_guide?.basic_syntax || ""}
                   onChange={(e) =>
                     setBasicInfo((prev) => ({
                       ...prev,
                       reference: {
                         ...prev.reference,
                         syntax_guide: {
-                          ...prev.reference.syntax_guide,
+                          ...(prev.reference?.syntax_guide || {}),
                           basic_syntax: e.target.value,
                         },
                       },
@@ -1903,9 +1902,10 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                         reference: {
                           ...prev.reference,
                           syntax_guide: {
-                            ...prev.reference.syntax_guide,
+                            ...(prev.reference?.syntax_guide || {}),
                             parameters: [
-                              ...prev.reference.syntax_guide.parameters,
+                              ...(prev.reference?.syntax_guide?.parameters ||
+                                []),
                               {
                                 name: "",
                                 description: "",
@@ -1923,7 +1923,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                   </button>
                 </div>
                 <div className="space-y-2">
-                  {basicInfo.reference.syntax_guide.parameters.map(
+                  {(basicInfo.reference?.syntax_guide?.parameters || []).map(
                     (param, index) => (
                       <div
                         key={index}
@@ -1939,14 +1939,15 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                                 reference: {
                                   ...prev.reference,
                                   syntax_guide: {
-                                    ...prev.reference.syntax_guide,
-                                    parameters:
-                                      prev.reference.syntax_guide.parameters.map(
-                                        (p, i) =>
-                                          i === index
-                                            ? { ...p, name: e.target.value }
-                                            : p
-                                      ),
+                                    ...(prev.reference?.syntax_guide || {}),
+                                    parameters: (
+                                      prev.reference?.syntax_guide
+                                        ?.parameters || []
+                                    ).map((p, i) =>
+                                      i === index
+                                        ? { ...p, name: e.target.value }
+                                        : p
+                                    ),
                                   },
                                 },
                               }))
@@ -1963,17 +1964,18 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                                 reference: {
                                   ...prev.reference,
                                   syntax_guide: {
-                                    ...prev.reference.syntax_guide,
-                                    parameters:
-                                      prev.reference.syntax_guide.parameters.map(
-                                        (p, i) =>
-                                          i === index
-                                            ? {
-                                                ...p,
-                                                description: e.target.value,
-                                              }
-                                            : p
-                                      ),
+                                    ...(prev.reference?.syntax_guide || {}),
+                                    parameters: (
+                                      prev.reference?.syntax_guide
+                                        ?.parameters || []
+                                    ).map((p, i) =>
+                                      i === index
+                                        ? {
+                                            ...p,
+                                            description: e.target.value,
+                                          }
+                                        : p
+                                    ),
                                   },
                                 },
                               }))
@@ -1991,17 +1993,18 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                                   reference: {
                                     ...prev.reference,
                                     syntax_guide: {
-                                      ...prev.reference.syntax_guide,
-                                      parameters:
-                                        prev.reference.syntax_guide.parameters.map(
-                                          (p, i) =>
-                                            i === index
-                                              ? {
-                                                  ...p,
-                                                  required: e.target.checked,
-                                                }
-                                              : p
-                                        ),
+                                      ...(prev.reference?.syntax_guide || {}),
+                                      parameters: (
+                                        prev.reference?.syntax_guide
+                                          ?.parameters || []
+                                      ).map((p, i) =>
+                                        i === index
+                                          ? {
+                                              ...p,
+                                              required: e.target.checked,
+                                            }
+                                          : p
+                                      ),
                                     },
                                   },
                                 }))
@@ -2013,8 +2016,8 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                             </span>
                           </label>
                         </div>
-                        {basicInfo.reference.syntax_guide.parameters.length >
-                          1 && (
+                        {(basicInfo.reference?.syntax_guide?.parameters || [])
+                          .length > 1 && (
                           <button
                             onClick={() =>
                               setBasicInfo((prev) => ({
@@ -2022,11 +2025,11 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                                 reference: {
                                   ...prev.reference,
                                   syntax_guide: {
-                                    ...prev.reference.syntax_guide,
-                                    parameters:
-                                      prev.reference.syntax_guide.parameters.filter(
-                                        (_, i) => i !== index
-                                      ),
+                                    ...(prev.reference?.syntax_guide || {}),
+                                    parameters: (
+                                      prev.reference?.syntax_guide
+                                        ?.parameters || []
+                                    ).filter((_, i) => i !== index),
                                   },
                                 },
                               }))

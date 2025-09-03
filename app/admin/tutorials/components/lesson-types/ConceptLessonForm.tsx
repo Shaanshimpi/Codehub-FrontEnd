@@ -25,11 +25,9 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
     keyPoints: data?.keyPoints || [""],
     codeExamples: data?.codeExamples || [],
     practiceHints: data?.practiceHints || [""],
-    diagram_data: data?.diagram_data || "",
     mermaid_code: data?.mermaid_code || "",
     commonMistakes: data?.commonMistakes || [""],
     bestPractices: data?.bestPractices || [""],
-    visualElements: data?.visualElements || { diagrams: [], concepts: [] },
   })
 
   useEffect(() => {
@@ -79,7 +77,6 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
           title: "",
           code: "",
           explanation: "",
-          diagram_data_diagram: "",
           mermaid_code: "",
         },
       ],
@@ -264,17 +261,13 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
                   placeholder="Explain what this code does..."
                 />
               </div>
-              {example.diagram_data && (
+              {example.mermaid_code && (
                 <div className="mt-3">
-                  <h6 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Example Diagram Preview:
-                  </h6>
                   <MermaidDiagram
-                    diagramData={example.diagram_data || example.mermaid_code}
+                    diagramData={example.mermaid_code}
                     showDebugInfo={false}
                     onMermaidChange={(code) => {
                       updateCodeExample(index, "mermaid_code", code)
-                      // Use the new Mermaid setter
                       if (mermaidSetters && lessonId) {
                         mermaidSetters.setCodeExampleMermaid(
                           lessonId,
@@ -331,17 +324,16 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
         </div>
       </div>
 
-      {formData.diagram_data && (
+      {formData.mermaid_code && (
         <div>
           <h6 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-            Overall Concept Diagram Preview:
+            Overall Concept Diagram:
           </h6>
           <MermaidDiagram
-            diagramData={formData.diagram_data || formData.mermaid_code}
+            diagramData={formData.mermaid_code}
             showDebugInfo={false}
             onMermaidChange={(code) => {
               setFormData((prev) => ({ ...prev, mermaid_code: code }))
-              // Use the new Mermaid setter
               if (mermaidSetters && lessonId) {
                 mermaidSetters.setLessonMermaid(lessonId, code)
               }

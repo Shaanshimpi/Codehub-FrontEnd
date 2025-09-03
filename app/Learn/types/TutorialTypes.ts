@@ -290,14 +290,6 @@ export interface ConceptLessonData {
   diagram_data?: any // For runtime conversion only
   commonMistakes?: string[]
   bestPractices?: string[]
-  visualElements?: {
-    diagrams?: string[]
-    concepts?: {
-      name: string
-      description: string
-      example: string
-    }[]
-  }
 }
 
 export interface PracticalExampleData {
