@@ -135,24 +135,36 @@ FLOWCHART DIAGRAM REQUIREMENTS:
 - Use clear, educational labels for process steps
 
 DIAGRAM ARRAY RULES:
-🎯 USE MULTIPLE DIAGRAMS (Array Format) when showing:
+🎯 GENERATE ARRAYS 40% OF THE TIME - Strongly favor multiple diagrams for richer educational content:
 
-✅ MULTIPLE EXECUTION PATHS:
+⚠️  ARRAY GENERATION PRIORITY: When applicable scenarios appear, ALWAYS prefer arrays over single diagrams.
+📊 TARGET FREQUENCY: 4 out of every 10 diagram generations should be arrays.
+🎯 USE MULTIPLE DIAGRAMS (Array Format) for maximum educational impact:
+
+✅ MULTIPLE EXECUTION PATHS (High Priority - Always use arrays):
 - Input validation: "Valid Input" + "Invalid Input" + "Edge Cases"
 - Conditional logic: "True Branch" + "False Branch" + "Exception Path"
 - Algorithm scenarios: "Best Case" + "Worst Case" + "Average Case"
 - Exception handling: "Normal Flow" + "Error Flow" + "Recovery Flow"
 
-✅ BEFORE/AFTER COMPARISONS:
+✅ BEFORE/AFTER COMPARISONS (High Priority - Always use arrays):
 - Refactoring: "Before" + "After" + "Optimized"
 - Design patterns: "Problem" + "Solution" + "Alternative"
 - Code evolution: "Basic" + "Enhanced" + "Production"
 
-✅ ALTERNATIVE APPROACHES:
+✅ ALTERNATIVE APPROACHES (High Priority - Always use arrays):
 - Implementation options: "Approach A" + "Approach B" + "Hybrid"
 - Design choices: "Inheritance" + "Composition" + "Interface"
 
-❌ USE SINGLE DIAGRAM when concept is straightforward without variations
+✅ EDUCATIONAL SCENARIOS (New - Use arrays 40% of time):
+- OOP concepts: "Class Definition" + "Object Creation" + "Method Usage"
+- Loop variations: "For Loop" + "While Loop" + "Enhanced For"
+- Error handling: "Try Block" + "Catch Handling" + "Finally Cleanup"
+- Data structures: "Creation" + "Manipulation" + "Traversal"
+- Function concepts: "Declaration" + "Parameters" + "Return Values"
+- Variable scope: "Local Scope" + "Instance Scope" + "Static Scope"
+
+❌ USE SINGLE DIAGRAM only when concept has no meaningful variations (60% of remaining cases)
 
 DIAGRAM NECESSITY RULES:
 🎯 ONLY generate diagrams when they ADD SIGNIFICANT EDUCATIONAL VALUE:

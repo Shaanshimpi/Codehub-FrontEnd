@@ -221,9 +221,37 @@ const MermaidDiagramTest: React.FC = () => {
         />
       </div>
 
-      {/* Test 5: Dark Theme */}
+      {/* Test 5: Array of Diagrams with Tabs */}
       <div>
-        <h2 className="mb-3 text-xl font-semibold">Test 5: Dark Theme</h2>
+        <h2 className="mb-3 text-xl font-semibold">
+          Test 5: Array of Diagrams (Multiple Tabs)
+        </h2>
+        <MermaidDiagram
+          diagramData={[
+            { ...sampleSequenceDiagram, title: "Valid Input Flow" },
+            { ...sampleFlowchartDiagram, title: "Error Handling Flow" },
+            {
+              ...sampleSequenceDiagram,
+              title: "Edge Case Flow",
+              nodes: sampleSequenceDiagram.nodes.map((node) => ({
+                ...node,
+                label: node.label.includes("add")
+                  ? "validate(value)"
+                  : node.label,
+              })),
+            },
+          ]}
+          showDebugInfo={true}
+          showMermaidEditor={true}
+          editable={false}
+          className="rounded-lg border"
+          onError={(error) => console.error("Array diagram error:", error)}
+        />
+      </div>
+
+      {/* Test 6: Dark Theme */}
+      <div>
+        <h2 className="mb-3 text-xl font-semibold">Test 6: Dark Theme</h2>
         <div className="rounded-lg bg-gray-900 p-4">
           <MermaidDiagram
             diagramData={sampleSequenceDiagram}

@@ -1068,7 +1068,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             </label>
             <input
               type="text"
-              value={basicInfo.title}
+              value={basicInfo.title || ""}
               onChange={(e) => {
                 const newTitle = e.target.value
                 setBasicInfo((prev) => ({
@@ -1088,7 +1088,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             </label>
             <input
               type="text"
-              value={basicInfo.slug}
+              value={basicInfo.slug || ""}
               onChange={(e) =>
                 setBasicInfo((prev) => ({ ...prev, slug: e.target.value }))
               }
@@ -1112,7 +1112,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             ) : (
               <div className="relative">
                 <select
-                  value={basicInfo.programmingLanguage}
+                  value={basicInfo.programmingLanguage || ""}
                   onChange={(e) =>
                     setBasicInfo((prev) => ({
                       ...prev,
@@ -1138,7 +1138,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
               Difficulty Level
             </label>
             <select
-              value={basicInfo.difficulty}
+              value={basicInfo.difficulty || 1}
               onChange={(e) =>
                 setBasicInfo((prev) => ({
                   ...prev,
@@ -1207,7 +1207,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             Description
           </label>
           <textarea
-            value={basicInfo.description}
+            value={basicInfo.description || ""}
             onChange={(e) =>
               setBasicInfo((prev) => ({ ...prev, description: e.target.value }))
             }
@@ -1223,7 +1223,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
           </label>
           <input
             type="url"
-            value={basicInfo.videoUrl}
+            value={basicInfo.videoUrl || ""}
             onChange={(e) =>
               setBasicInfo((prev) => ({ ...prev, videoUrl: e.target.value }))
             }

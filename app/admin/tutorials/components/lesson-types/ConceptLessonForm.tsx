@@ -268,7 +268,9 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
                   </label>
                 </div>
                 <MermaidDiagram
-                  diagramData={example.mermaid_code || ""}
+                  diagramData={
+                    example.diagram_data || example.mermaid_code || ""
+                  }
                   showDebugInfo={false}
                   onMermaidChange={(code) => {
                     updateCodeExample(index, "mermaid_code", code)
@@ -334,7 +336,7 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
           </label>
         </div>
         <MermaidDiagram
-          diagramData={formData.mermaid_code || ""}
+          diagramData={formData.diagram_data || formData.mermaid_code || ""}
           showDebugInfo={false}
           onMermaidChange={(code) => {
             setFormData((prev) => ({ ...prev, mermaid_code: code }))

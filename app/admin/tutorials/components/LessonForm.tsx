@@ -149,7 +149,7 @@ const LessonForm: React.FC<LessonFormProps> = ({
             </label>
             <input
               type="text"
-              value={formData.title}
+              value={formData.title || ""}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, title: e.target.value }))
               }
@@ -163,7 +163,7 @@ const LessonForm: React.FC<LessonFormProps> = ({
               Lesson Type
             </label>
             <select
-              value={formData.type}
+              value={formData.type || ""}
               onChange={(e) => {
                 setFormData((prev) => ({
                   ...prev,
@@ -188,7 +188,7 @@ const LessonForm: React.FC<LessonFormProps> = ({
             Description (Optional)
           </label>
           <textarea
-            value={formData.description}
+            value={formData.description || ""}
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, description: e.target.value }))
             }
@@ -204,7 +204,7 @@ const LessonForm: React.FC<LessonFormProps> = ({
           </label>
           <input
             type="url"
-            value={formData.videoUrl}
+            value={formData.videoUrl || ""}
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, videoUrl: e.target.value }))
             }
@@ -223,7 +223,7 @@ const LessonForm: React.FC<LessonFormProps> = ({
               Difficulty Level
             </label>
             <select
-              value={formData.difficulty}
+              value={formData.difficulty || 1}
               onChange={(e) =>
                 setFormData((prev) => ({
                   ...prev,
@@ -264,7 +264,7 @@ const LessonForm: React.FC<LessonFormProps> = ({
               <div key={index} className="flex items-center gap-2">
                 <input
                   type="text"
-                  value={objective}
+                  value={objective || ""}
                   onChange={(e) => {
                     const newObjectives = [...formData.learningObjectives]
                     newObjectives[index] = e.target.value
@@ -323,7 +323,7 @@ const LessonForm: React.FC<LessonFormProps> = ({
               <div key={index} className="flex items-center gap-2">
                 <input
                   type="text"
-                  value={topic}
+                  value={topic || ""}
                   onChange={(e) => {
                     const newTopics = [...formData.keyTopics]
                     newTopics[index] = e.target.value

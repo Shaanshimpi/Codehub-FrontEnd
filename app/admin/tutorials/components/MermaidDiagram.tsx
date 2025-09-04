@@ -144,10 +144,12 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
     }
   }, [theme, onError])
 
-  // Convert diagram data to Mermaid syntax
+  // Convert diagram data to Mermaid syntax (pure function - no state updates)
   const processDiagramData = useCallback(
     (
-      data: MermaidDiagramData | MermaidDiagramData[] | string | null
+      data: MermaidDiagramData | MermaidDiagramData[] | string | null,
+      validDiagrams: MermaidDiagramData[],
+      currentTabIndex: number
     ): string => {
       console.log("🎨 MermaidDiagram: Processing diagram data", {
         dataType: typeof data,
@@ -181,20 +183,8 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
         if (Array.isArray(data)) {
           console.log("📊 MermaidDiagram: Processing array of diagrams", {
             totalCount: data.length,
-            activeTabIndex,
+            activeTabIndex: currentTabIndex,
             diagramTitles: data.map((d, i) => d?.title || `Diagram ${i + 1}`),
-          })
-
-          setIsArrayDiagram(true)
-
-          // Validate array elements
-          const validDiagrams = data.filter((diagram) =>
-            isMermaidDiagramData(diagram)
-          )
-          console.log("✅ MermaidDiagram: Validation results", {
-            totalDiagrams: data.length,
-            validDiagrams: validDiagrams.length,
-            invalidDiagrams: data.length - validDiagrams.length,
           })
 
           if (validDiagrams.length === 0) {
@@ -202,9 +192,8 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
             throw new Error("Array contains no valid diagram data")
           }
 
-          setDiagrams(validDiagrams)
           const currentIndex =
-            activeTabIndex < validDiagrams.length ? activeTabIndex : 0
+            currentTabIndex < validDiagrams.length ? currentTabIndex : 0
 
           if (validDiagrams.length > 0 && validDiagrams[currentIndex]) {
             const selectedDiagram = validDiagrams[currentIndex]
@@ -235,7 +224,6 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
           diagramData: data,
         })
 
-        setIsArrayDiagram(false)
         if (isMermaidDiagramData(data)) {
           const convertedCode = convertJSONToMermaid(data)
           console.log("🔄 MermaidDiagram: Single diagram converted", {
@@ -274,7 +262,7 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
         return generateErrorDiagram("Invalid diagram data")
       }
     },
-    [onError, activeTabIndex]
+    [onError]
   )
 
   // Render Mermaid diagram to SVG
@@ -395,11 +383,70 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
     initializeMermaid()
   }, [initializeMermaid])
 
-  // Process diagram data when it changes
+  // Initialize diagram state when data changes
   useEffect(() => {
-    const processedCode = processDiagramData(diagramData)
-    setMermaidCode(processedCode)
-  }, [diagramData, processDiagramData])
+    console.log("🔄 MermaidDiagram: Data changed, updating state", {
+      dataType: typeof diagramData,
+      isArray: Array.isArray(diagramData),
+    })
+
+    if (Array.isArray(diagramData)) {
+      // Handle array data
+      const validDiagrams = diagramData.filter((diagram) =>
+        isMermaidDiagramData(diagram)
+      )
+      console.log("✅ MermaidDiagram: Array validation results", {
+        totalDiagrams: diagramData.length,
+        validDiagrams: validDiagrams.length,
+      })
+
+      setIsArrayDiagram(true)
+      setDiagrams(validDiagrams)
+
+      // Reset tab index if it's out of bounds
+      if (activeTabIndex >= validDiagrams.length) {
+        setActiveTabIndex(0)
+      }
+    } else {
+      // Handle single diagram or string data
+      setIsArrayDiagram(false)
+      setDiagrams([])
+    }
+  }, [diagramData, activeTabIndex])
+
+  // Process diagram data to mermaid code
+  useEffect(() => {
+    if (Array.isArray(diagramData)) {
+      // For arrays, only process if we have diagrams state populated
+      if (diagrams.length > 0) {
+        const processedCode = processDiagramData(
+          diagramData,
+          diagrams,
+          activeTabIndex
+        )
+        setMermaidCode(processedCode)
+      } else {
+        // Validate diagrams inline if state not ready yet
+        const validDiagrams = diagramData.filter((diagram) =>
+          isMermaidDiagramData(diagram)
+        )
+        if (validDiagrams.length > 0) {
+          const processedCode = processDiagramData(
+            diagramData,
+            validDiagrams,
+            activeTabIndex
+          )
+          setMermaidCode(processedCode)
+        } else {
+          setMermaidCode(generateErrorDiagram("Invalid diagram data"))
+        }
+      }
+    } else {
+      // For single diagrams or strings
+      const processedCode = processDiagramData(diagramData, [], 0)
+      setMermaidCode(processedCode)
+    }
+  }, [diagramData, diagrams, activeTabIndex, processDiagramData])
 
   // Render diagram when code changes
   useEffect(() => {
@@ -407,20 +454,6 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
       renderDiagram(mermaidCode)
     }
   }, [mermaidCode, isInitialized, renderDiagram])
-
-  // Handle tab changes for array diagrams
-  useEffect(() => {
-    if (isArrayDiagram && diagrams.length > 0) {
-      const processedCode = processDiagramData(diagramData)
-      setMermaidCode(processedCode)
-    }
-  }, [
-    activeTabIndex,
-    isArrayDiagram,
-    diagrams,
-    diagramData,
-    processDiagramData,
-  ])
 
   // Render component
   return (
@@ -532,7 +565,7 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
         </label>
         <textarea
           ref={editorRef}
-          value={mermaidCode}
+          value={mermaidCode || ""}
           onChange={(e) => handleCodeChange(e.target.value)}
           className="resize-vertical h-40 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
           placeholder="Edit Mermaid code here to update the diagram in real-time..."
