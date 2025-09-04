@@ -52,7 +52,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
       code.length,
       "characters"
     )
-    console.log(`🎨 Mermaid content preview:`, code.substring(0, 100) + "...")
   }
 
   const setCodeExampleMermaid = (
@@ -238,36 +237,49 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
         index: initialData.index || 1,
         isLocked:
           initialData.isLocked !== undefined ? initialData.isLocked : true,
-        reference: initialData.reference || {
-          title: "",
-          subtitle: "",
-          introduction: "",
-          examples: [
-            {
-              title: "",
-              description: "",
-              code: "",
-              explanation: "",
-              output: "",
-            },
-          ],
-          key_points: [""],
-          common_mistakes: [
-            {
-              mistake: "",
-              why_wrong: "",
-              correct_approach: "",
-            },
-          ],
+        reference: {
+          title: initialData.reference?.title || "",
+          subtitle: initialData.reference?.subtitle || "",
+          introduction: initialData.reference?.introduction || "",
+          examples:
+            initialData.reference?.examples?.length > 0
+              ? initialData.reference.examples
+              : [
+                  {
+                    title: "",
+                    description: "",
+                    code: "",
+                    explanation: "",
+                    output: "",
+                  },
+                ],
+          key_points:
+            initialData.reference?.key_points?.length > 0
+              ? initialData.reference.key_points
+              : [""],
+          common_mistakes:
+            initialData.reference?.common_mistakes?.length > 0
+              ? initialData.reference.common_mistakes
+              : [
+                  {
+                    mistake: "",
+                    why_wrong: "",
+                    correct_approach: "",
+                  },
+                ],
           syntax_guide: {
-            basic_syntax: "",
-            parameters: [
-              {
-                name: "",
-                description: "",
-                required: false,
-              },
-            ],
+            basic_syntax:
+              initialData.reference?.syntax_guide?.basic_syntax || "",
+            parameters:
+              initialData.reference?.syntax_guide?.parameters?.length > 0
+                ? initialData.reference.syntax_guide.parameters
+                : [
+                    {
+                      name: "",
+                      description: "",
+                      required: false,
+                    },
+                  ],
           },
         },
       })
@@ -294,16 +306,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
 
           // Handle array of diagrams - convert first valid diagram for legacy compatibility
           if (Array.isArray(diagramData)) {
-            console.log(
-              "🔄 MultiLessonForm: Converting array diagram to string",
-              {
-                arrayLength: diagramData.length,
-                firstTitle: diagramData[0]?.title,
-                allTitles: diagramData.map((d) => d?.title).filter(Boolean),
-                note: "Using first diagram for legacy string conversion",
-              }
-            )
-
             // Find first valid diagram in array
             const validDiagram = diagramData.find((d) => d && d.type)
             if (validDiagram) {
@@ -315,12 +317,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
           // Convert single JSON diagram data to mermaid using our converter
           return convertJSONToMermaid(diagramData)
         } catch (error) {
-          console.log("🔧 DIAGRAM CONVERSION ERROR:", {
-            originalData: diagramData,
-            error: error.message,
-            type: diagramData?.type || "unknown",
-            isArray: Array.isArray(diagramData),
-          })
           return ""
         }
       }
@@ -380,30 +376,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
               ),
               practiceHints: lesson.content.practiceHints || [],
               diagram_data: (() => {
-                // Log diagram conversion for verification (only if meaningful data)
-                if (
-                  lesson.content.diagram_data &&
-                  Object.keys(lesson.content.diagram_data).length > 0
-                ) {
-                  console.log("🎯 DIAGRAM CONVERSION - Concept Lesson:")
-                  console.log(
-                    "📊 Original JSON:",
-                    JSON.stringify(lesson.content.diagram_data, null, 2)
-                  )
-                  const mermaidCode =
-                    lesson.content.mermaid_code ||
-                    generateMermaidCodeFromDiagramData(
-                      lesson.content.diagram_data
-                    )
-                  if (mermaidCode) {
-                    console.log("🎨 Converted Mermaid:", mermaidCode)
-                  } else {
-                    console.log(
-                      "⚠️ No diagram generated - likely simple content"
-                    )
-                  }
-                  console.log("---")
-                }
                 return lesson.content.diagram_data || null
               })(),
               mermaid_code:
@@ -1500,7 +1472,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                 key={index}
                 className="mb-4 rounded-lg border border-slate-200 p-4 dark:border-slate-600"
               >
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3">
                   <div>
                     <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
                       Example Title
@@ -1529,8 +1501,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
                       Expected Output (optional)
                     </label>
-                    <input
-                      type="text"
+                    <textarea
                       value={example.output}
                       onChange={(e) =>
                         setBasicInfo((prev) => ({

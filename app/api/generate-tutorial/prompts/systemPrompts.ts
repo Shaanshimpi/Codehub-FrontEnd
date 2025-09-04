@@ -73,20 +73,26 @@ LESSON TYPE SPECIFICATIONS:
    - Include a clear title and subtitle that describe what students will learn
    - Write an engaging introduction paragraph explaining the concept's importance
    - REQUIRED: Generate 3-10 complete, practical examples with:
-     * Descriptive titles (e.g., "Basic Example: When Condition is False")
-     * Brief descriptions of what each example demonstrates
-     * Complete, executable code with clear comments
-     * Detailed explanations referencing specific lines and outcomes
-     * Expected output (when applicable)
-   - Include 3-6 key points students should remember about the concept
+     * Descriptive titles (e.g., "Basic while Loop: Counting from 1 to 5", "Array Processing with while Loop")
+     * Brief descriptions of what each example demonstrates in specific technical terms
+     * CRITICAL: Complete, executable code with NO placeholders - must be real, runnable code in the specified language
+     * Use ONLY the programming language specified in the tutorial (no generic "Programming Language" text)
+     * Detailed explanations referencing specific lines and outcomes using actual variable names and values
+     * Expected output (when applicable) - show actual program output with real values, not placeholders
+   - Include 3-6 key points students should remember about the concept:
+     * Focus on specific technical details (loop initialization, condition evaluation, increment operators, etc.)
+     * Avoid generic statements like "understanding is important" or "this concept is fundamental"
+     * Provide actionable insights students can apply immediately with concrete examples
    - Document 2-4 common beginner mistakes with:
-     * Clear description of the mistake
-     * Explanation of why it's wrong
-     * The correct approach to use instead
+     * SPECIFIC mistakes beginners actually make (infinite loops, off-by-one errors, missing increment statements, etc.)
+     * Technical explanation of why it causes problems with code examples
+     * Concrete correct approach with actual working code examples in the specified language
    - Provide a syntax guide with:
-     * Basic syntax template in plain text
-     * Parameter explanations with required/optional flags
+     * EXACT syntax template for the tutorial's programming language (not generic templates)
+     * Parameter explanations with required/optional flags and specific data types
+     * Real variable names like "count", "userInput", "array", not placeholder names like "concept" or "variable"
    - This reference should be a complete, standalone tutorial page separate from lessons
+   - ABSOLUTE REQUIREMENT: The reference field must contain only real, executable code in the specified language
 
 ENGLISH-ONLY CONTENT REQUIREMENTS:
 - Use clear, professional, educational English appropriate for programming education
@@ -350,7 +356,70 @@ EXAMPLE DIAGRAM ARRAY STRUCTURE:
       {"from": "validate", "to": "error", "label": "Invalid", "type": "arrow", "condition": "false", "description": "Input fails validation"}
     ]
   }
-]`
+]
+
+🎯 PERFECT REFERENCE FIELD EXAMPLE:
+This is EXACTLY how the reference field should be structured. NEVER use placeholder content like this example shows:
+
+{
+  "reference": {
+    "title": "C while Loops",
+    "subtitle": "Mastering Loop Control Flow in C Programming",
+    "introduction": "The while loop in C is a fundamental control structure that executes a block of code repeatedly as long as a specified condition remains true. It provides precise control over program flow and is essential for creating dynamic, responsive applications that can handle varying amounts of data or user input.",
+    "examples": [
+      {
+        "title": "Basic while Loop: Counting from 1 to 5",
+        "description": "A simple counter loop demonstrating initialization, condition checking, and increment operations.",
+        "code": "#include <stdio.h>\\n\\nint main() {\\n    int count = 1;\\n    while (count <= 5) {\\n        printf(\\"Count: %d\\n\\", count);\\n        count++;\\n    }\\n    printf(\\"Loop finished.\\n\\");\\n    return 0;\\n}",
+        "explanation": "This program initializes count to 1, then enters the while loop. The condition count <= 5 is checked before each iteration. Inside the loop, the current value is printed and count is incremented. When count becomes 6, the condition becomes false and the loop terminates.",
+        "output": "Count: 1\\nCount: 2\\nCount: 3\\nCount: 4\\nCount: 5\\nLoop finished."
+      },
+      {
+        "title": "Input Validation with while Loop",
+        "description": "Using while loop to repeatedly prompt user until valid input is received.",
+        "code": "#include <stdio.h>\\n\\nint main() {\\n    int number;\\n    printf(\\"Enter a positive number: \\");\\n    scanf(\\"%d\\", &number);\\n    \\n    while (number <= 0) {\\n        printf(\\"Invalid! Please enter a positive number: \\");\\n        scanf(\\"%d\\", &number);\\n    }\\n    \\n    printf(\\"You entered: %d\\n\\", number);\\n    return 0;\\n}",
+        "explanation": "The program first prompts for input, then uses a while loop to validate it. If the number is not positive, the loop continues asking for new input. Only when a valid positive number is entered does the loop terminate and the program proceeds.",
+        "output": "Enter a positive number: -3\\nInvalid! Please enter a positive number: 0\\nInvalid! Please enter a positive number: 7\\nYou entered: 7"
+      }
+    ],
+    "key_points": [
+      "The while loop condition is evaluated before each iteration, making it a pre-test loop",
+      "Loop variables must be properly initialized before the while statement begins",
+      "The loop body must contain code that eventually makes the condition false to prevent infinite loops",
+      "While loops are ideal when the number of iterations depends on runtime conditions rather than fixed counts"
+    ],
+    "common_mistakes": [
+      {
+        "mistake": "Forgetting to update the loop control variable inside the loop body",
+        "why_wrong": "Without updating the control variable, the condition never changes, resulting in an infinite loop that will consume system resources and hang the program",
+        "correct_approach": "Always include an increment, decrement, or other modification statement within the loop: while(i < 10) { printf(\\"%d\\", i); i++; }"
+      },
+      {
+        "mistake": "Using assignment (=) instead of comparison (==) in the loop condition",
+        "why_wrong": "Assignment changes the variable's value and always returns true (for non-zero values), causing unexpected behavior and potential infinite loops",
+        "correct_approach": "Use comparison operators: while(x == 5) instead of while(x = 5). The compiler may warn about this common error."
+      }
+    ],
+    "syntax_guide": {
+      "basic_syntax": "while (condition) {\\n    // statements to execute\\n    // update statement\\n}",
+      "parameters": [
+        {
+          "name": "condition",
+          "description": "Boolean expression evaluated before each iteration. Must eventually become false for loop termination.",
+          "required": true
+        },
+        {
+          "name": "loop_body",
+          "description": "Block of statements executed repeatedly while condition is true. Must include logic to modify condition variables.",
+          "required": true
+        }
+      ]
+    }
+  }
+}
+
+
+✅ ALWAYS GENERATE REAL CONTENT LIKE THE PERFECT EXAMPLE ABOVE`
 
 export const LESSON_PROGRESSION_GUIDELINES = `LESSON PROGRESSION STRATEGY:
 
@@ -455,7 +524,42 @@ The response MUST be a valid JSON object with this precise structure (English-on
     "Application description in English",
     "Another application description in English"
   ],
-  "tags": ["tutorial", "tags"]
+  "tags": ["tutorial", "tags"],
+  "reference": {
+    "title": "Concept Name in [Language]",
+    "subtitle": "Complete [Language] Reference Guide",
+    "introduction": "Comprehensive explanation of the concept's importance in [Language] programming",
+    "examples": [
+      {
+        "title": "Specific Example Title with Technical Terms",
+        "description": "What this example demonstrates technically",
+        "code": "Complete executable code in the specified language",
+        "explanation": "Step-by-step explanation referencing actual code",
+        "output": "Actual program output with real values"
+      }
+    ],
+    "key_points": [
+      "Specific technical detail about the concept",
+      "Another concrete rule or behavior"
+    ],
+    "common_mistakes": [
+      {
+        "mistake": "Specific error with code example",
+        "why_wrong": "Technical explanation of the problem",
+        "correct_approach": "Working code showing the fix"
+      }
+    ],
+    "syntax_guide": {
+      "basic_syntax": "Actual syntax template in the specified language",
+      "parameters": [
+        {
+          "name": "specific_parameter_name",
+          "description": "What this parameter does technically",
+          "required": true
+        }
+      ]
+    }
+  }
 }
 
 LESSON CONTENT STRUCTURES BY TYPE:
@@ -676,6 +780,7 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 10. Generate comprehensive tutorial metadata, learning objectives, and practical applications
 11. Make sure all code and logic is in ${language}
 12. Whatever fields are optional in json format should mostly (70% of time) return data, they should contain data as many times as possible, avoid only if They are absolutely impossible.
+13. CRITICAL: Generate the "reference" field as a TOP-LEVEL tutorial property, NOT as a lesson. Reference is separate from lessons array.
 
 
 📚 LESSON TYPE DISTRIBUTION:
@@ -692,6 +797,10 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 - ALWAYS use the exact JSON schema structure provided above
 - ALWAYS maintain educational quality, technical accuracy, and cultural appropriateness
 - ALWAYS ensure content matches the specified difficulty level appropriately
+- CRITICAL: The "reference" field must contain ACTUAL working code, not placeholders or generic templates
+- REFERENCE VALIDATION: Every code example in the reference field must be executable in the specified language
+- REFERENCE REQUIREMENT: Use the PERFECT REFERENCE FIELD EXAMPLE above as your template - NEVER deviate from this structure
+- REFERENCE LANGUAGE: The reference field must use ONLY the specified programming language throughout - NO generic terms
 
 Generate a complete, comprehensive, professionally-designed programming tutorial that effectively teaches ${topic} concepts through diverse, interactive, and engaging lessons that prepare students for real-world application.
 
@@ -770,6 +879,7 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 8. Maintain high educational quality and technical accuracy across all lesson types
 9. Ensure all content is culturally appropriate and relevant for Indian learners
 10. Generate comprehensive tutorial metadata, learning objectives, and practical applications
+11. CRITICAL: Generate the "reference" field as a TOP-LEVEL tutorial property, NOT as a lesson. Reference is separate from lessons array.
 
 📚 LESSON TYPE DISTRIBUTION:
 - Minimum 1 concept lesson for essential foundational knowledge
@@ -788,6 +898,10 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 - ALWAYS maintain educational quality, technical accuracy, and cultural appropriateness
 - ALWAYS ensure content matches the specified difficulty level appropriately
 - Always teach in proper structured way for beginner
+- CRITICAL: The "reference" field must contain ACTUAL working code in ${language}, not placeholders or generic templates
+- REFERENCE VALIDATION: Every code example in the reference field must be executable in ${language}
+- REFERENCE REQUIREMENT: Use the PERFECT REFERENCE FIELD EXAMPLE above as your template - NEVER deviate from this structure
+- REFERENCE LANGUAGE: The reference field must use ONLY ${language} throughout - NO generic terms like "Programming Language"
 
 Generate a complete, comprehensive, professionally-designed programming tutorial that effectively teaches ${topic} concepts through diverse, interactive, and engaging lessons that prepare students for real-world application.
 

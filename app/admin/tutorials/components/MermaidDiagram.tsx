@@ -151,44 +151,18 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
       validDiagrams: MermaidDiagramData[],
       currentTabIndex: number
     ): string => {
-      console.log("🎨 MermaidDiagram: Processing diagram data", {
-        dataType: typeof data,
-        isArray: Array.isArray(data),
-        isNull: data === null,
-        dataStructure: data
-          ? Array.isArray(data)
-            ? `Array[${data.length}]`
-            : typeof data === "string"
-              ? "String"
-              : "Object"
-          : "null",
-      })
-
       try {
         if (!data) {
-          console.log(
-            "⚪ MermaidDiagram: No data provided, returning empty string"
-          )
           return ""
         }
 
         if (typeof data === "string") {
-          console.log("📝 MermaidDiagram: Processing string data", {
-            codeLength: data.length,
-          })
           return data
         }
 
         // Handle array of diagrams
         if (Array.isArray(data)) {
-          console.log("📊 MermaidDiagram: Processing array of diagrams", {
-            totalCount: data.length,
-            activeTabIndex: currentTabIndex,
-            diagramTitles: data.map((d, i) => d?.title || `Diagram ${i + 1}`),
-          })
-
           if (validDiagrams.length === 0) {
-            console.error("❌ MermaidDiagram: No valid diagrams found in array")
             throw new Error("Array contains no valid diagram data")
           }
 
@@ -197,61 +171,20 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
 
           if (validDiagrams.length > 0 && validDiagrams[currentIndex]) {
             const selectedDiagram = validDiagrams[currentIndex]
-            console.log("🎯 MermaidDiagram: Converting selected diagram", {
-              selectedIndex: currentIndex,
-              diagramTitle: selectedDiagram.title,
-              diagramType: selectedDiagram.type,
-              diagramData: selectedDiagram,
-            })
-
             const convertedCode = convertJSONToMermaid(selectedDiagram)
-            console.log("🔄 MermaidDiagram: Conversion complete", {
-              convertedLength: convertedCode.length,
-              convertedPreview:
-                convertedCode.substring(0, 200) +
-                (convertedCode.length > 200 ? "..." : ""),
-            })
-
             return convertedCode
           }
           return ""
         }
 
         // Handle single diagram
-        console.log("🔷 MermaidDiagram: Processing single diagram", {
-          diagramType: data.type,
-          diagramTitle: data.title,
-          diagramData: data,
-        })
-
         if (isMermaidDiagramData(data)) {
           const convertedCode = convertJSONToMermaid(data)
-          console.log("🔄 MermaidDiagram: Single diagram converted", {
-            convertedLength: convertedCode.length,
-            convertedPreview:
-              convertedCode.substring(0, 200) +
-              (convertedCode.length > 200 ? "..." : ""),
-          })
           return convertedCode
         }
 
-        console.error("❌ MermaidDiagram: Invalid single diagram data", {
-          data,
-        })
         throw new Error("Invalid diagram data format")
       } catch (err) {
-        console.error("🚨 MermaidDiagram: Processing error")
-        console.error("  📋 Error Message:", err?.message)
-        console.error("  📄 Original Data:", JSON.stringify(data, null, 2))
-        console.error("  📊 Data Analysis:", {
-          dataType: typeof data,
-          isArray: Array.isArray(data),
-          arrayLength: Array.isArray(data) ? data.length : "N/A",
-          hasTitle:
-            data?.title || (Array.isArray(data) ? data[0]?.title : "N/A"),
-        })
-        console.error("  🔍 Error Stack:", err?.stack)
-
         const error: MermaidError = {
           type: MermaidErrorType.INVALID_DATA,
           message: "Failed to process diagram data",
@@ -268,17 +201,7 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
   // Render Mermaid diagram to SVG
   const renderDiagram = useCallback(
     async (code: string) => {
-      console.log("🔍 MermaidDiagram: Starting render process", {
-        codeLength: code.length,
-        codePreview: code.substring(0, 200) + (code.length > 200 ? "..." : ""),
-        isInitialized,
-        isEmpty: !code.trim(),
-      })
-
       if (!code.trim() || !isInitialized) {
-        console.log(
-          "⚪ MermaidDiagram: Skipping render - no code or not initialized"
-        )
         return
       }
 
@@ -287,42 +210,21 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
 
       try {
         // Validate syntax first
-        console.log("🔧 MermaidDiagram: Validating Mermaid syntax")
         const parseResult = await mermaid.parse(code)
         if (!parseResult) {
           throw new Error("Invalid Mermaid syntax")
         }
-        console.log("✅ MermaidDiagram: Syntax validation passed")
 
         // Generate unique ID for this render
         const renderCount = ++renderCountRef.current
         const diagramId = `mermaid-diagram-${renderCount}-${Date.now()}`
-        console.log("🆔 MermaidDiagram: Generated diagram ID", {
-          diagramId,
-          renderCount,
-        })
 
         // Render the diagram
-        console.log("🎨 MermaidDiagram: Rendering SVG")
         const { svg } = await mermaid.render(diagramId, code)
-
-        console.log("✅ MermaidDiagram: Render successful", {
-          svgLength: svg.length,
-          svgPreview: svg.substring(0, 200) + (svg.length > 200 ? "..." : ""),
-        })
 
         setRenderedSVG(svg)
         setError(null)
       } catch (err: any) {
-        console.error("🚨 MermaidDiagram: Render error", {
-          errorType: err.message?.includes("syntax")
-            ? "PARSE_ERROR"
-            : "RENDER_ERROR",
-          errorMessage: err.message,
-          errorStack: err.stack,
-          originalCode: code,
-        })
-
         const error: MermaidError = {
           type: err.message?.includes("syntax")
             ? MermaidErrorType.PARSE_ERROR
@@ -335,25 +237,19 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
         onError?.(error.message)
 
         // Generate fallback error diagram
-        console.log("🔧 MermaidDiagram: Generating fallback error diagram")
         const errorDiagram = generateErrorDiagram(error.message)
         try {
           const { svg } = await mermaid.render(
             `error-${Date.now()}`,
             errorDiagram
           )
-          console.log("✅ MermaidDiagram: Error diagram rendered successfully")
           setRenderedSVG(svg)
         } catch (errorErr) {
-          console.error("❌ MermaidDiagram: Even error diagram failed", {
-            errorErr,
-          })
           // If even error diagram fails, show text fallback
           setRenderedSVG("")
         }
       } finally {
         setIsLoading(false)
-        console.log("🏁 MermaidDiagram: Render process completed")
       }
     },
     [isInitialized, onError]
@@ -385,20 +281,11 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
 
   // Initialize diagram state when data changes
   useEffect(() => {
-    console.log("🔄 MermaidDiagram: Data changed, updating state", {
-      dataType: typeof diagramData,
-      isArray: Array.isArray(diagramData),
-    })
-
     if (Array.isArray(diagramData)) {
       // Handle array data
       const validDiagrams = diagramData.filter((diagram) =>
         isMermaidDiagramData(diagram)
       )
-      console.log("✅ MermaidDiagram: Array validation results", {
-        totalDiagrams: diagramData.length,
-        validDiagrams: validDiagrams.length,
-      })
 
       setIsArrayDiagram(true)
       setDiagrams(validDiagrams)

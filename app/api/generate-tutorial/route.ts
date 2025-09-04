@@ -50,34 +50,36 @@ export async function POST(request: Request) {
     }
 
     // Try with selected model first, fallback to GPT-4o-mini if needed
-    let response
     let attemptedModel = selectedModel || "openai/gpt-4o-mini"
 
-    response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.AI_CHATBOT_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: attemptedModel,
-        max_tokens: 50000,
-        temperature: 0.7,
-        top_p: 0.9,
-        frequency_penalty: 0.1,
-        presence_penalty: 0.1,
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        response_format: {
-          type: "json_object",
-          json_schema: COMPLETE_TUTORIAL_SCHEMA,
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.AI_CHATBOT_API_KEY}`,
+          "Content-Type": "application/json",
         },
-      }),
-    })
+        body: JSON.stringify({
+          model: attemptedModel,
+          max_tokens: 50000,
+          temperature: 0.7,
+          top_p: 0.9,
+          frequency_penalty: 0.1,
+          presence_penalty: 0.1,
+          messages: [
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+          response_format: {
+            type: "json_object",
+            json_schema: COMPLETE_TUTORIAL_SCHEMA,
+          },
+        }),
+      }
+    )
 
     const data = await response.json()
 
@@ -148,7 +150,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const processedTutorial = convertToModernFormat(parsedTutorial)
+    const processedTutorial = convertToModernFormat(JSON.parse(content))
 
     return NextResponse.json(processedTutorial)
   } catch (error) {

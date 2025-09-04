@@ -652,85 +652,95 @@ export const TUTORIAL_TAGS_SCHEMA = {
 export const TUTORIAL_REFERENCE_SCHEMA = {
   type: "object",
   description:
-    "W3Schools-style comprehensive reference tutorial page teaching the complete concept",
+    "CRITICAL: W3Schools-style comprehensive reference tutorial page. NEVER use placeholder content like '// Example code will be provided here'. ALL code must be real, executable code in the specified programming language.",
   properties: {
     title: {
       type: "string",
-      description: "Main concept title (e.g., 'If Statements', 'While Loops')",
+      description:
+        "Main concept title using the specific programming language (e.g., 'C while Loops', 'Python Functions', 'Java Classes') - NEVER use generic terms like 'Programming Language'",
     },
     subtitle: {
       type: "string",
       description:
-        "Brief subtitle explaining what will be learned (e.g., 'Using the `if` Statement in C')",
+        "Specific subtitle with the actual programming language (e.g., 'Mastering while Loop Control Flow in C Programming', 'Understanding Function Parameters in Python') - NEVER use 'Programming Language'",
     },
     introduction: {
       type: "string",
       description:
-        "Opening paragraph explaining the concept and its importance in programming",
+        "Opening paragraph explaining the concept's importance using the specific programming language name throughout the text. Must be 2-4 sentences with concrete technical details.",
     },
     examples: {
       type: "array",
-      description: "5-10 complete examples with full code and explanations",
+      description:
+        "MANDATORY: 3-10 complete, executable code examples. Each example must contain ACTUAL working code in the specified language, NEVER placeholder text or generic 'Programming Language' references.",
       items: {
         type: "object",
         properties: {
           title: {
             type: "string",
             description:
-              "Example title (e.g., 'Basic Example: When Condition is False')",
+              "SPECIFIC example title using technical terms (e.g., 'Basic while Loop: Counting from 1 to 5 in C', 'Array Processing with while Loop in C', 'Input Validation using while Loop in C') - NEVER generic titles like 'Basic Example'",
           },
           description: {
             type: "string",
-            description: "Brief description of what this example demonstrates",
+            description:
+              "Technical description explaining what this example demonstrates using specific programming concepts and the actual language name. Must be 1-2 sentences with concrete details.",
           },
           code: {
             type: "string",
             description:
-              "Complete, working PLAIN TEXT code example that can be executed",
+              "CRITICAL: Complete, working, executable code in the specified programming language. Must include proper imports, main functions, variable declarations, and be runnable. NEVER use placeholder comments like '// code will be provided here' or generic language references.",
           },
           explanation: {
             type: "string",
             description:
-              "Detailed explanation of how the code works, referencing specific lines and outcomes",
+              "DETAILED explanation referencing specific lines, variable names, function calls, and outcomes from the actual code above. Must be 3-5 sentences explaining HOW the code works step by step.",
           },
           output: {
             type: "string",
-            description: "Expected output when the code is run (optional)",
+            description:
+              "ACTUAL expected output when the code is executed - real values, not placeholders like '// output will be shown here'. Show the exact text that would appear when running the code.",
           },
         },
         required: ["title", "description", "code", "explanation"],
         additionalProperties: false,
       },
       minItems: 3,
-      maxItems: 4,
+      maxItems: 10,
     },
     key_points: {
       type: "array",
-      description: "Important points to remember about this concept",
+      description:
+        "SPECIFIC technical points about the concept in the given programming language. Each point must reference concrete syntax, behavior, or rules - NEVER generic statements like 'understanding is important'.",
       items: {
         type: "string",
-        description: "Key point or rule about the concept",
+        description:
+          "CONCRETE key point with technical details (e.g., 'The while loop condition is evaluated before each iteration', 'Loop variables must be initialized before the while statement') - NEVER vague generalities.",
       },
       minItems: 3,
       maxItems: 6,
     },
     common_mistakes: {
       type: "array",
-      description: "Common mistakes beginners make with this concept",
+      description:
+        "SPECIFIC mistakes beginners make with real code examples showing the error and correction in the actual programming language.",
       items: {
         type: "object",
         properties: {
           mistake: {
             type: "string",
-            description: "Description of the common mistake",
+            description:
+              "SPECIFIC technical mistake with actual code snippet or scenario (e.g., 'Forgetting to increment the loop counter: while(i < 5) { print(i); }' )",
           },
           why_wrong: {
             type: "string",
-            description: "Why this approach is incorrect",
+            description:
+              "TECHNICAL explanation of why this causes problems, mentioning specific consequences like infinite loops, compilation errors, or incorrect behavior.",
           },
           correct_approach: {
             type: "string",
-            description: "The correct way to handle this situation",
+            description:
+              "CONCRETE solution with actual code example in the specified language showing the correct way to handle this situation.",
           },
         },
         required: ["mistake", "why_wrong", "correct_approach"],
@@ -741,29 +751,35 @@ export const TUTORIAL_REFERENCE_SCHEMA = {
     },
     syntax_guide: {
       type: "object",
-      description: "Syntax reference for the concept",
+      description:
+        "EXACT syntax reference for the concept in the specified programming language - NO generic templates or placeholders.",
       properties: {
         basic_syntax: {
           type: "string",
-          description: "Basic syntax template in plain text",
+          description:
+            "ACTUAL syntax template in the specified programming language (e.g., 'while (condition) { statements; }' for C) - NEVER use placeholder text like '// syntax here'",
         },
         parameters: {
           type: "array",
-          description: "Explanation of syntax components",
+          description:
+            "DETAILED explanation of each syntax component with real examples from the programming language.",
           items: {
             type: "object",
             properties: {
               name: {
                 type: "string",
-                description: "Parameter or component name",
+                description:
+                  "SPECIFIC component name using real terminology (e.g., 'condition', 'loop_body', 'counter_variable') - NEVER generic names like 'concept' or 'parameter'",
               },
               description: {
                 type: "string",
-                description: "What this component does",
+                description:
+                  "TECHNICAL description of what this component does with specific details and examples from the actual programming language syntax.",
               },
               required: {
                 type: "boolean",
-                description: "Whether this component is required",
+                description:
+                  "Whether this syntax component is mandatory for the construct to work correctly.",
               },
             },
             required: ["name", "description", "required"],
