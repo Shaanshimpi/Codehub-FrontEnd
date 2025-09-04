@@ -218,7 +218,7 @@ const MCQForm: React.FC<MCQFormProps> = ({
           type="url"
           value={videoUrl}
           onChange={(e) => setVideoUrl(e.target.value)}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
           placeholder="e.g., https://youtube.com/watch?v=example"
         />
         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
@@ -236,7 +236,15 @@ const MCQForm: React.FC<MCQFormProps> = ({
               className="rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800"
             >
               {/* Question Header */}
-              <div className="flex items-center justify-between border-b border-slate-200 p-4 dark:border-slate-700">
+              <div
+                className="flex cursor-pointer items-center justify-between border-b border-slate-200 p-4 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700/50"
+                onClick={() => toggleQuestionExpanded(question.id)}
+                onKeyDown={(e) =>
+                  e.key === "Enter" && toggleQuestionExpanded(question.id)
+                }
+                role="button"
+                tabIndex={0}
+              >
                 <div className="flex items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
                     {questionIndex + 1}
@@ -252,23 +260,21 @@ const MCQForm: React.FC<MCQFormProps> = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => toggleQuestionExpanded(question.id)}
-                    className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700"
-                  >
-                    {isExpanded ? (
-                      <ChevronUp className="h-4 w-4" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4" />
-                    )}
-                  </button>
                   {questions.length > 1 && (
                     <button
-                      onClick={() => removeQuestion(question.id)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        removeQuestion(question.id)
+                      }}
                       className="rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
+                  )}
+                  {isExpanded ? (
+                    <ChevronUp className="h-4 w-4 text-slate-400" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 text-slate-400" />
                   )}
                 </div>
               </div>
@@ -287,7 +293,7 @@ const MCQForm: React.FC<MCQFormProps> = ({
                         updateQuestion(question.id, "question", e.target.value)
                       }
                       rows={3}
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                       placeholder="Enter your multiple choice question here..."
                     />
                   </div>
@@ -306,7 +312,7 @@ const MCQForm: React.FC<MCQFormProps> = ({
                           parseInt(e.target.value) as 1 | 2 | 3
                         )
                       }
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                     >
                       <option value={1}>1 - Beginner</option>
                       <option value={2}>2 - Intermediate</option>
@@ -397,7 +403,7 @@ const MCQForm: React.FC<MCQFormProps> = ({
                                   e.target.value
                                 )
                               }
-                              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                               placeholder={`Option ${String.fromCharCode(65 + optionIndex)}`}
                             />
                           </div>
@@ -458,7 +464,7 @@ const MCQForm: React.FC<MCQFormProps> = ({
                         )
                       }
                       rows={3}
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                       placeholder="Explain why the correct answer is right and provide additional context..."
                     />
                   </div>

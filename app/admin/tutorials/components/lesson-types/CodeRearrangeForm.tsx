@@ -273,7 +273,7 @@ const CodeRearrangeForm: React.FC<CodeRearrangeFormProps> = ({
           type="url"
           value={videoUrl}
           onChange={(e) => setVideoUrl(e.target.value)}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
           placeholder="e.g., https://youtube.com/watch?v=example"
         />
         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
@@ -325,7 +325,7 @@ const CodeRearrangeForm: React.FC<CodeRearrangeFormProps> = ({
                     )
                   }
                   onClick={(e) => e.stopPropagation()}
-                  className="rounded border border-slate-300 px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 >
                   <option value={1}>Easy</option>
                   <option value={2}>Medium</option>
@@ -337,15 +337,15 @@ const CodeRearrangeForm: React.FC<CodeRearrangeFormProps> = ({
                       e.stopPropagation()
                       removeQuestion(question.id)
                     }}
-                    className="rounded-lg p-1 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                    className="rounded-lg p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
                 )}
                 {expandedQuestions[question.id] ? (
-                  <ChevronUp className="h-5 w-5 text-slate-400" />
+                  <ChevronUp className="h-4 w-4 text-slate-400" />
                 ) : (
-                  <ChevronDown className="h-5 w-5 text-slate-400" />
+                  <ChevronDown className="h-4 w-4 text-slate-400" />
                 )}
               </div>
             </div>
@@ -363,7 +363,7 @@ const CodeRearrangeForm: React.FC<CodeRearrangeFormProps> = ({
                         updateQuestion(question.id, "scenario", e.target.value)
                       }
                       rows={3}
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                       placeholder="Describe what students need to do with the code blocks..."
                     />
                   </div>
@@ -383,7 +383,7 @@ const CodeRearrangeForm: React.FC<CodeRearrangeFormProps> = ({
                           )
                         }
                         rows={8}
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                        className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                         placeholder="Enter the complete, working code that students should create..."
                       />
                       <Code className="absolute right-3 top-3 h-4 w-4 text-slate-400" />
@@ -482,7 +482,7 @@ const CodeRearrangeForm: React.FC<CodeRearrangeFormProps> = ({
                                 )
                               }
                               rows={3}
-                              className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                              className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                               placeholder={`Enter code for block ${block.correctOrder}...`}
                             />
                           </div>
@@ -518,7 +518,7 @@ const CodeRearrangeForm: React.FC<CodeRearrangeFormProps> = ({
                             onChange={(e) =>
                               updateHint(question.id, hintIndex, e.target.value)
                             }
-                            className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                            className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                             placeholder="Progressive hint to help students..."
                           />
                           {question.hints.length > 1 && (

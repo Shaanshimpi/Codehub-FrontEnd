@@ -17,7 +17,7 @@ import {
 
 // Component props interface
 interface MermaidDiagramProps {
-  diagramData?: MermaidDiagramData | string | null
+  diagramData?: MermaidDiagramData | MermaidDiagramData[] | string | null
   className?: string
   showDebugInfo?: boolean
   showMermaidEditor?: boolean
@@ -93,6 +93,9 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<MermaidError | null>(null)
   const [isInitialized, setIsInitialized] = useState<boolean>(false)
+  const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
+  const [diagrams, setDiagrams] = useState<MermaidDiagramData[]>([])
+  const [isArrayDiagram, setIsArrayDiagram] = useState<boolean>(false)
 
   // Refs
   const containerRef = useRef<HTMLDivElement>(null)
@@ -143,22 +146,124 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
 
   // Convert diagram data to Mermaid syntax
   const processDiagramData = useCallback(
-    (data: MermaidDiagramData | string | null): string => {
+    (
+      data: MermaidDiagramData | MermaidDiagramData[] | string | null
+    ): string => {
+      console.log("🎨 MermaidDiagram: Processing diagram data", {
+        dataType: typeof data,
+        isArray: Array.isArray(data),
+        isNull: data === null,
+        dataStructure: data
+          ? Array.isArray(data)
+            ? `Array[${data.length}]`
+            : typeof data === "string"
+              ? "String"
+              : "Object"
+          : "null",
+      })
+
       try {
         if (!data) {
+          console.log(
+            "⚪ MermaidDiagram: No data provided, returning empty string"
+          )
           return ""
         }
 
         if (typeof data === "string") {
+          console.log("📝 MermaidDiagram: Processing string data", {
+            codeLength: data.length,
+          })
           return data
         }
 
-        if (isMermaidDiagramData(data)) {
-          return convertJSONToMermaid(data)
+        // Handle array of diagrams
+        if (Array.isArray(data)) {
+          console.log("📊 MermaidDiagram: Processing array of diagrams", {
+            totalCount: data.length,
+            activeTabIndex,
+            diagramTitles: data.map((d, i) => d?.title || `Diagram ${i + 1}`),
+          })
+
+          setIsArrayDiagram(true)
+
+          // Validate array elements
+          const validDiagrams = data.filter((diagram) =>
+            isMermaidDiagramData(diagram)
+          )
+          console.log("✅ MermaidDiagram: Validation results", {
+            totalDiagrams: data.length,
+            validDiagrams: validDiagrams.length,
+            invalidDiagrams: data.length - validDiagrams.length,
+          })
+
+          if (validDiagrams.length === 0) {
+            console.error("❌ MermaidDiagram: No valid diagrams found in array")
+            throw new Error("Array contains no valid diagram data")
+          }
+
+          setDiagrams(validDiagrams)
+          const currentIndex =
+            activeTabIndex < validDiagrams.length ? activeTabIndex : 0
+
+          if (validDiagrams.length > 0 && validDiagrams[currentIndex]) {
+            const selectedDiagram = validDiagrams[currentIndex]
+            console.log("🎯 MermaidDiagram: Converting selected diagram", {
+              selectedIndex: currentIndex,
+              diagramTitle: selectedDiagram.title,
+              diagramType: selectedDiagram.type,
+              diagramData: selectedDiagram,
+            })
+
+            const convertedCode = convertJSONToMermaid(selectedDiagram)
+            console.log("🔄 MermaidDiagram: Conversion complete", {
+              convertedLength: convertedCode.length,
+              convertedPreview:
+                convertedCode.substring(0, 200) +
+                (convertedCode.length > 200 ? "..." : ""),
+            })
+
+            return convertedCode
+          }
+          return ""
         }
 
+        // Handle single diagram
+        console.log("🔷 MermaidDiagram: Processing single diagram", {
+          diagramType: data.type,
+          diagramTitle: data.title,
+          diagramData: data,
+        })
+
+        setIsArrayDiagram(false)
+        if (isMermaidDiagramData(data)) {
+          const convertedCode = convertJSONToMermaid(data)
+          console.log("🔄 MermaidDiagram: Single diagram converted", {
+            convertedLength: convertedCode.length,
+            convertedPreview:
+              convertedCode.substring(0, 200) +
+              (convertedCode.length > 200 ? "..." : ""),
+          })
+          return convertedCode
+        }
+
+        console.error("❌ MermaidDiagram: Invalid single diagram data", {
+          data,
+        })
         throw new Error("Invalid diagram data format")
       } catch (err) {
+        console.error("🚨 MermaidDiagram: Processing error")
+        console.error("  📋 Error Message:", err?.message)
+        console.error("  📄 Original Data:", JSON.stringify(data, null, 2))
+        console.error("  📊 Data Analysis:", {
+          dataType: typeof data,
+          isArray: Array.isArray(data),
+          arrayLength: Array.isArray(data) ? data.length : "N/A",
+          hasTitle:
+            data?.title || (Array.isArray(data) ? data[0]?.title : "N/A"),
+        })
+        console.error("  🔍 Error Stack:", err?.stack)
+
         const error: MermaidError = {
           type: MermaidErrorType.INVALID_DATA,
           message: "Failed to process diagram data",
@@ -169,13 +274,23 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
         return generateErrorDiagram("Invalid diagram data")
       }
     },
-    [onError]
+    [onError, activeTabIndex]
   )
 
   // Render Mermaid diagram to SVG
   const renderDiagram = useCallback(
     async (code: string) => {
+      console.log("🔍 MermaidDiagram: Starting render process", {
+        codeLength: code.length,
+        codePreview: code.substring(0, 200) + (code.length > 200 ? "..." : ""),
+        isInitialized,
+        isEmpty: !code.trim(),
+      })
+
       if (!code.trim() || !isInitialized) {
+        console.log(
+          "⚪ MermaidDiagram: Skipping render - no code or not initialized"
+        )
         return
       }
 
@@ -184,29 +299,42 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
 
       try {
         // Validate syntax first
-        console.log("🔍 Validating Mermaid syntax:", {
-          codeLength: code.length,
-          codePreview:
-            code.substring(0, 200) + (code.length > 200 ? "..." : ""),
-        })
-
+        console.log("🔧 MermaidDiagram: Validating Mermaid syntax")
         const parseResult = await mermaid.parse(code)
         if (!parseResult) {
           throw new Error("Invalid Mermaid syntax")
         }
-
-        console.log("✅ Mermaid syntax validation passed")
+        console.log("✅ MermaidDiagram: Syntax validation passed")
 
         // Generate unique ID for this render
         const renderCount = ++renderCountRef.current
         const diagramId = `mermaid-diagram-${renderCount}-${Date.now()}`
+        console.log("🆔 MermaidDiagram: Generated diagram ID", {
+          diagramId,
+          renderCount,
+        })
 
         // Render the diagram
+        console.log("🎨 MermaidDiagram: Rendering SVG")
         const { svg } = await mermaid.render(diagramId, code)
+
+        console.log("✅ MermaidDiagram: Render successful", {
+          svgLength: svg.length,
+          svgPreview: svg.substring(0, 200) + (svg.length > 200 ? "..." : ""),
+        })
 
         setRenderedSVG(svg)
         setError(null)
       } catch (err: any) {
+        console.error("🚨 MermaidDiagram: Render error", {
+          errorType: err.message?.includes("syntax")
+            ? "PARSE_ERROR"
+            : "RENDER_ERROR",
+          errorMessage: err.message,
+          errorStack: err.stack,
+          originalCode: code,
+        })
+
         const error: MermaidError = {
           type: err.message?.includes("syntax")
             ? MermaidErrorType.PARSE_ERROR
@@ -215,32 +343,29 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
           details: err,
         }
 
-        // Console log detailed error information
-        console.error("🚨 Mermaid Render Error:", {
-          type: error.type,
-          message: error.message,
-          mermaidCode: code,
-          originalError: err,
-          stack: err.stack,
-        })
-
         setError(error)
         onError?.(error.message)
 
         // Generate fallback error diagram
+        console.log("🔧 MermaidDiagram: Generating fallback error diagram")
         const errorDiagram = generateErrorDiagram(error.message)
         try {
           const { svg } = await mermaid.render(
             `error-${Date.now()}`,
             errorDiagram
           )
+          console.log("✅ MermaidDiagram: Error diagram rendered successfully")
           setRenderedSVG(svg)
-        } catch {
+        } catch (errorErr) {
+          console.error("❌ MermaidDiagram: Even error diagram failed", {
+            errorErr,
+          })
           // If even error diagram fails, show text fallback
           setRenderedSVG("")
         }
       } finally {
         setIsLoading(false)
+        console.log("🏁 MermaidDiagram: Render process completed")
       }
     },
     [isInitialized, onError]
@@ -283,6 +408,20 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
     }
   }, [mermaidCode, isInitialized, renderDiagram])
 
+  // Handle tab changes for array diagrams
+  useEffect(() => {
+    if (isArrayDiagram && diagrams.length > 0) {
+      const processedCode = processDiagramData(diagramData)
+      setMermaidCode(processedCode)
+    }
+  }, [
+    activeTabIndex,
+    isArrayDiagram,
+    diagrams,
+    diagramData,
+    processDiagramData,
+  ])
+
   // Render component
   return (
     <div className={`mermaid-diagram-container ${className}`}>
@@ -306,6 +445,27 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
               <strong>Error:</strong> {error.type} - {error.message}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Tab Navigation for Array Diagrams */}
+      {isArrayDiagram && diagrams.length > 1 && (
+        <div className="mb-4">
+          <div className="flex space-x-1 rounded-lg bg-gray-100 p-1">
+            {diagrams.map((diagram, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveTabIndex(index)}
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                  activeTabIndex === index
+                    ? "bg-white text-blue-600 shadow"
+                    : "text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {diagram.title || `Case ${index + 1}`}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -358,21 +518,32 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
 
       {/* Mermaid Code Editor - Always show for admin forms */}
       <div className="mt-4">
-        <label className="mb-2 block text-sm font-medium text-gray-700">
+        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
           Mermaid Code Editor
+          {isArrayDiagram &&
+            diagrams.length > 0 &&
+            diagrams[activeTabIndex] && (
+              <span className="ml-2 text-sm font-normal text-blue-600">
+                (
+                {diagrams[activeTabIndex].title || `Case ${activeTabIndex + 1}`}
+                )
+              </span>
+            )}
         </label>
         <textarea
           ref={editorRef}
           value={mermaidCode}
           onChange={(e) => handleCodeChange(e.target.value)}
-          className="resize-vertical h-40 w-full rounded-lg border border-gray-300 p-3 font-mono text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          className="resize-vertical h-40 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
           placeholder="Edit Mermaid code here to update the diagram in real-time..."
         />
-        <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+        <div className="mt-2 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
           <span>
             Edit the Mermaid code above to update the diagram in real-time.
           </span>
-          <span className="text-gray-400">{mermaidCode.length} characters</span>
+          <span className="text-slate-400">
+            {mermaidCode.length} characters
+          </span>
         </div>
       </div>
     </div>

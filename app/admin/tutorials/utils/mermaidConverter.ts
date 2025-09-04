@@ -192,6 +192,38 @@ const EDUCATIONAL_COLOR_THEMES = {
  * @returns Mermaid syntax string ready for rendering
  */
 export function convertJSONToMermaid(diagramData: MermaidDiagramData): string {
+  console.log("🎯 MermaidConverter: Starting conversion", {
+    diagramType: diagramData?.type,
+    diagramTitle: diagramData?.title,
+    hasClasses: diagramData?.classes?.length > 0,
+    hasNodes: diagramData?.nodes?.length > 0,
+    dataStructure: {
+      type: diagramData?.type,
+      classCount: diagramData?.classes?.length || 0,
+      nodeCount: diagramData?.nodes?.length || 0,
+      relationshipCount: diagramData?.relationships?.length || 0,
+      connectionCount: diagramData?.connections?.length || 0,
+    },
+  })
+
+  // Additional safeguard: prevent arrays from reaching this function
+  if (Array.isArray(diagramData)) {
+    console.error("🚨 MermaidConverter: Array passed to single converter!")
+    console.error("  📋 Array Contents:", JSON.stringify(diagramData, null, 2))
+    console.error("  🔧 Fix: Use first valid diagram or handle array properly")
+
+    // Extract first valid diagram as emergency fallback
+    const validDiagram = diagramData.find(
+      (d) => d && typeof d === "object" && d.type
+    )
+    if (validDiagram) {
+      console.log("🔄 MermaidConverter: Using first valid diagram from array")
+      return convertJSONToMermaid(validDiagram)
+    } else {
+      return generateErrorDiagram(["Array contains no valid diagram objects"])
+    }
+  }
+
   try {
     // Handle null, empty, or unnecessary diagram data
     if (
@@ -200,30 +232,66 @@ export function convertJSONToMermaid(diagramData: MermaidDiagramData): string {
       diagramData === null ||
       diagramData === undefined
     ) {
+      console.log(
+        "⚪ MermaidConverter: Empty or null data, returning empty string"
+      )
       // Return empty string for cases where diagram is not needed
       return ""
     }
 
     // Validate input structure
+    console.log("🔍 MermaidConverter: Validating diagram data")
     const validation = validateDiagramData(diagramData)
     if (!validation.isValid) {
-      console.error("Invalid diagram data:", validation.errors)
+      console.error("❌ MermaidConverter: Validation failed")
+      console.error("  📋 Validation Errors:", validation.errors)
+      console.error("  📄 Original Data:", JSON.stringify(diagramData, null, 2))
+      console.error("  📊 Data Structure:", {
+        type: diagramData?.type,
+        title: diagramData?.title,
+        hasClasses: !!diagramData?.classes,
+        hasNodes: !!diagramData?.nodes,
+        classCount: diagramData?.classes?.length || 0,
+        nodeCount: diagramData?.nodes?.length || 0,
+      })
       return generateErrorDiagram(validation.errors)
     }
+    console.log("✅ MermaidConverter: Validation passed")
 
     // Convert based on diagram type
+    console.log(`🔄 MermaidConverter: Converting ${diagramData.type} diagram`)
+    let result: string
+
     switch (diagramData.type) {
       case "class":
-        return convertToMermaidClass(diagramData)
+        result = convertToMermaidClass(diagramData)
+        break
       case "flowchart":
-        return convertToMermaidFlowchart(diagramData)
+        result = convertToMermaidFlowchart(diagramData)
+        break
       default:
-        return generateErrorDiagram([
+        result = generateErrorDiagram([
           `Unsupported diagram type: ${diagramData.type}`,
         ])
+        break
     }
+
+    console.log("✅ MermaidConverter: Conversion completed", {
+      resultLength: result.length,
+      resultPreview:
+        result.substring(0, 200) + (result.length > 200 ? "..." : ""),
+      diagramType: diagramData.type,
+      diagramTitle: diagramData.title,
+    })
+
+    return result
   } catch (error) {
-    console.error("Mermaid conversion error:", error)
+    console.error("🚨 MermaidConverter: Conversion error", {
+      error,
+      errorMessage: error instanceof Error ? error.message : "Unknown error",
+      originalData: diagramData,
+      stack: error instanceof Error ? error.stack : undefined,
+    })
     return generateErrorDiagram([
       `Conversion failed: ${error instanceof Error ? error.message : "Unknown error"}`,
     ])

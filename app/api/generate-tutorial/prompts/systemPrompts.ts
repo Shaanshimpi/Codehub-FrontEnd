@@ -98,6 +98,8 @@ ENGLISH-ONLY CONTENT REQUIREMENTS:
 MERMAID DIAGRAM JSON FORMAT RULES:
 - Generate diagram data in structured JSON format optimized for Mermaid rendering
 - CRITICAL: ONLY use these 2 diagram types: "class", "flowchart"
+- MULTIPLE DIAGRAMS: Use array format when showing different scenarios, execution paths, or comparisons
+- SINGLE DIAGRAM: Use object format for simple, single-concept visualizations
 
 🏗️ CLASS DIAGRAMS (Use for STRUCTURAL concepts):
 - Object-oriented concepts (classes, interfaces, inheritance, polymorphism)
@@ -131,6 +133,26 @@ FLOWCHART DIAGRAM REQUIREMENTS:
 - Connection types: "arrow" (-->), use "condition" field for decision paths (Yes/No, True/False)
 - Include detailed descriptions for every node and connection explaining their purpose
 - Use clear, educational labels for process steps
+
+DIAGRAM ARRAY RULES:
+🎯 USE MULTIPLE DIAGRAMS (Array Format) when showing:
+
+✅ MULTIPLE EXECUTION PATHS:
+- Input validation: "Valid Input" + "Invalid Input" + "Edge Cases"
+- Conditional logic: "True Branch" + "False Branch" + "Exception Path"
+- Algorithm scenarios: "Best Case" + "Worst Case" + "Average Case"
+- Exception handling: "Normal Flow" + "Error Flow" + "Recovery Flow"
+
+✅ BEFORE/AFTER COMPARISONS:
+- Refactoring: "Before" + "After" + "Optimized"
+- Design patterns: "Problem" + "Solution" + "Alternative"
+- Code evolution: "Basic" + "Enhanced" + "Production"
+
+✅ ALTERNATIVE APPROACHES:
+- Implementation options: "Approach A" + "Approach B" + "Hybrid"
+- Design choices: "Inheritance" + "Composition" + "Interface"
+
+❌ USE SINGLE DIAGRAM when concept is straightforward without variations
 
 DIAGRAM NECESSITY RULES:
 🎯 ONLY generate diagrams when they ADD SIGNIFICANT EDUCATIONAL VALUE:
@@ -171,8 +193,12 @@ DIAGRAM NECESSITY RULES:
 - When in doubt, include the diagram - visual learning aids comprehension for most programming concepts
 
 CRITICAL REQUIREMENTS FOR AI:
-- Generate diagram_data ONLY when it passes the necessity criteria above
+- Generate diagram_data ONLY when it passes the necessity criteria above  
 - For simple concepts, set diagram_data to null or empty object
+- DIAGRAM TITLES: Use 2-3 words maximum for array diagram titles (e.g., "Valid Input", "Error Case", "Best Case")
+- TITLE GUIDELINES: Titles should be descriptive yet concise for tab navigation
+  * Good: "Valid Input", "Error Flow", "Success Path", "Edge Case"  
+  * Bad: "What happens when user provides valid input data", "Error handling scenario"
 
 🎯 DIAGRAM TYPE SELECTION RULES:
 
@@ -280,7 +306,39 @@ EXAMPLE FLOWCHART STRUCTURE:
       "condition": "false", "description": "Exit loop when all elements are processed"
     }
   ]
-}`
+}
+
+EXAMPLE DIAGRAM ARRAY STRUCTURE:
+[
+  {
+    "title": "Valid Input",
+    "type": "flowchart",
+    "direction": "TD",
+    "nodes": [
+      {"id": "input", "label": "User Input: Valid", "type": "start", "shape": "stadium", "description": "Valid user input received"},
+      {"id": "process", "label": "Process Data", "type": "process", "shape": "rectangle", "description": "Normal processing flow"},
+      {"id": "success", "label": "Success", "type": "end", "shape": "stadium", "description": "Operation completed successfully"}
+    ],
+    "connections": [
+      {"from": "input", "to": "process", "label": "Valid", "type": "arrow", "description": "Input passes validation"},
+      {"from": "process", "to": "success", "label": "Complete", "type": "arrow", "description": "Processing successful"}
+    ]
+  },
+  {
+    "title": "Invalid Input", 
+    "type": "flowchart",
+    "direction": "TD",
+    "nodes": [
+      {"id": "input", "label": "User Input: Invalid", "type": "start", "shape": "stadium", "description": "Invalid user input received"},
+      {"id": "validate", "label": "Validation Check", "type": "decision", "shape": "diamond", "description": "Check input validity"},
+      {"id": "error", "label": "Show Error", "type": "end", "shape": "stadium", "description": "Display error message"}
+    ],
+    "connections": [
+      {"from": "input", "to": "validate", "label": "Check", "type": "arrow", "description": "Validate input"},
+      {"from": "validate", "to": "error", "label": "Invalid", "type": "arrow", "condition": "false", "description": "Input fails validation"}
+    ]
+  }
+]`
 
 export const LESSON_PROGRESSION_GUIDELINES = `LESSON PROGRESSION STRATEGY:
 
@@ -458,6 +516,11 @@ LESSON CONTENT STRUCTURES BY TYPE:
         "nodes": [],
         "connections": []
       }
+      // OR for multiple scenarios:
+      // "diagram_data": [
+      //   {"title": "Case 1", "type": "flowchart", "direction": "TD", "nodes": [...], "connections": [...]},
+      //   {"title": "Case 2", "type": "flowchart", "direction": "TD", "nodes": [...], "connections": [...]}
+      // ]
     }
   ]
 }

@@ -291,13 +291,35 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             // If already a string, assume it's mermaid code
             return diagramData
           }
-          // Convert JSON diagram data to mermaid using our converter
+
+          // Handle array of diagrams - convert first valid diagram for legacy compatibility
+          if (Array.isArray(diagramData)) {
+            console.log(
+              "🔄 MultiLessonForm: Converting array diagram to string",
+              {
+                arrayLength: diagramData.length,
+                firstTitle: diagramData[0]?.title,
+                allTitles: diagramData.map((d) => d?.title).filter(Boolean),
+                note: "Using first diagram for legacy string conversion",
+              }
+            )
+
+            // Find first valid diagram in array
+            const validDiagram = diagramData.find((d) => d && d.type)
+            if (validDiagram) {
+              return convertJSONToMermaid(validDiagram)
+            }
+            return ""
+          }
+
+          // Convert single JSON diagram data to mermaid using our converter
           return convertJSONToMermaid(diagramData)
         } catch (error) {
           console.log("🔧 DIAGRAM CONVERSION ERROR:", {
             originalData: diagramData,
             error: error.message,
             type: diagramData?.type || "unknown",
+            isArray: Array.isArray(diagramData),
           })
           return ""
         }
