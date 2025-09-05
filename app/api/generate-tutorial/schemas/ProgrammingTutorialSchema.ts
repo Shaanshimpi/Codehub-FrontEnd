@@ -11,219 +11,225 @@ export const TUTORIAL_DESCRIPTION_SCHEMA = {
 }
 
 export const MERMAID_DIAGRAM_SCHEMA = {
-  type: "object",
-  description:
-    "JSON diagram data structure compatible with Mermaid rendering for class diagrams and flowcharts with detailed educational content",
-  properties: {
-    type: {
-      type: "string",
-      enum: ["class", "flowchart"], // CHANGED: class diagrams instead of sequence
-      description:
-        "Diagram type - class for object-oriented concepts, flowchart for processes",
-    },
-    title: {
-      type: "string",
-      description: "Descriptive title for the diagram",
-    },
-    direction: {
-      type: "string",
-      enum: ["TD", "LR", "BT", "RL"],
-      description:
-        "Flowchart direction (TD=top-down, LR=left-right). Only for flowcharts.",
-    },
-    // For flowcharts: nodes and connections
-    nodes: {
-      type: "array",
-      description: "Array of detailed node definitions for flowcharts",
-      items: {
-        type: "object",
-        properties: {
-          id: { type: "string", description: "Unique node identifier" },
-          label: { type: "string", description: "Display text for the node" },
-          type: {
-            type: "string",
-            enum: ["start", "end", "process", "decision"],
-            description: "Node type for proper Mermaid rendering",
-          },
-          shape: {
-            type: "string",
-            enum: ["rectangle", "circle", "diamond", "stadium", "rounded"],
-            description: "Visual shape for flowchart nodes",
-          },
-          description: {
-            type: "string",
-            description:
-              "REQUIRED: Detailed explanation of node purpose and function",
-          },
-        },
-        required: ["id", "label", "type", "description"],
+  type: "array",
+  items: {
+    type: "object",
+    description:
+      "JSON diagram data structure compatible with Mermaid rendering for class diagrams and flowcharts with detailed educational content",
+    properties: {
+      type: {
+        type: "string",
+        enum: ["class", "flowchart"], // CHANGED: class diagrams instead of sequence
+        description:
+          "Diagram type - class for object-oriented concepts, flowchart for processes",
       },
-      minItems: 2,
-      maxItems: 8,
-    },
-    connections: {
-      type: "array",
-      description: "Array of detailed connection definitions for flowcharts",
-      items: {
-        type: "object",
-        properties: {
-          from: { type: "string", description: "Source node ID" },
-          to: { type: "string", description: "Target node ID" },
-          label: {
-            type: "string",
-            description: "Connection label/message text",
-          },
-          type: {
-            type: "string",
-            enum: ["arrow", "dotted"],
-            description: "Connection type for proper Mermaid arrow styling",
-          },
-          condition: {
-            type: "string",
-            description:
-              "Conditional text for decision paths (yes/no/true/false)",
-          },
-          description: {
-            type: "string",
-            description: "REQUIRED: Detailed explanation of connection purpose",
-          },
-        },
-        required: ["from", "to", "label", "description"],
+      title: {
+        type: "string",
+        description: "Descriptive title for the diagram",
       },
-      minItems: 1,
-      maxItems: 8,
-    },
-    // For class diagrams: classes and relationships
-    classes: {
-      type: "array",
-      description: "Array of class definitions for class diagrams",
-      items: {
-        type: "object",
-        properties: {
-          id: { type: "string", description: "Unique class identifier" },
-          label: { type: "string", description: "Class name" },
-          type: {
-            type: "string",
-            enum: ["class", "interface", "abstract"],
-            description: "Class type - class, interface, or abstract class",
-          },
-          description: {
-            type: "string",
-            description:
-              "REQUIRED: Detailed explanation of class purpose and role",
-          },
-          attributes: {
-            type: "array",
-            description: "Class attributes/fields",
-            items: {
-              type: "object",
-              properties: {
-                name: { type: "string", description: "Attribute name" },
-                type: { type: "string", description: "Attribute data type" },
-                visibility: {
-                  type: "string",
-                  enum: ["+", "-", "#", "~"],
-                  description:
-                    "Visibility: + public, - private, # protected, ~ package",
-                },
-                description: {
-                  type: "string",
-                  description: "Attribute purpose explanation",
-                },
-              },
-              required: ["name", "type", "visibility", "description"],
+      direction: {
+        type: "string",
+        enum: ["TD", "LR", "BT", "RL"],
+        description:
+          "Flowchart direction (TD=top-down, LR=left-right). Only for flowcharts.",
+      },
+      // For flowcharts: nodes and connections
+      nodes: {
+        type: "array",
+        description: "Array of detailed node definitions for flowcharts",
+        items: {
+          type: "object",
+          properties: {
+            id: { type: "string", description: "Unique node identifier" },
+            label: { type: "string", description: "Display text for the node" },
+            type: {
+              type: "string",
+              enum: ["start", "end", "process", "decision"],
+              description: "Node type for proper Mermaid rendering",
+            },
+            shape: {
+              type: "string",
+              enum: ["rectangle", "circle", "diamond", "stadium", "rounded"],
+              description: "Visual shape for flowchart nodes",
+            },
+            description: {
+              type: "string",
+              description:
+                "REQUIRED: Detailed explanation of node purpose and function",
             },
           },
-          methods: {
-            type: "array",
-            description: "Class methods/operations",
-            items: {
-              type: "object",
-              properties: {
-                name: {
-                  type: "string",
-                  description: "Method name with parameters",
-                },
-                returnType: {
-                  type: "string",
-                  description: "Method return type",
-                },
-                visibility: {
-                  type: "string",
-                  enum: ["+", "-", "#", "~"],
-                  description:
-                    "Visibility: + public, - private, # protected, ~ package",
-                },
-                description: {
-                  type: "string",
-                  description: "Method purpose explanation",
-                },
-              },
-              required: ["name", "returnType", "visibility", "description"],
+          required: ["id", "label", "type", "description"],
+        },
+        minItems: 2,
+        maxItems: 8,
+      },
+      connections: {
+        type: "array",
+        description: "Array of detailed connection definitions for flowcharts",
+        items: {
+          type: "object",
+          properties: {
+            from: { type: "string", description: "Source node ID" },
+            to: { type: "string", description: "Target node ID" },
+            label: {
+              type: "string",
+              description: "Connection label/message text",
+            },
+            type: {
+              type: "string",
+              enum: ["arrow", "dotted"],
+              description: "Connection type for proper Mermaid arrow styling",
+            },
+            condition: {
+              type: "string",
+              description:
+                "Conditional text for decision paths (yes/no/true/false)",
+            },
+            description: {
+              type: "string",
+              description:
+                "REQUIRED: Detailed explanation of connection purpose",
             },
           },
+          required: ["from", "to", "label", "description"],
         },
-        required: [
-          "id",
-          "label",
-          "type",
-          "description",
-          "attributes",
-          "methods",
-        ],
+        minItems: 1,
+        maxItems: 8,
       },
-      minItems: 2,
-      maxItems: 6,
+      // For class diagrams: classes and relationships
+      classes: {
+        type: "array",
+        description: "Array of class definitions for class diagrams",
+        items: {
+          type: "object",
+          properties: {
+            id: { type: "string", description: "Unique class identifier" },
+            label: { type: "string", description: "Class name" },
+            type: {
+              type: "string",
+              enum: ["class", "interface", "abstract"],
+              description: "Class type - class, interface, or abstract class",
+            },
+            description: {
+              type: "string",
+              description:
+                "REQUIRED: Detailed explanation of class purpose and role",
+            },
+            attributes: {
+              type: "array",
+              description: "Class attributes/fields",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string", description: "Attribute name" },
+                  type: { type: "string", description: "Attribute data type" },
+                  visibility: {
+                    type: "string",
+                    enum: ["+", "-", "#", "~"],
+                    description:
+                      "Visibility: + public, - private, # protected, ~ package",
+                  },
+                  description: {
+                    type: "string",
+                    description: "Attribute purpose explanation",
+                  },
+                },
+                required: ["name", "type", "visibility", "description"],
+              },
+            },
+            methods: {
+              type: "array",
+              description: "Class methods/operations",
+              items: {
+                type: "object",
+                properties: {
+                  name: {
+                    type: "string",
+                    description: "Method name with parameters",
+                  },
+                  returnType: {
+                    type: "string",
+                    description: "Method return type",
+                  },
+                  visibility: {
+                    type: "string",
+                    enum: ["+", "-", "#", "~"],
+                    description:
+                      "Visibility: + public, - private, # protected, ~ package",
+                  },
+                  description: {
+                    type: "string",
+                    description: "Method purpose explanation",
+                  },
+                },
+                required: ["name", "returnType", "visibility", "description"],
+              },
+            },
+          },
+          required: [
+            "id",
+            "label",
+            "type",
+            "description",
+            "attributes",
+            "methods",
+          ],
+        },
+        minItems: 2,
+        maxItems: 6,
+      },
+      relationships: {
+        type: "array",
+        description: "Array of class relationship definitions",
+        items: {
+          type: "object",
+          properties: {
+            from: { type: "string", description: "Source class ID" },
+            to: { type: "string", description: "Target class ID" },
+            label: { type: "string", description: "Relationship label" },
+            type: {
+              type: "string",
+              enum: [
+                "inheritance",
+                "composition",
+                "aggregation",
+                "association",
+                "dependency",
+              ],
+              description: "Relationship type for proper Mermaid rendering",
+            },
+            description: {
+              type: "string",
+              description:
+                "REQUIRED: Detailed explanation of relationship meaning",
+            },
+          },
+          required: ["from", "to", "label", "type", "description"],
+        },
+        minItems: 1,
+        maxItems: 8,
+      },
     },
-    relationships: {
-      type: "array",
-      description: "Array of class relationship definitions",
-      items: {
-        type: "object",
+    required: ["type", "title"],
+    oneOf: [
+      {
+        description: "Flowchart diagram structure",
         properties: {
-          from: { type: "string", description: "Source class ID" },
-          to: { type: "string", description: "Target class ID" },
-          label: { type: "string", description: "Relationship label" },
-          type: {
-            type: "string",
-            enum: [
-              "inheritance",
-              "composition",
-              "aggregation",
-              "association",
-              "dependency",
-            ],
-            description: "Relationship type for proper Mermaid rendering",
-          },
-          description: {
-            type: "string",
-            description:
-              "REQUIRED: Detailed explanation of relationship meaning",
-          },
+          type: { const: "flowchart" },
         },
-        required: ["from", "to", "label", "type", "description"],
+        required: ["nodes", "connections"],
       },
-      minItems: 1,
-      maxItems: 8,
-    },
+      {
+        description: "Class diagram structure",
+        properties: {
+          type: { const: "class" },
+        },
+        required: ["classes", "relationships"],
+      },
+    ],
   },
-  required: ["type", "title"],
-  oneOf: [
-    {
-      description: "Flowchart diagram structure",
-      properties: {
-        type: { const: "flowchart" },
-      },
-      required: ["nodes", "connections"],
-    },
-    {
-      description: "Class diagram structure",
-      properties: {
-        type: { const: "class" },
-      },
-      required: ["classes", "relationships"],
-    },
-  ],
+  minItems: 1,
+  maxItems: 6,
 }
 
 // ==================== LESSON CONTENT SCHEMAS ====================
