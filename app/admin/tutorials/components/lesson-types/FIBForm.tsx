@@ -19,7 +19,7 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
         id: crypto.randomUUID(),
         scenario: "",
         code: "",
-        diagram_data: "",
+        diagram_data: [],
         blanks: [
           {
             id: crypto.randomUUID(),
@@ -35,7 +35,7 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
         solution: {
           completeCode: "",
           explanation: "",
-          diagram_data: "",
+          diagram_data: [],
         },
         difficulty: 1,
       },
@@ -58,7 +58,7 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
       id: crypto.randomUUID(),
       scenario: "",
       code: "",
-      diagram_data: "",
+      diagram_data: [],
       blanks: [
         {
           id: crypto.randomUUID(),
@@ -74,12 +74,99 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
       solution: {
         completeCode: "",
         explanation: "",
-        diagram_data: "",
+        diagram_data: [],
       },
       difficulty: 1,
     }
     setQuestions((prev) => [...prev, newQuestion])
     setExpandedQuestions((prev) => ({ ...prev, [newQuestion.id]: true }))
+  }
+
+  // Diagram management functions
+  const addQuestionDiagram = (questionIndex: number) => {
+    setQuestions((prev) =>
+      prev.map((q, i) =>
+        i === questionIndex
+          ? {
+              ...q,
+              diagram_data: [
+                ...(q.diagram_data || []),
+                {
+                  type: "flowchart",
+                  title: "New Blank Filling Diagram",
+                  direction: "TD",
+                  nodes: [],
+                  connections: [],
+                },
+              ],
+            }
+          : q
+      )
+    )
+  }
+
+  const removeQuestionDiagram = (
+    questionIndex: number,
+    diagramIndex: number
+  ) => {
+    setQuestions((prev) =>
+      prev.map((q, i) =>
+        i === questionIndex
+          ? {
+              ...q,
+              diagram_data: (q.diagram_data || []).filter(
+                (_, di) => di !== diagramIndex
+              ),
+            }
+          : q
+      )
+    )
+  }
+
+  const addSolutionDiagram = (questionIndex: number) => {
+    setQuestions((prev) =>
+      prev.map((q, i) =>
+        i === questionIndex
+          ? {
+              ...q,
+              solution: {
+                ...q.solution,
+                diagram_data: [
+                  ...(q.solution?.diagram_data || []),
+                  {
+                    type: "flowchart",
+                    title: "Solution Diagram",
+                    direction: "TD",
+                    nodes: [],
+                    connections: [],
+                  },
+                ],
+              },
+            }
+          : q
+      )
+    )
+  }
+
+  const removeSolutionDiagram = (
+    questionIndex: number,
+    diagramIndex: number
+  ) => {
+    setQuestions((prev) =>
+      prev.map((q, i) =>
+        i === questionIndex
+          ? {
+              ...q,
+              solution: {
+                ...q.solution,
+                diagram_data: (q.solution?.diagram_data || []).filter(
+                  (_, di) => di !== diagramIndex
+                ),
+              },
+            }
+          : q
+      )
+    )
   }
 
   const removeQuestion = (id: string) => {
@@ -321,20 +408,90 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
                   </div>
 
                   <div className="mt-3">
+                    {/* Multiple Question Diagrams */}
                     <div className="mb-2 flex items-center justify-between">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Question Diagram (Optional)
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Question Diagrams (
+                        {(question.diagram_data || []).length})
                       </label>
+                      <button
+                        type="button"
+                        onClick={() => addQuestionDiagram(questionIndex)}
+                        className="flex items-center gap-1 rounded-lg bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700"
+                      >
+                        <Plus className="h-3 w-3" />
+                        Add Diagram
+                      </button>
                     </div>
-                    <MermaidDiagram
-                      diagramData={
-                        question.diagram_data || question.mermaid_code || ""
-                      }
-                      showDebugInfo={false}
-                      onMermaidChange={(code) =>
-                        updateQuestion(question.id, "mermaid_code", code)
-                      }
-                    />
+                    {(question.diagram_data || []).length > 0 ? (
+                      <div className="space-y-3">
+                        {(question.diagram_data || []).map(
+                          (diagram: any, diagramIndex: number) => (
+                            <div
+                              key={diagramIndex}
+                              className="rounded-lg border border-slate-200 p-3 dark:border-slate-600"
+                            >
+                              <div className="mb-2 flex items-center justify-between">
+                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                                  Template Diagram {diagramIndex + 1}:{" "}
+                                  {diagram.title || "Untitled"}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    removeQuestionDiagram(
+                                      questionIndex,
+                                      diagramIndex
+                                    )
+                                  }
+                                  className="text-red-600 hover:text-red-700 dark:text-red-400"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+                              <MermaidDiagram
+                                diagramData={diagram}
+                                showDebugInfo={false}
+                                onMermaidChange={(code) =>
+                                  updateQuestion(
+                                    question.id,
+                                    "mermaid_code",
+                                    code
+                                  )
+                                }
+                              />
+                            </div>
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      <div className="rounded-lg border-2 border-dashed border-slate-300 p-4 text-center dark:border-slate-600">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          No template diagrams added yet. Click &quot;Add
+                          Diagram&quot; to create visual explanations for the
+                          blank-filling exercise.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Legacy single diagram support for backward compatibility */}
+                    {question.mermaid_code &&
+                      !(question.diagram_data || []).length && (
+                        <div className="mt-3 rounded-lg border border-orange-200 bg-orange-50 p-3 dark:border-orange-800 dark:bg-orange-900/20">
+                          <div className="mb-2">
+                            <span className="text-sm font-medium text-orange-800 dark:text-orange-200">
+                              Legacy Diagram (convert to new format)
+                            </span>
+                          </div>
+                          <MermaidDiagram
+                            diagramData={question.mermaid_code}
+                            showDebugInfo={false}
+                            onMermaidChange={(code) =>
+                              updateQuestion(question.id, "mermaid_code", code)
+                            }
+                          />
+                        </div>
+                      )}
                   </div>
 
                   <div>
@@ -576,6 +733,74 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
                           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                           placeholder="Comprehensive explanation of the solution..."
                         />
+                      </div>
+
+                      {/* Solution Diagrams */}
+                      <div>
+                        <div className="mb-2 flex items-center justify-between">
+                          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Solution Diagrams (
+                            {(question.solution?.diagram_data || []).length})
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => addSolutionDiagram(questionIndex)}
+                            className="flex items-center gap-1 rounded-lg bg-green-600 px-2 py-1 text-xs text-white hover:bg-green-700"
+                          >
+                            <Plus className="h-3 w-3" />
+                            Add Solution Diagram
+                          </button>
+                        </div>
+                        {(question.solution?.diagram_data || []).length > 0 ? (
+                          <div className="space-y-3">
+                            {(question.solution?.diagram_data || []).map(
+                              (diagram: any, diagramIndex: number) => (
+                                <div
+                                  key={diagramIndex}
+                                  className="rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-900/20"
+                                >
+                                  <div className="mb-2 flex items-center justify-between">
+                                    <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                                      Solution Diagram {diagramIndex + 1}:{" "}
+                                      {diagram.title || "Untitled"}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        removeSolutionDiagram(
+                                          questionIndex,
+                                          diagramIndex
+                                        )
+                                      }
+                                      className="text-red-600 hover:text-red-700 dark:text-red-400"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                  <MermaidDiagram
+                                    diagramData={diagram}
+                                    showDebugInfo={false}
+                                    onMermaidChange={(code) => {
+                                      // Update solution mermaid code if needed
+                                      updateQuestion(question.id, "solution", {
+                                        ...question.solution,
+                                        mermaid_code: code,
+                                      })
+                                    }}
+                                  />
+                                </div>
+                              )
+                            )}
+                          </div>
+                        ) : (
+                          <div className="rounded-lg border-2 border-dashed border-green-300 p-4 text-center dark:border-green-600">
+                            <p className="text-sm text-green-600 dark:text-green-400">
+                              No solution diagrams added yet. Click &quot;Add
+                              Solution Diagram&quot; to create visual
+                              explanations for the complete solution.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

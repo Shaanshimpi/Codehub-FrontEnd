@@ -293,20 +293,47 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
       // Populate tutorial data from AI data
       // Convert AI lesson structure (content) to manual form structure (data)
 
-      // Helper function to generate mermaid code from diagram data
+      // Helper function to convert diagram data - handles both arrays and single diagrams
+      const convertDiagramData = (diagramData: any): any[] => {
+        if (!diagramData) {
+          return []
+        }
+        try {
+          if (typeof diagramData === "string") {
+            // Legacy mermaid code - convert to empty array for new format
+            return []
+          }
+
+          // Handle array of diagrams - return as-is for new multi-diagram format
+          if (Array.isArray(diagramData)) {
+            return diagramData.filter(
+              (d) => d && (d.type || d.nodes || d.classes)
+            )
+          }
+
+          // Single diagram object - wrap in array for consistency
+          if (diagramData.type || diagramData.nodes || diagramData.classes) {
+            return [diagramData]
+          }
+
+          return []
+        } catch (error) {
+          console.error("Error converting diagram data:", error)
+          return []
+        }
+      }
+
+      // Legacy function for backward compatibility with mermaid code
       const generateMermaidCodeFromDiagramData = (diagramData: any): string => {
         if (!diagramData || Object.keys(diagramData).length === 0) {
           return ""
         }
         try {
           if (typeof diagramData === "string") {
-            // If already a string, assume it's mermaid code
             return diagramData
           }
 
-          // Handle array of diagrams - convert first valid diagram for legacy compatibility
           if (Array.isArray(diagramData)) {
-            // Find first valid diagram in array
             const validDiagram = diagramData.find((d) => d && d.type)
             if (validDiagram) {
               return convertJSONToMermaid(validDiagram)
@@ -314,7 +341,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             return ""
           }
 
-          // Convert single JSON diagram data to mermaid using our converter
           return convertJSONToMermaid(diagramData)
         } catch (error) {
           return ""
@@ -367,7 +393,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     code: example.code || "",
                     language: programmingLanguageSlug || "javascript",
                     explanation: example.explanation || "",
-                    diagram_data: example.diagram_data || "",
+                    diagram_data: convertDiagramData(example.diagram_data),
                     mermaid_code:
                       example.mermaid_code ||
                       generateMermaidCodeFromDiagramData(example.diagram_data),
@@ -375,9 +401,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                 }
               ),
               practiceHints: lesson.content.practiceHints || [],
-              diagram_data: (() => {
-                return lesson.content.diagram_data || null
-              })(),
+              diagram_data: convertDiagramData(lesson.content.diagram_data),
               mermaid_code:
                 lesson.content.mermaid_code ||
                 generateMermaidCodeFromDiagramData(lesson.content.diagram_data),
@@ -424,7 +448,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     explanation: q.explanation || "",
                     difficulty: q.difficulty || 1,
                     codeSnippet: q.codeSnippet || "",
-                    diagram_data: q.diagram_data || "",
+                    diagram_data: convertDiagramData(q.diagram_data),
                     mermaid_code:
                       q.mermaid_code ||
                       generateMermaidCodeFromDiagramData(q.diagram_data),
@@ -494,7 +518,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     id: q.id || crypto.randomUUID(),
                     scenario: q.scenario || "",
                     targetCode: q.targetCode || "",
-                    diagram_data: q.diagram_data || "",
+                    diagram_data: convertDiagramData(q.diagram_data),
                     mermaid_code:
                       q.mermaid_code ||
                       generateMermaidCodeFromDiagramData(q.diagram_data),
@@ -527,7 +551,9 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     id: crypto.randomUUID(),
                     scenario: lesson.content.scenario || "",
                     targetCode: lesson.content.targetCode || "",
-                    diagram_data: lesson.content.diagram_data || "",
+                    diagram_data: convertDiagramData(
+                      lesson.content.diagram_data
+                    ),
                     mermaid_code:
                       lesson.content.mermaid_code ||
                       generateMermaidCodeFromDiagramData(
@@ -613,7 +639,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     id: q.id || crypto.randomUUID(),
                     scenario: q.scenario || "",
                     code: q.codeTemplate || "",
-                    diagram_data: q.diagram_data || "",
+                    diagram_data: convertDiagramData(q.diagram_data),
                     mermaid_code:
                       q.mermaid_code ||
                       generateMermaidCodeFromDiagramData(q.diagram_data),
@@ -633,7 +659,9 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                       ? {
                           completeCode: q.solution.completeCode || "",
                           explanation: q.solution.explanation || "",
-                          diagram_data: q.solution.diagram_data || "",
+                          diagram_data: convertDiagramData(
+                            q.solution.diagram_data
+                          ),
                           mermaid_code:
                             q.solution.mermaid_code ||
                             generateMermaidCodeFromDiagramData(
@@ -656,7 +684,9 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     id: crypto.randomUUID(),
                     scenario: lesson.content.scenario || "",
                     code: lesson.content.codeTemplate || "",
-                    diagram_data: lesson.content.diagram_data || "",
+                    diagram_data: convertDiagramData(
+                      lesson.content.diagram_data
+                    ),
                     mermaid_code:
                       lesson.content.mermaid_code ||
                       generateMermaidCodeFromDiagramData(
@@ -680,8 +710,9 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                             lesson.content.solution.completeCode || "",
                           explanation:
                             lesson.content.solution.explanation || "",
-                          diagram_data:
-                            lesson.content.solution.diagram_data || "",
+                          diagram_data: convertDiagramData(
+                            lesson.content.solution.diagram_data
+                          ),
                           mermaid_code:
                             lesson.content.solution.mermaid_code ||
                             generateMermaidCodeFromDiagramData(

@@ -30,7 +30,7 @@ const CodeRearrangeForm: React.FC<CodeRearrangeFormProps> = ({
         id: crypto.randomUUID(),
         scenario: "",
         targetCode: "",
-        diagram_data_diagram: "",
+        diagram_data: [],
         blocks: [
           {
             id: crypto.randomUUID(),
@@ -65,7 +65,7 @@ const CodeRearrangeForm: React.FC<CodeRearrangeFormProps> = ({
       id: crypto.randomUUID(),
       scenario: "",
       targetCode: "",
-      diagram_data_diagram: "",
+      diagram_data: [],
       blocks: [
         {
           id: crypto.randomUUID(),
@@ -78,6 +78,47 @@ const CodeRearrangeForm: React.FC<CodeRearrangeFormProps> = ({
     }
     setQuestions((prev) => [...prev, newQuestion])
     setExpandedQuestions((prev) => ({ ...prev, [newQuestion.id]: true }))
+  }
+
+  // Diagram management functions
+  const addQuestionDiagram = (questionIndex: number) => {
+    setQuestions((prev) =>
+      prev.map((q, i) =>
+        i === questionIndex
+          ? {
+              ...q,
+              diagram_data: [
+                ...(q.diagram_data || []),
+                {
+                  type: "flowchart",
+                  title: "New Code Flow Diagram",
+                  direction: "TD",
+                  nodes: [],
+                  connections: [],
+                },
+              ],
+            }
+          : q
+      )
+    )
+  }
+
+  const removeQuestionDiagram = (
+    questionIndex: number,
+    diagramIndex: number
+  ) => {
+    setQuestions((prev) =>
+      prev.map((q, i) =>
+        i === questionIndex
+          ? {
+              ...q,
+              diagram_data: (q.diagram_data || []).filter(
+                (_, di) => di !== diagramIndex
+              ),
+            }
+          : q
+      )
+    )
   }
 
   const removeQuestion = (id: string) => {
@@ -390,21 +431,91 @@ const CodeRearrangeForm: React.FC<CodeRearrangeFormProps> = ({
                     </div>
                   </div>
 
+                  {/* Multiple Question Diagrams */}
                   <div className="mt-3">
                     <div className="mb-2 flex items-center justify-between">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Question Diagram (Optional)
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Code Flow Diagrams (
+                        {(question.diagram_data || []).length})
                       </label>
+                      <button
+                        type="button"
+                        onClick={() => addQuestionDiagram(questionIndex)}
+                        className="flex items-center gap-1 rounded-lg bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700"
+                      >
+                        <Plus className="h-3 w-3" />
+                        Add Diagram
+                      </button>
                     </div>
-                    <MermaidDiagram
-                      diagramData={
-                        question.diagram_data || question.mermaid_code || ""
-                      }
-                      showDebugInfo={false}
-                      onMermaidChange={(code) =>
-                        updateQuestion(question.id, "mermaid_code", code)
-                      }
-                    />
+                    {(question.diagram_data || []).length > 0 ? (
+                      <div className="space-y-3">
+                        {(question.diagram_data || []).map(
+                          (diagram: any, diagramIndex: number) => (
+                            <div
+                              key={diagramIndex}
+                              className="rounded-lg border border-slate-200 p-3 dark:border-slate-600"
+                            >
+                              <div className="mb-2 flex items-center justify-between">
+                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                                  Flow Diagram {diagramIndex + 1}:{" "}
+                                  {diagram.title || "Untitled"}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    removeQuestionDiagram(
+                                      questionIndex,
+                                      diagramIndex
+                                    )
+                                  }
+                                  className="text-red-600 hover:text-red-700 dark:text-red-400"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+                              <MermaidDiagram
+                                diagramData={diagram}
+                                showDebugInfo={false}
+                                onMermaidChange={(code) =>
+                                  updateQuestion(
+                                    question.id,
+                                    "mermaid_code",
+                                    code
+                                  )
+                                }
+                              />
+                            </div>
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      <div className="rounded-lg border-2 border-dashed border-slate-300 p-4 text-center dark:border-slate-600">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          No flow diagrams added yet. Click &quot;Add
+                          Diagram&quot; to create visual representations of the
+                          code flow.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Legacy single diagram support for backward compatibility */}
+                    {question.mermaid_code &&
+                      !(question.diagram_data || []).length && (
+                        <div className="mt-3 rounded-lg border border-orange-200 bg-orange-50 p-3 dark:border-orange-800 dark:bg-orange-900/20">
+                          <div className="mb-2">
+                            <span className="text-sm font-medium text-orange-800 dark:text-orange-200">
+                              Legacy Diagram (convert to new format)
+                            </span>
+                          </div>
+                          <MermaidDiagram
+                            diagramData={question.mermaid_code}
+                            showDebugInfo={false}
+                            onMermaidChange={(code) =>
+                              updateQuestion(question.id, "mermaid_code", code)
+                            }
+                          />
+                        </div>
+                      )}
                   </div>
 
                   <div>
