@@ -511,7 +511,7 @@ function inferShapeFromType(nodeType: string): string {
 
 /**
  * Clean and escape text for Mermaid syntax
- * Handles quotes properly by wrapping in double quotes and using single quotes inside
+ * Handles quotes, backticks, and special characters properly
  */
 function cleanText(text: string): string {
   // Clean up whitespace and line breaks
@@ -521,6 +521,9 @@ function cleanText(text: string): string {
     .replace(/\s+/g, " ")
     .trim()
 
+  // Escape backticks with backslashes first (before any other processing)
+  cleanedText = cleanedText.replace(/`/g, "\\`")
+
   // Handle quotes: if text contains double quotes, convert them to single quotes
   // and wrap the entire text in double quotes
   if (cleanedText.includes('"')) {
@@ -529,7 +532,7 @@ function cleanText(text: string): string {
   }
 
   // If text contains special characters, spaces, or reserved keywords, wrap in quotes
-  const hasSpecialChars = /[&<>(){}[\]|\\:;,.*+=~`!@#$%^]/.test(cleanedText)
+  const hasSpecialChars = /[&<>(){}[\]|\\:;,.*+=~!@#$%^]/.test(cleanedText)
   const hasSpaces = cleanedText.includes(" ")
   const isReservedKeyword = ["end", "start", "click", "call", "href"].includes(
     cleanedText.toLowerCase()
