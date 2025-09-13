@@ -607,13 +607,28 @@ export const TUTORIAL_LESSON_SCHEMA = {
     learningObjectives: {
       type: "array",
       items: { type: "string" },
-      description: "2-4 specific learning objectives in English",
+      description: "2-4 specific learning objectives for this lesson",
+      minItems: 2,
+      maxItems: 4,
+    },
+    keyTopics: {
+      type: "array",
+      items: { type: "string" },
+      description: "2-4 key topics covered in this lesson",
       minItems: 2,
       maxItems: 4,
     },
     order: { type: "number", description: "Lesson sequence order" },
   },
-  required: ["id", "title", "type", "content", "learningObjectives", "order"],
+  required: [
+    "id",
+    "title",
+    "type",
+    "content",
+    "learningObjectives",
+    "keyTopics",
+    "order",
+  ],
   additionalProperties: false,
 }
 

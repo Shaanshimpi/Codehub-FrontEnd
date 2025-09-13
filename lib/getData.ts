@@ -316,7 +316,7 @@ export async function generateTutorial(
     }
 
     const data = await response.json();
-    console.log("✅ Tutorial generated successfully:", data);
+    console.table("✅ Tutorial generated successfully:", data);
 
     // Check if the response contains an error field
     if (data.error) {

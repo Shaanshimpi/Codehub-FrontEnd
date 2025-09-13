@@ -14,7 +14,6 @@ interface MCQQuestion {
   difficulty: 1 | 2 | 3
   codeSnippet?: string
   diagram_data?: any[]
-  mermaid_code?: string
 }
 
 interface MCQData {

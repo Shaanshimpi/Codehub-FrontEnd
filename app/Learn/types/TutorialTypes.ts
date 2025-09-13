@@ -214,9 +214,7 @@ export interface FillInTheBlankData {
     id: string
     scenario?: string
     code: string
-    mermaid_diagram?: string
-    plantuml_code?: string
-    diagram_data?: any // For runtime conversion only
+    diagram_data?: any // JSON objects that convert to Mermaid
     blanks: {
       id: string
       position: number
@@ -230,9 +228,7 @@ export interface FillInTheBlankData {
     solution?: {
       completeCode: string
       explanation: string
-      mermaid_diagram?: string
-      plantuml_code?: string
-      diagram_data?: any // For runtime conversion only
+      diagram_data?: any // JSON objects that convert to Mermaid
     }
     difficulty?: 1 | 2 | 3
   }[]
@@ -243,9 +239,7 @@ export interface CodeRearrangeData {
     id: string
     scenario?: string
     targetCode?: string
-    mermaid_diagram?: string
-    plantuml_code?: string
-    diagram_data?: any // For runtime conversion only
+    diagram_data?: any // JSON objects that convert to Mermaid
     blocks: {
       id: string
       code: string
@@ -280,14 +274,10 @@ export interface ConceptLessonData {
     code: string
     language: string
     explanation: string
-    mermaid_diagram?: string
-    plantuml_code?: string
-    diagram_data?: any // For runtime conversion only
+    diagram_data?: any // JSON objects that convert to Mermaid
   }[]
   practiceHints: string[]
-  mermaid?: string
-  plantuml_code?: string
-  diagram_data?: any // For runtime conversion only
+  diagram_data?: any // JSON objects that convert to Mermaid
   commonMistakes?: string[]
   bestPractices?: string[]
 }
@@ -380,9 +370,7 @@ export interface MCQQuestion {
   explanation: string
   difficulty: 1 | 2 | 3
   codeSnippet?: string
-  mermaid_diagram?: string
-  plantuml_code?: string
-  diagram_data?: any // For runtime conversion only
+  diagram_data?: any // JSON objects that convert to Mermaid
 }
 
 // Code example interface for API schema
@@ -421,7 +409,6 @@ export interface LessonContent {
   keyPoints?: string[]
   codeExamples?: CodeExample[]
   practiceHints?: string[]
-  mermaid?: string
   commonMistakes?: string[]
   bestPractices?: string[]
 
@@ -461,7 +448,6 @@ export interface TutorialData {
   id: string
   title: string
   description: string
-  learningObjectives: string[]
   keyTopics: string[]
   difficulty: 1 | 2 | 3
   lessons: {
@@ -469,7 +455,6 @@ export interface TutorialData {
     title: string
     type: "concept" | "mcq" | "codeblock_rearranging" | "fill_in_blanks"
     content: LessonContent
-    learningObjectives: string[]
     order: number
   }[]
   practicalApplications: string[]

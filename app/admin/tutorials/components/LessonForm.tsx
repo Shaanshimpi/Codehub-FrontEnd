@@ -183,7 +183,7 @@ const LessonForm: React.FC<LessonFormProps> = ({
           </div>
         </div>
 
-        <div className="mt-4">
+        {/* <div className="mt-4">
           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             Description (Optional)
           </label>
@@ -196,7 +196,7 @@ const LessonForm: React.FC<LessonFormProps> = ({
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
             placeholder="Brief description of what this lesson covers..."
           />
-        </div>
+        </div> */}
 
         <div className="mt-4">
           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">

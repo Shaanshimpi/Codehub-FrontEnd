@@ -47,11 +47,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
       ...prev,
       [`lesson_${lessonId}`]: code,
     }))
-    console.log(
-      `🎨 Set Mermaid for lesson ${lessonId}:`,
-      code.length,
-      "characters"
-    )
   }
 
   const setCodeExampleMermaid = (
@@ -63,11 +58,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
       ...prev,
       [`lesson_${lessonId}_example_${exampleIndex}`]: code,
     }))
-    console.log(
-      `🎨 Set Mermaid for lesson ${lessonId} example ${exampleIndex}:`,
-      code.length,
-      "characters"
-    )
   }
 
   const setQuestionMermaid = (
@@ -79,11 +69,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
       ...prev,
       [`lesson_${lessonId}_question_${questionIndex}`]: code,
     }))
-    console.log(
-      `🎨 Set Mermaid for lesson ${lessonId} question ${questionIndex}:`,
-      code.length,
-      "characters"
-    )
   }
 
   const setSolutionMermaid = (
@@ -95,11 +80,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
       ...prev,
       [`lesson_${lessonId}_question_${questionIndex}_solution`]: code,
     }))
-    console.log(
-      `🎨 Set Mermaid for lesson ${lessonId} question ${questionIndex} solution:`,
-      code.length,
-      "characters"
-    )
   }
 
   const [basicInfo, setBasicInfo] = useState({
@@ -185,8 +165,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
   // Populate form with AI-generated data when initialData is provided
   useEffect(() => {
     if (initialData && !languagesLoading) {
-      console.log("🤖 Populating manual form with AI data:", initialData)
-
       // Convert programming language to slug if it's an ID
       let programmingLanguageSlug =
         initialData.programmingLanguage?.toString() || ""
@@ -203,24 +181,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
         }
       }
 
-      console.log("🔄 Programming language mapping:", {
-        original: initialData.programmingLanguage,
-        converted: programmingLanguageSlug,
-        availableLanguages: languages.map((l) => ({
-          id: l.id,
-          slug: l.slug,
-          title: l.title,
-        })),
-      })
-
-      console.log("🔍 Reference field in AI data:", {
-        hasReference: !!initialData.reference,
-        referenceData: initialData.reference,
-        referenceKeys: initialData.reference
-          ? Object.keys(initialData.reference)
-          : "None",
-      })
-
       // Populate basic info from AI data
       const title = initialData.title || ""
       setBasicInfo({
@@ -231,7 +191,10 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
         programmingLanguage: programmingLanguageSlug,
         difficulty: initialData.difficulty || 1,
         focusAreas: initialData.focusAreas || "",
-        keyTopics: initialData.keyTopics || [""],
+        keyTopics:
+          initialData.keyTopics && initialData.keyTopics.length > 0
+            ? initialData.keyTopics
+            : [""],
         practicalApplications: initialData.practicalApplications || [""],
         tags: initialData.tags || [""],
         index: initialData.index || 1,
@@ -282,12 +245,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                   ],
           },
         },
-      })
-
-      console.log("✅ Basic info set with reference:", {
-        hasReference: !!initialData.reference,
-        referenceTitle: initialData.reference?.title || "No title",
-        referenceExamplesCount: initialData.reference?.examples?.length || 0,
       })
 
       // Populate tutorial data from AI data
@@ -363,30 +320,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
               keyPoints: lesson.content.keyPoints || [],
               codeExamples: (lesson.content.codeExamples || []).map(
                 (example: any, idx: number) => {
-                  // Log diagram conversion for verification (only if meaningful data)
-                  if (
-                    example.diagram_data &&
-                    Object.keys(example.diagram_data).length > 0
-                  ) {
-                    console.log(
-                      `🎯 DIAGRAM CONVERSION - Code Example ${idx + 1}:`
-                    )
-                    console.log(
-                      "📊 Original JSON:",
-                      JSON.stringify(example.diagram_data, null, 2)
-                    )
-                    const mermaidCode =
-                      example.mermaid_code ||
-                      generateMermaidCodeFromDiagramData(example.diagram_data)
-                    if (mermaidCode) {
-                      console.log("🎨 Converted Mermaid:", mermaidCode)
-                    } else {
-                      console.log(
-                        "⚠️ No diagram generated - likely simple content"
-                      )
-                    }
-                    console.log("---")
-                  }
                   return {
                     id: example.id || `example-${idx}`,
                     title: example.title || `Example ${idx + 1}`,
@@ -419,28 +352,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             ) {
               convertedData = {
                 questions: lesson.content.questions.map((q: any) => {
-                  // Log diagram conversion for verification (only if meaningful data)
-                  if (
-                    q.diagram_data &&
-                    Object.keys(q.diagram_data).length > 0
-                  ) {
-                    console.log("🎯 DIAGRAM CONVERSION - MCQ Question:")
-                    console.log(
-                      "📊 Original JSON:",
-                      JSON.stringify(q.diagram_data, null, 2)
-                    )
-                    const mermaidCode =
-                      q.mermaid_code ||
-                      generateMermaidCodeFromDiagramData(q.diagram_data)
-                    if (mermaidCode) {
-                      console.log("🎨 Converted Mermaid:", mermaidCode)
-                    } else {
-                      console.log(
-                        "⚠️ No diagram generated - likely simple content"
-                      )
-                    }
-                    console.log("---")
-                  }
                   return {
                     id: q.id || crypto.randomUUID(),
                     question: q.question || "",
@@ -487,30 +398,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             ) {
               convertedData = {
                 questions: lesson.content.questions.map((q: any) => {
-                  // Log diagram conversion for verification (only if meaningful data)
-                  if (
-                    q.diagram_data &&
-                    Object.keys(q.diagram_data).length > 0
-                  ) {
-                    console.log(
-                      "🎯 DIAGRAM CONVERSION - Code Rearrange Question:"
-                    )
-                    console.log(
-                      "📊 Original JSON:",
-                      JSON.stringify(q.diagram_data, null, 2)
-                    )
-                    const mermaidCode =
-                      q.mermaid_code ||
-                      generateMermaidCodeFromDiagramData(q.diagram_data)
-                    if (mermaidCode) {
-                      console.log("🎨 Converted Mermaid:", mermaidCode)
-                    } else {
-                      console.log(
-                        "⚠️ No diagram generated - likely simple content"
-                      )
-                    }
-                    console.log("---")
-                  }
                   const aiCodeBlocks = q.codeBlocks || []
                   const aiCorrectOrder = q.correctOrder || []
 
@@ -584,57 +471,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             ) {
               convertedData = {
                 questions: lesson.content.questions.map((q: any) => {
-                  // Log diagram conversion for verification (only if meaningful data)
-                  if (
-                    q.diagram_data &&
-                    Object.keys(q.diagram_data).length > 0
-                  ) {
-                    console.log(
-                      "🎯 DIAGRAM CONVERSION - Fill-in-Blanks Question:"
-                    )
-                    console.log(
-                      "📊 Original JSON:",
-                      JSON.stringify(q.diagram_data, null, 2)
-                    )
-                    const mermaidCode =
-                      q.mermaid_code ||
-                      generateMermaidCodeFromDiagramData(q.diagram_data)
-                    if (mermaidCode) {
-                      console.log("🎨 Converted Mermaid:", mermaidCode)
-                    } else {
-                      console.log(
-                        "⚠️ No diagram generated - likely simple content"
-                      )
-                    }
-                    console.log("---")
-                  }
-
-                  // Log solution diagram conversion if exists (only if meaningful data)
-                  if (
-                    q.solution?.diagram_data &&
-                    Object.keys(q.solution.diagram_data).length > 0
-                  ) {
-                    console.log(
-                      "🎯 DIAGRAM CONVERSION - Fill-in-Blanks Solution:"
-                    )
-                    console.log(
-                      "📊 Original JSON:",
-                      JSON.stringify(q.solution.diagram_data, null, 2)
-                    )
-                    const solutionMermaidCode =
-                      q.solution.mermaid_code ||
-                      generateMermaidCodeFromDiagramData(
-                        q.solution.diagram_data
-                      )
-                    if (solutionMermaidCode) {
-                      console.log("🎨 Converted Mermaid:", solutionMermaidCode)
-                    } else {
-                      console.log(
-                        "⚠️ No diagram generated - likely simple content"
-                      )
-                    }
-                    console.log("---")
-                  }
                   return {
                     id: q.id || crypto.randomUUID(),
                     scenario: q.scenario || "",
@@ -745,7 +581,11 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
 
       setTutorialData({
         lessons: convertedLessons,
-        learningObjectives: initialData.learningObjectives || [""],
+        learningObjectives:
+          initialData.learningObjectives &&
+          initialData.learningObjectives.length > 0
+            ? initialData.learningObjectives
+            : [""], // Populate from AI if available, otherwise empty array
       })
     }
   }, [initialData, languagesLoading])
@@ -854,8 +694,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
     setIsSaving(true)
 
     try {
-      console.log("🎨 Final Mermaid state before submission:", mermaidCodes)
-
       const completeTutorialData: TutorialData = {
         id: crypto.randomUUID(),
         title: basicInfo.title,
@@ -971,13 +809,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
 
             enrichedLesson.data = lessonData
           }
-
-          console.log(`🚀 Enriched lesson ${lesson.id} with Mermaid codes:`, {
-            mainMermaid: !!mermaidCodes[`lesson_${lesson.id}`],
-            totalMermaidFields: Object.keys(mermaidCodes).filter((key) =>
-              key.includes(lesson.id)
-            ).length,
-          })
 
           return enrichedLesson
         }),
@@ -1239,7 +1070,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
           </p>
         </div>
 
-        <div className="mt-4">
+        {/* <div className="mt-4">
           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             Focus Areas (Optional)
           </label>
@@ -1254,7 +1085,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
               "Specify particular areas to focus on or teaching approaches you'd like to emphasize..."
             }
           />
-        </div>
+        </div> */}
       </div>
 
       {/* Key Topics */}
@@ -1419,7 +1250,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
       <div className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
         <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
           <BookOpen className="h-5 w-5" />
-          Tutorial Reference (W3Schools-style)
+          Tutorial Reference
         </h3>
         <p className="mb-4 text-sm text-slate-600 dark:text-slate-400">
           Create a comprehensive reference page that teaches the complete

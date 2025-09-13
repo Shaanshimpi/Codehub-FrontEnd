@@ -83,11 +83,7 @@ export interface TutorialLesson {
     | MCQContent
     | CodeBlockRearrangingContent
     | FillInTheBlanksContent
-  learningObjectives: string[] // 2-4 specific objectives in English
-  difficulty: 1 | 2 | 3 // Lesson difficulty
-  tags: string[] // Searchable tags
   order: number // Lesson sequence
-  estimatedTime: number // Minutes to complete
 }
 
 // ==================== TUTORIAL STRUCTURE ====================
@@ -98,18 +94,15 @@ export interface ProgrammingTutorial {
   description: string // English description
 
   // Educational Metadata
-  learningObjectives: string[] // 3-6 overall objectives in English
   keyTopics: string[] // 4-8 main topics covered
   difficulty: 1 | 2 | 3 // Overall difficulty
 
   // Content Structure
   lessons: TutorialLesson[] // 5-20 lessons
-  conceptualFlow: string[] // Learning progression
   practicalApplications: string[] // Real-world uses in English
 
   // Metadata
   tags: string[]
-  estimatedTime?: number // Total time in minutes
   diagram_data_diagram?: string // Optional overview diagram
   // Reference tutorial (W3Schools-style)
   reference: {
@@ -147,14 +140,11 @@ export interface TutorialAPIResponse {
   id: string
   title: string // English title
   description: string // English description
-  learningObjectives: string[] // English objectives
   keyTopics: string[]
   difficulty: 1 | 2 | 3
   lessons: TutorialLesson[]
-  conceptualFlow: string[]
   practicalApplications: string[] // English applications
   tags: string[]
-  estimatedTime: number
   diagram_data_diagram?: string
 }
 
@@ -166,22 +156,16 @@ export interface LegacyTutorialAPIResponse {
   description_en: string
   description_hi: string
   description_mr: string
-  learningObjectives: string[]
   keyTopics: string[]
   difficulty: 1 | 2 | 3
   lessons: {
     title: string
     type: "concept" | "mcq" | "codeblock_rearranging" | "fill_in_blanks"
     content: any
-    learningObjectives: string[]
-    difficulty: 1 | 2 | 3
-    estimatedTime: number
+    order: number
   }[]
-  conceptualFlow: string[]
   practicalApplications: string[]
   tags: string[]
-  estimatedTime: number
   prerequisites?: string[]
   assessmentSuggestions?: string[]
-  diagram_data_diagram?: string
 }

@@ -9,7 +9,6 @@ import {
   convertToModernFormat,
   createErrorResponse,
   logError,
-  parseJsonWithFallbacks,
 } from "./utilities/helpers"
 
 export async function POST(request: Request) {
@@ -108,47 +107,46 @@ export async function POST(request: Request) {
     }
 
     // Parse the content using fallback strategies and ensure it has a reference field
-    let parsedTutorial
-    try {
-      parsedTutorial = parseJsonWithFallbacks(content)
-    } catch (parseError) {
-      // Create a minimal tutorial structure as fallback
-      parsedTutorial = {
-        id: `${language}-${topic.replace(/\s+/g, "-").toLowerCase()}-tutorial`,
-        title: `${topic} in ${language}`,
-        description: `A tutorial covering ${topic} concepts in ${language} programming.`,
-        learningObjectives: [
-          `Understand ${topic} concepts`,
-          `Apply ${topic} in ${language} programming`,
-          `Practice with examples and exercises`,
-        ],
-        keyTopics: [topic.toLowerCase(), language.toLowerCase()],
-        difficulty: difficulty || 1,
-        lessons: [
-          {
-            id: "lesson-1",
-            title: `Introduction to ${topic}`,
-            type: "concept",
-            content: {
-              explanation: `Learn about ${topic} in ${language}.`,
-              keyPoints: [`${topic} is important in programming`],
-              codeExamples: [
-                {
-                  title: "Basic Example",
-                  code: `// ${language} ${topic} example\n// Code will be added here`,
-                  explanation: `This shows how to use ${topic} in ${language}.`,
-                },
-              ],
-              practiceHints: ["Practice with simple examples"],
-            },
-            learningObjectives: [`Understand ${topic} basics`],
-            order: 1,
-          },
-        ],
-        practicalApplications: [`Real-world use of ${topic}`],
-        tags: [topic.toLowerCase(), language.toLowerCase()],
-      }
-    }
+    // let parsedTutorial
+    // try {
+    //   parsedTutorial = parseJsonWithFallbacks(content)
+    // } catch (parseError) {
+    //   // Create a minimal tutorial structure as fallback
+    //   parsedTutorial = {
+    //     id: `${language}-${topic.replace(/\s+/g, "-").toLowerCase()}-tutorial`,
+    //     title: `${topic} in ${language}`,
+    //     description: `A tutorial covering ${topic} concepts in ${language} programming.`,
+    //     learningObjectives: [
+    //       `Understand ${topic} concepts`,
+    //       `Apply ${topic} in ${language} programming`,
+    //       `Practice with examples and exercises`,
+    //     ],
+    //     keyTopics: [topic.toLowerCase(), language.toLowerCase()],
+    //     difficulty: difficulty || 1,
+    //     lessons: [
+    //       {
+    //         id: "lesson-1",
+    //         title: `Introduction to ${topic}`,
+    //         type: "concept",
+    //         content: {
+    //           explanation: `Learn about ${topic} in ${language}.`,
+    //           keyPoints: [`${topic} is important in programming`],
+    //           codeExamples: [
+    //             {
+    //               title: "Basic Example",
+    //               code: `// ${language} ${topic} example\n// Code will be added here`,
+    //               explanation: `This shows how to use ${topic} in ${language}.`,
+    //             },
+    //           ],
+    //           practiceHints: ["Practice with simple examples"],
+    //         },
+    //         order: 1,
+    //       },
+    //     ],
+    //     practicalApplications: [`Real-world use of ${topic}`],
+    //     tags: [topic.toLowerCase(), language.toLowerCase()],
+    //   }
+    // }
 
     const processedTutorial = convertToModernFormat(JSON.parse(content))
 

@@ -626,8 +626,6 @@ const extractEnglishArray = (arr: any[]): string[] => {
 export const convertToModernFormat = (tutorial: any): any => {
   // Use AI-generated reference directly - our enhanced prompts ensure this is always present
 
-  console.log(tutorial)
-
   return {
     id: tutorial.id || `tutorial-${Date.now()}`,
     title: extractEnglishText(tutorial.title),
@@ -644,6 +642,7 @@ export const convertToModernFormat = (tutorial: any): any => {
         learningObjectives: extractEnglishArray(
           lesson.learningObjectives || []
         ),
+        keyTopics: lesson.keyTopics || [],
         order: lesson.order !== undefined ? lesson.order : index + 1,
       })) || [],
     practicalApplications: extractEnglishArray(

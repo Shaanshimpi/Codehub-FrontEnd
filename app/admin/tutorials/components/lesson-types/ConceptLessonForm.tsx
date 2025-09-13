@@ -25,7 +25,6 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
     keyPoints: data?.keyPoints || [""],
     codeExamples: data?.codeExamples || [],
     practiceHints: data?.practiceHints || [""],
-    mermaid_code: data?.mermaid_code || "",
     diagram_data: data?.diagram_data || [],
     commonMistakes: data?.commonMistakes || [""],
     bestPractices: data?.bestPractices || [""],
@@ -148,7 +147,6 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
           title: "",
           code: "",
           explanation: "",
-          mermaid_code: "",
         },
       ],
     }))

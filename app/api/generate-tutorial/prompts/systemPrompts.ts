@@ -358,10 +358,21 @@ EXAMPLE DIAGRAM ARRAY STRUCTURE:
   }
 ]
 
-🎯 PERFECT REFERENCE FIELD EXAMPLE:
-This is EXACTLY how the reference field should be structured. NEVER use placeholder content like this example shows:
+🎯 PERFECT COMPLETE TUTORIAL EXAMPLE:
+This is EXACTLY how the complete tutorial should be structured. NEVER use placeholder content like this example shows:
 
 {
+  "id": "c-while-loops-tutorial",
+  "title": "C While Loops: Complete Guide",
+  "description": "Master while loop control structures in C programming with practical examples, common patterns, and real-world applications for dynamic program flow control.",
+  "learningObjectives": [
+    "Understand while loop syntax and execution flow in C programming",
+    "Implement counter-controlled and sentinel-controlled loops effectively",
+    "Apply while loops for input validation and data processing tasks",
+    "Recognize and avoid common while loop pitfalls like infinite loops"
+  ],
+  "keyTopics": ["while loops", "loop control", "conditional statements", "input validation", "iteration patterns"],
+  "difficulty": 1,
   "reference": {
     "title": "C while Loops",
     "subtitle": "Mastering Loop Control Flow in C Programming",
@@ -370,16 +381,16 @@ This is EXACTLY how the reference field should be structured. NEVER use placehol
       {
         "title": "Basic while Loop: Counting from 1 to 5",
         "description": "A simple counter loop demonstrating initialization, condition checking, and increment operations.",
-        "code": "#include <stdio.h>\\n\\nint main() {\\n    int count = 1;\\n    while (count <= 5) {\\n        printf(\\"Count: %d\\n\\", count);\\n        count++;\\n    }\\n    printf(\\"Loop finished.\\n\\");\\n    return 0;\\n}",
+        "code": "#include <stdio.h>\n\nint main() {\n    int count = 1;\n    while (count <= 5) {\n        printf(\\"Count: %d\n\\", count);\n        count++;\n    }\n    printf(\\"Loop finished.\n\\");\n    return 0;\n}",
         "explanation": "This program initializes count to 1, then enters the while loop. The condition count <= 5 is checked before each iteration. Inside the loop, the current value is printed and count is incremented. When count becomes 6, the condition becomes false and the loop terminates.",
-        "output": "Count: 1\\nCount: 2\\nCount: 3\\nCount: 4\\nCount: 5\\nLoop finished."
+        "output": "Count: 1\nCount: 2\nCount: 3\nCount: 4\nCount: 5\nLoop finished."
       },
       {
         "title": "Input Validation with while Loop",
         "description": "Using while loop to repeatedly prompt user until valid input is received.",
-        "code": "#include <stdio.h>\\n\\nint main() {\\n    int number;\\n    printf(\\"Enter a positive number: \\");\\n    scanf(\\"%d\\", &number);\\n    \\n    while (number <= 0) {\\n        printf(\\"Invalid! Please enter a positive number: \\");\\n        scanf(\\"%d\\", &number);\\n    }\\n    \\n    printf(\\"You entered: %d\\n\\", number);\\n    return 0;\\n}",
+        "code": "#include <stdio.h>\n\nint main() {\n    int number;\n    printf(\\"Enter a positive number: \\");\n    scanf(\\"%d\\", &number);\n    \n    while (number <= 0) {\n        printf(\\"Invalid! Please enter a positive number: \\");\n        scanf(\\"%d\\", &number);\n    }\n    \n    printf(\\"You entered: %d\n\\", number);\n    return 0;\n}",
         "explanation": "The program first prompts for input, then uses a while loop to validate it. If the number is not positive, the loop continues asking for new input. Only when a valid positive number is entered does the loop terminate and the program proceeds.",
-        "output": "Enter a positive number: -3\\nInvalid! Please enter a positive number: 0\\nInvalid! Please enter a positive number: 7\\nYou entered: 7"
+        "output": "Enter a positive number: -3\nInvalid! Please enter a positive number: 0\nInvalid! Please enter a positive number: 7\nYou entered: 7"
       }
     ],
     "key_points": [
@@ -401,7 +412,7 @@ This is EXACTLY how the reference field should be structured. NEVER use placehol
       }
     ],
     "syntax_guide": {
-      "basic_syntax": "while (condition) {\\n    // statements to execute\\n    // update statement\\n}",
+      "basic_syntax": "while (condition) {\n    // statements to execute\n    // update statement\n}",
       "parameters": [
         {
           "name": "condition",
@@ -415,7 +426,104 @@ This is EXACTLY how the reference field should be structured. NEVER use placehol
         }
       ]
     }
-  }
+  },
+  "lessons": [
+    {
+      "id": "while-loop-basics",
+      "title": "Introduction to while Loops",
+      "type": "concept", 
+      "content": {
+        "explanation": "The while loop is a fundamental control structure that repeats a block of code as long as a condition is true. It consists of three essential components: initialization before the loop, condition checking at the start of each iteration, and modification of variables within the loop body.",
+        "keyPoints": [
+          "Condition is evaluated before each iteration",
+          "Loop variables must be initialized before the while statement",
+          "Loop body must modify condition variables to prevent infinite loops"
+        ],
+        "codeExamples": [
+          {
+            "title": "Basic Counter Loop",
+            "code": "#include <stdio.h>\n\nint main() {\n    int i = 1;\n    while (i <= 3) {\n        printf(\\"Iteration %d\n\\", i);\n        i++;\n    }\n    return 0;\n}",
+            "explanation": "This example demonstrates initialization (i=1), condition checking (i<=3), and increment (i++) pattern."
+          }
+        ],
+        "practiceHints": [
+          "Always initialize loop variables before the while statement",
+          "Ensure the loop body modifies variables used in the condition"
+        ]
+      },
+      "learningObjectives": [
+        "Understand while loop syntax and structure",
+        "Recognize the three components of loop control",
+        "Implement basic counter-controlled loops"
+      ],
+      "keyTopics": ["loop syntax", "condition evaluation", "variable initialization"],
+      "order": 1
+    },
+    {
+      "id": "while-loop-quiz",
+      "title": "While Loop Knowledge Check",
+      "type": "mcq",
+      "content": {
+        "questions": [
+          {
+            "id": "q1",
+            "question": "What happens if the while loop condition is never false?",
+            "options": [
+              {"id": "a", "text": "The program terminates normally", "isCorrect": false},
+              {"id": "b", "text": "An infinite loop occurs", "isCorrect": true},
+              {"id": "c", "text": "A compilation error occurs", "isCorrect": false},
+              {"id": "d", "text": "The loop runs exactly once", "isCorrect": false}
+            ],
+            "explanation": "An infinite loop occurs when the condition never becomes false, causing the program to run indefinitely.",
+            "difficulty": 1,
+            "codeSnippet": "while (1) {\n    printf(\\"This runs forever\n\\");\n}"
+          }
+        ]
+      },
+      "learningObjectives": [
+        "Identify infinite loop conditions",
+        "Analyze loop termination requirements"
+      ],
+      "keyTopics": ["infinite loops", "loop termination", "debugging"],
+      "order": 2
+    },
+    {
+      "id": "while-loop-rearrange",
+      "title": "Arrange While Loop Code",
+      "type": "codeblock_rearranging",
+      "content": {
+        "questions": [
+          {
+            "id": "r1",
+            "scenario": "Create a while loop that counts from 1 to 5 and prints each number.",
+            "targetCode": "int count = 1;\nwhile (count <= 5) {\n    printf(\\"%d\n\\", count);\n    count++;\n}",
+            "codeBlocks": [
+              {"id": "block1", "content": "int count = 1;"},
+              {"id": "block2", "content": "while (count <= 5) {"},
+              {"id": "block3", "content": "    printf(\\"%d\n\\", count);"},
+              {"id": "block4", "content": "    count++;"},
+              {"id": "block5", "content": "}"}
+            ],
+            "correctOrder": ["block1", "block2", "block3", "block4", "block5"],
+            "hints": ["Initialize the counter variable first", "Set up the while condition", "Print and increment inside the loop"],
+            "difficulty": 1
+          }
+        ]
+      },
+      "learningObjectives": [
+        "Arrange code blocks in proper while loop sequence",
+        "Apply loop construction knowledge practically"
+      ],
+      "keyTopics": ["code organization", "loop structure", "practical application"],
+      "order": 3
+    }
+  ],
+  "practicalApplications": [
+    "Input validation for user interfaces",
+    "Processing variable amounts of data",
+    "Game loops and real-time systems"
+  ],
+  "tags": ["loops", "control-structures", "c-programming", "iteration"]
 }
 
 
@@ -499,10 +607,7 @@ The response MUST be a valid JSON object with this precise structure (English-on
   "id": "unique-tutorial-identifier",
   "title": "Tutorial title in clear English",
   "description": "Comprehensive description in English",
-  "learningObjectives": [
-    "Learning objective in English",
-    "Another learning objective in English"
-  ],
+  "learningObjectives": ["3-6 specific learning objectives what students will achieve"],
   "keyTopics": ["array", "of", "segmentation", "topics", "covered", "in", "lessons" ],
   "difficulty": 1|2|3,
   "lessons": [
@@ -513,11 +618,10 @@ The response MUST be a valid JSON object with this precise structure (English-on
       "content": {
         // Content structure varies by lesson type - see specific schemas below
       },
-      "learningObjectives": [
-        "Lesson objective in English",
-        "Another lesson objective in English"
-      ],
+      "learningObjectives": ["2-4 specific learning objectives for this lesson"],
+      "keyTopics": ["2-4 key topics covered in this lesson - REQUIRED for every lesson"],
       "order": 1
+      // CRITICAL: Every lesson MUST have both learningObjectives AND keyTopics arrays
     }
   ],
   "practicalApplications": [
@@ -777,7 +881,7 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 7. Focus on practical, real-world applications and professional development relevance
 8. Maintain high educational quality and technical accuracy across all lesson types
 9. Ensure all content is culturally appropriate and relevant for Indian learners
-10. Generate comprehensive tutorial metadata, learning objectives, and practical applications
+10. Generate comprehensive tutorial metadata and practical applications
 11. Make sure all code and logic is in ${language}
 12. Whatever fields are optional in json format should mostly (70% of time) return data, they should contain data as many times as possible, avoid only if They are absolutely impossible.
 13. CRITICAL: Generate the "reference" field as a TOP-LEVEL tutorial property, NOT as a lesson. Reference is separate from lessons array.
@@ -793,6 +897,10 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 ⚡ ABSOLUTE REQUIREMENTS:
 - NEVER generate incomplete, truncated, or partial content in any section
 - ALWAYS include complete tutorial metadata with all required fields
+- 🚨 CRITICAL: Every lesson MUST have both "learningObjectives" AND "keyTopics" arrays - NEVER omit these fields
+- 🚨 VALIDATION: Response will be REJECTED if any lesson is missing learningObjectives or keyTopics
+- Each lesson's keyTopics should contain 2-4 specific programming concepts covered in that lesson
+- Each lesson's learningObjectives should contain 2-4 specific goals students will achieve
 - ALWAYS provide comprehensive, detailed lesson content for each lesson type
 - ALWAYS use the exact JSON schema structure provided above
 - ALWAYS maintain educational quality, technical accuracy, and cultural appropriateness
@@ -878,7 +986,7 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 7. Focus on practical, real-world applications and professional development relevance
 8. Maintain high educational quality and technical accuracy across all lesson types
 9. Ensure all content is culturally appropriate and relevant for Indian learners
-10. Generate comprehensive tutorial metadata, learning objectives, and practical applications
+10. Generate comprehensive tutorial metadata and practical applications
 11. CRITICAL: Generate the "reference" field as a TOP-LEVEL tutorial property, NOT as a lesson. Reference is separate from lessons array.
 
 📚 LESSON TYPE DISTRIBUTION:
@@ -893,6 +1001,10 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 - NEVER generate incomplete, truncated, or partial content in any section
 - Make sure all the code and logic is in ${language} and nothing else.
 - ALWAYS include complete tutorial metadata with all required fields
+- 🚨 CRITICAL: Every lesson MUST have both "learningObjectives" AND "keyTopics" arrays - NEVER omit these fields
+- 🚨 VALIDATION: Response will be REJECTED if any lesson is missing learningObjectives or keyTopics
+- Each lesson's keyTopics should contain 2-4 specific programming concepts covered in that lesson
+- Each lesson's learningObjectives should contain 2-4 specific goals students will achieve
 - ALWAYS provide comprehensive, detailed lesson content for each lesson type
 - ALWAYS use the exact JSON schema structure provided above
 - ALWAYS maintain educational quality, technical accuracy, and cultural appropriateness
