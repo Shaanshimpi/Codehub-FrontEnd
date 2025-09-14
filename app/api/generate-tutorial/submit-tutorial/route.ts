@@ -18,7 +18,7 @@ async function convertLanguageToId(
 
   // If it's a slug, fetch the language to get the ID
   const response = await fetch(
-    `${process.env.PAYLOAD_API_URL || "http://localhost:3001/api"}/programming-languages?where[slug][equals]=${programmingLanguage}`,
+    `${process.env.PAYLOAD_API_URL || "http://localhost:3005/api"}/programming-languages?where[slug][equals]=${programmingLanguage}`,
     {
       method: "GET",
       headers: {
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
         .trim()
     }
 
-    // Validate required fields
+    // Validate required fields based on updated TutorialData interface
     const requiredFields = ["title", "programmingLanguage"]
     const missingFields = requiredFields.filter((field) => !tutorialData[field])
 
@@ -60,6 +60,23 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           error: `Missing required fields: ${missingFields.join(", ")}`,
+        },
+        { status: 400 }
+      )
+    }
+
+    // Validate reference structure if provided
+    if (
+      tutorialData.reference &&
+      (!tutorialData.reference.title ||
+        !tutorialData.reference.subtitle ||
+        !tutorialData.reference.introduction)
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Reference content must include title, subtitle, and introduction",
         },
         { status: 400 }
       )
@@ -76,11 +93,41 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (tutorialData.lessons.length < 5 || tutorialData.lessons.length > 20) {
+    if (tutorialData.lessons.length < 1 || tutorialData.lessons.length > 20) {
       return NextResponse.json(
         {
           success: false,
-          error: "Tutorial must have between 5 and 20 lessons",
+          error: "Tutorial must have between 1 and 20 lessons",
+        },
+        { status: 400 }
+      )
+    }
+
+    // Validate each lesson has required fields
+    const lessonValidationErrors = []
+    tutorialData.lessons.forEach((lesson, index) => {
+      if (!lesson.title)
+        lessonValidationErrors.push(`Lesson ${index + 1}: missing title`)
+      if (!lesson.type)
+        lessonValidationErrors.push(`Lesson ${index + 1}: missing type`)
+      if (
+        !lesson.learningObjectives ||
+        lesson.learningObjectives.length === 0
+      ) {
+        lessonValidationErrors.push(
+          `Lesson ${index + 1}: missing learning objectives`
+        )
+      }
+      if (!lesson.keyTopics || lesson.keyTopics.length === 0) {
+        lessonValidationErrors.push(`Lesson ${index + 1}: missing key topics`)
+      }
+    })
+
+    if (lessonValidationErrors.length > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Lesson validation errors: ${lessonValidationErrors.join(", ")}`,
         },
         { status: 400 }
       )
@@ -98,10 +145,11 @@ export async function POST(request: NextRequest) {
         title: lesson.title || `Lesson ${lesson.order || 1}`,
         type: lesson.type || "concept",
         order: lesson.order || 1,
-        description: lesson.description || "",
-        difficulty: lesson.difficulty?.toString() || "1",
         learningObjectives: (lesson.learningObjectives || []).map((obj: any) =>
           typeof obj === "string" ? { objective: obj } : obj
+        ),
+        keyTopics: (lesson.keyTopics || []).map((topic: any) =>
+          typeof topic === "string" ? { topic: topic } : topic
         ),
       }
 
@@ -111,7 +159,7 @@ export async function POST(request: NextRequest) {
         `🎯 Lesson ${lesson.id} (${lesson.type}) data:`,
         JSON.stringify(lessonData, null, 2)
       )
-      console.log(`🔍 PlantUML code in lesson data:`, lessonData.plantuml_code)
+      console.log(`🔍 Diagram data in lesson data:`, lessonData.diagram_data)
 
       switch (lesson.type) {
         case "concept":
@@ -125,13 +173,13 @@ export async function POST(request: NextRequest) {
                 title: example.title || "",
                 code: example.code || "",
                 explanation: example.explanation || "",
-                plantuml_code: example.plantuml_code || "",
+                diagram_data: example.diagram_data || "",
               })
             ),
             practiceHints: (lessonData.practiceHints || []).map((hint: any) =>
               typeof hint === "string" ? { hint } : hint
             ),
-            plantuml_code: lessonData.plantuml_code || "",
+            diagram_data: lessonData.diagram_data || "",
             commonMistakes: (lessonData.commonMistakes || []).map(
               (mistake: any) =>
                 typeof mistake === "string" ? { mistake } : mistake
@@ -161,7 +209,7 @@ export async function POST(request: NextRequest) {
         case "mcq":
           const mcqData = {
             questions: (lessonData.questions || []).map((q: any) => {
-              console.log(`🎯 MCQ Question PlantUML:`, q.plantuml_code)
+              console.log(`🎯 MCQ Question Diagram:`, q.diagram_data)
               return {
                 question: q.question || "",
                 options: (q.options || []).map((opt: any) => ({
@@ -171,7 +219,7 @@ export async function POST(request: NextRequest) {
                 explanation: q.explanation || "",
                 difficulty: q.difficulty?.toString() || "1",
                 codeSnippet: q.codeSnippet || "",
-                plantuml_code: q.plantuml_code || "",
+                diagram_data: q.diagram_data || "",
               }
             }),
           }
@@ -191,7 +239,7 @@ export async function POST(request: NextRequest) {
               questions: (lessonData.questions || []).map((q: any) => ({
                 scenario: q.scenario || "",
                 targetCode: q.targetCode || "",
-                plantuml_code: q.plantuml_code || "",
+                diagram_data: q.diagram_data || "",
                 blocks: (q.blocks || []).map((block: any) => ({
                   code: block.code || "",
                   correctOrder: block.correctOrder || 1,
@@ -211,7 +259,7 @@ export async function POST(request: NextRequest) {
               questions: (lessonData.questions || []).map((q: any) => ({
                 scenario: q.scenario || "",
                 code: q.code || "",
-                plantuml_code: q.plantuml_code || "",
+                diagram_data: q.diagram_data || "",
                 blanks: (q.blanks || []).map((blank: any) => ({
                   position: blank.position || 0,
                   type: blank.type || "text",
@@ -229,7 +277,7 @@ export async function POST(request: NextRequest) {
                   ? {
                       completeCode: q.solution.completeCode || "",
                       explanation: q.solution.explanation || "",
-                      plantuml_code: q.solution.plantuml_code || "",
+                      diagram_data: q.solution.diagram_data || "",
                     }
                   : undefined,
                 difficulty: q.difficulty?.toString() || "1",
@@ -254,25 +302,28 @@ export async function POST(request: NextRequest) {
       index: tutorialData.index || 1,
 
       // Content fields
-      content: tutorialData.description || "",
+      content: tutorialData.content || tutorialData.description || "",
       description: tutorialData.description || "",
-
-      // New schema fields
-      learningObjectives: (tutorialData.learningObjectives || []).map(
-        (obj: any) => (typeof obj === "string" ? { objective: obj } : obj)
-      ),
-      keyTopics: (tutorialData.keyTopics || []).map((topic: any) =>
-        typeof topic === "string" ? { topic } : topic
-      ),
-      practicalApplications: (tutorialData.practicalApplications || []).map(
-        (app: any) => (typeof app === "string" ? { application: app } : app)
-      ),
-      tags: (tutorialData.tags || []).map((tag: any) =>
-        typeof tag === "string" ? { tag } : tag
-      ),
+      videoUrl: tutorialData.videoUrl || "",
 
       // Single value fields
       difficulty: tutorialData.difficulty?.toString() || "1",
+
+      // Learning Configuration Group (nested structure for server)
+      learningConfiguration: {
+        learningObjectives: (tutorialData.learningObjectives || []).map(
+          (obj: any) => (typeof obj === "string" ? { objective: obj } : obj)
+        ),
+        keyTopics: (tutorialData.keyTopics || []).map((topic: any) =>
+          typeof topic === "string" ? { topic } : topic
+        ),
+        practicalApplications: (tutorialData.practicalApplications || []).map(
+          (app: any) => (typeof app === "string" ? { application: app } : app)
+        ),
+        tags: (tutorialData.tags || []).map((tag: any) =>
+          typeof tag === "string" ? { tag } : tag
+        ),
+      },
 
       // Lessons array with transformed structure
       lessons: transformedLessons,
@@ -288,7 +339,7 @@ export async function POST(request: NextRequest) {
       // Settings
       isLocked: Boolean(tutorialData.isLocked ?? true),
 
-      // Reference tutorial - format according to server schema
+      // Reference tutorial - format according to server schema (optional field)
       reference: tutorialData.reference
         ? {
             title: tutorialData.reference.title || "",
@@ -303,9 +354,10 @@ export async function POST(request: NextRequest) {
                 output: example.output || "",
               })
             ),
-            key_points: Array.isArray(tutorialData.reference.key_points)
-              ? tutorialData.reference.key_points.join("\n")
-              : tutorialData.reference.key_points || "",
+            key_points: (tutorialData.reference.key_points || []).map(
+              (point: any) =>
+                typeof point === "string" ? { point: point } : point
+            ),
             common_mistakes: (tutorialData.reference.common_mistakes || []).map(
               (mistake: any) => ({
                 mistake: mistake.mistake || "",
@@ -338,30 +390,36 @@ export async function POST(request: NextRequest) {
       JSON.stringify(payloadData, null, 2)
     )
 
-    // Specifically log PlantUML fields for verification
-    console.log("🎯 PlantUML Fields in Payload:")
+    // Specifically log diagram fields for verification
+    console.log("🎯 Diagram Fields in Payload:")
     payloadData.lessons?.forEach((lesson: any, index: number) => {
       console.log(`Lesson ${index + 1} (${lesson.type}):`)
-      if (lesson.conceptData?.plantuml_code) {
-        console.log(
-          `  - Concept PlantUML: ${lesson.conceptData.plantuml_code.substring(0, 100)}...`
-        )
+      if (lesson.conceptData?.diagram_data) {
+        const diagramData =
+          typeof lesson.conceptData.diagram_data === "string"
+            ? lesson.conceptData.diagram_data.substring(0, 100)
+            : JSON.stringify(lesson.conceptData.diagram_data).substring(0, 100)
+        console.log(`  - Concept Diagram: ${diagramData}...`)
       }
       if (lesson.conceptData?.codeExamples) {
         lesson.conceptData.codeExamples.forEach((ex: any, i: number) => {
-          if (ex.plantuml_code) {
-            console.log(
-              `  - Code Example ${i + 1} PlantUML: ${ex.plantuml_code.substring(0, 50)}...`
-            )
+          if (ex.diagram_data) {
+            const diagramData =
+              typeof ex.diagram_data === "string"
+                ? ex.diagram_data.substring(0, 50)
+                : JSON.stringify(ex.diagram_data).substring(0, 50)
+            console.log(`  - Code Example ${i + 1} Diagram: ${diagramData}...`)
           }
         })
       }
       if (lesson.mcqData?.questions) {
         lesson.mcqData.questions.forEach((q: any, i: number) => {
-          if (q.plantuml_code) {
-            console.log(
-              `  - MCQ Question ${i + 1} PlantUML: ${q.plantuml_code.substring(0, 50)}...`
-            )
+          if (q.diagram_data) {
+            const diagramData =
+              typeof q.diagram_data === "string"
+                ? q.diagram_data.substring(0, 50)
+                : JSON.stringify(q.diagram_data).substring(0, 50)
+            console.log(`  - MCQ Question ${i + 1} Diagram: ${diagramData}...`)
           }
         })
       }
@@ -369,7 +427,7 @@ export async function POST(request: NextRequest) {
 
     // Submit to Payload CMS
     const payloadResponse = await fetch(
-      `${process.env.PAYLOAD_API_URL || "http://localhost:3001/api"}/tutorials`,
+      `${process.env.PAYLOAD_API_URL || "http://localhost:3005/api"}/tutorials`,
       {
         method: "POST",
         headers: {

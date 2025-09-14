@@ -189,13 +189,13 @@ export async function PATCH(
                     title: example.title || "",
                     code: example.code || "",
                     explanation: example.explanation || "",
-                    plantuml_code: example.plantuml_code || "",
+                    diagram_data: example.diagram_data || "",
                   })
                 ),
                 practiceHints: (lessonData.practiceHints || []).map(
                   (hint: any) => (typeof hint === "string" ? { hint } : hint)
                 ),
-                plantuml_code: lessonData.plantuml_code || "",
+                diagram_data: lessonData.diagram_data || "",
                 commonMistakes: (lessonData.commonMistakes || []).map(
                   (mistake: any) =>
                     typeof mistake === "string" ? { mistake } : mistake
@@ -227,7 +227,7 @@ export async function PATCH(
                   explanation: q.explanation || "",
                   difficulty: q.difficulty?.toString() || "1",
                   codeSnippet: q.codeSnippet || "",
-                  plantuml_code: q.plantuml_code || "",
+                  diagram_data: q.diagram_data || "",
                 })),
               },
             }
@@ -238,7 +238,7 @@ export async function PATCH(
                 questions: (lessonData.questions || []).map((q: any) => ({
                   scenario: q.scenario || "",
                   targetCode: q.targetCode || "",
-                  plantuml_code: q.plantuml_code || "",
+                  diagram_data: q.diagram_data || "",
                   blocks: (q.blocks || []).map((block: any) => ({
                     code: block.code || "",
                     correctOrder: block.correctOrder || 1,
@@ -257,7 +257,7 @@ export async function PATCH(
                 questions: (lessonData.questions || []).map((q: any) => ({
                   scenario: q.scenario || "",
                   code: q.code || "",
-                  plantuml_code: q.plantuml_code || "",
+                  diagram_data: q.diagram_data || "",
                   blanks: (q.blanks || []).map((blank: any) => ({
                     position: blank.position || 0,
                     type: blank.type || "text",
@@ -275,7 +275,7 @@ export async function PATCH(
                     ? {
                         completeCode: q.solution.completeCode || "",
                         explanation: q.solution.explanation || "",
-                        plantuml_code: q.solution.plantuml_code || "",
+                        diagram_data: q.solution.diagram_data || "",
                       }
                     : undefined,
                   difficulty: q.difficulty?.toString() || "1",

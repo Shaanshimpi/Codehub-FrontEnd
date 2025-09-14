@@ -99,15 +99,14 @@ const TutorialManagementView: React.FC = () => {
                     code: ex.code || "",
                     language: "javascript", // Default or detect from context
                     explanation: ex.explanation || "",
-                    plantuml_code: ex.plantuml_code || "",
-                    diagram_data: null, // Will be populated if needed
+                    diagram_data: ex.diagram_data || "",
                   })
                 ),
                 practiceHints: (lesson.conceptData.practiceHints || []).map(
                   (hint: any) =>
                     typeof hint === "string" ? hint : hint.hint || ""
                 ),
-                plantuml_code: lesson.conceptData.plantuml_code || "",
+                diagram_data: lesson.conceptData.diagram_data || "",
                 commonMistakes: (lesson.conceptData.commonMistakes || []).map(
                   (mistake: any) =>
                     typeof mistake === "string"
@@ -138,8 +137,7 @@ const TutorialManagementView: React.FC = () => {
                   explanation: q.explanation || "",
                   difficulty: q.difficulty || 1,
                   codeSnippet: q.codeSnippet || "",
-                  plantuml_code: q.plantuml_code || "",
-                  diagram_data: null,
+                  diagram_data: q.diagram_data || "",
                 })),
               }
             }
@@ -153,13 +151,12 @@ const TutorialManagementView: React.FC = () => {
                     id: q.id || crypto.randomUUID(),
                     scenario: q.scenario || "",
                     targetCode: q.targetCode || "",
-                    plantuml_code: q.plantuml_code || "",
+                    diagram_data: q.diagram_data || "",
                     blocks: q.blocks || [],
                     hints: (q.hints || []).map((hint: any) =>
                       typeof hint === "string" ? hint : hint.hint || ""
                     ),
                     difficulty: q.difficulty || 1,
-                    diagram_data: null,
                   })
                 ),
               }
@@ -173,7 +170,7 @@ const TutorialManagementView: React.FC = () => {
                   id: q.id || crypto.randomUUID(),
                   scenario: q.scenario || "",
                   code: q.code || "",
-                  plantuml_code: q.plantuml_code || "",
+                  diagram_data: q.diagram_data || "",
                   blanks: (q.blanks || []).map((blank: any) => ({
                     id: blank.id || crypto.randomUUID(),
                     position: blank.position || 0,
@@ -196,11 +193,10 @@ const TutorialManagementView: React.FC = () => {
                     ? {
                         completeCode: q.solution.completeCode || "",
                         explanation: q.solution.explanation || "",
-                        plantuml_code: q.solution.plantuml_code || "",
+                        diagram_data: q.solution.diagram_data || "",
                       }
                     : undefined,
                   difficulty: q.difficulty || 1,
-                  diagram_data: null,
                 })),
               }
             }

@@ -87,14 +87,17 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
     slug: "",
     description: "",
     videoUrl: "",
+    content: "",
     programmingLanguage: "",
     difficulty: 1,
-    focusAreas: "",
-    keyTopics: [""],
-    practicalApplications: [""],
-    tags: [""],
     index: 1,
     isLocked: true,
+    learningConfiguration: {
+      learningObjectives: [{ objective: "" }],
+      keyTopics: [{ topic: "" }],
+      practicalApplications: [{ application: "" }],
+      tags: [{ tag: "" }],
+    },
     reference: {
       title: "",
       subtitle: "",
@@ -190,16 +193,38 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
         videoUrl: initialData.videoUrl || "",
         programmingLanguage: programmingLanguageSlug,
         difficulty: initialData.difficulty || 1,
-        focusAreas: initialData.focusAreas || "",
-        keyTopics:
-          initialData.keyTopics && initialData.keyTopics.length > 0
-            ? initialData.keyTopics
-            : [""],
-        practicalApplications: initialData.practicalApplications || [""],
-        tags: initialData.tags || [""],
+        content: initialData.content || "",
         index: initialData.index || 1,
         isLocked:
           initialData.isLocked !== undefined ? initialData.isLocked : true,
+        learningConfiguration: {
+          learningObjectives:
+            initialData.learningObjectives &&
+            initialData.learningObjectives.length > 0
+              ? initialData.learningObjectives.map((obj) =>
+                  typeof obj === "string" ? { objective: obj } : obj
+                )
+              : [{ objective: "" }],
+          keyTopics:
+            initialData.keyTopics && initialData.keyTopics.length > 0
+              ? initialData.keyTopics.map((topic) =>
+                  typeof topic === "string" ? { topic: topic } : topic
+                )
+              : [{ topic: "" }],
+          practicalApplications:
+            initialData.practicalApplications &&
+            initialData.practicalApplications.length > 0
+              ? initialData.practicalApplications.map((app) =>
+                  typeof app === "string" ? { application: app } : app
+                )
+              : [{ application: "" }],
+          tags:
+            initialData.tags && initialData.tags.length > 0
+              ? initialData.tags.map((tag) =>
+                  typeof tag === "string" ? { tag: tag } : tag
+                )
+              : [{ tag: "" }],
+        },
         reference: {
           title: initialData.reference?.title || "",
           subtitle: initialData.reference?.subtitle || "",
@@ -581,11 +606,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
 
       setTutorialData({
         lessons: convertedLessons,
-        learningObjectives:
-          initialData.learningObjectives &&
-          initialData.learningObjectives.length > 0
-            ? initialData.learningObjectives
-            : [""], // Populate from AI if available, otherwise empty array
+        learningObjectives: [], // This field is now handled by basicInfo.learningConfiguration.learningObjectives
       })
     }
   }, [initialData, languagesLoading])
@@ -631,23 +652,36 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
     index: number,
     value: string
   ) => {
-    setTutorialData((prev) => ({
+    setBasicInfo((prev) => ({
       ...prev,
-      [field]: prev[field].map((item, i) => (i === index ? value : item)),
+      learningConfiguration: {
+        ...prev.learningConfiguration,
+        [field]: prev.learningConfiguration[field].map((item, i) =>
+          i === index ? { objective: value } : item
+        ),
+      },
     }))
   }
 
   const addArrayField = (field: "learningObjectives") => {
-    setTutorialData((prev) => ({
+    setBasicInfo((prev) => ({
       ...prev,
-      [field]: [...prev[field], ""],
+      learningConfiguration: {
+        ...prev.learningConfiguration,
+        [field]: [...prev.learningConfiguration[field], { objective: "" }],
+      },
     }))
   }
 
   const removeArrayField = (field: "learningObjectives", index: number) => {
-    setTutorialData((prev) => ({
+    setBasicInfo((prev) => ({
       ...prev,
-      [field]: prev[field].filter((_, i) => i !== index),
+      learningConfiguration: {
+        ...prev.learningConfiguration,
+        [field]: prev.learningConfiguration[field].filter(
+          (_, i) => i !== index
+        ),
+      },
     }))
   }
 
@@ -656,18 +690,40 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
     index: number,
     value: string
   ) => {
+    const fieldMap = {
+      keyTopics: "topic",
+      practicalApplications: "application",
+      tags: "tag",
+    }
+    const objKey = fieldMap[field]
+
     setBasicInfo((prev) => ({
       ...prev,
-      [field]: prev[field].map((item, i) => (i === index ? value : item)),
+      learningConfiguration: {
+        ...prev.learningConfiguration,
+        [field]: prev.learningConfiguration[field].map((item, i) =>
+          i === index ? { [objKey]: value } : item
+        ),
+      },
     }))
   }
 
   const addBasicArrayField = (
     field: "keyTopics" | "practicalApplications" | "tags"
   ) => {
+    const fieldMap = {
+      keyTopics: "topic",
+      practicalApplications: "application",
+      tags: "tag",
+    }
+    const objKey = fieldMap[field]
+
     setBasicInfo((prev) => ({
       ...prev,
-      [field]: [...prev[field], ""],
+      learningConfiguration: {
+        ...prev.learningConfiguration,
+        [field]: [...prev.learningConfiguration[field], { [objKey]: "" }],
+      },
     }))
   }
 
@@ -677,16 +733,20 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
   ) => {
     setBasicInfo((prev) => ({
       ...prev,
-      [field]: prev[field].filter((_, i) => i !== index),
+      learningConfiguration: {
+        ...prev.learningConfiguration,
+        [field]: prev.learningConfiguration[field].filter(
+          (_, i) => i !== index
+        ),
+      },
     }))
   }
 
   const handleSave = async () => {
     if (
       !basicInfo.title ||
-      tutorialData.lessons.length < 5 ||
-      tutorialData.lessons.length > 20 ||
-      isSaving
+      !basicInfo.description ||
+      !basicInfo.programmingLanguage
     ) {
       return
     }
@@ -694,141 +754,67 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
     setIsSaving(true)
 
     try {
-      const completeTutorialData: TutorialData = {
-        id: crypto.randomUUID(),
+      // Prepare tutorial data matching TutorialData interface
+      const submissionData: TutorialData = {
+        id: initialData?.id || crypto.randomUUID(),
         title: basicInfo.title,
-        slug: basicInfo.slug || generateSlug(basicInfo.title),
-        description: basicInfo.description || "",
-        videoUrl: basicInfo.videoUrl || "",
-        learningObjectives: tutorialData.learningObjectives.filter(
-          (obj) => obj.trim() !== ""
-        ),
-        keyTopics:
-          basicInfo.keyTopics?.filter((topic) => topic.trim() !== "") || [],
-        difficulty: basicInfo.difficulty || 1,
-        lessons: tutorialData.lessons.map((lesson) => {
-          const enrichedLesson = {
-            ...lesson,
-            type: lesson.type as
-              | "concept"
-              | "mcq"
-              | "codeblock_rearranging"
-              | "fill_in_blanks",
-          }
-
-          // Inject Mermaid codes into lesson data based on type
-          if (lesson.data) {
-            const lessonData = { ...lesson.data }
-
-            // Add main lesson Mermaid code
-            const mainMermaid = mermaidCodes[`lesson_${lesson.id}`]
-            if (mainMermaid) {
-              lessonData.mermaid_code = mainMermaid
-            }
-
-            switch (lesson.type) {
-              case "concept":
-                // Add Mermaid to code examples
-                if (lessonData.codeExamples) {
-                  lessonData.codeExamples = lessonData.codeExamples.map(
-                    (example: any, index: number) => ({
-                      ...example,
-                      mermaid_code:
-                        mermaidCodes[`lesson_${lesson.id}_example_${index}`] ||
-                        example.mermaid_code ||
-                        "",
-                    })
-                  )
-                }
-                break
-
-              case "mcq":
-                // Add Mermaid to questions
-                if (lessonData.questions) {
-                  lessonData.questions = lessonData.questions.map(
-                    (question: any, index: number) => ({
-                      ...question,
-                      mermaid_code:
-                        mermaidCodes[`lesson_${lesson.id}_question_${index}`] ||
-                        question.mermaid_code ||
-                        "",
-                    })
-                  )
-                }
-                break
-
-              case "codeblock_rearranging":
-                // Add Mermaid to questions
-                if (lessonData.questions) {
-                  lessonData.questions = lessonData.questions.map(
-                    (question: any, index: number) => ({
-                      ...question,
-                      mermaid_code:
-                        mermaidCodes[`lesson_${lesson.id}_question_${index}`] ||
-                        question.mermaid_code ||
-                        "",
-                    })
-                  )
-                }
-                break
-
-              case "fill_in_blanks":
-                // Add Mermaid to questions and solutions
-                if (lessonData.questions) {
-                  lessonData.questions = lessonData.questions.map(
-                    (question: any, index: number) => {
-                      const enrichedQuestion = {
-                        ...question,
-                        mermaid_code:
-                          mermaidCodes[
-                            `lesson_${lesson.id}_question_${index}`
-                          ] ||
-                          question.mermaid_code ||
-                          "",
-                      }
-
-                      // Add Mermaid to solution if it exists
-                      if (enrichedQuestion.solution) {
-                        enrichedQuestion.solution = {
-                          ...enrichedQuestion.solution,
-                          mermaid_code:
-                            mermaidCodes[
-                              `lesson_${lesson.id}_question_${index}_solution`
-                            ] ||
-                            enrichedQuestion.solution.mermaid_code ||
-                            "",
-                        }
-                      }
-
-                      return enrichedQuestion
-                    }
-                  )
-                }
-                break
-            }
-
-            enrichedLesson.data = lessonData
-          }
-
-          return enrichedLesson
-        }),
+        description: basicInfo.description,
+        videoUrl: basicInfo.videoUrl,
+        learningObjectives: basicInfo.learningConfiguration.learningObjectives
+          .map((obj) => obj.objective)
+          .filter((obj) => obj.trim() !== ""),
+        keyTopics: basicInfo.learningConfiguration.keyTopics
+          .map((topic) => topic.topic)
+          .filter((topic) => topic.trim() !== ""),
+        difficulty: basicInfo.difficulty,
+        lessons: tutorialData.lessons.map((lesson, index) => ({
+          ...lesson,
+          order: index + 1,
+        })),
         practicalApplications:
-          basicInfo.practicalApplications?.filter((app) => app.trim() !== "") ||
-          [],
-        tags: basicInfo.tags?.filter((tag) => tag.trim() !== "") || [],
+          basicInfo.learningConfiguration.practicalApplications
+            .map((app) => app.application)
+            .filter((app) => app.trim() !== ""),
+        tags: basicInfo.learningConfiguration.tags
+          .map((tag) => tag.tag)
+          .filter((tag) => tag.trim() !== ""),
         programmingLanguage: basicInfo.programmingLanguage,
-        focusAreas: basicInfo.focusAreas,
-        index: basicInfo.index,
-        isLocked: basicInfo.isLocked,
         reference: basicInfo.reference,
+        // Form-only fields
+        index: basicInfo.index || 1,
+        isLocked: basicInfo.isLocked ?? true,
       }
 
+      // Call onSave callback if provided
       if (onSave) {
-        await onSave(completeTutorialData)
+        await onSave(submissionData)
+      } else {
+        // Submit directly to API
+        const response = await fetch("/api/generate-tutorial/submit-tutorial", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(submissionData),
+        })
+
+        if (!response.ok) {
+          const error = await response.json()
+          throw new Error(error.error || "Failed to save tutorial")
+        }
+
+        const result = await response.json()
+        console.log("Tutorial saved successfully:", result)
       }
+
+      // Show success message or navigate away
+      onCancel()
     } catch (error) {
       console.error("Error saving tutorial:", error)
-      // You could add error handling here, like showing a toast notification
+      // Show error toast/notification here
+      alert(
+        `Error saving tutorial: ${error instanceof Error ? error.message : "Unknown error"}`
+      )
     } finally {
       setIsSaving(false)
     }
@@ -1070,22 +1056,23 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
           </p>
         </div>
 
-        {/* <div className="mt-4">
+        <div className="mt-4">
           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            Focus Areas (Optional)
+            Content (Optional)
           </label>
           <textarea
-            value={basicInfo.focusAreas}
+            value={basicInfo.content || ""}
             onChange={(e) =>
-              setBasicInfo((prev) => ({ ...prev, focusAreas: e.target.value }))
+              setBasicInfo((prev) => ({ ...prev, content: e.target.value }))
             }
             rows={3}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-            placeholder={
-              "Specify particular areas to focus on or teaching approaches you'd like to emphasize..."
-            }
+            placeholder="Additional content or notes for this tutorial..."
           />
-        </div> */}
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            Optional field for additional tutorial content or internal notes
+          </p>
+        </div>
       </div>
 
       {/* Key Topics */}
@@ -1095,18 +1082,18 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
           Key Topics
         </h3>
 
-        {basicInfo.keyTopics.map((topic, index) => (
+        {basicInfo.learningConfiguration.keyTopics.map((topic, index) => (
           <div key={index} className="mb-3 flex gap-2">
             <input
               type="text"
-              value={topic}
+              value={topic.topic}
               onChange={(e) =>
                 updateBasicArrayField("keyTopics", index, e.target.value)
               }
               className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
               placeholder="e.g., Variables, Functions, Loops"
             />
-            {basicInfo.keyTopics.length > 1 && (
+            {basicInfo.learningConfiguration.keyTopics.length > 1 && (
               <button
                 onClick={() => removeBasicArrayField("keyTopics", index)}
                 className="rounded-lg border border-red-300 px-3 py-2 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20"
@@ -1133,33 +1120,36 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
           Practical Applications
         </h3>
 
-        {basicInfo.practicalApplications.map((application, index) => (
-          <div key={index} className="mb-3 flex gap-2">
-            <input
-              type="text"
-              value={application}
-              onChange={(e) =>
-                updateBasicArrayField(
-                  "practicalApplications",
-                  index,
-                  e.target.value
-                )
-              }
-              className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-              placeholder="e.g., Building web forms, Data processing, API development"
-            />
-            {basicInfo.practicalApplications.length > 1 && (
-              <button
-                onClick={() =>
-                  removeBasicArrayField("practicalApplications", index)
+        {basicInfo.learningConfiguration.practicalApplications.map(
+          (application, index) => (
+            <div key={index} className="mb-3 flex gap-2">
+              <input
+                type="text"
+                value={application.application}
+                onChange={(e) =>
+                  updateBasicArrayField(
+                    "practicalApplications",
+                    index,
+                    e.target.value
+                  )
                 }
-                className="rounded-lg border border-red-300 px-3 py-2 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20"
-              >
-                Remove
-              </button>
-            )}
-          </div>
-        ))}
+                className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                placeholder="e.g., Building web forms, Data processing, API development"
+              />
+              {basicInfo.learningConfiguration.practicalApplications.length >
+                1 && (
+                <button
+                  onClick={() =>
+                    removeBasicArrayField("practicalApplications", index)
+                  }
+                  className="rounded-lg border border-red-300 px-3 py-2 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          )
+        )}
 
         <button
           onClick={() => addBasicArrayField("practicalApplications")}
@@ -1177,18 +1167,18 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
           Tags
         </h3>
 
-        {basicInfo.tags.map((tag, index) => (
+        {basicInfo.learningConfiguration.tags.map((tag, index) => (
           <div key={index} className="mb-3 flex gap-2">
             <input
               type="text"
-              value={tag}
+              value={tag.tag}
               onChange={(e) =>
                 updateBasicArrayField("tags", index, e.target.value)
               }
               className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
               placeholder="e.g., beginner, syntax, programming"
             />
-            {basicInfo.tags.length > 1 && (
+            {basicInfo.learningConfiguration.tags.length > 1 && (
               <button
                 onClick={() => removeBasicArrayField("tags", index)}
                 className="rounded-lg border border-red-300 px-3 py-2 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20"
@@ -1215,27 +1205,30 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
           Learning Objectives
         </h3>
 
-        {tutorialData.learningObjectives.map((objective, index) => (
-          <div key={index} className="mb-3 flex gap-2">
-            <input
-              type="text"
-              value={objective}
-              onChange={(e) =>
-                updateArrayField("learningObjectives", index, e.target.value)
-              }
-              className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-              placeholder="e.g., Understand variable declaration and assignment"
-            />
-            {tutorialData.learningObjectives.length > 1 && (
-              <button
-                onClick={() => removeArrayField("learningObjectives", index)}
-                className="rounded-lg border border-red-300 px-3 py-2 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20"
-              >
-                Remove
-              </button>
-            )}
-          </div>
-        ))}
+        {basicInfo.learningConfiguration.learningObjectives.map(
+          (objective, index) => (
+            <div key={index} className="mb-3 flex gap-2">
+              <input
+                type="text"
+                value={objective.objective}
+                onChange={(e) =>
+                  updateArrayField("learningObjectives", index, e.target.value)
+                }
+                className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                placeholder="e.g., Understand variable declaration and assignment"
+              />
+              {basicInfo.learningConfiguration.learningObjectives.length >
+                1 && (
+                <button
+                  onClick={() => removeArrayField("learningObjectives", index)}
+                  className="rounded-lg border border-red-300 px-3 py-2 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          )
+        )}
 
         <button
           onClick={() => addArrayField("learningObjectives")}
