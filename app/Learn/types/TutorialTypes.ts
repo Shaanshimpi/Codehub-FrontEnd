@@ -14,7 +14,7 @@ export interface Tutorial {
   slug: string
   index: number
   programmingLanguage: string | Language
-  content: string
+  content?: string // Optional for legacy tutorials
   multiLessonTutorial?: MultiLessonTutorial
   [key: string]: any
 }
@@ -195,7 +195,6 @@ export interface ExerciseAIData {
   explanation_hi: ExplanationItem[]
   hints_mr: HintItem[]
   explanation_mr: ExplanationItem[]
-  visual_elements?: VisualElements
   boilerplate_code: string
   learning_objectives?: string[]
   tags?: string[]

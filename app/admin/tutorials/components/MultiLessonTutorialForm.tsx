@@ -87,7 +87,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
     slug: "",
     description: "",
     videoUrl: "",
-    content: "",
     programmingLanguage: "",
     difficulty: 1,
     index: 1,
@@ -193,7 +192,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
         videoUrl: initialData.videoUrl || "",
         programmingLanguage: programmingLanguageSlug,
         difficulty: initialData.difficulty || 1,
-        content: initialData.content || "",
         index: initialData.index || 1,
         isLocked:
           initialData.isLocked !== undefined ? initialData.isLocked : true,
@@ -1053,24 +1051,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             Add a video link to supplement the tutorial content (YouTube, Vimeo,
             etc.)
-          </p>
-        </div>
-
-        <div className="mt-4">
-          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            Content (Optional)
-          </label>
-          <textarea
-            value={basicInfo.content || ""}
-            onChange={(e) =>
-              setBasicInfo((prev) => ({ ...prev, content: e.target.value }))
-            }
-            rows={3}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-            placeholder="Additional content or notes for this tutorial..."
-          />
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Optional field for additional tutorial content or internal notes
           </p>
         </div>
       </div>

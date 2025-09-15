@@ -5,6 +5,7 @@ export interface Tutorial {
   title: string
   slug: string
   description?: string
+  videoUrl?: string
   programmingLanguage: {
     id: number
     title: string
@@ -14,10 +15,38 @@ export interface Tutorial {
   index: number
   isLocked: boolean
   lessons: any[]
-  learningObjectives?: { objective: string }[]
-  keyTopics?: { topic: string }[]
-  practicalApplications?: { application: string }[]
-  tags?: { tag: string }[]
+  learningConfiguration?: {
+    learningObjectives?: { objective: string }[]
+    keyTopics?: { topic: string }[]
+    practicalApplications?: { application: string }[]
+    tags?: { tag: string }[]
+  }
+  reference?: {
+    title: string
+    subtitle: string
+    introduction: string
+    examples: {
+      title: string
+      description: string
+      code: string
+      explanation: string
+      output?: string
+    }[]
+    key_points: string[]
+    common_mistakes: {
+      mistake: string
+      why_wrong: string
+      correct_approach: string
+    }[]
+    syntax_guide: {
+      basic_syntax: string
+      parameters: {
+        name: string
+        description: string
+        required: boolean
+      }[]
+    }
+  }
   createdAt: string
   updatedAt: string
 }

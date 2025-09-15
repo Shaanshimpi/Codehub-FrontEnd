@@ -173,13 +173,13 @@ export async function POST(request: NextRequest) {
                 title: example.title || "",
                 code: example.code || "",
                 explanation: example.explanation || "",
-                diagram_data: example.diagram_data || "",
+                diagram_data: example.mermaid_code || "",
               })
             ),
             practiceHints: (lessonData.practiceHints || []).map((hint: any) =>
               typeof hint === "string" ? { hint } : hint
             ),
-            diagram_data: lessonData.diagram_data || "",
+            diagram_data: lessonData.mermaid_code || "",
             commonMistakes: (lessonData.commonMistakes || []).map(
               (mistake: any) =>
                 typeof mistake === "string" ? { mistake } : mistake
@@ -188,14 +188,6 @@ export async function POST(request: NextRequest) {
               (practice: any) =>
                 typeof practice === "string" ? { practice } : practice
             ),
-            visualElements: {
-              diagrams: (lessonData.visualElements?.diagrams || []).map(
-                (diagram: string) => ({ diagram })
-              ),
-              concepts: (lessonData.visualElements?.concepts || []).map(
-                (concept: string) => ({ concept })
-              ),
-            },
           }
           console.log(
             `✅ Transformed concept data:`,
@@ -209,7 +201,7 @@ export async function POST(request: NextRequest) {
         case "mcq":
           const mcqData = {
             questions: (lessonData.questions || []).map((q: any) => {
-              console.log(`🎯 MCQ Question Diagram:`, q.diagram_data)
+              console.log(`🎯 MCQ Question Diagram:`, q.mermaid_code)
               return {
                 question: q.question || "",
                 options: (q.options || []).map((opt: any) => ({
@@ -219,7 +211,7 @@ export async function POST(request: NextRequest) {
                 explanation: q.explanation || "",
                 difficulty: q.difficulty?.toString() || "1",
                 codeSnippet: q.codeSnippet || "",
-                diagram_data: q.diagram_data || "",
+                diagram_data: q.mermaid_code || "",
               }
             }),
           }
@@ -239,7 +231,7 @@ export async function POST(request: NextRequest) {
               questions: (lessonData.questions || []).map((q: any) => ({
                 scenario: q.scenario || "",
                 targetCode: q.targetCode || "",
-                diagram_data: q.diagram_data || "",
+                diagram_data: q.mermaid_code || "",
                 blocks: (q.blocks || []).map((block: any) => ({
                   code: block.code || "",
                   correctOrder: block.correctOrder || 1,
@@ -259,7 +251,7 @@ export async function POST(request: NextRequest) {
               questions: (lessonData.questions || []).map((q: any) => ({
                 scenario: q.scenario || "",
                 code: q.code || "",
-                diagram_data: q.diagram_data || "",
+                diagram_data: q.mermaid_code || "",
                 blanks: (q.blanks || []).map((blank: any) => ({
                   position: blank.position || 0,
                   type: blank.type || "text",
@@ -277,7 +269,7 @@ export async function POST(request: NextRequest) {
                   ? {
                       completeCode: q.solution.completeCode || "",
                       explanation: q.solution.explanation || "",
-                      diagram_data: q.solution.diagram_data || "",
+                      diagram_data: q.solution.mermaid_code || "",
                     }
                   : undefined,
                 difficulty: q.difficulty?.toString() || "1",
@@ -302,7 +294,6 @@ export async function POST(request: NextRequest) {
       index: tutorialData.index || 1,
 
       // Content fields
-      content: tutorialData.content || tutorialData.description || "",
       description: tutorialData.description || "",
       videoUrl: tutorialData.videoUrl || "",
 

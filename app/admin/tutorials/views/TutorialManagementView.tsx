@@ -67,15 +67,19 @@ const TutorialManagementView: React.FC = () => {
       index: tutorial.index,
       isLocked: tutorial.isLocked,
       learningObjectives:
-        tutorial.learningObjectives?.map((obj) => obj.objective) || [],
-      keyTopics: Array.isArray(tutorial.keyTopics)
-        ? tutorial.keyTopics.map((topic) =>
+        tutorial.learningConfiguration?.learningObjectives?.map(
+          (obj) => obj.objective
+        ) || [],
+      keyTopics: Array.isArray(tutorial.learningConfiguration?.keyTopics)
+        ? tutorial.learningConfiguration.keyTopics.map((topic) =>
             typeof topic === "string" ? topic : topic.topic || ""
           )
         : [],
       practicalApplications:
-        tutorial.practicalApplications?.map((app) => app.application) || [],
-      tags: tutorial.tags?.map((tag) => tag.tag) || [],
+        tutorial.learningConfiguration?.practicalApplications?.map(
+          (app) => app.application
+        ) || [],
+      tags: tutorial.learningConfiguration?.tags?.map((tag) => tag.tag) || [],
 
       // Fix lesson data mapping - extract actual lesson content
       lessons: (tutorial.lessons || []).map((lesson: any) => {
