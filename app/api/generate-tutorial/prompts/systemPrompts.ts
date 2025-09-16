@@ -799,7 +799,7 @@ LESSON CONTENT STRUCTURES BY TYPE:
       "blanks": [
         {
           "id": "blank1",
-          "type": "text|dropdown|code",
+          "type": "text|dropdown",
           "correctAnswer": "correct answer",
           "options": ["option1", "option2"], // for dropdown type
           "hint": "helpful hint",

@@ -58,7 +58,7 @@ export interface FillInTheBlanksContent {
   codeTemplate: string // Code with blanks marked as {{blank_id}}
   blanks: {
     id: string // Matches {{blank_id}} in template
-    type: "text" | "dropdown" | "code"
+    type: "text" | "dropdown"
     correctAnswer: string
     options?: string[] // For dropdown type
     hint?: string

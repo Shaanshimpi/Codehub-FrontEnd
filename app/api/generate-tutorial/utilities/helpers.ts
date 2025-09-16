@@ -172,6 +172,47 @@ export const repairJsonContent = (content: string): string => {
   return repaired
 }
 
+export const sanitizeControlCharacters = (content: string): string => {
+  // Smart control character replacement that preserves JSON structure
+  let sanitized = content
+
+  // Remove the most problematic control characters
+  // eslint-disable-next-line no-control-regex
+  sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+
+  // Only escape control characters that are inside string values
+  // We need to be careful not to break JSON structure
+  const lines = sanitized.split("\n")
+  const processedLines = lines.map((line) => {
+    // Skip lines that are pure JSON structure (braces, brackets, commas)
+    // eslint-disable-next-line no-useless-escape
+    if (/^\s*[{}\[\],]*\s*$/.test(line)) {
+      return line
+    }
+
+    // For lines with string values, escape problematic characters within quotes
+    return line.replace(
+      /"([^"]*)"(\s*:\s*"[^"]*")?/g,
+      (match, key, valueMatch) => {
+        if (valueMatch) {
+          // This is a key-value pair, sanitize the value part
+          const [keyPart, valuePart] = match.split(":", 2)
+          const cleanValue = valuePart
+            .replace(/\\/g, "\\\\") // Escape backslashes
+            .replace(/\t/g, "\\t") // Escape tabs
+            .replace(/\r/g, "\\r") // Escape carriage returns
+            .replace(/\f/g, "\\f") // Escape form feeds
+            .replace(/\b/g, "\\b") // Escape backspaces
+          return `${keyPart}:${cleanValue}`
+        }
+        return match
+      }
+    )
+  })
+
+  return processedLines.join("\n")
+}
+
 export const cleanJsonContent = (content: string): string => {
   let cleaned = content.trim()
 
@@ -198,19 +239,68 @@ export const cleanJsonContent = (content: string): string => {
     }
   }
 
-  // Find the first { and last } to extract just the JSON object
-  const firstBrace = cleaned.indexOf("{")
-  const lastBrace = cleaned.lastIndexOf("}")
+  // More robust JSON extraction - look for complete JSON objects
+  // Handle cases where there might be mermaid diagrams or other text before/after JSON
+  const lines = cleaned.split("\n")
+  let jsonStart = -1
+  let jsonEnd = -1
+  let braceCount = 0
+  let inJson = false
 
-  if (firstBrace !== -1 && lastBrace !== -1 && firstBrace < lastBrace) {
-    cleaned = cleaned.substring(firstBrace, lastBrace + 1)
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim()
+
+    // Skip obvious non-JSON lines (mermaid diagram content)
+    if (
+      line.startsWith("flowchart") ||
+      line.startsWith("graph") ||
+      line.includes("-->") ||
+      line.includes("style ") ||
+      line.startsWith("%%") ||
+      line.includes("fill:") ||
+      line.includes("stroke:")
+    ) {
+      continue
+    }
+
+    // Look for the start of JSON object
+    if (!inJson && line.includes("{")) {
+      // Check if this line looks like the start of a JSON object
+      if (
+        line.includes('"id"') ||
+        line.includes('"title"') ||
+        line.includes('"type"') ||
+        line.trim() === "{"
+      ) {
+        jsonStart = i
+        inJson = true
+        braceCount =
+          (line.match(/{/g) || []).length - (line.match(/}/g) || []).length
+      }
+    } else if (inJson) {
+      braceCount +=
+        (line.match(/{/g) || []).length - (line.match(/}/g) || []).length
+      if (braceCount === 0) {
+        jsonEnd = i
+        break
+      }
+    }
   }
 
-  // Remove any trailing text after the JSON
-  const jsonEndIndex = cleaned.lastIndexOf("}")
-  if (jsonEndIndex !== -1 && jsonEndIndex < cleaned.length - 1) {
-    cleaned = cleaned.substring(0, jsonEndIndex + 1)
+  if (jsonStart !== -1 && jsonEnd !== -1) {
+    cleaned = lines.slice(jsonStart, jsonEnd + 1).join("\n")
+  } else {
+    // Fallback to original method
+    const firstBrace = cleaned.indexOf("{")
+    const lastBrace = cleaned.lastIndexOf("}")
+
+    if (firstBrace !== -1 && lastBrace !== -1 && firstBrace < lastBrace) {
+      cleaned = cleaned.substring(firstBrace, lastBrace + 1)
+    }
   }
+
+  // Apply minimal sanitization only for the most problematic characters
+  cleaned = sanitizeControlCharacters(cleaned)
 
   // Apply JSON repair
   cleaned = repairJsonContent(cleaned)
@@ -222,6 +312,19 @@ export const parseJsonWithFallbacks = (content: string): any => {
   const strategies = [
     // Strategy 1: Try parsing as-is
     (json: string) => JSON.parse(json),
+
+    // Strategy 1.5: Try aggressive control character removal
+    (json: string) => {
+      const cleaned = json
+        // eslint-disable-next-line no-control-regex
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "") // Remove all control chars
+        .replace(/\r\n/g, " ") // Replace Windows line endings
+        .replace(/\n/g, " ") // Replace Unix line endings
+        .replace(/\r/g, " ") // Replace Mac line endings
+        .replace(/\t/g, " ") // Replace tabs with spaces
+        .replace(/\s+/g, " ") // Collapse multiple spaces
+      return JSON.parse(cleaned)
+    },
 
     // Strategy 0.5: Try fixing unterminated strings at the end
     (json: string) => {
@@ -622,6 +725,98 @@ const extractEnglishArray = (arr: any[]): string[] => {
 // Note: generateDefaultReference function removed - AI now always generates proper reference content
 // with enhanced prompts ensuring no placeholder content is created
 
+// Helper function to convert diagram_data to mermaid_code format
+const convertDiagramDataToMermaidCode = (diagramData: any): any[] => {
+  if (!diagramData) return []
+
+  // Helper to convert JSON diagram objects to Mermaid strings
+  const convertJSONToMermaidString = (jsonData: any): string => {
+    try {
+      // If it's already a string (mermaid code), return it
+      if (typeof jsonData === "string") {
+        // Check if it's a JSON string that needs parsing
+        if (jsonData.startsWith("{") && jsonData.includes('"type"')) {
+          const parsed = JSON.parse(jsonData)
+          // Import the proven converter function
+          const {
+            convertJSONToMermaid,
+          } = require("../../admin/tutorials/utils/mermaidConverter")
+          return convertJSONToMermaid(parsed)
+        }
+        return jsonData
+      }
+
+      // If it's a JSON object, use the proven converter
+      if (jsonData && typeof jsonData === "object" && jsonData.type) {
+        const {
+          convertJSONToMermaid,
+        } = require("../../admin/tutorials/utils/mermaidConverter")
+        return convertJSONToMermaid(jsonData)
+      }
+
+      // If it's not a valid diagram object, return as string
+      return typeof jsonData === "string" ? jsonData : JSON.stringify(jsonData)
+    } catch (error) {
+      console.warn("Failed to convert JSON to Mermaid:", error)
+      return typeof jsonData === "string" ? jsonData : JSON.stringify(jsonData)
+    }
+  }
+
+  // If it's already an array, map it to the new format
+  if (Array.isArray(diagramData)) {
+    return diagramData.map((item) => ({
+      code: convertJSONToMermaidString(
+        typeof item === "object" && item.code ? item.code : item
+      ),
+    }))
+  }
+
+  // If it's a single item, convert and wrap in array
+  return [{ code: convertJSONToMermaidString(diagramData) }]
+}
+
+// Helper function to recursively convert diagram_data fields to mermaid_code
+const convertLessonContent = (content: any): any => {
+  if (!content || typeof content !== "object") return content
+
+  const converted = { ...content }
+
+  // Handle diagram_data at root level
+  if (content.diagram_data !== undefined) {
+    converted.mermaid_code = convertDiagramDataToMermaidCode(
+      content.diagram_data
+    )
+    delete converted.diagram_data
+  }
+
+  // Handle nested objects and arrays
+  for (const [key, value] of Object.entries(content)) {
+    if (key === "diagram_data") continue // Already handled above
+
+    if (Array.isArray(value)) {
+      converted[key] = value.map((item) => {
+        if (
+          item &&
+          typeof item === "object" &&
+          item.diagram_data !== undefined
+        ) {
+          const convertedItem = { ...item }
+          convertedItem.mermaid_code = convertDiagramDataToMermaidCode(
+            item.diagram_data
+          )
+          delete convertedItem.diagram_data
+          return convertLessonContent(convertedItem) // Recursively convert nested content
+        }
+        return convertLessonContent(item)
+      })
+    } else if (value && typeof value === "object") {
+      converted[key] = convertLessonContent(value)
+    }
+  }
+
+  return converted
+}
+
 // Convert to modern English-only format matching updated schema structure
 export const convertToModernFormat = (tutorial: any): any => {
   // Use AI-generated reference directly - our enhanced prompts ensure this is always present
@@ -638,7 +833,7 @@ export const convertToModernFormat = (tutorial: any): any => {
         id: lesson.id || `lesson-${index + 1}`,
         title: extractEnglishText(lesson.title),
         type: lesson.type,
-        content: lesson.content,
+        content: convertLessonContent(lesson.content), // Convert diagram_data to mermaid_code
         learningObjectives: extractEnglishArray(
           lesson.learningObjectives || []
         ),

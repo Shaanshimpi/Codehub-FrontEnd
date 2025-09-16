@@ -103,14 +103,23 @@ const TutorialManagementView: React.FC = () => {
                     code: ex.code || "",
                     language: "javascript", // Default or detect from context
                     explanation: ex.explanation || "",
-                    diagram_data: ex.diagram_data || "",
+                    mermaid_code: Array.isArray(ex.mermaid_code)
+                      ? ex.mermaid_code.map((code: any) => ({
+                          code:
+                            typeof code === "string" ? code : code.code || "",
+                        }))
+                      : [],
                   })
                 ),
                 practiceHints: (lesson.conceptData.practiceHints || []).map(
                   (hint: any) =>
                     typeof hint === "string" ? hint : hint.hint || ""
                 ),
-                diagram_data: lesson.conceptData.diagram_data || "",
+                mermaid_code: Array.isArray(lesson.conceptData.mermaid_code)
+                  ? lesson.conceptData.mermaid_code.map((code: any) => ({
+                      code: typeof code === "string" ? code : code.code || "",
+                    }))
+                  : [],
                 commonMistakes: (lesson.conceptData.commonMistakes || []).map(
                   (mistake: any) =>
                     typeof mistake === "string"
@@ -141,7 +150,11 @@ const TutorialManagementView: React.FC = () => {
                   explanation: q.explanation || "",
                   difficulty: q.difficulty || 1,
                   codeSnippet: q.codeSnippet || "",
-                  diagram_data: q.diagram_data || "",
+                  mermaid_code: Array.isArray(q.mermaid_code)
+                    ? q.mermaid_code.map((code: any) => ({
+                        code: typeof code === "string" ? code : code.code || "",
+                      }))
+                    : [],
                 })),
               }
             }
@@ -155,7 +168,12 @@ const TutorialManagementView: React.FC = () => {
                     id: q.id || crypto.randomUUID(),
                     scenario: q.scenario || "",
                     targetCode: q.targetCode || "",
-                    diagram_data: q.diagram_data || "",
+                    mermaid_code: Array.isArray(q.mermaid_code)
+                      ? q.mermaid_code.map((code: any) => ({
+                          code:
+                            typeof code === "string" ? code : code.code || "",
+                        }))
+                      : [],
                     blocks: q.blocks || [],
                     hints: (q.hints || []).map((hint: any) =>
                       typeof hint === "string" ? hint : hint.hint || ""
@@ -174,7 +192,11 @@ const TutorialManagementView: React.FC = () => {
                   id: q.id || crypto.randomUUID(),
                   scenario: q.scenario || "",
                   code: q.code || "",
-                  diagram_data: q.diagram_data || "",
+                  mermaid_code: Array.isArray(q.mermaid_code)
+                    ? q.mermaid_code.map((code: any) => ({
+                        code: typeof code === "string" ? code : code.code || "",
+                      }))
+                    : [],
                   blanks: (q.blanks || []).map((blank: any) => ({
                     id: blank.id || crypto.randomUUID(),
                     position: blank.position || 0,
@@ -197,7 +219,14 @@ const TutorialManagementView: React.FC = () => {
                     ? {
                         completeCode: q.solution.completeCode || "",
                         explanation: q.solution.explanation || "",
-                        diagram_data: q.solution.diagram_data || "",
+                        mermaid_code: Array.isArray(q.solution.mermaid_code)
+                          ? q.solution.mermaid_code.map((code: any) => ({
+                              code:
+                                typeof code === "string"
+                                  ? code
+                                  : code.code || "",
+                            }))
+                          : [],
                       }
                     : undefined,
                   difficulty: q.difficulty || 1,

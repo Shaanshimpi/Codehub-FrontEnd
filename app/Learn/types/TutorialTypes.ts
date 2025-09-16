@@ -217,7 +217,7 @@ export interface FillInTheBlankData {
     blanks: {
       id: string
       position: number
-      type: "text" | "dropdown" // UPDATE: Remove "code" type to match API schema
+      type: "text" | "dropdown"
       correctAnswer: string
       options?: string[]
       hint?: string
@@ -389,7 +389,7 @@ export interface CodeBlock {
 // Fill in the blanks interface
 export interface FillInBlank {
   id: string
-  type: "text" | "dropdown" | "code"
+  type: "text" | "dropdown"
   correctAnswer: string
   options?: string[]
   hint?: string

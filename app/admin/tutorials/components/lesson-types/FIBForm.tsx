@@ -549,7 +549,6 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
                               >
                                 <option value="text">Text Input</option>
                                 <option value="dropdown">Dropdown</option>
-                                <option value="code">Code Input</option>
                               </select>
                             </div>
 

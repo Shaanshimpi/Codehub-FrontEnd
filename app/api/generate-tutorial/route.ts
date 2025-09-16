@@ -9,6 +9,7 @@ import {
   convertToModernFormat,
   createErrorResponse,
   logError,
+  parseJsonWithFallbacks,
 } from "./utilities/helpers"
 
 export async function POST(request: Request) {
@@ -106,7 +107,7 @@ export async function POST(request: Request) {
       )
     }
 
-    // Parse the content using fallback strategies and ensure it has a reference field
+    // // Parse the content using fallback strategies and ensure it has a reference field
     // let parsedTutorial
     // try {
     //   parsedTutorial = parseJsonWithFallbacks(content)
@@ -148,7 +149,12 @@ export async function POST(request: Request) {
     //   }
     // }
 
-    const processedTutorial = convertToModernFormat(JSON.parse(content))
+    console.log("before process", content)
+
+    // Use the robust JSON parsing from helpers.ts
+    const processedTutorial = convertToModernFormat(
+      parseJsonWithFallbacks(content)
+    )
 
     return NextResponse.json(processedTutorial)
   } catch (error) {
