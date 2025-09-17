@@ -319,50 +319,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
         }
       }
 
-      // Helper function to get diagram data with fallback to mermaid_code extraction
-      const getDiagramData = (diagramData: any, mermaidCode: any): any[] => {
-        const converted = convertDiagramData(diagramData)
-        if (converted.length > 0) {
-          return converted
-        }
-        return extractDiagramDataFromMermaidCode(mermaidCode)
-      }
-
-      // Helper function to extract diagram data as JSON objects from mermaid_code array
-      const extractDiagramDataFromMermaidCode = (
-        mermaidCodeArray: any
-      ): any[] => {
-        if (!mermaidCodeArray) return []
-
-        // If it's an array, extract JSON diagram data
-        if (Array.isArray(mermaidCodeArray) && mermaidCodeArray.length > 0) {
-          const extractedData: any[] = []
-
-          for (const item of mermaidCodeArray) {
-            if (item && item.code) {
-              const code = item.code
-              // If the code is a JSON string, parse it and add to diagram data
-              if (
-                typeof code === "string" &&
-                code.startsWith("{") &&
-                code.includes('"type"')
-              ) {
-                try {
-                  const jsonData = JSON.parse(code)
-                  extractedData.push(jsonData)
-                } catch (error) {
-                  // Skip invalid JSON
-                }
-              }
-            }
-          }
-
-          return extractedData
-        }
-
-        return []
-      }
-
       // Helper function to extract mermaid code from the new array format
       const extractMermaidCode = (mermaidCodeArray: any): string => {
         if (!mermaidCodeArray) return ""
@@ -443,24 +399,12 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     code: example.code || "",
                     language: programmingLanguageSlug || "javascript",
                     explanation: example.explanation || "",
-                    diagram_data: getDiagramData(
-                      example.diagram_data,
-                      example.mermaid_code
-                    ),
-                    mermaid_code:
-                      extractMermaidCode(example.mermaid_code) ||
-                      generateMermaidCodeFromDiagramData(example.diagram_data),
+                    mermaid_code: example.mermaid_code || [],
                   }
                 }
               ),
               practiceHints: lesson.content.practiceHints || [],
-              diagram_data: getDiagramData(
-                lesson.content.diagram_data,
-                lesson.content.mermaid_code
-              ),
-              mermaid_code:
-                extractMermaidCode(lesson.content.mermaid_code) ||
-                generateMermaidCodeFromDiagramData(lesson.content.diagram_data),
+              mermaid_code: lesson.content.mermaid_code || [],
               commonMistakes: lesson.content.commonMistakes || [],
               bestPractices: lesson.content.bestPractices || [],
             }
@@ -482,13 +426,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     explanation: q.explanation || "",
                     difficulty: q.difficulty || 1,
                     codeSnippet: q.codeSnippet || "",
-                    diagram_data: getDiagramData(
-                      q.diagram_data,
-                      q.mermaid_code
-                    ),
-                    mermaid_code:
-                      extractMermaidCode(q.mermaid_code) ||
-                      generateMermaidCodeFromDiagramData(q.diagram_data),
+                    mermaid_code: q.mermaid_code || [],
                   }
                 }),
               }
@@ -509,7 +447,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     explanation: "",
                     difficulty: 1,
                     codeSnippet: "",
-                    diagram_data: "",
                   },
                 ],
               }
@@ -531,13 +468,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     id: q.id || crypto.randomUUID(),
                     scenario: q.scenario || "",
                     targetCode: q.targetCode || "",
-                    diagram_data: getDiagramData(
-                      q.diagram_data,
-                      q.mermaid_code
-                    ),
-                    mermaid_code:
-                      extractMermaidCode(q.mermaid_code) ||
-                      generateMermaidCodeFromDiagramData(q.diagram_data),
+                    mermaid_code: q.mermaid_code || [],
                     blocks: aiCodeBlocks.map((block: any, index: number) => {
                       // Find the correct order for this block
                       const orderIndex = aiCorrectOrder.indexOf(block.id)
@@ -567,15 +498,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     id: crypto.randomUUID(),
                     scenario: lesson.content.scenario || "",
                     targetCode: lesson.content.targetCode || "",
-                    diagram_data: getDiagramData(
-                      lesson.content.diagram_data,
-                      lesson.content.mermaid_code
-                    ),
-                    mermaid_code:
-                      extractMermaidCode(lesson.content.mermaid_code) ||
-                      generateMermaidCodeFromDiagramData(
-                        lesson.content.diagram_data
-                      ),
+                    mermaid_code: lesson.content.mermaid_code || [],
                     blocks: aiCodeBlocks.map((block: any, index: number) => {
                       const orderIndex = aiCorrectOrder.indexOf(block.id)
                       return {
@@ -605,13 +528,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     id: q.id || crypto.randomUUID(),
                     scenario: q.scenario || "",
                     code: q.codeTemplate || "",
-                    diagram_data: getDiagramData(
-                      q.diagram_data,
-                      q.mermaid_code
-                    ),
-                    mermaid_code:
-                      extractMermaidCode(q.mermaid_code) ||
-                      generateMermaidCodeFromDiagramData(q.diagram_data),
+                    mermaid_code: q.mermaid_code || [],
                     blanks: (q.blanks || []).map(
                       (blank: any, index: number) => ({
                         id: blank.id || `blank-${index}`,
@@ -628,15 +545,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                       ? {
                           completeCode: q.solution.completeCode || "",
                           explanation: q.solution.explanation || "",
-                          diagram_data: getDiagramData(
-                            q.solution.diagram_data,
-                            q.solution.mermaid_code
-                          ),
-                          mermaid_code:
-                            extractMermaidCode(q.solution.mermaid_code) ||
-                            generateMermaidCodeFromDiagramData(
-                              q.solution.diagram_data
-                            ),
+                          mermaid_code: q.solution.mermaid_code || [],
                         }
                       : undefined,
                     difficulty: q.difficulty || 1,
@@ -654,15 +563,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                     id: crypto.randomUUID(),
                     scenario: lesson.content.scenario || "",
                     code: lesson.content.codeTemplate || "",
-                    diagram_data: getDiagramData(
-                      lesson.content.diagram_data,
-                      lesson.content.mermaid_code
-                    ),
-                    mermaid_code:
-                      extractMermaidCode(lesson.content.mermaid_code) ||
-                      generateMermaidCodeFromDiagramData(
-                        lesson.content.diagram_data
-                      ),
+                    mermaid_code: lesson.content.mermaid_code || [],
                     blanks: (lesson.content.blanks || []).map(
                       (blank: any, index: number) => ({
                         id: blank.id || `blank-${index}`,
@@ -681,17 +582,8 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
                             lesson.content.solution.completeCode || "",
                           explanation:
                             lesson.content.solution.explanation || "",
-                          diagram_data: getDiagramData(
-                            lesson.content.solution.diagram_data,
-                            lesson.content.solution.mermaid_code
-                          ),
                           mermaid_code:
-                            extractMermaidCode(
-                              lesson.content.solution.mermaid_code
-                            ) ||
-                            generateMermaidCodeFromDiagramData(
-                              lesson.content.solution.diagram_data
-                            ),
+                            lesson.content.solution.mermaid_code || [],
                         }
                       : undefined,
                     difficulty: 1,

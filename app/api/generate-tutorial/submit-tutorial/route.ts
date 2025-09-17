@@ -173,13 +173,13 @@ export async function POST(request: NextRequest) {
                 title: example.title || "",
                 code: example.code || "",
                 explanation: example.explanation || "",
-                diagram_data: example.mermaid_code || "",
+                mermaid_code: example.mermaid_code || [],
               })
             ),
             practiceHints: (lessonData.practiceHints || []).map((hint: any) =>
               typeof hint === "string" ? { hint } : hint
             ),
-            diagram_data: lessonData.mermaid_code || "",
+            mermaid_code: lessonData.mermaid_code || [],
             commonMistakes: (lessonData.commonMistakes || []).map(
               (mistake: any) =>
                 typeof mistake === "string" ? { mistake } : mistake
@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
                 explanation: q.explanation || "",
                 difficulty: q.difficulty?.toString() || "1",
                 codeSnippet: q.codeSnippet || "",
-                diagram_data: q.mermaid_code || "",
+                mermaid_code: q.mermaid_code || [],
               }
             }),
           }
@@ -231,7 +231,7 @@ export async function POST(request: NextRequest) {
               questions: (lessonData.questions || []).map((q: any) => ({
                 scenario: q.scenario || "",
                 targetCode: q.targetCode || "",
-                diagram_data: q.mermaid_code || "",
+                mermaid_code: q.mermaid_code || [],
                 blocks: (q.blocks || []).map((block: any) => ({
                   code: block.code || "",
                   correctOrder: block.correctOrder || 1,
@@ -251,7 +251,7 @@ export async function POST(request: NextRequest) {
               questions: (lessonData.questions || []).map((q: any) => ({
                 scenario: q.scenario || "",
                 code: q.code || "",
-                diagram_data: q.mermaid_code || "",
+                mermaid_code: q.mermaid_code || [],
                 blanks: (q.blanks || []).map((blank: any) => ({
                   position: blank.position || 0,
                   type: blank.type || "text",
@@ -269,7 +269,7 @@ export async function POST(request: NextRequest) {
                   ? {
                       completeCode: q.solution.completeCode || "",
                       explanation: q.solution.explanation || "",
-                      diagram_data: q.solution.mermaid_code || "",
+                      mermaid_code: q.solution.mermaid_code || [],
                     }
                   : undefined,
                 difficulty: q.difficulty?.toString() || "1",

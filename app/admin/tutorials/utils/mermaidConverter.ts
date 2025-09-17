@@ -564,7 +564,15 @@ function getSafeNodeId(nodeId: string): string {
   // Clean the node ID
   let safeId = nodeId.toLowerCase().trim()
 
-  // If it's a reserved keyword, append suffix
+  // Special handling for start and end - use start_node and end_node
+  if (safeId === "start") {
+    return "start_node"
+  }
+  if (safeId === "end") {
+    return "end_node"
+  }
+
+  // If it's any other reserved keyword, append suffix
   if (reservedKeywords.includes(safeId)) {
     return `${safeId}_node`
   }
@@ -612,7 +620,7 @@ function getNodeColorTheme(node: MermaidDiagramData["nodes"][0]): ColorTheme {
     }
   }
 
-  // Node type-based coloring
+  // Node type-based coloring (handles both original type and safe ID)
   switch (node.type) {
     case "start":
       return EDUCATIONAL_COLOR_THEMES.start

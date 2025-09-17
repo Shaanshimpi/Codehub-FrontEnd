@@ -19,13 +19,35 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
   lessonId,
   mermaidSetters,
 }) => {
+  // Helper function to extract mermaid code strings from the data structure
+  const extractMermaidCodeStrings = (mermaidData: any[]): string[] => {
+    if (!Array.isArray(mermaidData)) return []
+
+    return mermaidData.map((item) => {
+      // If it's already a string, return it
+      if (typeof item === "string") return item
+
+      // If it's an object with a code property, extract the code
+      if (item && typeof item === "object" && item.code) {
+        return item.code
+      }
+
+      // Fallback: convert to string
+      return String(item)
+    })
+  }
+
   const [formData, setFormData] = useState<ConceptLessonData>({
     explanation: data?.explanation || "",
     videoUrl: data?.videoUrl || "",
     keyPoints: data?.keyPoints || [""],
-    codeExamples: data?.codeExamples || [],
+    codeExamples:
+      data?.codeExamples?.map((example) => ({
+        ...example,
+        mermaid_code: extractMermaidCodeStrings(example.mermaid_code || []),
+      })) || [],
     practiceHints: data?.practiceHints || [""],
-    diagram_data: data?.diagram_data || [],
+    mermaid_code: extractMermaidCodeStrings(data?.mermaid_code || []),
     commonMistakes: data?.commonMistakes || [""],
     bestPractices: data?.bestPractices || [""],
   })
@@ -72,18 +94,13 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
   }
 
   // Diagram management functions
+  // Functions for managing concept-level diagrams
   const addDiagram = () => {
     setFormData((prev) => ({
       ...prev,
-      diagram_data: [
-        ...(prev.diagram_data || []),
-        {
-          type: "flowchart",
-          title: "New Diagram",
-          direction: "TD",
-          nodes: [],
-          connections: [],
-        },
+      mermaid_code: [
+        ...(prev.mermaid_code || []),
+        "graph TD\n    A[Start] --> B[End]", // Default mermaid syntax
       ],
     }))
   }
@@ -91,7 +108,16 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
   const removeDiagram = (index: number) => {
     setFormData((prev) => ({
       ...prev,
-      diagram_data: (prev.diagram_data || []).filter((_, i) => i !== index),
+      mermaid_code: (prev.mermaid_code || []).filter((_, i) => i !== index),
+    }))
+  }
+
+  const updateDiagram = (index: number, newCode: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      mermaid_code: (prev.mermaid_code || []).map((code, i) =>
+        i === index ? newCode : code
+      ),
     }))
   }
 
@@ -102,15 +128,9 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
         i === exampleIndex
           ? {
               ...example,
-              diagram_data: [
-                ...(example.diagram_data || []),
-                {
-                  type: "flowchart",
-                  title: "New Example Diagram",
-                  direction: "TD",
-                  nodes: [],
-                  connections: [],
-                },
+              mermaid_code: [
+                ...(example.mermaid_code || []),
+                "graph TD\n    A[Start] --> B[End]", // Default mermaid syntax
               ],
             }
           : example
@@ -128,7 +148,7 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
         i === exampleIndex
           ? {
               ...example,
-              diagram_data: (example.diagram_data || []).filter(
+              mermaid_code: (example.mermaid_code || []).filter(
                 (_, di) => di !== diagramIndex
               ),
             }
@@ -147,6 +167,7 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
           title: "",
           code: "",
           explanation: "",
+          mermaid_code: [],
         },
       ],
     }))
@@ -182,7 +203,6 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
       practiceHints: prev.practiceHints.filter((_, i) => i !== index),
     }))
   }
-
   return (
     <div className="space-y-6">
       <div>
@@ -337,101 +357,81 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
                   </label>
                 </div>
                 <div className="space-y-4">
-                  {/* Multiple Diagrams for Code Example */}
-                  <div>
-                    <div className="mb-2 flex items-center justify-between">
-                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Code Example Diagrams (
-                        {(example.diagram_data || []).length})
-                      </label>
+                  {/* Mermaid Diagrams for Code Example */}
+                  {(example.mermaid_code || []).length > 0 ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                          Mermaid Diagrams (
+                          {(example.mermaid_code || []).length})
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => addCodeExampleDiagram(index)}
+                          className="flex items-center gap-1 rounded-lg bg-blue-600 px-2 py-1 text-sm text-white hover:bg-blue-700"
+                        >
+                          <Plus className="h-3 w-3" />
+                          Add
+                        </button>
+                      </div>
+                      {(example.mermaid_code || []).map(
+                        (diagram: string, diagramIndex: number) => (
+                          <div
+                            key={diagramIndex}
+                            className="rounded-lg border border-slate-200 p-3 dark:border-slate-600"
+                          >
+                            <div className="mb-2 flex items-center justify-between">
+                              <h5 className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                                Diagram {diagramIndex + 1}
+                              </h5>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  removeCodeExampleDiagram(index, diagramIndex)
+                                }
+                                className="text-red-600 hover:text-red-700 dark:text-red-400"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            </div>
+                            <MermaidDiagram
+                              diagramData={diagram}
+                              showDebugInfo={false}
+                              onMermaidChange={(code) => {
+                                updateCodeExample(
+                                  index,
+                                  "mermaid_code",
+                                  (example.mermaid_code || []).map((c, i) =>
+                                    i === diagramIndex ? code : c
+                                  )
+                                )
+                                if (mermaidSetters && lessonId) {
+                                  mermaidSetters.setCodeExampleMermaid(
+                                    lessonId,
+                                    index,
+                                    (example.mermaid_code || []).map((c, i) =>
+                                      i === diagramIndex ? code : c
+                                    )
+                                  )
+                                }
+                              }}
+                            />
+                          </div>
+                        )
+                      )}
+                    </div>
+                  ) : (
+                    <div className="rounded-lg border-2 border-dashed border-slate-300 p-4 text-center dark:border-slate-600">
                       <button
                         type="button"
                         onClick={() => addCodeExampleDiagram(index)}
-                        className="flex items-center gap-1 rounded-lg bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700"
+                        className="flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
                       >
-                        <Plus className="h-3 w-3" />
+                        <Plus className="h-4 w-4" />
                         Add Diagram
                       </button>
                     </div>
-                    {(example.diagram_data || []).length > 0 ? (
-                      <div className="space-y-3">
-                        {(example.diagram_data || []).map(
-                          (diagram: any, diagramIndex: number) => (
-                            <div
-                              key={diagramIndex}
-                              className="rounded-lg border border-slate-200 p-3 dark:border-slate-600"
-                            >
-                              <div className="mb-2 flex items-center justify-between">
-                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                                  Diagram {diagramIndex + 1}:{" "}
-                                  {diagram.title || "Untitled"}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    removeCodeExampleDiagram(
-                                      index,
-                                      diagramIndex
-                                    )
-                                  }
-                                  className="text-red-600 hover:text-red-700 dark:text-red-400"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </div>
-                              <MermaidDiagram
-                                diagramData={diagram}
-                                showDebugInfo={false}
-                                onMermaidChange={(code) => {
-                                  updateCodeExample(index, "mermaid_code", code)
-                                  if (mermaidSetters && lessonId) {
-                                    mermaidSetters.setCodeExampleMermaid(
-                                      lessonId,
-                                      index,
-                                      code
-                                    )
-                                  }
-                                }}
-                              />
-                            </div>
-                          )
-                        )}
-                      </div>
-                    ) : (
-                      <div className="rounded-lg border-2 border-dashed border-slate-300 p-4 text-center dark:border-slate-600">
-                        <p className="text-sm text-slate-500 dark:text-slate-400">
-                          No diagrams added yet. Click &quot;Add Diagram&quot;
-                          to create visual explanations.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Legacy single diagram support for backward compatibility */}
-                  {example.mermaid_code &&
-                    !(example.diagram_data || []).length && (
-                      <div className="rounded-lg border border-orange-200 bg-orange-50 p-3 dark:border-orange-800 dark:bg-orange-900/20">
-                        <div className="mb-2">
-                          <span className="text-sm font-medium text-orange-800 dark:text-orange-200">
-                            Legacy Diagram (convert to new format)
-                          </span>
-                        </div>
-                        <MermaidDiagram
-                          diagramData={example.mermaid_code}
-                          showDebugInfo={false}
-                          onMermaidChange={(code) => {
-                            updateCodeExample(index, "mermaid_code", code)
-                            if (mermaidSetters && lessonId) {
-                              mermaidSetters.setCodeExampleMermaid(
-                                lessonId,
-                                index,
-                                code
-                              )
-                            }
-                          }}
-                        />
-                      </div>
-                    )}
+                  )}
                 </div>
               </div>
             </div>
@@ -482,7 +482,7 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
       <div>
         <div className="mb-3 flex items-center justify-between">
           <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-            Overall Concept Diagrams ({(formData.diagram_data || []).length})
+            Overall Concept Diagrams ({(formData.mermaid_code || []).length})
           </label>
           <button
             type="button"
@@ -494,9 +494,9 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
           </button>
         </div>
 
-        {(formData.diagram_data || []).length > 0 ? (
+        {(formData.mermaid_code || []).length > 0 ? (
           <div className="space-y-4">
-            {(formData.diagram_data || []).map(
+            {(formData.mermaid_code || []).map(
               (diagram: any, index: number) => (
                 <div
                   key={index}
@@ -504,7 +504,7 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
                 >
                   <div className="mb-3 flex items-center justify-between">
                     <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                      Diagram {index + 1}: {diagram.title || "Untitled"}
+                      Diagram {index + 1}
                     </h4>
                     <button
                       type="button"
@@ -518,9 +518,12 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
                     diagramData={diagram}
                     showDebugInfo={false}
                     onMermaidChange={(code) => {
-                      setFormData((prev) => ({ ...prev, mermaid_code: code }))
+                      updateDiagram(index, code)
                       if (mermaidSetters && lessonId) {
-                        mermaidSetters.setLessonMermaid(lessonId, code)
+                        const allCodes = (formData.mermaid_code || []).map(
+                          (c, i) => (i === index ? code : c)
+                        )
+                        mermaidSetters.setLessonMermaid(lessonId, allCodes)
                       }
                     }}
                   />
@@ -534,27 +537,6 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
               No concept diagrams added yet. Click &quot;Add Diagram&quot; to
               create visual explanations for this lesson.
             </p>
-          </div>
-        )}
-
-        {/* Legacy single diagram support for backward compatibility */}
-        {formData.mermaid_code && !(formData.diagram_data || []).length && (
-          <div className="mt-4 rounded-lg border border-orange-200 bg-orange-50 p-4 dark:border-orange-800 dark:bg-orange-900/20">
-            <div className="mb-2">
-              <span className="text-sm font-medium text-orange-800 dark:text-orange-200">
-                Legacy Diagram (convert to new format recommended)
-              </span>
-            </div>
-            <MermaidDiagram
-              diagramData={formData.mermaid_code}
-              showDebugInfo={false}
-              onMermaidChange={(code) => {
-                setFormData((prev) => ({ ...prev, mermaid_code: code }))
-                if (mermaidSetters && lessonId) {
-                  mermaidSetters.setLessonMermaid(lessonId, code)
-                }
-              }}
-            />
           </div>
         )}
       </div>

@@ -13,13 +13,39 @@ interface FIBFormProps {
 const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
   const [videoUrl, setVideoUrl] = useState<string>(data?.videoUrl || "")
 
+  // Helper function to extract mermaid code strings from the data structure
+  const extractMermaidCodeStrings = (mermaidData: any[]): string[] => {
+    if (!Array.isArray(mermaidData)) return []
+
+    return mermaidData.map((item) => {
+      // If it's already a string, return it
+      if (typeof item === "string") return item
+
+      // If it's an object with a code property, extract the code
+      if (item && typeof item === "object" && item.code) {
+        return item.code
+      }
+
+      // Fallback: convert to string
+      return String(item)
+    })
+  }
+
   const [questions, setQuestions] = useState(
-    data?.questions || [
+    data?.questions?.map((q: any) => ({
+      ...q,
+      mermaid_code: extractMermaidCodeStrings(q.mermaid_code || []),
+      solution: {
+        ...q.solution,
+        mermaid_code: extractMermaidCodeStrings(q.solution?.mermaid_code || []),
+      },
+    })) || [
       {
         id: crypto.randomUUID(),
         scenario: "",
         code: "",
         diagram_data: [],
+        mermaid_code: [],
         blanks: [
           {
             id: crypto.randomUUID(),
@@ -36,6 +62,7 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
           completeCode: "",
           explanation: "",
           diagram_data: [],
+          mermaid_code: [],
         },
         difficulty: 1,
       },
@@ -59,6 +86,7 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
       scenario: "",
       code: "",
       diagram_data: [],
+      mermaid_code: [],
       blanks: [
         {
           id: crypto.randomUUID(),
@@ -75,6 +103,7 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
         completeCode: "",
         explanation: "",
         diagram_data: [],
+        mermaid_code: [],
       },
       difficulty: 1,
     }
@@ -474,24 +503,44 @@ const FIBForm: React.FC<FIBFormProps> = ({ data, onChange }) => {
                       </div>
                     )}
 
-                    {/* Legacy single diagram support for backward compatibility */}
-                    {question.mermaid_code &&
-                      !(question.diagram_data || []).length && (
-                        <div className="mt-3 rounded-lg border border-orange-200 bg-orange-50 p-3 dark:border-orange-800 dark:bg-orange-900/20">
-                          <div className="mb-2">
-                            <span className="text-sm font-medium text-orange-800 dark:text-orange-200">
-                              Legacy Diagram (convert to new format)
-                            </span>
-                          </div>
-                          <MermaidDiagram
-                            diagramData={question.mermaid_code}
-                            showDebugInfo={false}
-                            onMermaidChange={(code) =>
-                              updateQuestion(question.id, "mermaid_code", code)
-                            }
-                          />
+                    {/* Mermaid Code Diagrams */}
+                    {(question.mermaid_code || []).length > 0 && (
+                      <div className="mt-3 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Mermaid Diagrams (
+                            {(question.mermaid_code || []).length})
+                          </label>
                         </div>
-                      )}
+                        {(question.mermaid_code || []).map(
+                          (mermaidCode: string, mermaidIndex: number) => (
+                            <div
+                              key={mermaidIndex}
+                              className="rounded-lg border border-slate-200 p-3 dark:border-slate-600"
+                            >
+                              <div className="mb-2 flex items-center justify-between">
+                                <h5 className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                                  Mermaid Diagram {mermaidIndex + 1}
+                                </h5>
+                              </div>
+                              <MermaidDiagram
+                                diagramData={mermaidCode}
+                                showDebugInfo={false}
+                                onMermaidChange={(code) =>
+                                  updateQuestion(
+                                    question.id,
+                                    "mermaid_code",
+                                    (question.mermaid_code || []).map((c, i) =>
+                                      i === mermaidIndex ? code : c
+                                    )
+                                  )
+                                }
+                              />
+                            </div>
+                          )
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div>

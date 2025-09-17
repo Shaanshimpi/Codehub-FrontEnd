@@ -725,33 +725,197 @@ const extractEnglishArray = (arr: any[]): string[] => {
 // Note: generateDefaultReference function removed - AI now always generates proper reference content
 // with enhanced prompts ensuring no placeholder content is created
 
+// Proven convertJSONToMermaid function from MultiLessonTutorialForm
+const convertJSONToMermaidString = (diagramData: any): string => {
+  // Use the exact same logic as convertJSONToMermaid from MultiLessonTutorialForm
+  if (!diagramData || typeof diagramData !== "object" || !diagramData.type) {
+    return ""
+  }
+
+  try {
+    const {
+      type,
+      nodes = [],
+      connections = [],
+      classes = [],
+      relationships = [],
+    } = diagramData
+
+    switch (type) {
+      case "flowchart":
+        let flowchartCode = "flowchart TD\n"
+
+        // Helper function to properly escape Mermaid labels
+        const escapeMermaidLabel = (label: string): string => {
+          if (!label) return '""'
+
+          // Clean the label
+          let cleanedLabel = label.trim()
+
+          // Always wrap complex labels in double quotes for safety
+          const needsQuotes =
+            cleanedLabel.includes(" ") ||
+            cleanedLabel.includes("'") ||
+            cleanedLabel.includes('"') ||
+            cleanedLabel.includes(".") ||
+            cleanedLabel.includes("?") ||
+            cleanedLabel.includes("!") ||
+            cleanedLabel.includes(">") ||
+            cleanedLabel.includes("<") ||
+            cleanedLabel.includes("=") ||
+            cleanedLabel.includes("&") ||
+            cleanedLabel.includes("|") ||
+            cleanedLabel.includes("#") ||
+            cleanedLabel.includes("%") ||
+            cleanedLabel.includes("(") ||
+            cleanedLabel.includes(")") ||
+            cleanedLabel.includes("[") ||
+            cleanedLabel.includes("]") ||
+            cleanedLabel.includes("{") ||
+            cleanedLabel.includes("}")
+
+          if (needsQuotes) {
+            // For robust escaping, replace problematic quotes with appropriate alternatives
+            cleanedLabel = cleanedLabel
+              .replace(/"/g, "'") // Double quotes → single quotes
+              .replace(/\\/g, "/") // Backslashes → forward slashes (safer for display)
+            return `"${cleanedLabel}"`
+          }
+
+          return cleanedLabel
+        }
+
+        // Add nodes with proper shapes
+        nodes.forEach((node: any) => {
+          let nodeId = node.id || "node"
+          const nodeLabel = escapeMermaidLabel(node.label || node.text || "")
+          const nodeType = node.type || "process"
+
+          // Handle reserved keywords - use start_node and end_node instead of start and end
+          if (nodeId.toLowerCase() === "start") {
+            nodeId = "start_node"
+          } else if (nodeId.toLowerCase() === "end") {
+            nodeId = "end_node"
+          }
+
+          switch (nodeType) {
+            case "start":
+              flowchartCode += `    ${nodeId}([${nodeLabel}])\n`
+              break
+            case "end":
+              flowchartCode += `    ${nodeId}([${nodeLabel}])\n`
+              break
+            case "decision":
+              flowchartCode += `    ${nodeId}{${nodeLabel}}\n`
+              break
+            case "process":
+            default:
+              flowchartCode += `    ${nodeId}[${nodeLabel}]\n`
+              break
+          }
+        })
+
+        // Add connections
+        connections.forEach((conn: any) => {
+          let from = conn.from || conn.source
+          let to = conn.to || conn.target
+          const label = conn.label || ""
+
+          // Handle reserved keywords in connections too
+          if (from && from.toLowerCase() === "start") {
+            from = "start_node"
+          } else if (from && from.toLowerCase() === "end") {
+            from = "end_node"
+          }
+
+          if (to && to.toLowerCase() === "start") {
+            to = "start_node"
+          } else if (to && to.toLowerCase() === "end") {
+            to = "end_node"
+          }
+
+          if (from && to) {
+            if (label) {
+              // Escape connection labels properly
+              const escapedLabel = label.replace(/"/g, "'").trim()
+              flowchartCode += `    ${from} -->|"${escapedLabel}"| ${to}\n`
+            } else {
+              flowchartCode += `    ${from} --> ${to}\n`
+            }
+          }
+        })
+
+        return flowchartCode
+
+      case "class":
+        let classCode = "classDiagram\n"
+
+        classes.forEach((cls: any) => {
+          const className = cls.id || cls.label
+          classCode += `    class ${className} {\n`
+
+          if (cls.attributes) {
+            cls.attributes.forEach((attr: any) => {
+              classCode += `        ${attr.type || "string"} ${attr.name}\n`
+            })
+          }
+
+          if (cls.methods) {
+            cls.methods.forEach((method: any) => {
+              classCode += `        ${method.name}()\n`
+            })
+          }
+
+          classCode += `    }\n`
+        })
+
+        relationships.forEach((rel: any) => {
+          const from = rel.from
+          const to = rel.to
+
+          switch (rel.type) {
+            case "inheritance":
+              classCode += `    ${from} <|-- ${to}\n`
+              break
+            case "composition":
+              classCode += `    ${from} *-- ${to}\n`
+              break
+            case "aggregation":
+              classCode += `    ${from} o-- ${to}\n`
+              break
+            default:
+              classCode += `    ${from} --> ${to}\n`
+              break
+          }
+        })
+
+        return classCode
+
+      default:
+        return ""
+    }
+  } catch (error) {
+    console.error("Error converting JSON to mermaid:", error)
+    return ""
+  }
+}
+
 // Helper function to convert diagram_data to mermaid_code format
 const convertDiagramDataToMermaidCode = (diagramData: any): any[] => {
   if (!diagramData) return []
 
-  // Helper to convert JSON diagram objects to Mermaid strings
-  const convertJSONToMermaidString = (jsonData: any): string => {
+  // Helper to convert JSON diagram objects to Mermaid strings - DEPRECATED, use convertJSONToMermaidString instead
+  const convertJSONToMermaidStringLegacy = (jsonData: any): string => {
     try {
       // If it's already a string (mermaid code), return it
       if (typeof jsonData === "string") {
-        // Check if it's a JSON string that needs parsing
-        if (jsonData.startsWith("{") && jsonData.includes('"type"')) {
-          const parsed = JSON.parse(jsonData)
-          // Import the proven converter function
-          const {
-            convertJSONToMermaid,
-          } = require("../../admin/tutorials/utils/mermaidConverter")
-          return convertJSONToMermaid(parsed)
-        }
+        // If it's already a string mermaid code, return it as is
         return jsonData
       }
 
-      // If it's a JSON object, use the proven converter
+      // If it's a JSON object, use the proven convertJSONToMermaid function
       if (jsonData && typeof jsonData === "object" && jsonData.type) {
-        const {
-          convertJSONToMermaid,
-        } = require("../../admin/tutorials/utils/mermaidConverter")
-        return convertJSONToMermaid(jsonData)
+        return convertJSONToMermaidString(jsonData)
       }
 
       // If it's not a valid diagram object, return as string
@@ -781,12 +945,12 @@ const convertLessonContent = (content: any): any => {
 
   const converted = { ...content }
 
-  // Handle diagram_data at root level
+  // Handle diagram_data at root level - keep diagram_data and create mermaid_code
   if (content.diagram_data !== undefined) {
     converted.mermaid_code = convertDiagramDataToMermaidCode(
       content.diagram_data
     )
-    delete converted.diagram_data
+    // Keep diagram_data for form display, don't delete it
   }
 
   // Handle nested objects and arrays
@@ -804,7 +968,7 @@ const convertLessonContent = (content: any): any => {
           convertedItem.mermaid_code = convertDiagramDataToMermaidCode(
             item.diagram_data
           )
-          delete convertedItem.diagram_data
+          // Keep diagram_data for form display, don't delete it
           return convertLessonContent(convertedItem) // Recursively convert nested content
         }
         return convertLessonContent(item)
