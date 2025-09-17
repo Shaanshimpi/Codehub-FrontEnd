@@ -904,28 +904,6 @@ const convertJSONToMermaidString = (diagramData: any): string => {
 const convertDiagramDataToMermaidCode = (diagramData: any): any[] => {
   if (!diagramData) return []
 
-  // Helper to convert JSON diagram objects to Mermaid strings - DEPRECATED, use convertJSONToMermaidString instead
-  const convertJSONToMermaidStringLegacy = (jsonData: any): string => {
-    try {
-      // If it's already a string (mermaid code), return it
-      if (typeof jsonData === "string") {
-        // If it's already a string mermaid code, return it as is
-        return jsonData
-      }
-
-      // If it's a JSON object, use the proven convertJSONToMermaid function
-      if (jsonData && typeof jsonData === "object" && jsonData.type) {
-        return convertJSONToMermaidString(jsonData)
-      }
-
-      // If it's not a valid diagram object, return as string
-      return typeof jsonData === "string" ? jsonData : JSON.stringify(jsonData)
-    } catch (error) {
-      console.warn("Failed to convert JSON to Mermaid:", error)
-      return typeof jsonData === "string" ? jsonData : JSON.stringify(jsonData)
-    }
-  }
-
   // If it's already an array, map it to the new format
   if (Array.isArray(diagramData)) {
     return diagramData.map((item) => ({
