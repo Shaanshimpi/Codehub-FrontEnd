@@ -140,6 +140,19 @@ export async function POST(request: NextRequest) {
     )
 
     const transformedLessons = tutorialData.lessons.map((lesson: any) => {
+      // Debug lesson type
+      console.log(`🔍 Lesson ${lesson.order || "unknown"} type validation:`, {
+        originalType: lesson.type,
+        typeOf: typeof lesson.type,
+        isValidType: [
+          "concept",
+          "mcq",
+          "codeblock_rearranging",
+          "fill_in_blanks",
+        ].includes(lesson.type),
+        fallbackType: lesson.type || "concept",
+      })
+
       const baseLesson = {
         id: lesson.id || crypto.randomUUID(),
         title: lesson.title || `Lesson ${lesson.order || 1}`,
@@ -173,13 +186,17 @@ export async function POST(request: NextRequest) {
                 title: example.title || "",
                 code: example.code || "",
                 explanation: example.explanation || "",
-                mermaid_code: example.mermaid_code || [],
+                mermaid_code: (example.mermaid_code || []).map((code: any) =>
+                  typeof code === "string" ? { code } : code
+                ),
               })
             ),
             practiceHints: (lessonData.practiceHints || []).map((hint: any) =>
               typeof hint === "string" ? { hint } : hint
             ),
-            mermaid_code: lessonData.mermaid_code || [],
+            mermaid_code: (lessonData.mermaid_code || []).map((code: any) =>
+              typeof code === "string" ? { code } : code
+            ),
             commonMistakes: (lessonData.commonMistakes || []).map(
               (mistake: any) =>
                 typeof mistake === "string" ? { mistake } : mistake
@@ -211,7 +228,9 @@ export async function POST(request: NextRequest) {
                 explanation: q.explanation || "",
                 difficulty: q.difficulty?.toString() || "1",
                 codeSnippet: q.codeSnippet || "",
-                mermaid_code: q.mermaid_code || [],
+                mermaid_code: (q.mermaid_code || []).map((code: any) =>
+                  typeof code === "string" ? { code } : code
+                ),
               }
             }),
           }
@@ -231,7 +250,9 @@ export async function POST(request: NextRequest) {
               questions: (lessonData.questions || []).map((q: any) => ({
                 scenario: q.scenario || "",
                 targetCode: q.targetCode || "",
-                mermaid_code: q.mermaid_code || [],
+                mermaid_code: (q.mermaid_code || []).map((code: any) =>
+                  typeof code === "string" ? { code } : code
+                ),
                 blocks: (q.blocks || []).map((block: any) => ({
                   code: block.code || "",
                   correctOrder: block.correctOrder || 1,
@@ -251,7 +272,9 @@ export async function POST(request: NextRequest) {
               questions: (lessonData.questions || []).map((q: any) => ({
                 scenario: q.scenario || "",
                 code: q.code || "",
-                mermaid_code: q.mermaid_code || [],
+                mermaid_code: (q.mermaid_code || []).map((code: any) =>
+                  typeof code === "string" ? { code } : code
+                ),
                 blanks: (q.blanks || []).map((blank: any) => ({
                   position: blank.position || 0,
                   type: blank.type || "text",
@@ -269,7 +292,10 @@ export async function POST(request: NextRequest) {
                   ? {
                       completeCode: q.solution.completeCode || "",
                       explanation: q.solution.explanation || "",
-                      mermaid_code: q.solution.mermaid_code || [],
+                      mermaid_code: (q.solution.mermaid_code || []).map(
+                        (code: any) =>
+                          typeof code === "string" ? { code } : code
+                      ),
                     }
                   : undefined,
                 difficulty: q.difficulty?.toString() || "1",
@@ -287,7 +313,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Transform the data to match the server Tutorial schema
-    const payloadData = {
+    const payloadData: any = {
       // Basic required fields
       title: tutorialData.title,
       slug: tutorialData.slug,

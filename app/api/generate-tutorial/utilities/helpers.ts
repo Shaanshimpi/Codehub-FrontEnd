@@ -901,20 +901,20 @@ const convertJSONToMermaidString = (diagramData: any): string => {
 }
 
 // Helper function to convert diagram_data to mermaid_code format
-const convertDiagramDataToMermaidCode = (diagramData: any): any[] => {
+const convertDiagramDataToMermaidCode = (diagramData: any): string[] => {
   if (!diagramData) return []
 
   // If it's already an array, map it to the new format
   if (Array.isArray(diagramData)) {
-    return diagramData.map((item) => ({
-      code: convertJSONToMermaidString(
+    return diagramData.map((item) =>
+      convertJSONToMermaidString(
         typeof item === "object" && item.code ? item.code : item
-      ),
-    }))
+      )
+    )
   }
 
   // If it's a single item, convert and wrap in array
-  return [{ code: convertJSONToMermaidString(diagramData) }]
+  return [convertJSONToMermaidString(diagramData)]
 }
 
 // Helper function to recursively convert diagram_data fields to mermaid_code

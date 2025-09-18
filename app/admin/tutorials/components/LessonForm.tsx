@@ -52,13 +52,202 @@ const LessonForm: React.FC<LessonFormProps> = ({
     difficulty: lesson?.difficulty || (1 as 1 | 2 | 3),
   })
 
+  // Convert AI content structure to manual form data structure
+  const convertAIContentToManualData = (lesson: any): any => {
+    if (!lesson.content) {
+      return null
+    }
+
+    let convertedData = null
+
+    switch (lesson.type) {
+      case "concept":
+        convertedData = {
+          explanation: lesson.content.explanation || "",
+          keyPoints: lesson.content.keyPoints || [],
+          codeExamples: (lesson.content.codeExamples || []).map(
+            (example: any, idx: number) => {
+              return {
+                id: example.id || `example-${idx}`,
+                title: example.title || `Example ${idx + 1}`,
+                code: example.code || "",
+                language: "javascript", // Default language
+                explanation: example.explanation || "",
+                mermaid_code: example.mermaid_code || [],
+              }
+            }
+          ),
+          practiceHints: lesson.content.practiceHints || [],
+          mermaid_code: lesson.content.mermaid_code || [],
+          commonMistakes: lesson.content.commonMistakes || [],
+          bestPractices: lesson.content.bestPractices || [],
+        }
+        break
+
+      case "mcq":
+        if (lesson.content.questions && lesson.content.questions.length > 0) {
+          convertedData = {
+            questions: lesson.content.questions.map((q: any) => {
+              return {
+                id: q.id || crypto.randomUUID(),
+                question: q.question || "",
+                options: q.options || [],
+                explanation: q.explanation || "",
+                difficulty: q.difficulty || 1,
+                codeSnippet: q.codeSnippet || "",
+                mermaid_code: q.mermaid_code || [],
+              }
+            }),
+          }
+        } else {
+          convertedData = {
+            questions: [
+              {
+                id: crypto.randomUUID(),
+                question: "",
+                options: [
+                  { id: crypto.randomUUID(), text: "", isCorrect: false },
+                  { id: crypto.randomUUID(), text: "", isCorrect: false },
+                ],
+                explanation: "",
+                difficulty: 1,
+                codeSnippet: "",
+              },
+            ],
+          }
+        }
+        break
+
+      case "codeblock_rearranging":
+        if (lesson.content.questions && lesson.content.questions.length > 0) {
+          convertedData = {
+            questions: lesson.content.questions.map((q: any) => {
+              const aiCodeBlocks = q.codeBlocks || []
+              const aiCorrectOrder = q.correctOrder || []
+
+              return {
+                id: q.id || crypto.randomUUID(),
+                scenario: q.scenario || "",
+                targetCode: q.targetCode || "",
+                mermaid_code: q.mermaid_code || [],
+                blocks: aiCodeBlocks.map((block: any, index: number) => {
+                  const orderIndex = aiCorrectOrder.indexOf(block.id)
+                  return {
+                    id: block.id || `block-${index}`,
+                    code: block.content || "",
+                    correctOrder: orderIndex >= 0 ? orderIndex + 1 : index + 1,
+                  }
+                }),
+                hints: q.hints || [],
+                difficulty: q.difficulty || 1,
+              }
+            }),
+          }
+        } else {
+          const aiCodeBlocks = lesson.content.codeBlocks || []
+          const aiCorrectOrder = lesson.content.correctOrder || []
+
+          convertedData = {
+            questions: [
+              {
+                id: crypto.randomUUID(),
+                scenario: lesson.content.scenario || "",
+                targetCode: lesson.content.targetCode || "",
+                mermaid_code: lesson.content.mermaid_code || [],
+                blocks: aiCodeBlocks.map((block: any, index: number) => {
+                  const orderIndex = aiCorrectOrder.indexOf(block.id)
+                  return {
+                    id: block.id || `block-${index}`,
+                    code: block.content || "",
+                    correctOrder: orderIndex >= 0 ? orderIndex + 1 : index + 1,
+                  }
+                }),
+                hints: lesson.content.hints || [],
+                difficulty: 1,
+              },
+            ],
+          }
+        }
+        break
+
+      case "fill_in_blanks":
+        if (lesson.content.questions && lesson.content.questions.length > 0) {
+          convertedData = {
+            questions: lesson.content.questions.map((q: any) => {
+              return {
+                id: q.id || crypto.randomUUID(),
+                scenario: q.scenario || "",
+                code: q.codeTemplate || "",
+                mermaid_code: q.mermaid_code || [],
+                blanks: (q.blanks || []).map((blank: any, index: number) => ({
+                  id: blank.id || `blank-${index}`,
+                  position: blank.position || index,
+                  type: blank.type || "text",
+                  correctAnswer: blank.correctAnswer || "",
+                  options: blank.options || [],
+                  hint: blank.hint || "",
+                  explanation: blank.explanation || "",
+                })),
+                hints: q.hints || [],
+                solution: q.solution
+                  ? {
+                      completeCode: q.solution.completeCode || "",
+                      explanation: q.solution.explanation || "",
+                      mermaid_code: q.solution.mermaid_code || [],
+                    }
+                  : undefined,
+                difficulty: q.difficulty || 1,
+              }
+            }),
+          }
+        } else {
+          convertedData = {
+            questions: [
+              {
+                id: crypto.randomUUID(),
+                scenario: lesson.content.scenario || "",
+                code: lesson.content.codeTemplate || "",
+                mermaid_code: lesson.content.mermaid_code || [],
+                blanks: (lesson.content.blanks || []).map(
+                  (blank: any, index: number) => ({
+                    id: blank.id || `blank-${index}`,
+                    position: blank.position || index,
+                    type: blank.type || "text",
+                    correctAnswer: blank.correctAnswer || "",
+                    options: blank.options || [],
+                    hint: blank.hint || "",
+                    explanation: blank.explanation || "",
+                  })
+                ),
+                hints: lesson.content.hints || [],
+                solution: lesson.content.solution
+                  ? {
+                      completeCode: lesson.content.solution.completeCode || "",
+                      explanation: lesson.content.solution.explanation || "",
+                      mermaid_code: lesson.content.solution.mermaid_code || [],
+                    }
+                  : undefined,
+                difficulty: 1,
+              },
+            ],
+          }
+        }
+        break
+
+      default:
+        convertedData = lesson.content
+    }
+
+    return convertedData
+  }
+
   // Handle both manual form structure (data) and AI-generated structure (content)
   const [lessonData, setLessonData] = useState(() => {
     if (lesson?.data) {
       return lesson.data
     } else if (lesson?.content) {
       // Convert AI content structure to manual form data structure
-      return lesson.content
+      return convertAIContentToManualData(lesson)
     }
     return null
   })

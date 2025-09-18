@@ -104,10 +104,9 @@ const TutorialManagementView: React.FC = () => {
                     language: "javascript", // Default or detect from context
                     explanation: ex.explanation || "",
                     mermaid_code: Array.isArray(ex.mermaid_code)
-                      ? ex.mermaid_code.map((code: any) => ({
-                          code:
-                            typeof code === "string" ? code : code.code || "",
-                        }))
+                      ? ex.mermaid_code.map((code: any) =>
+                          typeof code === "string" ? code : code.code || ""
+                        )
                       : [],
                   })
                 ),
@@ -116,9 +115,9 @@ const TutorialManagementView: React.FC = () => {
                     typeof hint === "string" ? hint : hint.hint || ""
                 ),
                 mermaid_code: Array.isArray(lesson.conceptData.mermaid_code)
-                  ? lesson.conceptData.mermaid_code.map((code: any) => ({
-                      code: typeof code === "string" ? code : code.code || "",
-                    }))
+                  ? lesson.conceptData.mermaid_code.map((code: any) =>
+                      typeof code === "string" ? code : code.code || ""
+                    )
                   : [],
                 commonMistakes: (lesson.conceptData.commonMistakes || []).map(
                   (mistake: any) =>
@@ -151,9 +150,9 @@ const TutorialManagementView: React.FC = () => {
                   difficulty: q.difficulty || 1,
                   codeSnippet: q.codeSnippet || "",
                   mermaid_code: Array.isArray(q.mermaid_code)
-                    ? q.mermaid_code.map((code: any) => ({
-                        code: typeof code === "string" ? code : code.code || "",
-                      }))
+                    ? q.mermaid_code.map((code: any) =>
+                        typeof code === "string" ? code : code.code || ""
+                      )
                     : [],
                 })),
               }
@@ -193,9 +192,9 @@ const TutorialManagementView: React.FC = () => {
                   scenario: q.scenario || "",
                   code: q.code || "",
                   mermaid_code: Array.isArray(q.mermaid_code)
-                    ? q.mermaid_code.map((code: any) => ({
-                        code: typeof code === "string" ? code : code.code || "",
-                      }))
+                    ? q.mermaid_code.map((code: any) =>
+                        typeof code === "string" ? code : code.code || ""
+                      )
                     : [],
                   blanks: (q.blanks || []).map((blank: any) => ({
                     id: blank.id || crypto.randomUUID(),
@@ -220,12 +219,9 @@ const TutorialManagementView: React.FC = () => {
                         completeCode: q.solution.completeCode || "",
                         explanation: q.solution.explanation || "",
                         mermaid_code: Array.isArray(q.solution.mermaid_code)
-                          ? q.solution.mermaid_code.map((code: any) => ({
-                              code:
-                                typeof code === "string"
-                                  ? code
-                                  : code.code || "",
-                            }))
+                          ? q.solution.mermaid_code.map((code: any) =>
+                              typeof code === "string" ? code : code.code || ""
+                            )
                           : [],
                       }
                     : undefined,
@@ -318,23 +314,19 @@ const TutorialManagementView: React.FC = () => {
       const isEdit = editingTutorial && tutorialData.id
 
       let url: string
+      let method: string
+
       if (isEdit) {
-        console.log("🔗 Constructing edit URL for ID:", tutorialData.id)
-
-        // Use proxy route for editing (keeps API private)
-        const baseUrl =
-          typeof window !== "undefined"
-            ? window.location.origin
-            : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-        url = `${baseUrl}/api/payload/tutorials/${tutorialData.id}`
-
-        console.log("🔗 Final edit URL:", url)
+        // Use dedicated update route for editing
+        url = "/api/generate-tutorial/update-tutorial"
+        method = "PATCH"
+        console.log(`🔄 Using update route for tutorial ID: ${tutorialData.id}`)
       } else {
-        // Use existing submit route for creation
+        // Use submit route for creating new tutorials
         url = "/api/generate-tutorial/submit-tutorial"
+        method = "POST"
+        console.log("✨ Using submit route for new tutorial")
       }
-
-      const method = isEdit ? "PATCH" : "POST"
 
       const response = await fetch(url, {
         method: method,

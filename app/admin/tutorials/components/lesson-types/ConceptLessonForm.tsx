@@ -27,7 +27,7 @@ const ConceptLessonForm: React.FC<ConceptLessonFormProps> = ({
       // If it's already a string, return it
       if (typeof item === "string") return item
 
-      // If it's an object with a code property, extract the code
+      // If it's an object with a code property, extract the code (legacy support)
       if (item && typeof item === "object" && item.code) {
         return item.code
       }
