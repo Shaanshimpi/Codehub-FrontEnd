@@ -111,7 +111,7 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
 
       if (newIndex >= 0 && newIndex < newOrder.length) {
         //no semicolon here
-        ;[newOrder[currentIndex], newOrder[newIndex]] = [
+        [newOrder[currentIndex], newOrder[newIndex]] = [
           newOrder[newIndex],
           newOrder[currentIndex],
         ]
