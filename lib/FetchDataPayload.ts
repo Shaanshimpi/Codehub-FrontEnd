@@ -67,11 +67,11 @@ export async function fetchCollection(
   if (depth) queryObject.depth = depth;
   if (sort) queryObject.sort = sort;
   if (limit) queryObject.limit = limit;
-  if (where) queryObject.where = JSON.stringify(where);
+  if (where) queryObject.where = where; // Don't stringify, let qs handle the nested structure
 
   const queryString = qs.stringify(queryObject, {
     addQueryPrefix: true,
-    encode: false,
+    encode: false, // Let qs handle the encoding naturally
   });
 
   // Use absolute URL in the browser

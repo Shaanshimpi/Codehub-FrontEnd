@@ -19,16 +19,36 @@ import {
 } from "lucide-react"
 import TutorialPreview from "./TutorialPreview"
 
-// AI Models array
+// AI Models array with pricing (per 1M tokens)
 const AI_MODELS = [
+  { name: "Google: Gemini 2.0 Flash", slug: "google/gemini-2.5-flash" },
+
   {
-    name: "Google: Gemini 2.5 Flash Lite",
-    slug: "google/gemini-2.5-flash-lite",
+    name: "Qwen 2.5 72B ($1.00/$3.00)",
+    slug: "qwen/qwen-2.5-72b-instruct",
   },
-  { name: "Z.AI: GLM 4.5 Air", slug: "z-ai/glm-4.5-air" },
-  { name: "Qwen3 Coder", slug: "qwen/qwen3-coder" },
-  { name: "Mistral: Codestral", slug: "mistralai/codestral-2508" },
-  { name: "GPT-5 Nano", slug: "openai/gpt-5-nano" },
+  {
+    name: "Gemini 1.5 Pro ($1.25/$5.00)",
+    slug: "google/gemini-1.5-pro",
+  },
+  {
+    name: "GPT-4o ($2.50/$10.00)",
+    slug: "openai/gpt-4o",
+  },
+
+  // Premium Tier - Best quality
+  {
+    name: "Claude 3.5 Sonnet ($3.00/$15.00)",
+    slug: "anthropic/claude-3.5-sonnet",
+  },
+  {
+    name: "WizardLM 2 8x22B ($5.00/$15.00)",
+    slug: "microsoft/wizardlm-2-8x22b",
+  },
+  {
+    name: "Grok 2 ($10.00/$30.00)",
+    slug: "x-ai/grok-2-1212",
+  },
 ]
 
 interface AITutorialFormProps {

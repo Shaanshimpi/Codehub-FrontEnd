@@ -8,6 +8,7 @@ import { useTheme } from "@/app/contexts/theme-context"
 import { cn } from "@/lib/utils"
 import {
   BookOpen,
+  Bot,
   ChevronDown,
   Code2,
   Home,
@@ -32,7 +33,7 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
   const { user, isLoading } = useUser()
   const { toggleTheme, theme } = useTheme()
   const pathname = usePathname()
-  const baseSegment = pathname?.split("/")[1] || "learn"
+  const baseSegment = pathname?.split("/")[1] || "Learn"
 
   const [isTutorialsOpen, setIsTutorialsOpen] = useState(false)
   const [isExercisesOpen, setIsExercisesOpen] = useState(false)
@@ -287,6 +288,20 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                 )}
               </div>
 
+              {/* Vivy AI Chat */}
+              {process.env.ENV == "DEV" && (
+                <Link
+                  href={`/${baseSegment}/Vivy`}
+                  className={cn(
+                    "group flex items-center space-x-2 rounded-lg text-slate-100 transition-all duration-200 hover:bg-white/10 hover:text-white dark:text-slate-300 dark:hover:text-white",
+                    isShrunk ? "rounded-sm px-4 py-0" : "rounded-lg px-4 py-4"
+                  )}
+                >
+                  <Bot className="h-4 w-4" />
+                  <span className="font-medium">Vivy AI</span>
+                </Link>
+              )}
+
               {/* Interactive Dropdown */}
               {false && (
                 <div className="relative">
@@ -457,6 +472,18 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                   </Link>
                 ))}
               </div>
+
+              {/* Vivy AI Chat - Mobile */}
+              <Link
+                href={`/${baseSegment}/Vivy`}
+                className="flex items-center space-x-3 rounded-lg px-4 py-3 text-slate-100 transition-all duration-200 hover:bg-white/10"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <div className="flex h-6 w-6 items-center justify-center rounded bg-blue-600">
+                  <Bot className="h-4 w-4 text-white" />
+                </div>
+                <span className="font-medium">Vivy AI Chat</span>
+              </Link>
 
               <div className="space-y-2">
                 <div className="px-4 py-2">

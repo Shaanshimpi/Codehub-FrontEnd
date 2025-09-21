@@ -41,6 +41,7 @@ LESSON TYPE SPECIFICATIONS:
    - Progressive difficulty levels within the lesson (mix of easy, medium, hard)
    - Focus on understanding concepts, not memorization
    - NEVER generate just 1 question - always create multiple questions for comprehensive assessment
+   - NEVER put code in questions.
 
 🎯 CODE BLOCK REARRANGING:
    - MANDATORY: Generate 2-7 code rearranging questions per lesson
@@ -124,6 +125,7 @@ MERMAID DIAGRAM JSON FORMAT RULES:
 - Data processing pipelines
 - Error handling and exception flow
 - ANY concept showing "how something WORKS" or "what happens WHEN"
+- AVOID using for OOP concepts
 
 CLASS DIAGRAM REQUIREMENTS:
 - Use "class" type for main classes, "interface" type for interfaces, "abstract" type for abstract classes

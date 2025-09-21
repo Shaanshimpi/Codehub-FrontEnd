@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server"
-import qs from "qs"
 
 export async function GET(
   request: NextRequest,
@@ -8,32 +7,8 @@ export async function GET(
   const { collection } = await params
   const searchParams = request.nextUrl.searchParams
 
-  const queryObject: Record<string, any> = {}
-
-  if (searchParams.has("depth")) {
-    queryObject.depth = parseInt(searchParams.get("depth") || "1")
-  }
-
-  if (searchParams.has("limit")) {
-    queryObject.limit = parseInt(searchParams.get("limit") || "100")
-  }
-
-  if (searchParams.has("sort")) {
-    queryObject.sort = searchParams.get("sort")
-  }
-
-  if (searchParams.has("where")) {
-    try {
-      queryObject.where = JSON.parse(searchParams.get("where") || "{}")
-    } catch (e) {
-      console.error("Error parsing where clause:", e)
-    }
-  }
-
-  const queryString = qs.stringify(queryObject, {
-    addQueryPrefix: true,
-    encode: false,
-  })
+  // Simply pass through the entire query string as-is
+  const queryString = request.nextUrl.search || ""
 
   const payloadApiUrl = process.env.PAYLOAD_API_URL
 
@@ -45,7 +20,7 @@ export async function GET(
     )
   }
 
-  const url = `${payloadApiUrl}/${collection}${queryString.replace(`where=`, `where`)}`
+  const url = `${payloadApiUrl}/${collection}${queryString}`
 
   console.log(`🔄 Fetching ${collection} from:`, url)
 

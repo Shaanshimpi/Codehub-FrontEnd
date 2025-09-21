@@ -13,6 +13,7 @@ export default async function TutorialLanguagePage({
       getLanguageBySlug(langSlug),
       getTutorialsByLanguage(langSlug),
     ])
+    console.log(language, tutorials)
 
     // If no language found, create a mock one for now
     const finalLanguage = language || {

@@ -21,6 +21,13 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Handle slug filter
+    if (searchParams.get("where[slug][equals]")) {
+      queryObject["where[slug][equals]"] = searchParams.get(
+        "where[slug][equals]"
+      )
+    }
+
     // Handle search (OR queries for title and description)
     if (searchParams.get("where[or][0][title][contains]")) {
       queryObject["where[or][0][title][contains]"] = searchParams.get(

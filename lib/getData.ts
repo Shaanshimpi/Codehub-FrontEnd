@@ -91,7 +91,9 @@ export async function getTutorialsByLanguage(
     }
 
     // Then get tutorials for that language
-    return await getTutorialsByLanguageId(language.id);
+    const tutorials = await getTutorialsByLanguageId(language.id);
+
+    return tutorials;
   } catch (error) {
     console.error("Error fetching tutorials by language slug:", error);
     return [];
@@ -120,11 +122,10 @@ export async function getTutorialBySlug(
   languageId: string | number,
 ): Promise<Tutorial | null> {
   try {
+    // Use direct field queries instead of nested and conditions
     const query = {
-      and: [
-        { slug: { equals: tutSlug } },
-        { programmingLanguage: { equals: languageId } },
-      ],
+      slug: { equals: tutSlug },
+      programmingLanguage: { equals: languageId },
     };
 
     const tutorials = await fetchCollection("tutorials", {

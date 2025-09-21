@@ -1,12 +1,7 @@
 import React from "react"
-import {
-  getLanguageBySlug,
-  getLanguages,
-  getTutorialBySlug,
-  getTutorialsByLanguageId,
-} from "@/lib/getData"
+import { getLanguageBySlug, getTutorialBySlug } from "@/lib/getData"
 import { notFound } from "next/navigation"
-import TutorialView from "./components/TutorialView"
+import TutorialPageContainer from "./components/TutorialPageContainer"
 
 interface TutorialPageProps {
   params: Promise<{
@@ -15,65 +10,66 @@ interface TutorialPageProps {
   }>
 }
 
-export default async function TutorialPage({ params }: TutorialPageProps) {
+export default async function NewTutorialPage({ params }: TutorialPageProps) {
   const { langSlug, tutSlug } = await params
 
-  // Get language first
-  const language = await getLanguageBySlug(langSlug)
-  if (!language) {
+  try {
+    // Fetch language and tutorial data
+    const language = await getLanguageBySlug(langSlug)
+    if (!language) {
+      notFound()
+    }
+
+    const tutorial = await getTutorialBySlug(tutSlug, language.id)
+
+    if (!tutorial) {
+      console.log("Tutorial not found, calling notFound()")
+      notFound()
+    }
+
+    return (
+      <TutorialPageContainer
+        tutorial={tutorial}
+        language={language}
+        langSlug={langSlug}
+        tutSlug={tutSlug}
+      />
+    )
+  } catch (error) {
+    console.error("Error loading tutorial:", error)
     notFound()
   }
-
-  // Get tutorial, all tutorials for navigation, and all languages for header
-  const [tutorial, allTutorials, languages] = await Promise.all([
-    getTutorialBySlug(tutSlug, language.id),
-    getTutorialsByLanguageId(language.id),
-    getLanguages(),
-  ])
-
-  if (!tutorial) {
-    notFound()
-  }
-
-  // Find previous and next tutorials
-  const currentIndex = allTutorials.findIndex((t) => t.id === tutorial.id)
-  const previousTutorial =
-    currentIndex > 0 ? allTutorials[currentIndex - 1] : null
-  const nextTutorial =
-    currentIndex < allTutorials.length - 1
-      ? allTutorials[currentIndex + 1]
-      : null
-
-  return (
-    <TutorialView
-      tutorial={tutorial}
-      language={language}
-      allTutorials={allTutorials}
-      previousTutorial={previousTutorial}
-      nextTutorial={nextTutorial}
-      languages={languages}
-    />
-  )
 }
 
 export async function generateMetadata({ params }: TutorialPageProps) {
   const { langSlug, tutSlug } = await params
 
-  const language = await getLanguageBySlug(langSlug)
-  if (!language) {
-    return { title: "Tutorial Not Found" }
-  }
+  try {
+    const language = await getLanguageBySlug(langSlug)
+    if (!language) {
+      return {
+        title: "Tutorial Not Found",
+        description: "The requested tutorial was not found.",
+      }
+    }
 
-  const tutorial = await getTutorialBySlug(tutSlug, language.id)
-  if (!tutorial) {
-    return { title: "Tutorial Not Found" }
-  }
+    const tutorial = await getTutorialBySlug(tutSlug, language.id)
+    if (!tutorial) {
+      return {
+        title: "Tutorial Not Found",
+        description: "The requested tutorial was not found.",
+      }
+    }
 
-  return {
-    title: `${tutorial.title} - ${language.title} Tutorial`,
-    description:
-      tutorial.description ||
-      `Learn ${tutorial.title} in ${language.title} with interactive lessons and practical examples.`,
-    keywords: `${tutorial.title}, ${language.title} tutorial, programming tutorial, learn ${language.title}`,
+    return {
+      title: `${tutorial.title} - ${language.title} Interactive Tutorial`,
+      description: `Learn ${tutorial.title} in ${language.title} through interactive lessons, quizzes, and hands-on exercises.`,
+      keywords: `${language.title}, ${tutorial.title}, interactive tutorial, programming lessons, coding practice`,
+    }
+  } catch (error) {
+    return {
+      title: "Tutorial Error",
+      description: "There was an error loading the tutorial.",
+    }
   }
 }

@@ -14,6 +14,7 @@ export default function Header() {
 
   const links = [
     { href: "/", label: "Home.", showMd: true },
+    { href: "/Vivy", label: "Vivy.", showMd: true },
     {
       href: "https://www.instagram.com/code.hub.india/",
       label: "Instagram.",
