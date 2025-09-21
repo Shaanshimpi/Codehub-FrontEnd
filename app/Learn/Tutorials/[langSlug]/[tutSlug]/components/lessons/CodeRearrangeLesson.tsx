@@ -293,7 +293,7 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
                       <code className="flex-1 text-sm text-blue-800 dark:text-blue-200">
                         {blockCode}
                       </code>
-                      <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                      <div className="col flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                         <button
                           onClick={() => moveBlock(blockCode, "up")}
                           disabled={index === 0}
