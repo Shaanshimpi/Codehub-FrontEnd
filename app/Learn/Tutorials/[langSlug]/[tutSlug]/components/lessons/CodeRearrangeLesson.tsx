@@ -84,7 +84,6 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
       setUserOrder((prev) => prev.filter((code) => code !== blockCode))
       setAvailableBlocks((prev) => [...prev, blockCode])
     } else if (target === "solution" && source === "available") {
-      // Move from available to solution
       setAvailableBlocks((prev) => prev.filter((code) => code !== blockCode))
       if (index !== undefined) {
         setUserOrder((prev) => {
