@@ -296,7 +296,7 @@ function convertToMermaidClass(data: MermaidDiagramData): string {
 
     // Add constructors (if provided separately from methods)
     if ((cls as any).constructor && Array.isArray((cls as any).constructor)) {
-      ;(cls as any).constructor.forEach((constructor: any) => {
+      (cls as any).constructor.forEach((constructor: any) => {
         const safeConstructorName = cleanMethodName(constructor.name)
         const visibility = formatVisibility(constructor.visibility)
         lines.push(`        ${visibility}${safeConstructorName} void`)
