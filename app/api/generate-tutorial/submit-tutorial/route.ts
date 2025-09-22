@@ -93,11 +93,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (tutorialData.lessons.length < 1 || tutorialData.lessons.length > 20) {
+    if (tutorialData.lessons.length > 20) {
       return NextResponse.json(
         {
           success: false,
-          error: "Tutorial must have between 1 and 20 lessons",
+          error: "Tutorial cannot have more than 20 lessons",
         },
         { status: 400 }
       )

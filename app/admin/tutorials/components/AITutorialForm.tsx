@@ -21,7 +21,12 @@ import TutorialPreview from "./TutorialPreview"
 
 // AI Models array with pricing (per 1M tokens)
 const AI_MODELS = [
-  { name: "Google: Gemini 2.0 Flash", slug: "google/gemini-2.5-flash" },
+  {
+    name: "google/gemini-2.5-flash-lite",
+    slug: "google/gemini-2.5-flash-lite",
+  },
+  { name: "google/gemini-2.5-flash", slug: "google/gemini-2.5-flash" },
+  { name: "google/gemini-2.5-pro", slug: "google/gemini-2.5-pro" },
 
   {
     name: "Qwen 2.5 72B ($1.00/$3.00)",
@@ -63,7 +68,7 @@ const AITutorialForm: React.FC<AITutorialFormProps> = ({
   const [topic, setTopic] = useState("")
   const [selectedLanguage, setSelectedLanguage] = useState("")
   const [difficulty, setDifficulty] = useState(1)
-  const [numLessons, setNumLessons] = useState(7)
+  const [numLessons, setNumLessons] = useState(0)
   const [focusAreas, setFocusAreas] = useState("")
   const [exclusions, setExclusions] = useState("")
   const [selectedModel, setSelectedModel] = useState(AI_MODELS[0].slug)
@@ -259,7 +264,7 @@ const AITutorialForm: React.FC<AITutorialFormProps> = ({
                   value={numLessons}
                   onChange={(e) => setNumLessons(parseInt(e.target.value) || 7)}
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                  min="5"
+                  min="0"
                   max="20"
                 />
               </div>

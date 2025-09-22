@@ -407,8 +407,8 @@ export const validateTutorialData = (data: any): string[] => {
     errors.push("Programming language must be selected");
   }
 
-  if (!data.lessons || data.lessons.length < 5) {
-    errors.push("Tutorial must have at least 5 lessons");
+  if (!data.lessons) {
+    errors.push("Lessons array is required");
   }
 
   if (data.lessons && data.lessons.length > 20) {

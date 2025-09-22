@@ -842,7 +842,7 @@ export const ProgrammingTutorialSchema = {
     items: TUTORIAL_LESSON_SCHEMA,
     description:
       "Array of tutorial lessons with varied types and progressive difficulty",
-    minItems: 5,
+    minItems: 0,
     maxItems: 20,
   },
   practicalApplications: TUTORIAL_PRACTICAL_APPLICATIONS_SCHEMA,
