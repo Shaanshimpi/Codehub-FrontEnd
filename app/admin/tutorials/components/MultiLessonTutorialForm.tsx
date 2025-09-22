@@ -986,7 +986,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             </label>
             <input
               type="number"
-              min="1"
+              min="0"
               value={basicInfo.index}
               onChange={(e) =>
                 setBasicInfo((prev) => ({
@@ -1893,7 +1893,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             </h3>
             <p className="text-sm text-slate-500 dark:text-slate-400">
               {tutorialData.lessons.length < 5
-                ? `Add ${5 - tutorialData.lessons.length} more lesson(s) (minimum 5 required)`
+                ? `Add ${5 - tutorialData.lessons.length} more lesson(s) (minimum 0 required)`
                 : `${20 - tutorialData.lessons.length} lesson(s) remaining (maximum 20)`}
             </p>
           </div>
@@ -1912,8 +1912,8 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
             <p className="text-slate-500 dark:text-slate-400">
               No lessons added yet. Click &quot;Add Lesson&quot; to get started.
             </p>
-            <p className="mt-2 text-sm text-orange-600 dark:text-orange-400">
-              Minimum 5 lessons required to save tutorial
+            <p className="mt-2 text-sm text-blue-600 dark:text-blue-400">
+              You can save with 0 or more lessons
             </p>
           </div>
         ) : (
@@ -1967,15 +1967,6 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
         )}
 
         {/* Lesson count warning */}
-        {tutorialData.lessons.length > 0 && tutorialData.lessons.length < 5 && (
-          <div className="mt-4 rounded-lg border border-orange-200 bg-orange-50 p-4 dark:border-orange-800 dark:bg-orange-900/20">
-            <p className="text-sm text-orange-800 dark:text-orange-200">
-              <strong>Warning:</strong> You need at least{" "}
-              {5 - tutorialData.lessons.length} more lesson(s) to save this
-              tutorial.
-            </p>
-          </div>
-        )}
       </div>
 
       {/* Actions */}
@@ -1989,10 +1980,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
         <button
           onClick={handleSave}
           disabled={
-            !basicInfo.title ||
-            tutorialData.lessons.length < 5 ||
-            tutorialData.lessons.length > 20 ||
-            isSaving
+            !basicInfo.title || tutorialData.lessons.length > 20 || isSaving
           }
           className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
