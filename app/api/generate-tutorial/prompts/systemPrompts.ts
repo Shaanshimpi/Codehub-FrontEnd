@@ -46,7 +46,7 @@ LESSON TYPE SPECIFICATIONS:
 🎯 CODE BLOCK REARRANGING:
    - MANDATORY: Generate 2-7 code rearranging questions per lesson
    - Each question has real-world programming scenarios that students can relate to
-   - Code broken into 3-8 logical blocks possibly multiline blocks for drag-and-drop interaction
+   - Code broken into at most 5 logical blocks possibly multiline blocks for drag-and-drop interaction
    - MANDATORY: Code blocks should be unique and multiline
    - RECOMMENDED: JSON diagram data for multi-step processes, algorithms, loops, or branching logic
    - SKIP diagrams only for very simple linear sequences without logical flow
