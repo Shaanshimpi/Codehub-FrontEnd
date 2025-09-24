@@ -8,7 +8,7 @@ export class StorageService {
   /**
    * Get item from localStorage with fallback
    */
-  private getItem<T>(key: string, fallback: T): T {
+  getItem<T>(key: string, fallback: T): T {
     if (typeof window === "undefined") return fallback
 
     try {
@@ -23,7 +23,7 @@ export class StorageService {
   /**
    * Set item in localStorage
    */
-  private setItem(key: string, value: any): void {
+  setItem(key: string, value: any): void {
     if (typeof window === "undefined") return
 
     try {

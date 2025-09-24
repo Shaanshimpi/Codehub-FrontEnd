@@ -4,7 +4,7 @@ import React, { useState } from "react"
 import { useTheme } from "../../hooks/useTheme"
 import MermaidRenderer from "../MermaidRenderer"
 
-interface CodeBlock {
+interface CodeBlockItem {
   code: string
   correctOrder: number
 }
@@ -13,7 +13,7 @@ interface CodeRearrangeQuestion {
   scenario: string
   targetCode: string
   mermaid_code?: Array<{ code: string } | string>
-  blocks: CodeBlock[]
+  blocks: CodeBlockItem[]
   hints: Array<{ hint: string } | string>
   difficulty: string
 }

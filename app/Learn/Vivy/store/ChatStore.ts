@@ -1,7 +1,13 @@
 import { create } from "zustand"
 import { devtools } from "zustand/middleware"
-import { conversationService, storageService } from "../services"
-import { AIModel, ChatUIState, Message } from "../types"
+import { AIModel, getAllModels } from "../constants/models"
+import {
+  apiService,
+  modelService,
+  storageService,
+  userService,
+} from "../services"
+import { ChatUIState, Message } from "../types"
 import { createId, debounce } from "../utils"
 
 interface ChatState extends ChatUIState {
@@ -51,6 +57,9 @@ interface ChatState extends ChatUIState {
   generateMessageId: () => string
   createUserMessage: (content: string) => Message
   createAssistantMessage: (content: string, model?: string) => Message
+
+  // Initialization
+  initialize: () => void
 
   // Reset
   reset: () => void
@@ -119,6 +128,27 @@ export const useChatStore = create<ChatState>()(
           return false
         }
 
+        // Check authentication and Gold subscription for paid models
+        const isAuthenticated = userService.isAuthenticated()
+        const isGoldUser = userService.isGoldUser()
+        const requiresGold =
+          modelService.requiresGoldSubscription(selectedModel)
+
+        if (requiresGold && !isGoldUser) {
+          if (!isAuthenticated) {
+            setLoading(
+              false,
+              "Please log in with a Gold account to use this premium model. Free models are available without login."
+            )
+          } else {
+            setLoading(
+              false,
+              "This premium model requires a Gold subscription. Please upgrade your account or use free models."
+            )
+          }
+          return false
+        }
+
         setLoading(true, null)
 
         try {
@@ -134,10 +164,23 @@ export const useChatStore = create<ChatState>()(
 
           // Send to AI
           const currentMessages = [...get().messages, userMessage]
-          const response = await conversationService.sendMessage(
-            currentMessages,
-            selectedModel.id
-          )
+          const response = await apiService.post<{
+            content: string
+            tokens?: {
+              prompt: number
+              completion: number
+              total: number
+            }
+            model: string
+            id?: string
+            created?: number
+          }>("/api/chat", {
+            messages: currentMessages.map((msg) => ({
+              role: msg.role,
+              content: msg.content,
+            })),
+            model: selectedModel.id,
+          })
 
           // Add assistant message
           const assistantMessage = createAssistantMessage(
@@ -183,10 +226,23 @@ export const useChatStore = create<ChatState>()(
           // Get messages up to the selected message
           const contextMessages = messages.slice(0, messageIndex + 1)
 
-          const response = await conversationService.sendMessage(
-            contextMessages,
-            selectedModel.id
-          )
+          const response = await apiService.post<{
+            content: string
+            tokens?: {
+              prompt: number
+              completion: number
+              total: number
+            }
+            model: string
+            id?: string
+            created?: number
+          }>("/api/chat", {
+            messages: contextMessages.map((msg) => ({
+              role: msg.role,
+              content: msg.content,
+            })),
+            model: selectedModel.id,
+          })
 
           // Update or add new assistant message
           const nextMessageIndex = messageIndex + 1
@@ -312,6 +368,67 @@ export const useChatStore = create<ChatState>()(
           content,
           timestamp: new Date(),
           model,
+        }
+      },
+
+      initialize: async () => {
+        try {
+          // Load dynamic models first
+          await modelService.loadModels()
+
+          // Check authentication status and Gold membership
+          const isAuthenticated = userService.isAuthenticated()
+          const isGoldUser = userService.isGoldUser()
+
+          // Set default model if none selected
+          const { selectedModel } = get()
+          if (!selectedModel) {
+            // Get models available to the user based on auth status and Gold membership
+            const availableModels = modelService.getAvailableModels(
+              isAuthenticated,
+              isGoldUser
+            )
+
+            // Try to load from storage or use first available model
+            const lastModelId = storageService.getLastModel()
+            let defaultModel = lastModelId
+              ? availableModels.find((m) => m.id === lastModelId)
+              : null
+
+            // If last model is not available (e.g., paid model for non-authenticated user),
+            // use first available model
+            if (!defaultModel && availableModels.length > 0) {
+              defaultModel = availableModels[0]
+            }
+
+            if (defaultModel) {
+              set({ selectedModel: defaultModel })
+              console.log(
+                `✅ Initialized with model: ${defaultModel.name} (Auth: ${isAuthenticated}, Gold: ${isGoldUser})`
+              )
+            }
+          } else {
+            // Check if current model is still available to the user
+            const requiresGold =
+              modelService.requiresGoldSubscription(selectedModel)
+            if (requiresGold && !isGoldUser) {
+              // Switch to a free model
+              const freeModels = modelService.getFreeModels()
+              if (freeModels.length > 0) {
+                set({ selectedModel: freeModels[0] })
+                console.log(
+                  `⚠️ Switched to free model due to Gold subscription requirement: ${freeModels[0].name}`
+                )
+              }
+            }
+          }
+        } catch (error) {
+          console.error("❌ Failed to initialize models:", error)
+          // Fallback to static models
+          const availableModels = getAllModels()
+          if (availableModels.length > 0) {
+            set({ selectedModel: availableModels[0] })
+          }
         }
       },
 

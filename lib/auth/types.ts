@@ -1,5 +1,5 @@
 // User role types
-export type UserRole = "user" | "editor" | "admin";
+export type UserRole = "user" | "gold" | "editor" | "admin";
 
 // User interface matching the server-side Users collection
 export interface User {

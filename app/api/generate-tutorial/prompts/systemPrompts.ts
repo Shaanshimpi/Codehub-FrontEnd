@@ -43,6 +43,21 @@ LESSON TYPE SPECIFICATIONS:
    - NEVER generate just 1 question - always create multiple questions for comprehensive assessment
    - NEVER put code in questions.
 
+🚨 MCQ OPTION QUALITY GUIDELINES:
+   - Options can span multiple lines for code output or formatted text
+   - Use \\n for line breaks in options when showing:
+     * Console output with multiple lines
+     * Multi-line code snippets as answer choices
+     * Error messages with stack traces
+     * Formatted data structures (JSON, arrays, etc.)
+     * Program execution results across multiple lines
+
+   Example MCQ options with multiline content:
+   Option A: "Hello\\nWorld\\nProgram completed successfully"
+   Option B: "for (int i = 0; i < 5; i++) {\\n    printf(\\"%d\\", i);\\n}"
+   Option C: "Error: Segmentation fault\\n    at line 15\\n    in function main()"
+   Option D: "{\\n    \\"name\\": \\"John\\",\\n    \\"age\\": 25\\n}"
+
 🎯 CODE BLOCK REARRANGING:
    - MANDATORY: Generate 2-7 code rearranging questions per lesson
    - Each question has real-world programming scenarios that students can relate to
@@ -577,6 +592,22 @@ export const CONTENT_QUALITY_STANDARDS = `CONTENT QUALITY REQUIREMENTS:
 - Test concepts with realistic, practical examples that students can relate to
 - Avoid truncated or incomplete code - always provide full, functional examples
 
+🚨 CRITICAL CODE FORMATTING RULES:
+- ALWAYS use \\n for line breaks in generated code (never single-line code blocks)
+- ALWAYS use proper indentation (4 spaces per level) with \\n\\n for blank lines
+- NEVER generate single-line code blocks - each statement MUST be on separate lines
+- Each statement MUST be on separate lines with proper formatting
+- Include proper #include statements on separate lines (for C/C++)
+- Use proper bracket placement and consistent indentation throughout
+
+VALIDATION CHECK: Every code block must contain \\n characters for proper formatting
+
+Example of CORRECT formatting:
+"code": "#include <stdio.h>\\n\\nint main() {\\n    int age = 20;\\n    if (age >= 18) {\\n        printf(\\"You are an adult.\\");\\n    }\\n    return 0;\\n}"
+
+Example of WRONG formatting (NEVER do this):
+"code": "#include <stdio.h> int main() { int age = 20; if (age >= 18) { printf(\\"You are an adult.\\"); } return 0; }"
+
 📚 EXPLANATIONS & CONTENT:
 - Write clear, concise explanations appropriate for the target skill level
 - Use analogies and real-world examples to clarify abstract programming concepts
@@ -599,7 +630,32 @@ export const CONTENT_QUALITY_STANDARDS = `CONTENT QUALITY REQUIREMENTS:
 - Keep technical accuracy while making content universally accessible
 - Ensure content feels natural and conversational, not mechanical or robotic
 - Preserve educational effectiveness and clarity throughout the tutorial
-- Use examples and scenarios that are universally understandable and relevant`
+- Use examples and scenarios that are universally understandable and relevant
+
+🔍 CONTENT VALIDATION REQUIREMENTS:
+BEFORE FINALIZING: Verify that:
+✓ All code examples compile without errors and use proper \\n formatting
+✓ All MCQ questions have exactly 4 options with 1 correct answer
+✓ All code uses proper \\n formatting (not single-line strings)
+✓ All explanations are clear and educational
+✓ Fill-in-blank exercises have complete solutions with proper code formatting
+✓ Code rearrange exercises have logical block sequences
+✓ All content progresses logically from basic to advanced concepts
+
+🎯 EDUCATIONAL QUALITY STANDARDS:
+- Code examples must progress from simple to complex within each lesson
+- Each explanation must answer "what", "why", and "how" for better understanding
+- Common mistakes should include real-world scenarios that students encounter
+- Practice hints should be actionable and specific, not generic advice
+- MCQ questions should test understanding of concepts, not memorization
+- All code formatting must be consistent throughout the entire tutorial
+
+🔧 OUTPUT CONSISTENCY REQUIREMENTS:
+- Use the same variable naming conventions throughout all lessons
+- Maintain consistent terminology (e.g., always "function" not "method" in C)
+- Code style must match across all examples in the tutorial
+- Explanation depth should be consistent across similar lesson types
+- All multiline content (code, options, output) must use \\n for line breaks`
 
 export const JSON_STRUCTURE_REQUIREMENTS = `CRITICAL JSON STRUCTURE - MUST MATCH EXACTLY:
 

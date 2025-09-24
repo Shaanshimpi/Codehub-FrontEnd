@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { useTheme } from "../../hooks/useTheme"
 import MermaidRenderer from "../MermaidRenderer"
+import { Badge, Button, CodeBlock, Icon, ProgressBar } from "../ui"
 
 interface MCQQuestion {
   question: string
@@ -105,8 +106,18 @@ const MCQLesson: React.FC<MCQLessonProps> = ({ data, lessonTitle }) => {
     return (
       <div className="space-y-6">
         <div className="rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 p-8 text-center dark:from-blue-900/20 dark:to-purple-900/20">
-          <div className="mb-4 text-6xl">
-            {scorePercentage >= 80 ? "🎉" : scorePercentage >= 60 ? "👍" : "📚"}
+          <div className="mb-4 flex justify-center">
+            <Icon
+              name={
+                scorePercentage >= 80
+                  ? "trophy"
+                  : scorePercentage >= 60
+                    ? "check"
+                    : "book"
+              }
+              className={`${scorePercentage >= 80 ? "text-yellow-500" : scorePercentage >= 60 ? "text-green-500" : "text-blue-500"}`}
+              size="xl"
+            />
           </div>
           <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
             Quiz Complete!
@@ -119,24 +130,27 @@ const MCQLesson: React.FC<MCQLessonProps> = ({ data, lessonTitle }) => {
             {scorePercentage}%
           </div>
           <div className="flex justify-center gap-4">
-            <button
+            <Button
+              variant="primary"
+              size="md"
               onClick={() => {
                 setCurrentQuestion(0)
                 setSelectedAnswers({})
                 setShowExplanations({})
                 setQuizComplete(false)
               }}
-              className="rounded-lg bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700"
+              icon={<Icon name="clock" size="sm" />}
             >
-              🔄 Retake Quiz
-            </button>
+              Retake Quiz
+            </Button>
           </div>
         </div>
 
         {/* Review Questions */}
         <div>
-          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-            📝 Review Your Answers
+          <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
+            <Icon name="notes" className="text-blue-500" size="sm" />
+            Review Your Answers
           </h3>
           <div className="space-y-4">
             {data.questions.map((question, questionIndex) => {
@@ -151,11 +165,11 @@ const MCQLesson: React.FC<MCQLessonProps> = ({ data, lessonTitle }) => {
                   className="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
                 >
                   <div className="mb-3 flex items-start gap-3">
-                    <span
+                    <Icon
+                      name={isCorrect ? "check" : "x"}
                       className={`text-lg ${isCorrect ? "text-green-500" : "text-red-500"}`}
-                    >
-                      {isCorrect ? "✅" : "❌"}
-                    </span>
+                      size="sm"
+                    />
                     <p className="font-medium text-gray-900 dark:text-white">
                       {questionIndex + 1}. {question.question}
                     </p>
@@ -190,21 +204,19 @@ const MCQLesson: React.FC<MCQLessonProps> = ({ data, lessonTitle }) => {
       {/* Progress Bar */}
       <div className="rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-900 dark:text-white">
+          <Badge variant="info" size="sm">
             Question {currentQuestion + 1} of {data.questions.length}
-          </span>
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+          </Badge>
+          <Badge variant="success" size="sm">
             Progress: {getQuestionProgress()}%
-          </span>
+          </Badge>
         </div>
-        <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-          <div
-            className="h-2 rounded-full bg-blue-600 transition-all duration-300"
-            style={{
-              width: `${((currentQuestion + 1) / data.questions.length) * 100}%`,
-            }}
-          />
-        </div>
+        <ProgressBar
+          progress={((currentQuestion + 1) / data.questions.length) * 100}
+          size="md"
+          animated
+          showLabel={false}
+        />
       </div>
 
       {/* Question */}
@@ -223,14 +235,16 @@ const MCQLesson: React.FC<MCQLessonProps> = ({ data, lessonTitle }) => {
         {/* Code Context */}
         {currentQ.codeSnippet && (
           <div className="mb-6">
-            <h4 className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-              💻 Code Context:
+            <h4 className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
+              <Icon name="code" className="text-green-500" size="sm" />
+              Code Context:
             </h4>
-            <div className="rounded-lg bg-gray-900 p-4">
-              <pre className="overflow-x-auto text-sm text-gray-100">
-                <code>{currentQ.codeSnippet}</code>
-              </pre>
-            </div>
+            <CodeBlock
+              code={currentQ.codeSnippet}
+              language="javascript"
+              copyable
+              showLineNumbers
+            />
           </div>
         )}
 
@@ -308,19 +322,21 @@ const MCQLesson: React.FC<MCQLessonProps> = ({ data, lessonTitle }) => {
 
         {/* Submit Button */}
         {!showExplanation && selectedOption !== undefined && (
-          <button
+          <Button
+            variant="primary"
+            size="lg"
             onClick={() => handleSubmitAnswer(currentQuestion)}
-            className="w-full rounded-lg bg-blue-600 py-3 font-medium text-white transition-colors hover:bg-blue-700"
+            fullWidth
           >
             Submit Answer
-          </button>
+          </Button>
         )}
 
         {/* Explanation */}
         {showExplanation && (
           <div className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
             <div className="flex items-start gap-3">
-              <span className="mt-1 text-blue-500">💡</span>
+              <Icon name="star" className="mt-1 text-blue-500" size="sm" />
               <div>
                 <h4 className="mb-2 font-medium text-blue-900 dark:text-blue-100">
                   {selectedOption !== undefined &&
@@ -340,27 +356,30 @@ const MCQLesson: React.FC<MCQLessonProps> = ({ data, lessonTitle }) => {
       {/* Navigation */}
       {showExplanation && (
         <div className="flex items-center justify-between">
-          <button
+          <Button
+            variant="outline"
+            size="md"
             onClick={handlePreviousQuestion}
             disabled={currentQuestion === 0}
-            className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+            icon={<Icon name="chevronLeft" size="sm" />}
           >
-            ◀️ Previous Question
-          </button>
+            Previous Question
+          </Button>
 
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <Badge variant="info" size="sm">
             {currentQuestion + 1} of {data.questions.length}
-          </span>
+          </Badge>
 
-          <button
+          <Button
+            variant="primary"
+            size="md"
             onClick={handleNextQuestion}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            icon={<Icon name="chevronRight" size="sm" />}
           >
             {currentQuestion === data.questions.length - 1
               ? "Finish Quiz"
-              : "Next Question"}{" "}
-            ▶️
-          </button>
+              : "Next Question"}
+          </Button>
         </div>
       )}
     </div>

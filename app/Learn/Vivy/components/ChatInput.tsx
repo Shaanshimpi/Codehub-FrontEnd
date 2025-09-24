@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Send, Settings } from "lucide-react"
-import { AIModel } from "../constants/models"
+import { AIModel, getModelIcon } from "../constants/models"
 import { ModelSelector } from "./ModelSelector"
 
 interface ChatInputProps {
@@ -12,6 +12,7 @@ interface ChatInputProps {
   isLoading: boolean
   selectedModel: AIModel
   onModelChange: (model: AIModel) => void
+  onRequestLogin?: () => void
 }
 
 export function ChatInput({
@@ -21,6 +22,7 @@ export function ChatInput({
   isLoading,
   selectedModel,
   onModelChange,
+  onRequestLogin,
 }: ChatInputProps) {
   const [showModelSelector, setShowModelSelector] = useState(false)
 
@@ -46,6 +48,7 @@ export function ChatInput({
                   setShowModelSelector(false)
                 }}
                 disabled={isLoading}
+                onRequestLogin={onRequestLogin}
               />
             </div>
           </div>
@@ -76,7 +79,8 @@ export function ChatInput({
                 <div className="hidden items-center gap-1 rounded-lg border border-slate-200/50 bg-slate-100/50 px-2 py-2 dark:border-slate-600/50 dark:bg-slate-700/50 sm:flex">
                   <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
                   <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
-                    {selectedModel.icon} {selectedModel.name}
+                    {getModelIcon(selectedModel) || "🤖"}{" "}
+                    {selectedModel?.name || "Select Model"}
                   </span>
                 </div>
               </div>

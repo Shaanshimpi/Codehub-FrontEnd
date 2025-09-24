@@ -1,8 +1,20 @@
 // Re-export all types from individual modules
 export * from "./user"
-export * from "./conversation"
 export * from "./api"
-export * from "./models"
+
+// Chat message interface
+export interface Message {
+  id: string
+  role: "user" | "assistant" | "system"
+  content: string
+  timestamp: Date
+  model?: string
+  tokens?: {
+    prompt: number
+    completion: number
+    total: number
+  }
+}
 
 // Common utility types
 export interface LoadingState {
@@ -31,20 +43,9 @@ export interface ChatUIState {
   inputValue: string
 }
 
-export interface ConversationUIState {
-  selectedConversationId: string | null
-  isCreating: boolean
-  isDeleting: boolean
-  isRenaming: boolean
-}
-
 // Event types
 export interface ChatEvent {
-  type:
-    | "message_sent"
-    | "message_received"
-    | "conversation_created"
-    | "conversation_updated"
+  type: "message_sent" | "message_received"
   payload: any
   timestamp: string
 }

@@ -2,13 +2,13 @@
 export * from "./APIService"
 export * from "./StorageService"
 export * from "./UserService"
-export * from "./ConversationService"
+export * from "./ModelService"
 
 // Service instances
 export { apiService } from "./APIService"
 export { storageService } from "./StorageService"
 export { userService } from "./UserService"
-export { conversationService } from "./ConversationService"
+export { modelService } from "./ModelService"
 
 /**
  * Initialize all services
@@ -16,6 +16,7 @@ export { conversationService } from "./ConversationService"
 export async function initializeServices(): Promise<void> {
   try {
     // Initialize user service first (loads user session)
+    const { userService } = await import("./UserService")
     await userService.initialize()
 
     console.log("✅ Services initialized successfully")
@@ -40,6 +41,10 @@ export async function healthCheck(): Promise<{
   }
 
   try {
+    const { storageService } = await import("./StorageService")
+    const { apiService } = await import("./APIService")
+    const { userService } = await import("./UserService")
+
     // Test storage
     results.storage = storageService.isAvailable()
 

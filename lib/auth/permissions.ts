@@ -8,6 +8,15 @@ export const PERMISSIONS = {
     canDeleteExercises: false,
     canManageUsers: false,
     canViewAnalytics: false,
+    canAccessPremiumModels: false,
+  },
+  gold: {
+    canAccessAdmin: false,
+    canEditExercises: false,
+    canDeleteExercises: false,
+    canManageUsers: false,
+    canViewAnalytics: false,
+    canAccessPremiumModels: true,
   },
   editor: {
     canAccessAdmin: true,
@@ -15,6 +24,7 @@ export const PERMISSIONS = {
     canDeleteExercises: true,
     canManageUsers: false,
     canViewAnalytics: true,
+    canAccessPremiumModels: true,
   },
   admin: {
     canAccessAdmin: true,
@@ -22,6 +32,7 @@ export const PERMISSIONS = {
     canDeleteExercises: true,
     canManageUsers: true,
     canViewAnalytics: true,
+    canAccessPremiumModels: true,
   },
 } as const;
 
@@ -86,11 +97,20 @@ export const getUserDisplayName = (user: User | null): string => {
 };
 
 /**
+ * Check if user can access premium AI models
+ */
+export const canAccessPremiumModels = (user: User | null): boolean => {
+  if (!user?.isActive) return false;
+  return hasPermission(user.role, "canAccessPremiumModels");
+};
+
+/**
  * Get role display name
  */
 export const getRoleDisplayName = (role: UserRole): string => {
   const roleNames = {
     user: "User",
+    gold: "Gold Member",
     editor: "Editor",
     admin: "Administrator",
   };

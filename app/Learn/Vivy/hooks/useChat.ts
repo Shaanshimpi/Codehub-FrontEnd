@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react"
+import { AIModel } from "../constants/models"
 import { useChatStore } from "../store"
-import { AIModel } from "../types"
 import { scrollToBottom } from "../utils"
 
 /**
@@ -35,9 +35,15 @@ export function useChat() {
     clearError,
     createUserMessage,
     createAssistantMessage,
+    initialize,
   } = useChatStore()
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Initialize on first load
+  useEffect(() => {
+    initialize()
+  }, [initialize])
 
   // Auto-scroll when messages change
   useEffect(() => {
