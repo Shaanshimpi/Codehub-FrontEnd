@@ -175,7 +175,7 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                       {languages.map((language) => (
                         <Link
                           key={language.slug}
-                          href={`/${baseSegment}/${language.slug}`}
+                          href={`/${baseSegment}/Tutorials/${language.slug}`}
                           className="group flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-blue-50 dark:text-slate-300 dark:hover:bg-slate-700/50"
                           onClick={() => setIsTutorialsOpen(false)}
                         >
@@ -455,7 +455,7 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                 {languages.map((language) => (
                   <Link
                     key={language.slug}
-                    href={`/${baseSegment}/${language.slug}`}
+                    href={`/${baseSegment}/Tutorials/${language.slug}`}
                     className="flex items-center space-x-3 rounded-lg px-4 py-3 text-slate-100 transition-all duration-200 hover:bg-white/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >

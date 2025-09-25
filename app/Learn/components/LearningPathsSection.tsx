@@ -20,7 +20,7 @@ const LearningPathsSection = () => {
 
         <div className="grid gap-8 md:grid-cols-2">
           {/* Tutorials Path */}
-          <Link href="/learn/Tutorials" className="group block">
+          <Link href="/Learn/Tutorials" className="group block">
             <div className="h-full rounded-xl border-2 border-blue-600/30 bg-gradient-to-br from-blue-900/50 to-blue-800/30 p-8 transition-all duration-300 hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/20 dark:from-blue-900/30 dark:to-blue-800/20">
               <div className="mb-6 flex items-center justify-between">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-600 dark:bg-blue-500">

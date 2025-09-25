@@ -23,7 +23,7 @@ const TutorialLanguageHeader = ({ language }: TutorialLanguageHeaderProps) => {
   const parentPath = getParentPath()
 
   return (
-    <div className="bg-gradient-to-br from-blue-600 to-blue-800 px-6 py-[8vh] text-white dark:from-slate-800 dark:to-slate-900 dark:text-gray-100">
+    <div className="bg-gradient-to-br from-blue-600 to-blue-800 px-6 pb-[8vh] pt-[calc(8vh+4rem)] text-white dark:from-slate-800 dark:to-slate-900 dark:text-gray-100">
       <div className="mx-auto max-w-6xl">
         <Link
           href={parentPath}

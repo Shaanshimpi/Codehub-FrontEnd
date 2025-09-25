@@ -2,7 +2,7 @@ import React from "react"
 
 const IntroSection = () => {
   return (
-    <section className="bg-gradient-to-br from-blue-600 to-blue-800 px-6 py-20 text-white dark:from-slate-800 dark:to-slate-900">
+    <section className="bg-gradient-to-br from-blue-600 to-blue-800 px-6 pb-20 pt-36 text-white dark:from-slate-800 dark:to-slate-900">
       <div className="mx-auto max-w-4xl text-center">
         <h1 className="mb-6 bg-gradient-to-r from-sky-100 to-white bg-clip-text text-5xl font-bold text-transparent dark:from-sky-200 dark:to-slate-100 md:text-6xl">
           Learn Programming

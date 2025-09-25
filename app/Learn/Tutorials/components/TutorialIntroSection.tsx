@@ -6,7 +6,7 @@ import Link from "next/link"
 
 const TutorialIntroSection = () => {
   return (
-    <section className="bg-gradient-to-br from-blue-600 to-blue-800 px-6 py-20 text-white dark:from-slate-800 dark:to-slate-900">
+    <section className="bg-gradient-to-br from-blue-600 to-blue-800 px-6 pb-20 pt-36 text-white dark:from-slate-800 dark:to-slate-900">
       <div className="mx-auto max-w-4xl">
         <div className="mb-6 text-left">
           <Link

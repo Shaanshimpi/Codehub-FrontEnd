@@ -32,7 +32,10 @@ const LanguageCard = ({ language }: LanguageCardProps) => {
   const slug = language.slug || createSlug(language.title)
 
   return (
-    <Link href={`${pathname}/${slug}`} className="group relative block">
+    <Link
+      href={`${pathname}/Tutorials/${slug}`}
+      className="group relative block"
+    >
       <div className="cursor-pointer rounded-xl border-2 border-transparent bg-sky-50 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-blue-600 hover:shadow-xl hover:shadow-blue-600/20 dark:bg-slate-800 dark:hover:border-blue-400 dark:hover:shadow-blue-400/20">
         <div className="flex flex-col items-center space-y-4 text-center">
           <div className="relative flex h-16 w-16 items-center justify-center">

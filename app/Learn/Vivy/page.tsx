@@ -62,13 +62,6 @@ export default function VivyChat() {
     <div className="flex h-full bg-gradient-to-br from-slate-50 to-gray-100 dark:from-slate-900 dark:to-slate-800">
       {/* Main Chat Area */}
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* Header */}
-        <div className="border-b border-gray-200/50 p-4 dark:border-slate-700/50">
-          <h1 className="font-medium text-slate-900 dark:text-slate-100">
-            Vivy AI Chat
-          </h1>
-        </div>
-
         {/* Messages Area */}
         <div className="min-h-0 flex-1">
           <MessagesContainer
