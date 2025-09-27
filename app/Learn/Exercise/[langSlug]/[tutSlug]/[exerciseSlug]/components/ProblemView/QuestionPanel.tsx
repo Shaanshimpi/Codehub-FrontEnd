@@ -10,6 +10,8 @@ import { ChevronDown, ChevronUp, Lightbulb, Tag, Target } from "lucide-react"
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ProblemView/QuestionPanel.tsx
 
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ProblemView/QuestionPanel.tsx
+
 interface QuestionPanelProps {
   exercise: any
   language: any
@@ -82,14 +84,20 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
           {exercise.learning_objectives?.map(
             (objective: any, index: number) => (
               <div
-                key={objective.id || index}
+                key={
+                  typeof objective === "string"
+                    ? `${objective}-${index}`
+                    : objective.id || index
+                }
                 className="flex items-start gap-2"
               >
                 <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-white dark:bg-blue-500">
                   <span className="text-xs font-bold">{index + 1}</span>
                 </div>
                 <p className="text-xs leading-relaxed text-slate-700 dark:text-slate-300">
-                  {objective.objective}
+                  {typeof objective === "string"
+                    ? objective
+                    : objective.objective}
                 </p>
               </div>
             )
@@ -104,12 +112,14 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
           Topics
         </h2>
         <div className="flex flex-wrap gap-1">
-          {exercise.tags?.map((tagObj: any, index: number) => (
+          {exercise.tags?.map((tag: any, index: number) => (
             <span
-              key={tagObj.id || index}
+              key={
+                typeof tag === "string" ? `${tag}-${index}` : tag.id || index
+              }
               className="inline-flex items-center gap-1 rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
             >
-              {tagObj.tag}
+              {typeof tag === "string" ? tag : tag.tag}
             </span>
           ))}
         </div>

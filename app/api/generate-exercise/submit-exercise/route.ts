@@ -9,12 +9,7 @@ export async function POST(request: NextRequest) {
     console.log("elements structure:", JSON.stringify(exerciseData, null, 5))
 
     // Validate required fields
-    const requiredFields = [
-      "title_en",
-      "slug",
-      "programmingLanguage",
-      "tutorial",
-    ]
+    const requiredFields = ["title", "slug", "programmingLanguage", "tutorial"]
     const missingFields = requiredFields.filter((field) => !exerciseData[field])
 
     if (missingFields.length > 0) {
@@ -31,6 +26,8 @@ export async function POST(request: NextRequest) {
     // but we'll ensure proper structure here as well
     const payloadData = {
       // Basic fields
+      title: exerciseData.title,
+      description: exerciseData.description || "",
       index: exerciseData.index || 1,
       slug: exerciseData.slug,
 
@@ -43,18 +40,9 @@ export async function POST(request: NextRequest) {
       learning_objectives: exerciseData.learning_objectives || [],
       tags: exerciseData.tags || [],
 
-      // Multi-language titles
-      title_en: exerciseData.title_en,
-      title_hi: exerciseData.title_hi || "",
-      title_mr: exerciseData.title_mr || "",
-
-      // Multi-language hints and explanations (already transformed)
-      hints_en: exerciseData.hints_en || [],
-      hints_hi: exerciseData.hints_hi || [],
-      hints_mr: exerciseData.hints_mr || [],
-      explanation_en: exerciseData.explanation_en || [],
-      explanation_hi: exerciseData.explanation_hi || [],
-      explanation_mr: exerciseData.explanation_mr || [],
+      // Single language hints and explanations (already transformed)
+      hints: exerciseData.hints || [],
+      explanation: exerciseData.explanation || [],
 
       // Visual elements as grouped object matching Exercise.ts schema
       visual_elements: {

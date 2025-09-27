@@ -1,565 +1,526 @@
-/* eslint-disable jsx-a11y/label-has-associated-control, no-console */
 "use client"
 
-import React, { useEffect, useState } from "react"
-import { deleteExercise, deleteMultipleExercises } from "@/lib/deleteData"
-import { getAllExercises } from "@/lib/getData"
+import React, { useMemo, useState } from "react"
+import { Language } from "@/app/Learn/types/TutorialTypes"
 import {
-  AlertTriangle,
-  BookOpen,
-  Code,
+  ChevronDown,
+  ChevronUp,
   Edit,
-  Eye,
+  Filter,
+  Loader2,
   Lock,
+  Plus,
+  Search,
+  Sparkles,
   Trash2,
   Unlock,
+  X,
 } from "lucide-react"
-import { DIFFICULTY_LEVELS } from "../constants"
-import { ExerciseFilters } from "../hooks/useExerciseFilters"
-import { AdminExercise } from "../types"
-import EditExerciseModal from "./EditExerciseModal"
-import ExercisePreview from "./ExercisePreview"
-
-/* eslint-disable jsx-a11y/label-has-associated-control, no-console */
+import { Exercise, useExercises } from "../hooks/useExercises"
 
 interface ExerciseListProps {
-  filters: ExerciseFilters
-  refreshTrigger?: number
+  languages: Language[]
+  onEdit: (exercise: Exercise) => void
+  onCreate: () => void
+  onAIGenerate?: () => void
 }
 
+type SortField =
+  | "title"
+  | "difficultyLevel"
+  | "createdAt"
+  | "updatedAt"
+  | "index"
+type SortOrder = "asc" | "desc"
+
 const ExerciseList: React.FC<ExerciseListProps> = ({
-  filters,
-  refreshTrigger,
+  languages,
+  onEdit,
+  onCreate,
+  onAIGenerate,
 }) => {
-  const [exercises, setExercises] = useState<AdminExercise[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selectedExercises, setSelectedExercises] = useState<number[]>([])
-  const [previewExercise, setPreviewExercise] = useState<AdminExercise | null>(
-    null
+  // State management
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("all")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [sortField, setSortField] = useState<SortField>("index")
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc")
+  const [selectedExercises, setSelectedExercises] = useState<Set<string>>(
+    new Set()
   )
-  const [editingExercise, setEditingExercise] = useState<AdminExercise | null>(
-    null
-  )
-  const [deleteConfirm, setDeleteConfirm] = useState<{
-    exercise: AdminExercise | null
-    isMultiple: boolean
-  }>({ exercise: null, isMultiple: false })
-  const [deleting, setDeleting] = useState(false)
+  const [showBulkActions, setShowBulkActions] = useState(false)
+  const [bulkActionLoading, setBulkActionLoading] = useState(false)
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(10)
+  // Build sort string for API
+  const sortString = useMemo(() => {
+    return `${sortOrder === "desc" ? "-" : ""}${sortField}`
+  }, [sortField, sortOrder])
 
-  // Load exercises from database
-  useEffect(() => {
-    const fetchExercises = async () => {
-      try {
-        console.log("🔄 Fetching exercises...")
-        const exercisesData = await getAllExercises()
-        console.log("✅ Exercises fetched:", exercisesData)
-        setExercises(exercisesData || [])
-      } catch (error) {
-        console.error("❌ Error loading exercises:", error)
-        setExercises([])
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchExercises()
-  }, [refreshTrigger])
-
-  const filteredExercises = exercises.filter((exercise) => {
-    const title = exercise.title_en?.toLowerCase() || ""
-    const language = exercise.programmingLanguage?.title?.toLowerCase() || ""
-    const tutorial = exercise.tutorial?.title?.toLowerCase() || ""
-    const search = filters.searchTerm.toLowerCase()
-
-    // Search filter
-    const matchesSearch =
-      title.includes(search) ||
-      language.includes(search) ||
-      tutorial.includes(search)
-
-    // Language filter
-    const matchesLanguage =
-      filters.selectedLanguage === null ||
-      exercise.programmingLanguage?.id === filters.selectedLanguage
-
-    // Tutorial filter
-    const matchesTutorial =
-      filters.selectedTutorial === null ||
-      exercise.tutorial?.id === filters.selectedTutorial
-
-    // Difficulty filter
-    const matchesDifficulty =
-      filters.difficultyLevel === null ||
-      exercise.difficultyLevel === filters.difficultyLevel
-
-    // Status filter
-    const matchesStatus =
-      filters.statusFilter === null ||
-      (filters.statusFilter === "free" && !exercise.isLocked) ||
-      (filters.statusFilter === "premium" && exercise.isLocked)
-
-    return (
-      matchesSearch &&
-      matchesLanguage &&
-      matchesTutorial &&
-      matchesDifficulty &&
-      matchesStatus
-    )
+  // Fetch exercises with current filters
+  const {
+    exercises,
+    loading,
+    error,
+    totalDocs,
+    refetch,
+    deleteExercise,
+    bulkDelete,
+    bulkUpdate,
+  } = useExercises({
+    programmingLanguage:
+      selectedLanguage === "all" ? undefined : selectedLanguage,
+    search: searchQuery || undefined,
+    sort: sortString,
+    limit: 50, // Show more exercises per page for admin
   })
 
-  // Pagination logic
-  const totalPages = Math.ceil(filteredExercises.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const paginatedExercises = filteredExercises.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  )
-
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1)
-  }, [filters])
-
-  const getDifficultyDisplay = (level: number) => {
-    const difficulty = DIFFICULTY_LEVELS.find((d) => d.value === level)
-    return (
-      difficulty || { label: "Unknown", color: "bg-slate-100 text-slate-800" }
-    )
+  // Handle sorting
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+    } else {
+      setSortField(field)
+      setSortOrder("asc")
+    }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-  }
-
-  const handleSelectExercise = (id: number) => {
-    setSelectedExercises((prev) =>
-      prev.includes(id)
-        ? prev.filter((exerciseId) => exerciseId !== id)
-        : [...prev, id]
-    )
+  // Handle exercise selection
+  const handleSelectExercise = (exerciseId: string) => {
+    const newSelected = new Set(selectedExercises)
+    if (newSelected.has(exerciseId)) {
+      newSelected.delete(exerciseId)
+    } else {
+      newSelected.add(exerciseId)
+    }
+    setSelectedExercises(newSelected)
   }
 
   const handleSelectAll = () => {
-    if (selectedExercises.length === paginatedExercises.length) {
-      setSelectedExercises([])
+    if (selectedExercises.size === exercises.length) {
+      setSelectedExercises(new Set())
     } else {
-      setSelectedExercises(paginatedExercises.map((exercise) => exercise.id))
+      setSelectedExercises(new Set(exercises.map((e) => e.id)))
     }
   }
 
-  const handlePreviewExercise = (exercise: AdminExercise) => {
-    setPreviewExercise(exercise)
-  }
-
-  const handleClosePreview = () => {
-    setPreviewExercise(null)
-  }
-
-  const handleEditExercise = (exercise: AdminExercise) => {
-    setEditingExercise(exercise)
-  }
-
-  const handleCloseEdit = () => {
-    setEditingExercise(null)
-  }
-
-  const handleSaveEdit = async (updatedExercise: any) => {
-    try {
-      console.log("Saving updated exercise:", updatedExercise)
-
-      // Update local state
-      setExercises((prev) =>
-        prev.map((ex) =>
-          ex.id === updatedExercise.id ? { ...ex, ...updatedExercise } : ex
-        )
-      )
-
-      handleCloseEdit()
-    } catch (error) {
-      console.error("Error updating exercise:", error)
-    }
-  }
-
-  const handleDeleteConfirm = async () => {
-    setDeleting(true)
-    try {
-      if (deleteConfirm.isMultiple) {
-        // Delete multiple exercises
-        console.log("Deleting exercises:", selectedExercises)
-
-        const results = await deleteMultipleExercises(selectedExercises)
-
-        // Update local state - remove only successfully deleted exercises
-        setExercises((prev) =>
-          prev.filter((ex) => !results.successful.includes(ex.id))
-        )
-        setSelectedExercises([])
-
-        if (results.failed.length > 0) {
-          const failedCount = results.failed.length
-          const successCount = results.successful.length
-          alert(
-            `⚠️ Partial success: ${successCount} exercise(s) deleted, ${failedCount} failed. Check console for details.`
-          )
-        } else {
-          // Show success message
-          console.log(
-            `✅ Successfully deleted ${results.successful.length} exercises`
-          )
-        }
-      } else if (deleteConfirm.exercise) {
-        // Delete single exercise
-        console.log("Deleting exercise:", deleteConfirm.exercise.id)
-
-        await deleteExercise(deleteConfirm.exercise.id)
-
-        // Update local state
-        setExercises((prev) =>
-          prev.filter((ex) => ex.id !== deleteConfirm.exercise!.id)
-        )
-
-        console.log(`✅ Deleted exercise: ${deleteConfirm.exercise.title_en}`)
+  // Handle individual actions
+  const handleDelete = async (exercise: Exercise) => {
+    if (confirm(`Are you sure you want to delete "${exercise.title}"?`)) {
+      try {
+        await deleteExercise(exercise.id)
+      } catch (err) {
+        alert("Failed to delete exercise")
       }
-    } catch (error) {
-      console.error("❌ Error deleting exercise(s):", error)
-      alert(
-        `❌ Failed to delete exercise(s). ${error instanceof Error ? error.message : "Unknown error occurred"}`
-      )
-    } finally {
-      setDeleting(false)
-      setDeleteConfirm({ exercise: null, isMultiple: false })
     }
   }
 
-  const handleDeleteCancel = () => {
-    setDeleteConfirm({ exercise: null, isMultiple: false })
+  // Handle bulk actions
+  const handleBulkDelete = async () => {
+    if (selectedExercises.size === 0) return
+
+    if (
+      confirm(
+        `Are you sure you want to delete ${selectedExercises.size} exercise(s)?`
+      )
+    ) {
+      setBulkActionLoading(true)
+      try {
+        await bulkDelete(Array.from(selectedExercises))
+        setSelectedExercises(new Set())
+        setShowBulkActions(false)
+      } catch (err) {
+        alert("Failed to delete exercises")
+      } finally {
+        setBulkActionLoading(false)
+      }
+    }
+  }
+
+  const handleBulkLockToggle = async (locked: boolean) => {
+    if (selectedExercises.size === 0) return
+
+    setBulkActionLoading(true)
+    try {
+      await bulkUpdate(Array.from(selectedExercises), { isLocked: locked })
+      setSelectedExercises(new Set())
+      setShowBulkActions(false)
+    } catch (err) {
+      alert("Failed to update exercises")
+    } finally {
+      setBulkActionLoading(false)
+    }
+  }
+
+  const getDifficultyLabel = (difficultyLevel: number) => {
+    switch (difficultyLevel) {
+      case 1:
+        return "1 - Beginner"
+      case 2:
+        return "2 - Intermediate"
+      case 3:
+        return "3 - Advanced"
+      case 4:
+        return "4 - Expert"
+      case 5:
+        return "5 - Master"
+      default:
+        return "Unknown"
+    }
+  }
+
+  const getDifficultyColor = (difficultyLevel: number) => {
+    switch (difficultyLevel) {
+      case 1:
+        return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+      case 2:
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
+      case 3:
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
+      case 4:
+        return "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400"
+      case 5:
+        return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400"
+    }
+  }
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) return null
+    return sortOrder === "asc" ? (
+      <ChevronUp className="h-4 w-4" />
+    ) : (
+      <ChevronDown className="h-4 w-4" />
+    )
   }
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="text-center">
-          <div className="mb-2 h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600" />
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Loading exercises...
-          </p>
-        </div>
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <span className="ml-2 text-slate-600 dark:text-slate-400">
+          Loading exercises...
+        </span>
       </div>
     )
   }
 
-  if (exercises.length === 0) {
+  if (error) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="text-center">
-          <BookOpen className="mx-auto mb-3 h-12 w-12 text-slate-400" />
-          <h3 className="mb-1 text-sm font-medium text-slate-900 dark:text-white">
-            No exercises yet
-          </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Create your first exercise to get started.
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  if (filteredExercises.length === 0) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="text-center">
-          <AlertTriangle className="mx-auto mb-3 h-12 w-12 text-slate-400" />
-          <h3 className="mb-1 text-sm font-medium text-slate-900 dark:text-white">
-            No exercises match your filters
-          </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Try adjusting your search or filter criteria.
-          </p>
-        </div>
+      <div className="rounded-lg bg-red-50 p-4 dark:bg-red-900/20">
+        <p className="text-red-800 dark:text-red-200">Error: {error}</p>
+        <button
+          onClick={refetch}
+          className="mt-2 text-sm text-red-600 hover:text-red-700 dark:text-red-400"
+        >
+          Try again
+        </button>
       </div>
     )
   }
 
   return (
-    <div className="p-4">
-      {/* Results Summary */}
-      <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-slate-600 dark:text-slate-300">
-          Showing {startIndex + 1}-
-          {Math.min(startIndex + itemsPerPage, filteredExercises.length)} of{" "}
-          {filteredExercises.length} exercises
-        </p>
-
-        {selectedExercises.length > 0 && (
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-600 dark:text-slate-300">
-              {selectedExercises.length} selected
-            </span>
+    <div className="space-y-6">
+      {/* Header with Create Buttons */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+            Exercises ({totalDocs})
+          </h2>
+          <p className="text-slate-600 dark:text-slate-400">
+            Manage programming exercises and challenges
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {onAIGenerate && (
             <button
-              onClick={() =>
-                setDeleteConfirm({ exercise: null, isMultiple: true })
-              }
-              className="flex items-center gap-1 rounded-md bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700"
+              onClick={onAIGenerate}
+              className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
             >
-              <Trash2 className="h-3 w-3" />
-              Delete Selected
+              <Sparkles className="h-4 w-4" />
+              AI Generate
             </button>
-          </div>
+          )}
+          <button
+            onClick={onCreate}
+            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            <Plus className="h-4 w-4" />
+            Create Exercise
+          </button>
+        </div>
+      </div>
+
+      {/* Language Tabs */}
+      <div className="border-b border-slate-200 dark:border-slate-700">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setSelectedLanguage("all")}
+            className={`border-b-2 px-1 py-2 text-sm font-medium ${
+              selectedLanguage === "all"
+                ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+            }`}
+          >
+            All Languages
+          </button>
+          {languages.map((language) => (
+            <button
+              key={language.id}
+              onClick={() => setSelectedLanguage(language.id.toString())}
+              className={`border-b-2 px-1 py-2 text-sm font-medium ${
+                selectedLanguage === language.id.toString()
+                  ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                  : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+              }`}
+            >
+              {language.title}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search exercises..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full rounded-lg border border-slate-300 py-2 pl-10 pr-4 text-slate-900 placeholder-slate-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
+          />
+        </div>
+
+        {selectedExercises.size > 0 && (
+          <button
+            onClick={() => setShowBulkActions(!showBulkActions)}
+            className="flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+          >
+            <Filter className="h-4 w-4" />
+            Bulk Actions ({selectedExercises.size})
+          </button>
         )}
       </div>
 
+      {/* Bulk Actions Panel */}
+      {showBulkActions && selectedExercises.size > 0 && (
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
+          <h3 className="mb-3 text-sm font-medium text-slate-900 dark:text-white">
+            Bulk Actions ({selectedExercises.size} selected)
+          </h3>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleBulkLockToggle(true)}
+              disabled={bulkActionLoading}
+              className="flex items-center gap-2 rounded-lg bg-yellow-600 px-3 py-2 text-sm font-medium text-white hover:bg-yellow-700 disabled:opacity-50"
+            >
+              <Lock className="h-4 w-4" />
+              Lock Selected
+            </button>
+            <button
+              onClick={() => handleBulkLockToggle(false)}
+              disabled={bulkActionLoading}
+              className="flex items-center gap-2 rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+            >
+              <Unlock className="h-4 w-4" />
+              Unlock Selected
+            </button>
+            <button
+              onClick={handleBulkDelete}
+              disabled={bulkActionLoading}
+              className="flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete Selected
+            </button>
+            <button
+              onClick={() => setShowBulkActions(false)}
+              disabled={bulkActionLoading}
+              className="flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+            >
+              <X className="h-4 w-4" />
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Exercise Table */}
       <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
-        <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-          <thead className="bg-slate-50 dark:bg-slate-800">
-            <tr>
-              <th className="w-12 px-4 py-3">
-                <input
-                  type="checkbox"
-                  checked={
-                    paginatedExercises.length > 0 &&
-                    selectedExercises.length === paginatedExercises.length
-                  }
-                  onChange={handleSelectAll}
-                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                />
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Title
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Difficulty
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Language
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Tutorial
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Status
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Created
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-200 bg-white dark:divide-slate-700 dark:bg-slate-900">
-            {paginatedExercises.map((exercise) => {
-              const difficulty = getDifficultyDisplay(exercise.difficultyLevel)
-
-              return (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+            <thead className="bg-slate-50 dark:bg-slate-800">
+              <tr>
+                <th className="px-6 py-3 text-left">
+                  <input
+                    type="checkbox"
+                    checked={
+                      exercises.length > 0 &&
+                      selectedExercises.size === exercises.length
+                    }
+                    onChange={handleSelectAll}
+                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600"
+                  />
+                </th>
+                <th
+                  className="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                  onClick={() => handleSort("index")}
+                >
+                  <div className="flex items-center gap-1">
+                    Order
+                    <SortIcon field="index" />
+                  </div>
+                </th>
+                <th
+                  className="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                  onClick={() => handleSort("title")}
+                >
+                  <div className="flex items-center gap-1">
+                    Title
+                    <SortIcon field="title" />
+                  </div>
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Language
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Tutorial
+                </th>
+                <th
+                  className="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                  onClick={() => handleSort("difficultyLevel")}
+                >
+                  <div className="flex items-center gap-1">
+                    Difficulty
+                    <SortIcon field="difficultyLevel" />
+                  </div>
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Status
+                </th>
+                <th
+                  className="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                  onClick={() => handleSort("updatedAt")}
+                >
+                  <div className="flex items-center gap-1">
+                    Updated
+                    <SortIcon field="updatedAt" />
+                  </div>
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200 bg-white dark:divide-slate-700 dark:bg-slate-900">
+              {exercises.map((exercise) => (
                 <tr
                   key={exercise.id}
                   className="hover:bg-slate-50 dark:hover:bg-slate-800"
                 >
-                  <td className="px-4 py-3">
+                  <td className="px-6 py-4">
                     <input
                       type="checkbox"
-                      checked={selectedExercises.includes(exercise.id)}
+                      checked={selectedExercises.has(exercise.id)}
                       onChange={() => handleSelectExercise(exercise.id)}
-                      className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600"
                     />
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center">
-                      <Code className="mr-2 h-4 w-4 text-slate-400" />
-                      <div>
-                        <div className="text-sm font-medium text-slate-900 dark:text-white">
-                          {exercise.title_en}
-                        </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400">
-                          /{exercise.slug}
-                        </div>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">
+                    {exercise.index}
+                  </td>
+                  <td className="px-6 py-4">
+                    <div>
+                      <div className="text-sm font-medium text-slate-900 dark:text-white">
+                        {exercise.title}
+                      </div>
+                      <div className="max-w-xs truncate text-sm text-slate-500 dark:text-slate-400">
+                        {exercise.description}
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${difficulty.color}`}
-                    >
-                      {difficulty.label}
+                  <td className="whitespace-nowrap px-6 py-4">
+                    <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
+                      {exercise.programmingLanguage?.title}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="text-sm text-slate-900 dark:text-white">
-                      {exercise.programmingLanguage?.title}
-                    </div>
+                  <td className="whitespace-nowrap px-6 py-4">
+                    <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
+                      {exercise.tutorial?.title || "No Tutorial"}
+                    </span>
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="text-sm text-slate-900 dark:text-white">
-                      {exercise.tutorial?.title}
-                    </div>
+                  <td className="whitespace-nowrap px-6 py-4">
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getDifficultyColor(exercise.difficultyLevel)}`}
+                    >
+                      {getDifficultyLabel(exercise.difficultyLevel)}
+                    </span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="whitespace-nowrap px-6 py-4">
                     {exercise.isLocked ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/20 dark:text-red-400">
                         <Lock className="h-3 w-3" />
-                        Premium
+                        Locked
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800 dark:bg-green-900/20 dark:text-green-400">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">
                         <Unlock className="h-3 w-3" />
-                        Free
+                        Open
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="text-sm text-slate-500 dark:text-slate-400">
-                      {formatDate(exercise.createdAt)}
-                    </div>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
+                    {new Date(exercise.updatedAt).toLocaleDateString()}
                   </td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex items-center justify-end gap-1">
+                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                    <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => handlePreviewExercise(exercise)}
-                        className="rounded p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400"
-                        title="Preview"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleEditExercise(exercise)}
-                        className="rounded p-1 text-slate-400 hover:text-green-600 dark:hover:text-green-400"
-                        title="Edit"
+                        onClick={() => onEdit(exercise)}
+                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                       >
                         <Edit className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() =>
-                          setDeleteConfirm({ exercise, isMultiple: false })
-                        }
-                        className="rounded p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400"
-                        title="Delete"
+                        onClick={() => handleDelete(exercise)}
+                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
                   </td>
                 </tr>
-              )
-            })}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-slate-600 dark:text-slate-300">
-            Page {currentPage} of {totalPages}
-          </div>
-          <div className="flex gap-1">
-            <button
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-              className="rounded border border-slate-300 px-3 py-1 text-sm disabled:opacity-50 dark:border-slate-600"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() =>
-                setCurrentPage(Math.min(totalPages, currentPage + 1))
-              }
-              disabled={currentPage === totalPages}
-              className="rounded border border-slate-300 px-3 py-1 text-sm disabled:opacity-50 dark:border-slate-600"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Preview Modal */}
-      {previewExercise && (
-        <ExercisePreview
-          exerciseData={previewExercise}
-          onClose={handleClosePreview}
-          onSave={() => {}}
-          onEdit={() => {
-            handleClosePreview()
-            handleEditExercise(previewExercise)
-          }}
-          isLoading={false}
-        />
-      )}
-
-      {/* Edit Modal */}
-      {editingExercise && (
-        <EditExerciseModal
-          exercise={editingExercise}
-          onClose={handleCloseEdit}
-          onSave={handleSaveEdit}
-        />
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {(deleteConfirm.exercise || deleteConfirm.isMultiple) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-slate-800">
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
-                <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                  {deleteConfirm.isMultiple
-                    ? "Delete Exercises"
-                    : "Delete Exercise"}
-                </h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  This action cannot be undone.
-                </p>
-              </div>
-            </div>
-
-            <p className="mb-6 text-sm text-slate-600 dark:text-slate-300">
-              {deleteConfirm.isMultiple
-                ? `Are you sure you want to delete ${selectedExercises.length} selected exercise${selectedExercises.length === 1 ? "" : "s"}?`
-                : `Are you sure you want to delete "${deleteConfirm.exercise?.title_en}"?`}
-            </p>
-
-            <div className="flex items-center justify-end gap-3">
+      {/* Empty State */}
+      {exercises.length === 0 && (
+        <div className="py-12 text-center">
+          <p className="text-slate-500 dark:text-slate-400">
+            {searchQuery || selectedLanguage !== "all"
+              ? "No exercises found matching your filters."
+              : "No exercises created yet."}
+          </p>
+          <div className="mt-4 flex items-center justify-center gap-2">
+            {onAIGenerate && (
               <button
-                onClick={handleDeleteCancel}
-                disabled={deleting}
-                className="rounded-md border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+                onClick={onAIGenerate}
+                className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
               >
-                Cancel
+                <Sparkles className="h-4 w-4" />
+                Generate with AI
               </button>
-              <button
-                onClick={handleDeleteConfirm}
-                disabled={deleting}
-                className="flex items-center gap-2 rounded-md bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {deleting ? (
-                  <>
-                    <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
-                    Deleting...
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="h-4 w-4" />
-                    {deleteConfirm.isMultiple
-                      ? `Delete ${selectedExercises.length}`
-                      : "Delete"}
-                  </>
-                )}
-              </button>
-            </div>
+            )}
+            <button
+              onClick={onCreate}
+              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              <Plus className="h-4 w-4" />
+              Create Manually
+            </button>
           </div>
         </div>
       )}

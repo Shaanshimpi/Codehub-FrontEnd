@@ -184,20 +184,25 @@ export interface ExplanationItem {
 
 // Updated ExerciseAIData interface with boilerplate_code as required
 export interface ExerciseAIData {
-  title_en: string
-  title_hi: string
-  title_mr: string
+  title: string
+  description: string
+  slug: string
   solution_code: string
   mermaid_diagram: string
-  hints_en: HintItem[]
-  explanation_en: ExplanationItem[]
-  hints_hi: HintItem[]
-  explanation_hi: ExplanationItem[]
-  hints_mr: HintItem[]
-  explanation_mr: ExplanationItem[]
+  hints: HintItem[]
+  explanation: ExplanationItem[]
   boilerplate_code: string
   learning_objectives?: string[]
   tags?: string[]
+  visual_elements?: {
+    execution_steps: any[]
+    concepts: any[]
+  }
+  difficultyLevel?: number
+  programmingLanguage?: string | number
+  tutorial?: string | number
+  index?: number
+  isLocked?: boolean
 }
 
 // Update the getLocalizedContent helper

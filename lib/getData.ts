@@ -207,7 +207,7 @@ export async function generateExercise(
   exclusions?: string,
 ) {
   try {
-    const response = await fetch("/api/generate-exercise", {
+    const response = await fetch("/api/generate-exercise-v2", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -107,8 +107,15 @@ export async function POST(request: NextRequest) {
     console.log("✅ Chat response received successfully")
     console.log("📊 Full AI Response Object:", JSON.stringify(data, null, 2))
 
-    // Extract the response content
-    const content = data.choices?.[0]?.message?.content
+    // Extract the response content - handle both standard content and reasoning models
+    const messageChoice = data.choices?.[0]?.message
+    let content = messageChoice?.content
+
+    // Some models (like reasoning models) put the actual content in the reasoning field
+    if (!content || content.trim() === "") {
+      content = messageChoice?.reasoning
+    }
+
     if (!content) {
       console.error("❌ No content in response:", data)
       return NextResponse.json(

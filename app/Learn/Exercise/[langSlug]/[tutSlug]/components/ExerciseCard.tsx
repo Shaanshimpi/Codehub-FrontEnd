@@ -97,18 +97,18 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, index }) => {
       {/* Content */}
       <div className="flex-1">
         <h3 className="mb-3 line-clamp-2 text-lg font-semibold text-slate-900 transition-colors group-hover:text-blue-600 dark:text-gray-100 dark:group-hover:text-blue-400">
-          {getCleanTitle(exercise.title_en || exercise.title)}
+          {getCleanTitle(exercise.title)}
         </h3>
 
         {/* Tags */}
         {exercise.tags && exercise.tags.length > 0 && (
           <div className="mb-4 flex flex-wrap gap-2">
-            {exercise.tags.slice(0, 3).map((tag: any) => (
+            {exercise.tags.slice(0, 3).map((tag: any, index: number) => (
               <span
-                key={tag.id}
+                key={typeof tag === "string" ? `${tag}-${index}` : tag.id}
                 className="rounded-full bg-blue-50 px-2 py-1 text-xs text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
               >
-                {tag.tag}
+                {typeof tag === "string" ? tag : tag.tag}
               </span>
             ))}
             {exercise.tags.length > 3 && (
@@ -169,7 +169,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, index }) => {
           className="group block cursor-pointer"
           role="button"
           tabIndex={0}
-          aria-label={`Unlock ${getCleanTitle(exercise.title_en || exercise.title)} exercise`}
+          aria-label={`Unlock ${getCleanTitle(exercise.title)} exercise`}
         >
           <CardContent />
         </div>

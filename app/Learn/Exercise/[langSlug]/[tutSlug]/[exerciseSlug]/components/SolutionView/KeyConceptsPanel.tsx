@@ -14,6 +14,8 @@ import {
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/KeyConceptsPanel.tsx
 
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/KeyConceptsPanel.tsx
+
 interface KeyConceptsPanelProps {
   concepts: any[]
   tags: any[]
@@ -57,7 +59,11 @@ const KeyConceptsPanel: React.FC<KeyConceptsPanelProps> = ({
           <div className="space-y-3">
             {objectives.map((objective: any, index: number) => (
               <div
-                key={objective.id || index}
+                key={
+                  typeof objective === "string"
+                    ? `${objective}-${index}`
+                    : objective.id || index
+                }
                 className="flex items-start gap-3"
               >
                 <div className="mt-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
@@ -76,7 +82,9 @@ const KeyConceptsPanel: React.FC<KeyConceptsPanelProps> = ({
                   </svg>
                 </div>
                 <p className="text-sm leading-relaxed text-blue-700 dark:text-blue-300">
-                  {objective.objective}
+                  {typeof objective === "string"
+                    ? objective
+                    : objective.objective}
                 </p>
               </div>
             ))}
@@ -94,13 +102,15 @@ const KeyConceptsPanel: React.FC<KeyConceptsPanelProps> = ({
             </h4>
           </div>
           <div className="flex flex-wrap gap-2">
-            {tags.map((tagObj: any, index: number) => (
+            {tags.map((tag: any, index: number) => (
               <span
-                key={tagObj.id || index}
+                key={
+                  typeof tag === "string" ? `${tag}-${index}` : tag.id || index
+                }
                 className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-3 py-1 text-sm font-medium text-purple-800 dark:bg-purple-900/30 dark:text-purple-200"
               >
                 <Zap className="h-3 w-3" />
-                {tagObj.tag}
+                {typeof tag === "string" ? tag : tag.tag}
               </span>
             ))}
           </div>

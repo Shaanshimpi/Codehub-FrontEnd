@@ -83,13 +83,15 @@ export async function generateMetadata({ params }: ExercisePageProps) {
     }
 
     // Get clean title without HTML tags
-    const cleanTitle = (exercise.title_en || exercise.title || "Exercise")
+    const cleanTitle = (exercise.title || "Exercise")
       .replace(/<[^>]*>/g, "")
       .trim()
     const languageTitle =
       exercise.programmingLanguage?.title || language.title || "Programming"
     const tags =
-      exercise.tags?.map((t: any) => t.tag).join(", ") || "programming, coding"
+      exercise.tags
+        ?.map((t: any) => (typeof t === "string" ? t : t.tag))
+        .join(", ") || "programming, coding"
 
     return {
       title: `${cleanTitle} - ${languageTitle} Exercise`,

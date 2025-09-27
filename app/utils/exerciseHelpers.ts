@@ -4,25 +4,11 @@ export const getLocalizedContent = (
   exerciseData: ExerciseAIData,
   language: string
 ) => {
-  switch (language) {
-    case "hi":
-      return {
-        title: exerciseData.title_hi,
-        hints: exerciseData.hints_hi,
-        explanation: exerciseData.explanation_hi,
-      }
-    case "mr":
-      return {
-        title: exerciseData.title_mr,
-        hints: exerciseData.hints_mr,
-        explanation: exerciseData.explanation_mr,
-      }
-    default:
-      return {
-        title: exerciseData.title_en,
-        hints: exerciseData.hints_en,
-        explanation: exerciseData.explanation_en,
-      }
+  // Return single language fields (multi-language support removed)
+  return {
+    title: exerciseData.title,
+    hints: exerciseData.hints,
+    explanation: exerciseData.explanation,
   }
 }
 

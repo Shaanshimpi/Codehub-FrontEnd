@@ -176,17 +176,17 @@ export function ModelSelector({
                       Upgrade to Gold
                     </h4>
                     <p className="mt-1 text-xs text-yellow-700 dark:text-yellow-300">
-                      Upgrade to Gold to unlock all premium AI models including
-                      GPT-4, Claude, and more.
+                      Gold membership is completely free! Apply now to unlock
+                      all premium AI models including GPT-4, Claude, and more.
                     </p>
                     <button
                       onClick={() => {
-                        window.location.href = "/upgrade"
+                        window.location.href = "/Learn/upgrade"
                       }}
                       className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-yellow-800 hover:text-yellow-900 dark:text-yellow-200 dark:hover:text-yellow-100"
                     >
                       <User className="h-3 w-3" />
-                      Upgrade to Gold
+                      Apply for Free Gold
                     </button>
                   </div>
                 </div>
@@ -291,10 +291,10 @@ export function ModelSelector({
                   </div>
                   <div>
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                      Gold Subscription Required
+                      Gold Membership Required
                     </h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Unlock premium AI models
+                      Apply for free Gold membership
                     </p>
                   </div>
                 </div>
@@ -315,9 +315,9 @@ export function ModelSelector({
                 </div>
                 <ul className="space-y-1 text-xs text-yellow-800 dark:text-yellow-200">
                   <li>• Access to all premium AI models</li>
-                  <li>• GPT-4, Claude, Gemini, and more</li>
-                  <li>• Higher rate limits</li>
-                  <li>• Priority support</li>
+                  <li>• GPT-4, Claude, Gemini, and 60+ more</li>
+                  <li>• Complete learning platform access</li>
+                  <li>• 100% free for Codehub students</li>
                 </ul>
               </div>
 
@@ -331,11 +331,11 @@ export function ModelSelector({
                 <button
                   onClick={() => {
                     setShowUpgradeModal(false)
-                    window.location.href = "/upgrade"
+                    window.location.href = "/Learn/upgrade"
                   }}
                   className="flex-1 rounded-lg bg-yellow-600 px-4 py-3 text-sm font-medium text-white hover:bg-yellow-700"
                 >
-                  Upgrade to Gold
+                  Apply for Free Gold
                 </button>
               </div>
             </div>

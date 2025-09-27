@@ -3,22 +3,15 @@ import { NextResponse } from "next/server"
 import { buildPrompt } from "./systemPrompts"
 
 // Separate variable definitions for better AI understanding
-const TITLE_EN_SCHEMA = {
+const TITLE_SCHEMA = {
   type: "string",
-  description:
-    "Exercise question in brief couple of lines in English as a statement",
+  description: "Exercise question in brief couple of lines as a statement",
 }
 
-const TITLE_HI_SCHEMA = {
+const DESCRIPTION_SCHEMA = {
   type: "string",
   description:
-    "Exercise question in brief couple of lines in use enough Hindi grammar for a Hindi first language person to understand. Use mostly nouns in English(English script) as a statement (Roman script)",
-}
-
-const TITLE_MR_SCHEMA = {
-  type: "string",
-  description:
-    "Exercise question in brief couple of lines in almost English. use enough marathi grammar for a marathi first language person to understand. Use mostly nouns in English(English script) as a statement (Roman script)",
+    "Detailed description of the exercise, explaining what the student will learn and implement",
 }
 
 const CODE_SCHEMA = {
@@ -253,50 +246,24 @@ export async function POST(request: Request) {
               schema: {
                 type: "object",
                 properties: {
-                  title_en: TITLE_EN_SCHEMA,
-                  title_hi: TITLE_HI_SCHEMA,
-                  title_mr: TITLE_MR_SCHEMA,
+                  title: TITLE_SCHEMA,
+                  description: DESCRIPTION_SCHEMA,
                   solution_code: CODE_SCHEMA,
                   mermaid_diagram: MERMAID_SCHEMA,
-                  hints_en: HINTS_SCHEMA,
-                  explanation_en: EXPLANATION_SCHEMA,
+                  hints: HINTS_SCHEMA,
+                  explanation: EXPLANATION_SCHEMA,
                   tags: TAGS_SCHEMA,
                   learning_objectives: LEARNING_OBJECTIVES_SCHEMA,
-                  hints_hi: {
-                    ...HINTS_SCHEMA,
-                    description:
-                      "Practical hints array in use enough Hindi grammar for a Hindi first language person to understand. Use mostly nouns in English(English script)",
-                  },
-                  explanation_hi: {
-                    ...EXPLANATION_SCHEMA,
-                    description:
-                      "Detailed explanation array in use enough Hindi grammar for a Hindi first language person to understand. Use mostly nouns in English(English script)",
-                  },
-                  hints_mr: {
-                    ...HINTS_SCHEMA,
-                    description:
-                      "Practical hints array in almost English. use enough marathi grammar for a marathi first language person to understand. Use mostly nouns in English(English script)",
-                  },
-                  explanation_mr: {
-                    ...EXPLANATION_SCHEMA,
-                    description:
-                      "Detailed explanation array in almost English. use enough marathi grammar for a marathi first language person to understand. Use mostly nouns in English(English script)",
-                  },
                   visual_elements: VISUAL_ELEMENTS_SCHEMA,
                   boilerplate_code: BOILERPLATE_SCHEMA,
                 },
                 required: [
-                  "title_en",
-                  "title_hi",
-                  "title_mr",
+                  "title",
+                  "description",
                   "solution_code",
                   "mermaid_diagram",
-                  "hints_en",
-                  "explanation_en",
-                  "hints_hi",
-                  "explanation_hi",
-                  "hints_mr",
-                  "explanation_mr",
+                  "hints",
+                  "explanation",
                   "visual_elements",
                   "boilerplate_code",
                 ],
@@ -391,69 +358,21 @@ export async function POST(request: Request) {
       // Validate code completeness
       if (parsedContent.solution_code) {
         const codeLength = parsedContent.solution_code.length
-        const hasMain =
-          parsedContent.solution_code.includes("main(") ||
-          parsedContent.solution_code.includes("main ")
-        const hasReturn = parsedContent.solution_code.includes("return")
 
         if (codeLength < 50) {
           console.warn("⚠️ Solution code seems too short - may be incomplete")
-        }
-
-        const language = (selectedLanguage || "").toLowerCase()
-        if (!hasMain && (language.includes("c") || language.includes("java"))) {
-          console.warn(
-            "⚠️ Solution code missing main function for compiled language"
-          )
-        }
-
-        if (!hasReturn) {
-          console.warn("⚠️ Solution code missing return statements")
         }
       }
 
       if (parsedContent.boilerplate_code) {
         const boilerplateLength = parsedContent.boilerplate_code.length
-        const hasStructure =
-          parsedContent.boilerplate_code.includes("TODO") ||
-          parsedContent.boilerplate_code.includes("todo")
 
         if (boilerplateLength < 30) {
           console.warn(
             "⚠️ Boilerplate code seems too short - may be incomplete"
           )
         }
-
-        if (!hasStructure) {
-          console.warn("⚠️ Boilerplate code missing TODO comments for guidance")
-        }
       }
-
-      // Validate Mermaid diagram for double quotes
-      if (parsedContent.mermaid_diagram) {
-        const mermaidContent = parsedContent.mermaid_diagram
-        // Check for single quotes in node labels (potential issue)
-        if (mermaidContent.includes("'") && !mermaidContent.includes('"')) {
-          console.warn(
-            "⚠️ Mermaid diagram may be using single quotes instead of double quotes"
-          )
-        }
-      }
-
-      console.log("✅ All validations passed:", {
-        executionStepsWithMemory: visualElements.execution_steps.length,
-        concepts: visualElements.concepts.length,
-        hasBoilerplate: !!parsedContent.boilerplate_code,
-        codeFormat: parsedContent.solution_code?.includes("<")
-          ? "HTML"
-          : "Plain Text",
-        boilerplateFormat: parsedContent.boilerplate_code?.includes("<")
-          ? "HTML"
-          : "Plain Text",
-        mermaidQuotes: parsedContent.mermaid_diagram?.includes('"')
-          ? "Double Quotes"
-          : "Single Quotes",
-      })
 
       return NextResponse.json(parsedContent)
     } catch (parseError) {
