@@ -600,6 +600,16 @@ export const CONTENT_QUALITY_STANDARDS = `CONTENT QUALITY REQUIREMENTS:
 - Include proper #include statements on separate lines (for C/C++)
 - Use proper bracket placement and consistent indentation throughout
 
+🚨 PRINTF FORMATTING RULES - CRITICAL:
+- ALWAYS escape newline characters properly in printf statements
+- Use \\\\n for newline in printf statements (NOT \\n which breaks formatting)
+- Correct: printf("Hello World\\\\n");
+- Incorrect: printf("Hello World\\n"); (this breaks line formatting)
+- Correct: printf("%d is even\\\\n", number);
+- Incorrect: printf("%d is even\\n", number); (this causes broken display)
+- Apply this rule to ALL printf, cout, print, and similar output statements
+- This ensures proper display in code editors and prevents broken line formatting
+
 VALIDATION CHECK: Every code block must contain \\n characters for proper formatting
 
 Example of CORRECT formatting:

@@ -55,6 +55,16 @@ CRITICAL CODE COMPLETENESS REQUIREMENTS:
 - Include proper variable declarations, input/output, and return statements
 - The code should be ready to copy-paste and execute immediately
 
+🚨 PRINTF FORMATTING RULES - CRITICAL:
+- ALWAYS escape newline characters properly in printf statements
+- Use \\\\n for newline in printf statements (NOT \\n which breaks formatting)
+- Correct: printf("Hello World\\\\n");
+- Incorrect: printf("Hello World\\n"); (this breaks line formatting)
+- Correct: printf("%d is even\\\\n", number);
+- Incorrect: printf("%d is even\\n", number); (this causes broken display)
+- Apply this rule to ALL printf, cout, print, and similar output statements
+- This ensures proper display in code editors and prevents broken line formatting
+
 MAIN CODE FIELD (Plain text with numbered comments):
 Provide clean, executable code with numbered comments for educational reference.
 

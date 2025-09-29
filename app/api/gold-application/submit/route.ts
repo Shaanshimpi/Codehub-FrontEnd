@@ -55,6 +55,8 @@ export async function POST(request: NextRequest) {
     console.log(
       `📝 Processing Gold application submission for user: ${user.email}`
     )
+    console.log(`📝 Current user data:`, JSON.stringify(user, null, 2))
+    console.log(`📝 Form data received:`, JSON.stringify(formData, null, 2))
 
     // Prepare the update data
     const updateData = {
@@ -72,6 +74,11 @@ export async function POST(request: NextRequest) {
       },
     }
 
+    console.log(
+      `📦 Update data being sent:`,
+      JSON.stringify(updateData, null, 2)
+    )
+
     // Update the user record
     const updateResponse = await fetch(`${payloadApiUrl}/users/${user.id}`, {
       method: "PATCH",
@@ -82,6 +89,8 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(updateData),
     })
 
+    console.log(`🔄 Submit update response status:`, updateResponse.status)
+
     if (!updateResponse.ok) {
       const errorText = await updateResponse.text()
       console.error("❌ Failed to update user application:", errorText)
@@ -89,6 +98,10 @@ export async function POST(request: NextRequest) {
     }
 
     const updatedUser = await updateResponse.json()
+    console.log(
+      `✅ Final updated user data:`,
+      JSON.stringify(updatedUser, null, 2)
+    )
 
     console.log(
       `✅ Successfully processed Gold application for user: ${user.email}`

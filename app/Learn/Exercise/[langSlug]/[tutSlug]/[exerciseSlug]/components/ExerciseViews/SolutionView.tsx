@@ -1,17 +1,30 @@
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useUser } from "@/app/(payload)/_providers/UserProvider"
 import LoginModal from "@/app/Learn/components/LoginModal"
 import { useLanguage } from "@/app/contexts/LanguageContext"
+import { removeComments } from "@/app/utils/codeCommentUtils"
 import { getLocalizedContent } from "@/app/utils/exerciseHelpers"
-import { Code, FileText, Lightbulb, Lock, Network, Play } from "lucide-react"
+import {
+  Code,
+  FileText,
+  Lightbulb,
+  Lock,
+  MessageSquare,
+  Network,
+  Play,
+  Zap,
+} from "lucide-react"
+import EnhancedTabContainer, { TabConfig } from "../Shared/EnhancedTabContainer"
 import UnifiedCodeEditor from "../Shared/UnifiedCodeEditor"
 import ExecutionStepsPanel from "../SolutionView/ExecutionStepsPanel"
 import ExplanationTabs from "../SolutionView/ExplanationTabs"
 import KeyConceptsPanel from "../SolutionView/KeyConceptsPanel"
 import MermaidViewer from "../SolutionView/MermaidViewer"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
@@ -49,6 +62,51 @@ const SolutionView: React.FC<SolutionViewProps> = ({
 
   // Get localized content based on selected language
   const content = getLocalizedContent(exercise, currentLanguage)
+
+  // Handle solution code changes
+  const handleSolutionCodeChange = useCallback((code: string) => {
+    setCurrentCode(code)
+  }, [])
+
+  // Enhanced tabs configuration for solution code section
+  const solutionTabsConfig: TabConfig[] = useMemo(() => {
+    const solutionCode = exercise.solution_code || ""
+    const cleanSolutionCode = removeComments(solutionCode, language.slug)
+
+    return [
+      {
+        id: "with-explanation",
+        label: "With Explanation",
+        icon: <MessageSquare className="h-4 w-4" />,
+        content: (
+          <UnifiedCodeEditor
+            key="solution-explanation-editor"
+            exercise={exercise}
+            language={language}
+            code={currentCode}
+            onCodeChange={handleSolutionCodeChange}
+            mode="solution"
+          />
+        ),
+      },
+      {
+        id: "clean-solution",
+        label: "Clean Solution",
+        icon: <Zap className="h-4 w-4" />,
+        content: (
+          <UnifiedCodeEditor
+            key="solution-clean-editor"
+            exercise={exercise}
+            language={language}
+            code={cleanSolutionCode}
+            onCodeChange={() => {}} // Read-only
+            mode="solution"
+            isReadOnly={true}
+          />
+        ),
+      },
+    ]
+  }, [exercise, language, currentCode, handleSolutionCodeChange])
 
   // Check if premium features are locked
   const isPremiumLocked = !user
@@ -228,19 +286,20 @@ const SolutionView: React.FC<SolutionViewProps> = ({
           />
         )}
 
-        {/* Solution Code Panel */}
+        {/* Enhanced Solution Code Panel with Sub-tabs */}
         <div
           className={`lg:bg-slate-900 ${mobileActiveTab === "code" ? `block ${isFullscreen ? "h-screen" : "h-[calc(100vh-6rem)]"}` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2 lg:overflow-y-auto" : "lg:flex-1"}`}
           style={
             isFullscreen ? { width: `calc(${100 - panelWidth}% - 4px)` } : {}
           }
         >
-          <UnifiedCodeEditor
-            exercise={exercise}
-            language={language}
-            code={currentCode}
-            onCodeChange={setCurrentCode}
-            mode="solution"
+          <EnhancedTabContainer
+            tabs={solutionTabsConfig}
+            variant="secondary"
+            size="sm"
+            className="h-full bg-slate-900"
+            contentClassName="h-[calc(100%-3rem)]"
+            defaultTab="with-explanation"
           />
         </div>
       </div>

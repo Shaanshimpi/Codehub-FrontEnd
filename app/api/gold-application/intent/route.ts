@@ -36,6 +36,13 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`🎯 Recording Gold application intent for user: ${user.email}`)
+    console.log(`📝 Current user data:`, JSON.stringify(user, null, 2))
+
+    const updatePayload = {
+      goldApplicationStatus: "interested",
+      goldApplicationDate: new Date().toISOString(),
+    }
+    console.log(`📦 Update payload:`, JSON.stringify(updatePayload, null, 2))
 
     // Update the user's gold application status to 'interested'
     const updateResponse = await fetch(`${payloadApiUrl}/users/${user.id}`, {
@@ -44,11 +51,10 @@ export async function POST(request: NextRequest) {
         "Content-Type": "application/json",
         cookie: request.headers.get("cookie") || "",
       },
-      body: JSON.stringify({
-        goldApplicationStatus: "interested",
-        goldApplicationDate: new Date().toISOString(),
-      }),
+      body: JSON.stringify(updatePayload),
     })
+
+    console.log(`🔄 Update response status:`, updateResponse.status)
 
     if (!updateResponse.ok) {
       const errorText = await updateResponse.text()
@@ -57,6 +63,7 @@ export async function POST(request: NextRequest) {
     }
 
     const updatedUser = await updateResponse.json()
+    console.log(`✅ Updated user data:`, JSON.stringify(updatedUser, null, 2))
     console.log(
       `✅ Successfully recorded Gold application intent for user: ${user.email}`
     )
