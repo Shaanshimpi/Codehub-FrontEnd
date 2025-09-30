@@ -2,7 +2,13 @@
 "use client"
 
 import React from "react"
+import {
+  ReferenceList,
+  SafeTextWithReferences,
+} from "@/app/Learn/Exercise/components/SafeHTML"
 import { AlertTriangle, Code, FileText, Lightbulb, Target } from "lucide-react"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/ExplanationTabs.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/ExplanationTabs.tsx
 
@@ -82,13 +88,8 @@ const ExplanationTabs: React.FC<ExplanationTabsProps> = ({ explanation }) => {
     }
   }
 
-  const formatTextWithReferences = (text: string) => {
-    // Replace [1], [2], etc. with styled spans
-    return text.replace(
-      /\[(\d+)\]/g,
-      '<span class="inline-flex items-center justify-center w-6 h-6 bg-blue-600 text-white text-xs font-bold rounded-full mx-1">$1</span>'
-    )
-  }
+  // Removed unsafe formatTextWithReferences function
+  // Now using SafeTextWithReferences component instead
 
   const renderCodeBlock = (text: string) => {
     // Extract code from markdown-style code blocks
@@ -162,27 +163,28 @@ const ExplanationTabs: React.FC<ExplanationTabsProps> = ({ explanation }) => {
               <div className="flex items-start gap-3">
                 <Icon className={`mt-1 h-5 w-5 flex-shrink-0 ${styles.icon}`} />
                 <div className="min-w-0 flex-1">
-                  <div
-                    className={`prose prose-sm max-w-none ${styles.text}`}
-                    dangerouslySetInnerHTML={{
-                      __html: formatTextWithReferences(item.text),
-                    }}
-                  />
+                  <div className={`prose prose-sm max-w-none ${styles.text}`}>
+                    <SafeTextWithReferences
+                      text={item.text}
+                      onReferenceClick={(number) => {
+                        // Handle reference click - could scroll to code section
+                        console.log(`Reference ${number} clicked`)
+                      }}
+                    />
+                  </div>
 
                   {/* Show code references if available */}
                   {item.code_ref && item.code_ref.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                        References:
-                      </span>
-                      {item.code_ref.map((ref: any, refIndex: number) => (
-                        <span
-                          key={refIndex}
-                          className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-600 text-xs font-bold text-white"
-                        >
-                          {ref.ref_number}
-                        </span>
-                      ))}
+                    <div className="mt-3">
+                      <ReferenceList
+                        references={item.code_ref.map(
+                          (ref: any) => ref.ref_number || 0
+                        )}
+                        onReferenceClick={(number) => {
+                          // Handle reference click - could highlight code
+                          console.log(`Code reference ${number} clicked`)
+                        }}
+                      />
                     </div>
                   )}
                 </div>

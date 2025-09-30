@@ -4,17 +4,23 @@
 import React, { useCallback, useEffect, useState } from "react"
 import { useUser } from "@/app/(payload)/_providers/UserProvider"
 import {
+  ExerciseContainer,
+  FullscreenToggle,
+} from "@/app/Learn/Exercise/components/Exercise/ExerciseControls"
+import LockedExerciseView from "@/app/Learn/Exercise/components/Exercise/LockedExerciseView"
+import { usePanelResize } from "@/app/Learn/Exercise/hooks/usePanelResize"
+import { useFullscreen } from "@/app/Learn/Exercise/hooks/useViewState"
+import {
   hasViewedSolution,
   markSolutionViewed,
 } from "@/app/Learn/Exercise/utils/localStorage"
-import { ArrowRight, Lock, Maximize2, Minimize2, User } from "lucide-react"
-import Link from "next/link"
 import ExerciseHeader from "./ExerciseHeader"
 import ProblemView from "./ExerciseViews/ProblemView"
 import SolutionView from "./ExerciseViews/SolutionView"
-// import ProgressBar from "./Shared/ProgressBar"
 import SolutionConfirmModal from "./Shared/SolutionConfirmModal"
 import ViewSwitcher from "./Shared/ViewSwitcher"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseLayout.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseLayout.tsx
 
@@ -48,9 +54,11 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
   const { user, isLoading } = useUser()
   const [currentView, setCurrentView] = useState<ViewType>("problem")
   const [progress, setProgress] = useState(0) // 0-100 progress percentage
-  const [isFullscreen, setIsFullscreen] = useState(false)
-  const [panelWidth, setPanelWidth] = useState(50) // Panel width percentage (50% default)
   const [showSolutionModal, setShowSolutionModal] = useState(false)
+
+  // Use custom hooks for panel and fullscreen management
+  const { isFullscreen, toggleFullscreen } = useFullscreen()
+  const { panelWidth, handleMouseDown } = usePanelResize({ initialWidth: 50 })
 
   // Persistent state that survives view switches
   const [persistentCodeState, setPersistentCodeState] =
@@ -150,36 +158,7 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
     setShowSolutionModal(false)
   }, [])
 
-  // Handle fullscreen toggle
-  const toggleFullscreen = useCallback(() => {
-    setIsFullscreen(!isFullscreen)
-  }, [isFullscreen])
-
-  // Handle panel resize
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault()
-      const startX = e.clientX
-      const startWidth = panelWidth
-
-      const handleMouseMove = (e: MouseEvent) => {
-        const containerWidth = window.innerWidth
-        const deltaX = e.clientX - startX
-        const deltaPercent = (deltaX / containerWidth) * 100
-        const newWidth = Math.min(Math.max(startWidth + deltaPercent, 20), 80)
-        setPanelWidth(newWidth)
-      }
-
-      const handleMouseUp = () => {
-        document.removeEventListener("mousemove", handleMouseMove)
-        document.removeEventListener("mouseup", handleMouseUp)
-      }
-
-      document.addEventListener("mousemove", handleMouseMove)
-      document.addEventListener("mouseup", handleMouseUp)
-    },
-    [panelWidth]
-  )
+  // Panel resize and fullscreen logic moved to custom hooks
 
   // Check if exercise is locked and user is not authenticated
   const isExerciseLocked = exercise.isLocked && !user
@@ -206,72 +185,18 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
           tutorial={tutorial}
           params={params}
         />
-
-        <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-6">
-          <div className="w-full max-w-md text-center">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30">
-              <Lock className="h-10 w-10 text-amber-600 dark:text-amber-400" />
-            </div>
-
-            <h1 className="mb-4 text-3xl font-bold text-white">
-              Premium Exercise
-            </h1>
-            <p className="mb-8 text-lg text-slate-300">
-              This exercise is part of our premium content. Sign in to unlock
-              advanced coding challenges and comprehensive learning materials.
-            </p>
-
-            <div className="mb-8 space-y-3">
-              <div className="flex items-center gap-3 text-left text-slate-300">
-                <div className="h-2 w-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
-                <span>Access to premium exercises</span>
-              </div>
-              <div className="flex items-center gap-3 text-left text-slate-300">
-                <div className="h-2 w-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
-                <span>Detailed step-by-step solutions</span>
-              </div>
-              <div className="flex items-center gap-3 text-left text-slate-300">
-                <div className="h-2 w-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
-                <span>Advanced coding challenges</span>
-              </div>
-              <div className="flex items-center gap-3 text-left text-slate-300">
-                <div className="h-2 w-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
-                <span>Progress tracking</span>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <Link
-                href="/login"
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 font-medium text-white transition-all hover:from-blue-700 hover:to-purple-700 hover:shadow-lg"
-              >
-                <User className="h-5 w-5" />
-                Sign In to Continue
-                <ArrowRight className="h-5 w-5" />
-              </Link>
-
-              <div className="text-center">
-                <span className="text-sm text-slate-400">
-                  Don&apos;t have an account?{" "}
-                </span>
-                <Link
-                  href="/signup"
-                  className="text-sm font-medium text-blue-400 hover:text-blue-300"
-                >
-                  Sign up here
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
+        <LockedExerciseView
+          exercise={exercise}
+          language={language}
+          tutorial={tutorial}
+          params={params}
+        />
       </div>
     )
   }
 
   return (
-    <div
-      className={`min-h-screen bg-white dark:bg-slate-900 ${isFullscreen ? "fixed inset-0 z-50" : "pt-14"}`}
-    >
+    <ExerciseContainer isFullscreen={isFullscreen}>
       {/* Header container - hidden in fullscreen */}
       {!isFullscreen && (
         <>
@@ -290,47 +215,34 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
       )}
 
       {/* Fullscreen Toggle Button */}
-      <button
-        onClick={toggleFullscreen}
-        className={`fixed right-4 z-50 rounded-lg bg-blue-600 p-2 text-white shadow-lg transition-all hover:bg-blue-700 ${
-          isFullscreen ? "top-4" : "bottom-4 lg:bottom-auto lg:top-20"
-        }`}
-        title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-      >
-        {isFullscreen ? (
-          <Minimize2 className="h-5 w-5" />
-        ) : (
-          <Maximize2 className="h-5 w-5" />
-        )}
-      </button>
+      <FullscreenToggle
+        isFullscreen={isFullscreen}
+        onToggle={toggleFullscreen}
+      />
 
       {/* Main content area */}
-      <div className={isFullscreen ? "h-screen" : ""}>
-        {currentView === "problem" && (
-          <ProblemView
-            exercise={exercise}
-            language={language}
-            onProgressUpdate={handleProgressUpdate}
-            onComplete={handleCompleteExercise}
-            persistentState={persistentCodeState}
-            onStateUpdate={updatePersistentState}
-            isFullscreen={isFullscreen}
-            panelWidth={panelWidth}
-            onPanelResize={handleMouseDown}
-          />
-        )}
-
-        {currentView === "solution" && (
-          <SolutionView
-            exercise={exercise}
-            language={language}
-            onComplete={handleCompleteExercise}
-            isFullscreen={isFullscreen}
-            panelWidth={panelWidth}
-            onPanelResize={handleMouseDown}
-          />
-        )}
-      </div>
+      {currentView === "problem" ? (
+        <ProblemView
+          exercise={exercise}
+          language={language}
+          onProgressUpdate={handleProgressUpdate}
+          onComplete={handleCompleteExercise}
+          persistentState={persistentCodeState}
+          onStateUpdate={updatePersistentState}
+          isFullscreen={isFullscreen}
+          panelWidth={panelWidth}
+          onPanelResize={handleMouseDown}
+        />
+      ) : (
+        <SolutionView
+          exercise={exercise}
+          language={language}
+          onComplete={handleCompleteExercise}
+          isFullscreen={isFullscreen}
+          panelWidth={panelWidth}
+          onPanelResize={handleMouseDown}
+        />
+      )}
 
       {/* Solution confirmation modal */}
       <SolutionConfirmModal
@@ -338,7 +250,7 @@ const ExerciseLayout: React.FC<ExerciseLayoutProps> = ({
         onConfirm={handleSolutionConfirm}
         onCancel={handleSolutionCancel}
       />
-    </div>
+    </ExerciseContainer>
   )
 }
 

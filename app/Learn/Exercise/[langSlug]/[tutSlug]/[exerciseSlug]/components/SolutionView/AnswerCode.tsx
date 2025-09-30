@@ -2,6 +2,7 @@
 "use client"
 
 import React, { useState } from "react"
+import { SafeCodeHighlight } from "@/app/Learn/Exercise/components/SafeHTML"
 import {
   Copy,
   Download,
@@ -11,6 +12,8 @@ import {
   ZoomIn,
   ZoomOut,
 } from "lucide-react"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/AnswerCode.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/AnswerCode.tsx
 
@@ -106,30 +109,8 @@ const AnswerCode: React.FC<AnswerCodeProps> = ({
     return lines.map((_, index) => index + 1)
   }
 
-  const formatCodeWithHighlighting = (code: string) => {
-    if (!highlightComments) return code
-
-    // Simple syntax highlighting for comments and code references
-    return code
-      .split("\n")
-      .map((line, index) => {
-        let formattedLine = line
-
-        // Highlight comments
-        if (line.trim().startsWith("//")) {
-          return `<span class="text-green-400 italic">${line}</span>`
-        }
-
-        // Highlight code references like [1], [2], etc.
-        formattedLine = formattedLine.replace(
-          /\/\/ \[(\d+)\]/g,
-          '// <span class="inline-flex items-center justify-center w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full mx-1">$1</span>'
-        )
-
-        return formattedLine
-      })
-      .join("\n")
-  }
+  // Removed unsafe formatCodeWithHighlighting function
+  // Now using SafeCodeHighlight component instead
 
   return (
     <div className="flex h-full flex-col">
@@ -259,20 +240,22 @@ const AnswerCode: React.FC<AnswerCodeProps> = ({
 
         {/* Code Content */}
         <div className="flex-1 overflow-auto bg-slate-900 p-4">
-          <pre
-            className="font-mono leading-6 text-slate-200"
-            style={{ fontSize: `${fontSize}px` }}
-          >
-            {highlightComments ? (
-              <code
-                dangerouslySetInnerHTML={{
-                  __html: formatCodeWithHighlighting(code),
-                }}
-              />
-            ) : (
+          {highlightComments ? (
+            <SafeCodeHighlight
+              code={code}
+              language={language.slug}
+              fontSize={fontSize}
+              showLineNumbers={false} // Line numbers are handled separately
+              className="leading-6"
+            />
+          ) : (
+            <pre
+              className="font-mono leading-6 text-slate-200"
+              style={{ fontSize: `${fontSize}px` }}
+            >
               <code>{code}</code>
-            )}
-          </pre>
+            </pre>
+          )}
         </div>
       </div>
 
