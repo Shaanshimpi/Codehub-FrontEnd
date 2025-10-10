@@ -1,16 +1,15 @@
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ProblemView/QuestionPanel.tsx
+// Enhanced QuestionPanel with unified design system and progressive hints
 "use client"
 
-import React, { useState } from "react"
-import { useLanguage } from "@/app/contexts/LanguageContext"
-import { getLocalizedContent } from "@/app/utils/exerciseHelpers"
-import { ChevronDown, ChevronUp, Lightbulb, Tag, Target } from "lucide-react"
+import React, { useCallback, useMemo } from "react"
+import ProgressiveHintSystem from "@/app/Learn/Exercise/components/ProgressiveHints/ProgressiveHintSystem"
+import {
+  Badge,
+  DifficultyBadge,
+} from "@/app/Learn/Exercise/design/UnifiedComponents"
+import { Code, Tag, Target } from "lucide-react"
 
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ProblemView/QuestionPanel.tsx
-
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ProblemView/QuestionPanel.tsx
-
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ProblemView/QuestionPanel.tsx
+// Enhanced QuestionPanel with unified design system and progressive hints
 
 interface QuestionPanelProps {
   exercise: any
@@ -19,200 +18,251 @@ interface QuestionPanelProps {
 
 const QuestionPanel: React.FC<QuestionPanelProps> = ({
   exercise,
-  language,
+  language: _language,
 }) => {
-  const [showHints, setShowHints] = useState(false)
-  const { language: currentLanguage } = useLanguage()
+  // Use exercise data directly (no multi-language support)
+  const content = {
+    title: exercise.title,
+    description: exercise.description,
+    hints: exercise.hints,
+  }
 
-  // Get localized content based on selected language
-
-  const content = getLocalizedContent(exercise, currentLanguage)
-
-  const getDifficultyColor = (level: number) => {
+  // Map exercise difficulty to our unified system
+  const getDifficultyLevel = (level: number) => {
     switch (level) {
       case 1:
-        return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300"
+        return "beginner"
       case 2:
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300"
+        return "intermediate"
       case 3:
-        return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300"
+        return "advanced"
       default:
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
+        return "beginner"
     }
   }
 
-  const getDifficultyLabel = (level: number) => {
-    switch (level) {
-      case 1:
-        return "Beginner"
-      case 2:
-        return "Intermediate"
-      case 3:
-        return "Advanced"
-      default:
-        return "Unknown"
-    }
-  }
+  // Handle hint revelation tracking
+  const handleHintRevealed = useCallback(
+    (_hintIndex: number, _timeSpent: number) => {
+      // TODO: Track hint usage for analytics
+      // Analytics tracking will be implemented here
+    },
+    []
+  )
+
+  // Process hints to match our progressive system format
+  // Memoized to prevent resetting hint states on every render
+  const processedHints = useMemo(
+    () =>
+      (content.hints || []).map((hint: any, index: number) => ({
+        id: hint.id || `hint-${index}`,
+        text: hint.text,
+        code_snippet: hint.code_snippet,
+        difficulty_level: Math.min(3, Math.max(1, index + 1)) as 1 | 2 | 3,
+        type:
+          hint.type || (hint.code_snippet ? "implementation" : "conceptual"),
+      })),
+    [content.hints]
+  )
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto p-2 lg:p-3">
-      {/* Compact Title & Difficulty */}
-      <div className="mb-3">
-        <div className="mb-2 flex items-center justify-between">
-          <span
-            className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${getDifficultyColor(exercise.difficultyLevel)}`}
-          >
-            {getDifficultyLabel(exercise.difficultyLevel)}
-          </span>
-          <span className="text-xs text-slate-500 dark:text-slate-400">
-            Ex {exercise.index}
-          </span>
-        </div>
-
-        <h1 className="text-lg font-bold leading-tight text-slate-900 dark:text-white">
-          {content.title}
-        </h1>
-      </div>
-
-      {/* Compact Learning Objectives */}
-      <div className="mb-3">
-        <h2 className="mb-2 flex items-center gap-1 text-sm font-semibold text-slate-800 dark:text-slate-200">
-          <Target className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          Objectives
-        </h2>
-        <div className="space-y-2">
-          {exercise.learning_objectives?.map(
-            (objective: any, index: number) => (
-              <div
-                key={
-                  typeof objective === "string"
-                    ? `${objective}-${index}`
-                    : objective.id || index
-                }
-                className="flex items-start gap-2"
-              >
-                <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-white dark:bg-blue-500">
-                  <span className="text-xs font-bold">{index + 1}</span>
-                </div>
-                <p className="text-xs leading-relaxed text-slate-700 dark:text-slate-300">
-                  {typeof objective === "string"
-                    ? objective
-                    : objective.objective}
-                </p>
-              </div>
-            )
-          )}
-        </div>
-      </div>
-
-      {/* Compact Tags */}
-      <div className="mb-3">
-        <h2 className="mb-2 flex items-center gap-1 text-sm font-semibold text-slate-800 dark:text-slate-200">
-          <Tag className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          Topics
-        </h2>
-        <div className="flex flex-wrap gap-1">
-          {exercise.tags?.map((tag: any, index: number) => (
-            <span
-              key={
-                typeof tag === "string" ? `${tag}-${index}` : tag.id || index
-              }
-              className="inline-flex items-center gap-1 rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
-            >
-              {typeof tag === "string" ? tag : tag.tag}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Enhanced Hints Section - Made to Stand Out */}
-      <div className="mb-4 rounded-lg border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 shadow-md dark:border-amber-700/50 dark:from-amber-900/30 dark:to-yellow-900/30">
-        <button
-          onClick={() => setShowHints(!showHints)}
-          className="flex w-full items-center justify-between rounded-t-lg bg-gradient-to-r from-amber-500 to-yellow-500 p-3 text-left font-bold text-white shadow-sm transition-all duration-200 hover:from-amber-600 hover:to-yellow-600 hover:shadow-lg dark:from-amber-600 dark:to-yellow-600 dark:hover:from-amber-700 dark:hover:to-yellow-700"
-        >
-          <div className="flex items-center gap-2">
-            <div className="rounded-full bg-white/20 p-1">
-              <Lightbulb className="h-5 w-5 flex-shrink-0 text-white" />
-            </div>
-            <div>
-              <span className="text-base font-bold">💡 Hints Available</span>
-              <div className="text-xs font-medium opacity-90">
-                {content.hints?.length || 0} helpful tip
-                {(content.hints?.length || 0) !== 1 ? "s" : ""} to guide you
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-shrink-0 items-center gap-2">
-            <span className="text-xs font-medium opacity-90">
-              {showHints ? "Hide" : "Show"}
-            </span>
-            <div className="rounded-full bg-white/20 p-1">
-              {showHints ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
-            </div>
-          </div>
-        </button>
-
-        {showHints && (
-          <div className="border-t-2 border-amber-200 bg-white/50 p-4 dark:border-amber-700/50 dark:bg-black/20">
-            <div className="space-y-4">
-              {content.hints?.map((hint: any, index: number) => (
-                <div
-                  key={hint.id || index}
-                  className="group rounded-lg border border-amber-200 bg-white p-3 shadow-sm transition-all duration-200 hover:border-amber-300 hover:shadow-md dark:border-amber-700/30 dark:bg-slate-800/50 dark:hover:border-amber-600/50"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 font-bold text-white shadow-sm">
-                      <span className="text-sm">{index + 1}</span>
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <p className="text-sm font-medium leading-relaxed text-slate-800 dark:text-slate-200">
-                        {hint.text}
-                      </p>
-                      {hint.code_snippet && (
-                        <div className="rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-700/30 dark:bg-amber-900/20">
-                          <div className="mb-2 flex items-center gap-1">
-                            <div className="h-2 w-2 rounded-full bg-amber-500" />
-                            <span className="text-xs font-medium text-amber-700 dark:text-amber-300">
-                              Code Example
-                            </span>
-                          </div>
-                          <pre className="overflow-x-auto rounded bg-slate-900 p-2 text-xs text-green-400 dark:bg-slate-950">
-                            <code>{hint.code_snippet}</code>
-                          </pre>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Helpful tip at bottom */}
-            <div className="mt-4 rounded-lg bg-amber-100 p-3 dark:bg-amber-900/40">
+    <div
+      className="relative flex h-full flex-col overflow-y-auto bg-gradient-to-br from-neutral-50 to-white dark:from-neutral-900 dark:to-neutral-800"
+      role="main"
+      aria-label="Exercise problem statement"
+      id="problem-statement"
+    >
+      {/* Content container with modern design */}
+      <div className="relative h-full">
+        <div className="flex min-h-full flex-col space-y-3 p-2 pb-4 lg:p-3 lg:pb-6">
+          {/* Compact Modern Header */}
+          <div className="rounded-lg border border-gray-300 bg-white p-3 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-black">
+            {/* Header row with badges */}
+            <div className="mb-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-amber-500" />
-                <p className="text-xs font-medium text-amber-800 dark:text-amber-200">
-                  💡 Pro tip: Try implementing the solution step by step using
-                  these hints as your guide!
-                </p>
+                <DifficultyBadge
+                  difficulty={getDifficultyLevel(exercise.difficultyLevel)}
+                />
+                <Badge variant="primary" size="sm" className="text-xs">
+                  #{exercise.index}
+                </Badge>
               </div>
             </div>
-          </div>
-        )}
-      </div>
 
-      {/* Compact Instructions */}
-      <div className="rounded bg-blue-50 p-2 dark:bg-blue-900/20">
-        <ul className="space-y-0.5 text-xs text-blue-700 dark:text-blue-300">
-          <li>• Load boilerplate code</li>
-          <li>• Complete TODO sections</li>
-          <li>• Run and test your solution</li>
-        </ul>
+            {/* Title */}
+            <h1
+              className="mb-1 text-lg font-bold leading-tight text-black dark:text-white"
+              id="exercise-title"
+              tabIndex={-1}
+            >
+              {content.title}
+            </h1>
+
+            {/* Description */}
+            {content.description && (
+              <div
+                className="text-sm leading-relaxed text-black dark:text-white"
+                role="region"
+                aria-labelledby="exercise-title"
+              >
+                {content.description}
+              </div>
+            )}
+          </div>
+
+          {/* Compact Learning Objectives */}
+          {exercise.learning_objectives &&
+            exercise.learning_objectives.length > 0 && (
+              <section
+                className="rounded-lg border border-blue-200 bg-white p-3 shadow-lg backdrop-blur-sm dark:border-blue-800 dark:bg-gray-900"
+                aria-labelledby="learning-objectives-heading"
+              >
+                {/* Section header */}
+                <div className="mb-2 flex items-center gap-2">
+                  <div
+                    className="rounded-md bg-black p-1 text-white shadow-sm dark:bg-white dark:text-black"
+                    aria-hidden="true"
+                  >
+                    <Target className="h-3 w-3" />
+                  </div>
+                  <h2
+                    id="learning-objectives-heading"
+                    className="text-sm font-bold text-blue-900 dark:text-blue-100"
+                  >
+                    Learning Objectives
+                  </h2>
+                </div>
+
+                {/* Compact objectives list */}
+                <ol
+                  className="space-y-1.5"
+                  aria-label="Learning objectives for this exercise"
+                >
+                  {exercise.learning_objectives.map(
+                    (objective: any, index: number) => (
+                      <li
+                        key={
+                          typeof objective === "string"
+                            ? `${objective}-${index}`
+                            : objective.id || index
+                        }
+                        className="flex items-start gap-2 text-sm"
+                      >
+                        <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-black text-xs font-bold text-white dark:bg-white dark:text-black">
+                          {index + 1}
+                        </div>
+                        <span className="font-medium leading-relaxed text-black dark:text-white">
+                          {typeof objective === "string"
+                            ? objective
+                            : objective.objective}
+                        </span>
+                      </li>
+                    )
+                  )}
+                </ol>
+              </section>
+            )}
+
+          {/* Compact Topics */}
+          {exercise.tags && exercise.tags.length > 0 && (
+            <section
+              className="rounded-lg border border-gray-300 bg-white p-3 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-gray-900"
+              aria-labelledby="topics-heading"
+            >
+              {/* Section header */}
+              <div className="mb-2 flex items-center gap-2">
+                <div
+                  className="rounded-md bg-black p-1 text-white shadow-sm dark:bg-white dark:text-black"
+                  aria-hidden="true"
+                >
+                  <Tag className="h-3 w-3" />
+                </div>
+                <h2
+                  id="topics-heading"
+                  className="text-sm font-bold text-black dark:text-white"
+                >
+                  Topics
+                </h2>
+              </div>
+
+              {/* Compact tags */}
+              <ul
+                className="flex list-none flex-wrap gap-1.5"
+                aria-label="Programming topics covered in this exercise"
+              >
+                {exercise.tags.map((tag: any, index: number) => (
+                  <li
+                    key={
+                      typeof tag === "string"
+                        ? `${tag}-${index}`
+                        : tag.id || index
+                    }
+                    className="rounded-md border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-bold text-blue-900 dark:border-blue-700 dark:bg-blue-900 dark:text-blue-100"
+                    title={`Topic: ${typeof tag === "string" ? tag : tag.tag}`}
+                  >
+                    {typeof tag === "string" ? tag : tag.tag}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {/* Progressive Hints System */}
+          {processedHints.length > 0 && (
+            <ProgressiveHintSystem
+              hints={processedHints}
+              exerciseTitle={content.title}
+              onHintRevealed={handleHintRevealed}
+              className="rounded-lg border border-blue-200/50 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-sm backdrop-blur-sm dark:border-blue-800/50 dark:from-blue-950/50 dark:to-indigo-950/50"
+            />
+          )}
+
+          {/* Compact Getting Started */}
+          <section
+            className="mt-auto rounded-lg border border-gray-300 bg-white p-3 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-gray-900"
+            aria-labelledby="getting-started-heading"
+          >
+            {/* Section header */}
+            <div className="mb-2 flex items-center gap-2">
+              <div
+                className="rounded-md bg-black p-1 text-white shadow-sm dark:bg-white dark:text-black"
+                aria-hidden="true"
+              >
+                <Code className="h-3 w-3" />
+              </div>
+              <h2
+                id="getting-started-heading"
+                className="text-sm font-bold text-black dark:text-white"
+              >
+                Quick Start
+              </h2>
+            </div>
+
+            {/* Compact steps */}
+            <ol
+              className="space-y-1.5"
+              aria-label="Steps to complete the exercise"
+            >
+              {[
+                { text: "Load boilerplate code", icon: "1" },
+                { text: "Complete TODO sections", icon: "2" },
+                { text: "Test your solution", icon: "3" },
+              ].map((step, index) => (
+                <li key={index} className="flex items-center gap-2 text-sm">
+                  <div
+                    className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-black text-xs font-bold text-white dark:bg-white dark:text-black"
+                    aria-hidden="true"
+                  >
+                    {step.icon}
+                  </div>
+                  <span className="font-medium text-black dark:text-white">
+                    {step.text}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        </div>
       </div>
     </div>
   )

@@ -3,6 +3,7 @@ export * from "./constants"
 export * from "./dateUtils"
 export * from "./tokenUtils"
 export * from "./validationUtils"
+export * from "./budget"
 
 // User ID validation functions for API compatibility
 export const validateUserId = (

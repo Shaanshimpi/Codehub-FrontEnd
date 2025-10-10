@@ -1,20 +1,11 @@
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/ProblemView.tsx
 "use client"
 
-import React, { useCallback, useEffect, useMemo, useState } from "react"
-import {
-  removeComments,
-} from "@/app/utils/codeCommentUtils"
-import { BookOpen, Code, Code2, Play, Zap } from "lucide-react"
+import React, { useCallback, useEffect, useState } from "react"
+import UnifiedMobileTabSwitcher from "@/app/Learn/Exercise/components/Mobile/UnifiedMobileTabSwitcher"
+import { BookOpen, Code } from "lucide-react"
 import QuestionPanel from "../ProblemView/QuestionPanel"
-import EnhancedTabContainer, { TabConfig } from "../Shared/EnhancedTabContainer"
-import UnifiedCodeEditor from "../Shared/UnifiedCodeEditor"
-
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/ProblemView.tsx
-
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/ProblemView.tsx
-
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/ProblemView.tsx
+import StudentPlayground from "../Shared/StudentPlayground"
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/ProblemView.tsx
 
@@ -148,7 +139,7 @@ main();`
 
     // Here you would implement actual code execution logic
     // For now, just simulate it
-  }, [persistentState.userCode, onProgressUpdate])
+  }, [onProgressUpdate])
 
   // Handle boilerplate status changes (from reset)
   const handleBoilerplateStatusChange = useCallback(
@@ -162,20 +153,17 @@ main();`
     [onStateUpdate, onProgressUpdate]
   )
 
-  // Separate code states for different tabs
+  // Streamlined code state - Direct playground integration
   const [playgroundCode, setPlaygroundCode] = useState<string>(
     persistentState.userCode || ""
   )
-  const [currentActiveTab, setCurrentActiveTab] = useState<string>("playground")
 
-  // Update playground code when persistent state changes (from external sources)
+  // Update playground code when persistent state changes
   useEffect(() => {
-    if (currentActiveTab === "playground") {
-      setPlaygroundCode(persistentState.userCode || "")
-    }
-  }, [persistentState.userCode, currentActiveTab])
+    setPlaygroundCode(persistentState.userCode || "")
+  }, [persistentState.userCode])
 
-  // Handle playground code changes
+  // Handle code changes - Direct integration
   const handlePlaygroundCodeChange = useCallback(
     (code: string) => {
       setPlaygroundCode(code)
@@ -184,113 +172,43 @@ main();`
     [handleCodeChange]
   )
 
-  // Enhanced tabs configuration for code section - all using Monaco editor
-  const codeTabsConfig: TabConfig[] = useMemo(() => {
-    const boilerplateCode = getBoilerplateCode()
-    const cleanBoilerplateCode = removeComments(boilerplateCode, language.slug)
-
-    return [
-      {
-        id: "playground",
-        label: "Playground",
-        icon: <Play className="h-4 w-4" />,
-        content: (
-          <UnifiedCodeEditor
-            key="playground-editor" // Unique key to maintain component state
-            exercise={exercise}
-            language={language}
-            code={playgroundCode} // Use separate playground code state
-            onCodeChange={handlePlaygroundCodeChange}
-            onLoadBoilerplate={handleLoadBoilerplate}
-            onRunCode={handleRunCode}
-            isBoilerplateLoaded={persistentState.isBoilerplateLoaded}
-            onBoilerplateStatusChange={handleBoilerplateStatusChange}
-            mode="problem"
-          />
-        ),
-      },
-      {
-        id: "boilerplate",
-        label: "Boilerplate",
-        icon: <Code2 className="h-4 w-4" />,
-        content: (
-          <UnifiedCodeEditor
-            key="boilerplate-editor" // Unique key
-            exercise={exercise}
-            language={language}
-            code={boilerplateCode}
-            onCodeChange={() => {}} // Read-only
-            mode="problem"
-            isReadOnly={true}
-          />
-        ),
-      },
-      {
-        id: "clean",
-        label: "Clean Code",
-        icon: <Zap className="h-4 w-4" />,
-        content: (
-          <UnifiedCodeEditor
-            key="clean-editor" // Unique key
-            exercise={exercise}
-            language={language}
-            code={cleanBoilerplateCode}
-            onCodeChange={() => {}} // Read-only
-            mode="problem"
-            isReadOnly={true}
-          />
-        ),
-      },
-    ]
-  }, [
-    exercise,
-    language,
-    playgroundCode,
-    persistentState.isBoilerplateLoaded,
-    getBoilerplateCode,
-    handlePlaygroundCodeChange,
-    handleLoadBoilerplate,
-    handleRunCode,
-    handleBoilerplateStatusChange,
-  ])
+  // Mobile tabs configuration for UnifiedMobileTabSwitcher
+  const mobileTabs = [
+    {
+      id: "question",
+      label: "Problem",
+      icon: <BookOpen className="h-4 w-4" />,
+      description: "View problem statement and requirements",
+    },
+    {
+      id: "code",
+      label: "Code Editor",
+      icon: <Code className="h-4 w-4" />,
+      description: "Write and test your solution",
+    },
+  ]
 
   return (
     <>
-      {/* Mobile Tab Switcher - Hidden on desktop */}
-      <div className="bg-white dark:bg-slate-900 lg:hidden">
-        <div className="flex">
-          <button
-            onClick={() => setMobileActiveTab("question")}
-            className={`flex flex-1 items-center justify-center gap-1 border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
-              mobileActiveTab === "question"
-                ? "border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-900/20"
-                : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-            }`}
-          >
-            <BookOpen className="h-3 w-3" />
-            Question
-          </button>
-          <button
-            onClick={() => setMobileActiveTab("code")}
-            className={`flex flex-1 items-center justify-center gap-1 border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
-              mobileActiveTab === "code"
-                ? "border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-900/20"
-                : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-            }`}
-          >
-            <Code className="h-3 w-3" />
-            Code
-          </button>
-        </div>
+      {/* Enhanced Mobile Tab Switcher - Hidden on desktop */}
+      <div className="lg:hidden">
+        <UnifiedMobileTabSwitcher
+          tabs={mobileTabs}
+          activeTab={mobileActiveTab}
+          onTabChange={(tabId) =>
+            setMobileActiveTab(tabId as "question" | "code")
+          }
+          className="bg-white dark:bg-neutral-900"
+        />
       </div>
 
       {/* Responsive Layout */}
       <div
-        className={`lg:flex ${isFullscreen ? "h-screen" : "lg:h-[calc(100vh-10rem)]"}`}
+        className={`lg:flex ${isFullscreen ? "h-screen" : "h-[calc(100vh-8rem)]"}`}
       >
         {/* Question Panel */}
         <div
-          className={`lg:border-r lg:border-slate-200 lg:bg-sky-50 lg:dark:border-slate-700 lg:dark:bg-slate-800 ${mobileActiveTab === "question" ? `block ${isFullscreen ? "h-screen" : "h-[calc(100vh-6rem)]"} overflow-y-auto` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2 lg:overflow-y-auto" : "lg:flex-none"}`}
+          className={`lg:border-r lg:border-slate-200 lg:bg-sky-50 lg:dark:border-slate-700 lg:dark:bg-slate-800 ${mobileActiveTab === "question" ? `block ${isFullscreen ? "h-screen" : "h-[calc(100vh-8rem)]"} overflow-y-auto` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2 lg:overflow-y-auto" : "lg:flex-none"}`}
           style={isFullscreen ? { width: `${panelWidth}%` } : {}}
         >
           <QuestionPanel exercise={exercise} language={language} />
@@ -305,21 +223,22 @@ main();`
           />
         )}
 
-        {/* Enhanced Code Editor Panel with Sub-tabs */}
+        {/* Streamlined Code Editor Panel - Direct Integration */}
         <div
-          className={`lg:bg-white lg:dark:bg-slate-900 ${mobileActiveTab === "code" ? `block ${isFullscreen ? "h-screen" : "h-[calc(100vh-6rem)]"}` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2 lg:overflow-y-auto" : "lg:flex-1"}`}
+          className={`border-l border-gray-300 bg-white dark:border-gray-600 dark:bg-black ${mobileActiveTab === "code" ? `block h-full` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2" : "lg:flex-1"}`}
           style={
             isFullscreen ? { width: `calc(${100 - panelWidth}% - 4px)` } : {}
           }
         >
-          <EnhancedTabContainer
-            tabs={codeTabsConfig}
-            variant="secondary"
-            size="sm"
-            className="h-full bg-white dark:bg-slate-900"
-            contentClassName="h-[calc(100%-3rem)]"
-            defaultTab="playground"
-            onTabChange={(tabId) => setCurrentActiveTab(tabId)}
+          {/* New Simplified Student Playground */}
+          <StudentPlayground
+            key="new-student-playground"
+            exercise={exercise}
+            language={language}
+            code={playgroundCode}
+            onCodeChange={handlePlaygroundCodeChange}
+            onRunCode={handleRunCode}
+            mode="problem"
           />
         </div>
       </div>

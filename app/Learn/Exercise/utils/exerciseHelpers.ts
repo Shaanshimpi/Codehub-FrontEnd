@@ -2,14 +2,10 @@
 import type { ExerciseAIData } from "@/app/Learn/types/TutorialTypes"
 
 /**
- * Get localized content for an exercise based on the selected language
- * This is a wrapper around the main getLocalizedContent function
+ * Get exercise content
+ * Multi-language support has been removed
  */
-export const getLocalizedContent = (
-  exerciseData: ExerciseAIData,
-  language: string
-) => {
-  // Return single language fields (multi-language support can be added later)
+export const getLocalizedContent = (exerciseData: ExerciseAIData) => {
   return {
     title: exerciseData.title,
     hints: exerciseData.hints,

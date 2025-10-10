@@ -185,7 +185,7 @@ EXAMPLE ENHANCED EXECUTION STEPS:
   "step": 3,
   "line_number": 8,
   "line": "int result = a + b;",
-  "description": "Calculate sum of a and b, store in result variable",
+  "description": "Calculate sum of a and b, store in result variable  ",
   "memory_state": [
     {"name": "a", "value": "5", "type": "int", "changed": false},
     {"name": "b", "value": "3", "type": "int", "changed": false},

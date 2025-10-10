@@ -17,6 +17,8 @@ import {
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/MermaidViewer.tsx
 
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/MermaidViewer.tsx
+
 interface MermaidViewerProps {
   diagram: string
   title?: string
@@ -56,11 +58,11 @@ const MermaidViewer: React.FC<MermaidViewerProps> = ({
 
   if (!diagram) {
     return (
-      <div className="flex h-full items-center justify-center text-center text-slate-500 dark:text-slate-400">
+      <div className="flex h-full items-center justify-center text-center text-black dark:text-white">
         <div>
           <ChartBar className="mx-auto mb-4 h-12 w-12 opacity-50" />
-          <p className="text-lg font-medium">No Flowchart Available</p>
-          <p className="mt-2 text-sm">
+          <p className="text-lg font-bold">No Flowchart Available</p>
+          <p className="mt-2 text-sm font-medium">
             {`This exercise doesn't include a visual flowchart diagram.`}
           </p>
         </div>
@@ -85,62 +87,66 @@ const MermaidViewer: React.FC<MermaidViewerProps> = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-            {title}
-          </h3>
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            {`Visual representation of the program's logic flow`}
-          </p>
-        </div>
+      <div className="rounded-lg border border-gray-300 bg-white p-3 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-gray-900">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-bold text-black dark:text-white">
+              {title}
+            </h3>
+            <p className="text-sm font-medium text-black dark:text-white">
+              {`Visual representation of the program's logic flow`}
+            </p>
+          </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowRawCode(!showRawCode)}
-            className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-300"
-            title="Toggle raw code view"
-          >
-            <Eye className="h-4 w-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowRawCode(!showRawCode)}
+              className="rounded-lg border border-gray-300 bg-white p-2 text-black shadow-lg hover:bg-blue-50 hover:shadow-xl dark:border-gray-600 dark:bg-black dark:text-white dark:hover:bg-blue-900"
+              title="Toggle raw code view"
+            >
+              <Eye className="h-4 w-4" />
+            </button>
 
-          <button
-            onClick={copyDiagram}
-            className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-300"
-            title="Copy diagram code"
-          >
-            <Copy className="h-4 w-4" />
-          </button>
+            <button
+              onClick={copyDiagram}
+              className="rounded-lg border border-gray-300 bg-white p-2 text-black shadow-lg hover:bg-blue-50 hover:shadow-xl dark:border-gray-600 dark:bg-black dark:text-white dark:hover:bg-blue-900"
+              title="Copy diagram code"
+            >
+              <Copy className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
 
       {showRawCode && (
         /* Raw Mermaid Code View */
-        <div className="space-y-4">
-          <div className="rounded-lg bg-amber-50 p-4 dark:bg-amber-900/20">
-            <h4 className="mb-2 font-semibold text-amber-800 dark:text-amber-200">
+        <div className="space-y-3">
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 shadow-lg dark:border-blue-700 dark:bg-blue-900">
+            <h4 className="mb-2 font-bold text-blue-900 dark:text-blue-100">
               Mermaid Diagram Code
             </h4>
-            <p className="text-sm text-amber-700 dark:text-amber-300">
+            <p className="text-sm font-medium text-black dark:text-white">
               This is the Mermaid syntax used to generate the flowchart. You can
               copy this code and use it in any Mermaid-compatible editor.
             </p>
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
-            <div className="flex items-center justify-between bg-slate-800 px-4 py-2">
-              <span className="font-mono text-sm text-slate-300">mermaid</span>
+          <div className="overflow-hidden rounded-lg border border-gray-300 shadow-lg dark:border-gray-600">
+            <div className="flex items-center justify-between bg-black px-4 py-2 dark:bg-white">
+              <span className="font-mono text-sm font-bold text-white dark:text-black">
+                mermaid
+              </span>
               <button
                 onClick={copyDiagram}
-                className="text-sm text-slate-400 hover:text-white"
+                className="text-sm font-bold text-white hover:text-blue-300 dark:text-black dark:hover:text-blue-600"
               >
                 Copy
               </button>
             </div>
-            <div className="bg-slate-900 p-4">
-              <pre className="overflow-x-auto text-sm text-slate-200">
+            <div className="bg-gray-900 p-4 dark:bg-gray-100">
+              <pre className="overflow-x-auto text-sm font-medium text-gray-200 dark:text-gray-800">
                 <code>{diagram}</code>
               </pre>
             </div>
@@ -148,30 +154,30 @@ const MermaidViewer: React.FC<MermaidViewerProps> = ({
         </div>
       )}
 
-      <div className={`space-y-4 ${showRawCode && "hidden"}`}>
+      <div className={`space-y-3 ${showRawCode && "hidden"}`}>
         {/* Zoom Controls */}
-        <div className="flex items-center justify-between rounded-lg bg-slate-50 p-3 dark:bg-slate-800">
-          <div className="text-sm text-slate-600 dark:text-slate-400">
+        <div className="flex items-center justify-between rounded-lg border border-gray-300 bg-white p-3 shadow-lg dark:border-gray-600 dark:bg-gray-900">
+          <div className="text-sm font-bold text-black dark:text-white">
             Zoom: {zoom}%
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={zoomOut}
               disabled={zoom <= 50}
-              className="rounded p-1 text-slate-500 hover:bg-slate-200 hover:text-slate-700 disabled:opacity-50 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+              className="rounded-lg border border-gray-300 bg-white p-2 text-black shadow-lg hover:bg-blue-50 hover:shadow-xl disabled:opacity-50 dark:border-gray-600 dark:bg-black dark:text-white dark:hover:bg-blue-900"
             >
               <ZoomOut className="h-4 w-4" />
             </button>
             <button
               onClick={resetZoom}
-              className="rounded p-1 text-slate-500 hover:bg-slate-200 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+              className="rounded-lg border border-gray-300 bg-white p-2 text-black shadow-lg hover:bg-blue-50 hover:shadow-xl dark:border-gray-600 dark:bg-black dark:text-white dark:hover:bg-blue-900"
             >
               <RotateCcw className="h-4 w-4" />
             </button>
             <button
               onClick={zoomIn}
               disabled={zoom >= 200}
-              className="rounded p-1 text-slate-500 hover:bg-slate-200 hover:text-slate-700 disabled:opacity-50 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+              className="rounded-lg border border-gray-300 bg-white p-2 text-black shadow-lg hover:bg-blue-50 hover:shadow-xl disabled:opacity-50 dark:border-gray-600 dark:bg-black dark:text-white dark:hover:bg-blue-900"
             >
               <ZoomIn className="h-4 w-4" />
             </button>
@@ -179,15 +185,15 @@ const MermaidViewer: React.FC<MermaidViewerProps> = ({
         </div>
 
         {/* Diagram Container */}
-        <div className="overflow-auto rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+        <div className="overflow-auto rounded-lg border border-gray-300 bg-white p-6 shadow-lg dark:border-gray-600 dark:bg-gray-900">
           {diagramError ? (
             <div className="flex items-center justify-center p-8 text-center">
               <div>
                 <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
-                <p className="text-lg font-medium text-red-700 dark:text-red-400">
+                <p className="text-lg font-bold text-red-700 dark:text-red-400">
                   Diagram Render Error
                 </p>
-                <p className="mt-2 text-sm text-red-600 dark:text-red-300">
+                <p className="mt-2 text-sm font-medium text-red-600 dark:text-red-300">
                   There was an issue rendering the flowchart. You can view the
                   raw code above.
                 </p>

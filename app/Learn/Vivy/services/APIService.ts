@@ -51,7 +51,10 @@ export class APIService {
 
         if (!response.ok) {
           const errorData = await this.handleErrorResponse(response)
-          throw new Error(errorData.error)
+          const error: any = new Error(errorData.error)
+          error.response = errorData // Attach full response data to error
+          error.status = response.status
+          throw error
         }
 
         return await response.json()
@@ -59,13 +62,14 @@ export class APIService {
         lastError = error as Error
 
         // Don't retry on certain errors
+        const errorMessage = (error as Error)?.message || ""
         if (
           error instanceof TypeError ||
           (error as any).name === "AbortError" ||
-          (error as Error).message.includes("400") ||
-          (error as Error).message.includes("401") ||
-          (error as Error).message.includes("403") ||
-          (error as Error).message.includes("404")
+          errorMessage.includes("400") ||
+          errorMessage.includes("401") ||
+          errorMessage.includes("403") ||
+          errorMessage.includes("404")
         ) {
           throw this.createAPIError(error as Error, url)
         }
@@ -180,6 +184,8 @@ export class APIService {
       details: errorData.details || errorData.message,
       status: response.status,
       timestamp: new Date().toISOString(),
+      suggestedModels: errorData.suggestedModels, // Include suggested models from server
+      retryable: errorData.retryable, // Include retryable flag from server
     }
   }
 
@@ -207,8 +213,9 @@ export class APIService {
    * Create a standardized API error
    */
   private createAPIError(error: Error, _url: string): Error {
+    const errorMessage = error?.message || ""
     const isNetworkError =
-      error.name === "TypeError" && error.message.includes("fetch")
+      error.name === "TypeError" && errorMessage.includes("fetch")
 
     if (isNetworkError) {
       return new Error(ERROR_MESSAGES.NETWORK_ERROR)

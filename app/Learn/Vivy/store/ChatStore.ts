@@ -7,7 +7,7 @@ import {
   storageService,
   userService,
 } from "../services"
-import { ChatUIState, Message } from "../types"
+import { BudgetInfo, ChatUIState, Message } from "../types"
 import { createId, debounce } from "../utils"
 
 interface ChatState extends ChatUIState {
@@ -16,6 +16,7 @@ interface ChatState extends ChatUIState {
   isLoading: boolean
   error: string | null
   selectedModel: AIModel | null
+  budget: BudgetInfo | null
 
   // Draft Management
   currentDraft: string
@@ -38,6 +39,9 @@ interface ChatState extends ChatUIState {
 
   // Model Management
   setSelectedModel: (model: AIModel) => void
+
+  // Budget Management
+  setBudget: (budget: BudgetInfo | null) => void
 
   // Draft Management
   setDraft: (content: string, conversationId?: string) => void
@@ -71,6 +75,7 @@ const initialState = {
   isLoading: false,
   error: null,
   selectedModel: null,
+  budget: null,
 
   // Draft Management
   currentDraft: "",
@@ -172,6 +177,8 @@ export const useChatStore = create<ChatState>()(
               total: number
             }
             model: string
+            cost?: number
+            budget?: BudgetInfo | null
             id?: string
             created?: number
           }>("/api/chat", {
@@ -194,11 +201,39 @@ export const useChatStore = create<ChatState>()(
           }
 
           addMessage(assistantMessage)
+
+          // Update budget if provided (for Gold+ users)
+          if (response.budget !== undefined) {
+            get().setBudget(response.budget)
+          }
+
           setLoading(false, null)
 
           return true
-        } catch (error) {
-          setLoading(false, (error as Error).message)
+        } catch (error: any) {
+          console.log("❌ Chat error caught:", error)
+          console.log("❌ Error response:", error?.response)
+
+          // Check if it's a rate limit error with suggestions
+          let errorMessage = error?.message || "An error occurred"
+
+          // If the error response contains suggested models, format a helpful message
+          if (error?.response?.suggestedModels) {
+            const suggestions = error.response.suggestedModels
+              .slice(0, 3)
+              .join(", ")
+            errorMessage = `🚦 ${errorMessage}\n\n💡 Try switching to: ${suggestions}`
+          } else if (
+            errorMessage.includes("429") ||
+            errorMessage.includes("rate limit") ||
+            errorMessage.includes("heavy load")
+          ) {
+            errorMessage =
+              "🚦 This model is experiencing heavy load. Please try a different model from the dropdown above."
+          }
+
+          console.log("❌ Final error message:", errorMessage)
+          setLoading(false, errorMessage)
           return false
         }
       },
@@ -234,6 +269,8 @@ export const useChatStore = create<ChatState>()(
               total: number
             }
             model: string
+            cost?: number
+            budget?: BudgetInfo | null
             id?: string
             created?: number
           }>("/api/chat", {
@@ -276,10 +313,33 @@ export const useChatStore = create<ChatState>()(
             }))
           }
 
+          // Update budget if provided (for Gold+ users)
+          if (response.budget !== undefined) {
+            get().setBudget(response.budget)
+          }
+
           setLoading(false, null)
           return true
-        } catch (error) {
-          setLoading(false, (error as Error).message)
+        } catch (error: any) {
+          // Check if it's a rate limit error with suggestions
+          let errorMessage = error?.message || "An error occurred"
+
+          // If the error response contains suggested models, format a helpful message
+          if (error?.response?.suggestedModels) {
+            const suggestions = error.response.suggestedModels
+              .slice(0, 3)
+              .join(", ")
+            errorMessage = `🚦 ${errorMessage}\n\n💡 Try switching to: ${suggestions}`
+          } else if (
+            errorMessage.includes("429") ||
+            errorMessage.includes("rate limit") ||
+            errorMessage.includes("heavy load")
+          ) {
+            errorMessage =
+              "🚦 This model is experiencing heavy load. Please try a different model from the dropdown above."
+          }
+
+          setLoading(false, errorMessage)
           return false
         }
       },
@@ -291,6 +351,10 @@ export const useChatStore = create<ChatState>()(
         if (model) {
           storageService.setLastModel(model.id)
         }
+      },
+
+      setBudget: (budget) => {
+        set({ budget })
       },
 
       setDraft: debounce((content: string, conversationId?: string) => {

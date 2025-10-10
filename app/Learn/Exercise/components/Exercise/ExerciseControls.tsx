@@ -6,6 +6,8 @@ import { Maximize2, Minimize2 } from "lucide-react"
 
 // Exercise control components (fullscreen, panel resize, etc.)
 
+// Exercise control components (fullscreen, panel resize, etc.)
+
 interface FullscreenToggleProps {
   isFullscreen: boolean
   onToggle: () => void
@@ -80,8 +82,10 @@ export const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
 }) => {
   return (
     <div
-      className={`min-h-screen bg-white dark:bg-slate-900 ${
-        isFullscreen ? "fixed inset-0 z-50" : "pt-14"
+      className={`bg-white dark:bg-slate-900 ${
+        isFullscreen
+          ? "fixed inset-0 z-50 h-screen overflow-hidden"
+          : "min-h-[calc(100vh-4rem)] pt-16"
       } ${className}`}
     >
       {children}

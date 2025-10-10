@@ -8,7 +8,7 @@ export const TITLE_SCHEMA = {
 export const DESCRIPTION_SCHEMA = {
   type: "string",
   description:
-    "Detailed description of the exercise, explaining what the student will learn and implement",
+    "Detailed description of the exercise, explaining what the full question is what inputs should produce what output",
 } as const
 
 export const CODE_SCHEMA = {

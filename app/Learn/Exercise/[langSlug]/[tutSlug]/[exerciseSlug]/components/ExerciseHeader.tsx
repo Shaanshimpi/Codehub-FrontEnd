@@ -1,14 +1,9 @@
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseHeader.tsx
-"use client"
-
+// Enhanced ExerciseHeader with back to tutorial navigation
+// Server Component - No 'use client' directive
 import React from "react"
-import { useLanguage } from "@/app/contexts/LanguageContext"
-import { getLocalizedContent } from "@/app/utils/exerciseHelpers"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseHeader.tsx
-
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseHeader.tsx
+import { Text } from "@/app/Learn/Exercise/design/UnifiedComponents"
+import { ArrowLeft } from "lucide-react"
+import Link from "next/link"
 
 interface ExerciseHeaderProps {
   exercise: any
@@ -27,48 +22,51 @@ const ExerciseHeader: React.FC<ExerciseHeaderProps> = ({
   tutorial,
   params,
 }) => {
-  const { langSlug, tutSlug, exerciseSlug } = params
-  const { language: currentLanguage } = useLanguage()
+  const { langSlug, tutSlug } = params
 
-  // Get localized content based on selected language
-  const content = getLocalizedContent(exercise, currentLanguage)
+  // Use exercise data directly (no multi-language support)
+  const content = {
+    title: exercise.title,
+  }
 
   return (
-    <div className="border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+    <div className="border-b border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-black">
       <div className="mx-auto max-w-7xl px-4 py-3 lg:px-6">
         {/* Compact Single Row Layout */}
         <div className="flex items-center justify-between gap-4">
           {/* Left: Title + Context */}
           <div className="min-w-0 flex-1">
-            <h1 className="truncate text-lg font-bold text-slate-900 dark:text-white lg:text-xl">
+            <h1 className="truncate text-lg font-bold text-black dark:text-white lg:text-xl">
               {content.title}
             </h1>
-            <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
-              <span className="truncate">{tutorial.title}</span>
+            <div className="flex items-center gap-2 text-xs text-black dark:text-white">
+              <Text
+                variant="tiny"
+                className="truncate font-medium text-blue-900 dark:text-blue-100"
+              >
+                {tutorial.title}
+              </Text>
               <span>•</span>
-              <span>{language.title}</span>
-              <span>•</span>
-              <span>Exercise {exercise.index}</span>
+              <Text
+                variant="tiny"
+                className="font-medium text-black dark:text-white"
+              >
+                {language.title}
+              </Text>
             </div>
           </div>
 
-          {/* Right: Navigation */}
-          <div className="flex items-center gap-1">
-            <button
-              className="flex items-center gap-1 rounded bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-              disabled
+          {/* Right: Back to Tutorial Button */}
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/Learn/Exercise/${langSlug}/${tutSlug}`}
+              className="flex min-h-[44px] touch-manipulation items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-black shadow-lg transition-all duration-200 hover:scale-105 hover:bg-blue-50 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-95 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:hover:bg-blue-900"
+              title="Back to Tutorial"
+              aria-label="Back to Tutorial page"
             >
-              <ChevronLeft className="h-3 w-3" />
-              <span className="hidden sm:inline">Prev</span>
-            </button>
-
-            <button
-              className="flex items-center gap-1 rounded bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-              disabled
-            >
-              <span className="hidden sm:inline">Next</span>
-              <ChevronRight className="h-3 w-3" />
-            </button>
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Back to Exercises</span>
+            </Link>
           </div>
         </div>
       </div>

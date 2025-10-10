@@ -10,6 +10,8 @@ export interface APIError {
   details?: string
   status: number
   timestamp: string
+  suggestedModels?: string[]
+  retryable?: boolean
 }
 
 export interface PaginatedResponse<T> {
@@ -33,6 +35,14 @@ export interface ChatRequest {
   maxTokens?: number
 }
 
+export interface BudgetInfo {
+  current: number
+  limit: number
+  remaining: number
+  percentUsed: number
+  resetTime: string
+}
+
 export interface ChatResponse {
   content: string
   tokens: {
@@ -41,6 +51,8 @@ export interface ChatResponse {
     total: number
   }
   model: string
+  cost: number
+  budget?: BudgetInfo | null
   id: string
   created: number
   finishReason?: string

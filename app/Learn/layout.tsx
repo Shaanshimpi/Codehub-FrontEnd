@@ -1,6 +1,6 @@
 import React from "react"
+import ConditionalFooter from "./components/ConditionalFooter"
 import Header from "./layouts/Header"
-import LearnFooter from "./layouts/LearnFooter"
 
 export default function LearnLayout({
   children,
@@ -15,8 +15,8 @@ export default function LearnLayout({
       {/* Page Content */}
       <main>{children}</main>
 
-      {/* Learn Footer */}
-      <LearnFooter />
+      {/* Conditional Footer - Hidden on Exercise pages */}
+      <ConditionalFooter />
     </div>
   )
 }

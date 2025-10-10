@@ -12,6 +12,8 @@ import { AlertTriangle, Code, FileText, Lightbulb, Target } from "lucide-react"
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/ExplanationTabs.tsx
 
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/ExplanationTabs.tsx
+
 interface ExplanationTabsProps {
   explanation: any[]
 }
@@ -19,11 +21,11 @@ interface ExplanationTabsProps {
 const ExplanationTabs: React.FC<ExplanationTabsProps> = ({ explanation }) => {
   if (!explanation || explanation.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center text-center text-slate-500 dark:text-slate-400">
+      <div className="flex h-full items-center justify-center text-center text-black dark:text-white">
         <div>
           <FileText className="mx-auto mb-4 h-12 w-12 opacity-50" />
-          <p className="text-lg font-medium">No Explanation Available</p>
-          <p className="mt-2 text-sm">
+          <p className="text-lg font-bold">No Explanation Available</p>
+          <p className="mt-2 text-sm font-medium">
             The explanation content is not available for the selected language.
           </p>
         </div>
@@ -53,37 +55,42 @@ const ExplanationTabs: React.FC<ExplanationTabsProps> = ({ explanation }) => {
       case "solution_code":
         return {
           container:
-            "bg-blue-50 border-l-4 border-blue-500 dark:bg-blue-900/20 dark:border-blue-400",
-          icon: "text-blue-600 dark:text-blue-400",
-          text: "text-blue-800 dark:text-blue-200",
+            "bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-700 shadow-lg",
+          icon: "bg-black dark:bg-white text-white dark:text-black p-1 rounded-md",
+          text: "text-black dark:text-white font-medium",
+          accent: "text-blue-900 dark:text-blue-100",
         }
       case "warning":
         return {
           container:
-            "bg-red-50 border-l-4 border-red-500 dark:bg-red-900/20 dark:border-red-400",
-          icon: "text-red-600 dark:text-red-400",
-          text: "text-red-800 dark:text-red-200",
+            "bg-white dark:bg-gray-900 border border-red-200 dark:border-red-700 shadow-lg",
+          icon: "bg-black dark:bg-white text-white dark:text-black p-1 rounded-md",
+          text: "text-black dark:text-white font-medium",
+          accent: "text-red-900 dark:text-red-100",
         }
       case "tip":
         return {
           container:
-            "bg-green-50 border-l-4 border-green-500 dark:bg-green-900/20 dark:border-green-400",
-          icon: "text-green-600 dark:text-green-400",
-          text: "text-green-800 dark:text-green-200",
+            "bg-white dark:bg-gray-900 border border-green-200 dark:border-green-700 shadow-lg",
+          icon: "bg-black dark:bg-white text-white dark:text-black p-1 rounded-md",
+          text: "text-black dark:text-white font-medium",
+          accent: "text-green-900 dark:text-green-100",
         }
       case "concept":
         return {
           container:
-            "bg-purple-50 border-l-4 border-purple-500 dark:bg-purple-900/20 dark:border-purple-400",
-          icon: "text-purple-600 dark:text-purple-400",
-          text: "text-purple-800 dark:text-purple-200",
+            "bg-white dark:bg-gray-900 border border-purple-200 dark:border-purple-700 shadow-lg",
+          icon: "bg-black dark:bg-white text-white dark:text-black p-1 rounded-md",
+          text: "text-black dark:text-white font-medium",
+          accent: "text-purple-900 dark:text-purple-100",
         }
       default:
         return {
           container:
-            "bg-slate-50 border-l-4 border-slate-300 dark:bg-slate-800/50 dark:border-slate-600",
-          icon: "text-slate-600 dark:text-slate-400",
-          text: "text-slate-800 dark:text-slate-200",
+            "bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 shadow-lg",
+          icon: "bg-black dark:bg-white text-white dark:text-black p-1 rounded-md",
+          text: "text-black dark:text-white font-medium",
+          accent: "text-black dark:text-white",
         }
     }
   }
@@ -97,9 +104,9 @@ const ExplanationTabs: React.FC<ExplanationTabsProps> = ({ explanation }) => {
     if (codeMatch) {
       const [, language, code] = codeMatch
       return (
-        <div className="mt-3 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
-          <div className="flex items-center justify-between bg-slate-800 px-4 py-2">
-            <span className="font-mono text-sm text-slate-300">
+        <div className="mt-3 overflow-hidden rounded-lg border border-gray-300 shadow-lg dark:border-gray-600">
+          <div className="flex items-center justify-between bg-black px-4 py-2 dark:bg-white">
+            <span className="font-mono text-sm font-bold text-white dark:text-black">
               {language || "code"}
             </span>
             <div className="flex space-x-1">
@@ -108,8 +115,8 @@ const ExplanationTabs: React.FC<ExplanationTabsProps> = ({ explanation }) => {
               <div className="h-3 w-3 rounded-full bg-green-500" />
             </div>
           </div>
-          <div className="bg-slate-900 p-4">
-            <pre className="overflow-x-auto text-sm text-slate-200">
+          <div className="bg-gray-900 p-4 dark:bg-gray-100">
+            <pre className="overflow-x-auto text-sm font-medium text-gray-200 dark:text-gray-800">
               <code>{code.trim()}</code>
             </pre>
           </div>
@@ -120,12 +127,12 @@ const ExplanationTabs: React.FC<ExplanationTabsProps> = ({ explanation }) => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="mb-6">
-        <h3 className="mb-2 text-lg font-semibold text-slate-900 dark:text-white">
+    <div className="space-y-4">
+      <div className="rounded-lg border border-gray-300 bg-white p-3 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-gray-900">
+        <h3 className="mb-2 text-lg font-bold text-black dark:text-white">
           Step-by-Step Solution
         </h3>
-        <p className="text-sm text-slate-600 dark:text-slate-400">
+        <p className="text-sm font-medium text-black dark:text-white">
           Follow along as we break down the solution into manageable steps.
         </p>
       </div>
@@ -138,11 +145,13 @@ const ExplanationTabs: React.FC<ExplanationTabsProps> = ({ explanation }) => {
         if (item.type === "solution_code") {
           return (
             <div key={item.id || index} className="space-y-3">
-              <div className={`rounded-lg p-4 ${styles.container}`}>
+              <div className={`rounded-lg p-3 ${styles.container}`}>
                 <div className="flex items-start gap-3">
-                  <Icon className={`mt-1 h-5 w-5 ${styles.icon}`} />
+                  <div className={styles.icon}>
+                    <Icon className="h-4 w-4" />
+                  </div>
                   <div className="flex-1">
-                    <h4 className={`font-semibold ${styles.text}`}>
+                    <h4 className={`font-bold ${styles.accent}`}>
                       Complete Solution Code
                     </h4>
                     <p className={`mt-1 text-sm ${styles.text}`}>
@@ -159,9 +168,11 @@ const ExplanationTabs: React.FC<ExplanationTabsProps> = ({ explanation }) => {
         // Handle regular explanation items
         return (
           <div key={item.id || index} className="space-y-3">
-            <div className={`rounded-lg p-4 ${styles.container}`}>
+            <div className={`rounded-lg p-3 ${styles.container}`}>
               <div className="flex items-start gap-3">
-                <Icon className={`mt-1 h-5 w-5 flex-shrink-0 ${styles.icon}`} />
+                <div className={`mt-1 flex-shrink-0 ${styles.icon}`}>
+                  <Icon className="h-4 w-4" />
+                </div>
                 <div className="min-w-0 flex-1">
                   <div className={`prose prose-sm max-w-none ${styles.text}`}>
                     <SafeTextWithReferences

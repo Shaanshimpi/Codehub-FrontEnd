@@ -6,6 +6,8 @@ import Script from "next/script"
 // import EndSection from "./sections/EndSection"
 // 👈 import theme provider
 import { UserProvider } from "./(payload)/_providers/UserProvider"
+import "./Learn/Exercise/styles/playground.css"
+import "./Learn/Exercise/styles/scrollbar.css"
 import ScrollToTop from "./ScrollToTop"
 import { LanguageProvider } from "./contexts/LanguageContext"
 import ThemeClientWrapper from "./contexts/theme-client-wrapper"

@@ -1,10 +1,7 @@
 import type { ExerciseAIData } from "@/app/Learn/types/TutorialTypes"
 
-export const getLocalizedContent = (
-  exerciseData: ExerciseAIData,
-  language: string
-) => {
-  // Return single language fields (multi-language support removed)
+export const getLocalizedContent = (exerciseData: ExerciseAIData) => {
+  // Multi-language support has been removed
   return {
     title: exerciseData.title,
     hints: exerciseData.hints,

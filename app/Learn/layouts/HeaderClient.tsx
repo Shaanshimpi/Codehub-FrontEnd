@@ -11,6 +11,7 @@ import {
   Bot,
   ChevronDown,
   Code2,
+  Crown,
   Home,
   LogIn,
   Menu,
@@ -22,7 +23,6 @@ import {
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Language } from "../types/TutorialTypes"
-import { LanguageSwitcher } from "./LanguageSwitcher"
 
 interface HeaderClientProps {
   className?: string
@@ -288,20 +288,6 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                 )}
               </div>
 
-              {/* Vivy AI Chat */}
-              {process.env.ENV == "DEV" && (
-                <Link
-                  href={`/${baseSegment}/Vivy`}
-                  className={cn(
-                    "group flex items-center space-x-2 rounded-lg text-slate-100 transition-all duration-200 hover:bg-white/10 hover:text-white dark:text-slate-300 dark:hover:text-white",
-                    isShrunk ? "rounded-sm px-4 py-0" : "rounded-lg px-4 py-4"
-                  )}
-                >
-                  <Bot className="h-4 w-4" />
-                  <span className="font-medium">Vivy AI</span>
-                </Link>
-              )}
-
               {/* Interactive Dropdown */}
               {false && (
                 <div className="relative">
@@ -360,8 +346,30 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-3">
-            {/* Language Switcher */}
-            <LanguageSwitcher />
+            {/* Vivy Chat Button - Desktop Only */}
+            <Link
+              href={`/${baseSegment}/Vivy`}
+              className={cn(
+                "group relative hidden items-center space-x-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 px-4 transition-all duration-200 hover:from-blue-700 hover:to-blue-800 md:flex",
+                isShrunk ? "h-8 text-sm" : "h-10 text-sm"
+              )}
+            >
+              <Bot className="h-4 w-4 text-white" />
+              <span className="font-medium text-white">Vivy AI</span>
+            </Link>
+
+            {/* Upgrade Button - Desktop Only */}
+            <Link
+              href={`/${baseSegment}/upgrade`}
+              className={cn(
+                "group relative hidden items-center space-x-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 px-4 transition-all duration-200 hover:from-amber-600 hover:to-amber-700 md:flex",
+                isShrunk ? "h-8 text-sm" : "h-10 text-sm"
+              )}
+            >
+              <Crown className="h-4 w-4 text-white" />
+              <span className="font-medium text-white">Upgrade</span>
+            </Link>
+
             {/* Auth Button - Desktop Only */}
             <div className="hidden items-center space-x-3 md:flex">
               {isLoading ? (
@@ -370,13 +378,16 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                 <Link
                   href="/profile"
                   className={cn(
-                    "group relative flex h-10 items-center justify-center rounded-lg bg-white/10 px-4 text-white transition-all duration-200 hover:bg-white/20 dark:bg-slate-800/50 dark:hover:bg-slate-700/50",
+                    "group relative flex flex-col items-center justify-center rounded-lg bg-white/10 px-3 py-2 text-white transition-all duration-200 hover:bg-white/20 dark:bg-slate-800/50 dark:hover:bg-slate-700/50",
                     isShrunk
                       ? "hover:scale-80 scale-75"
                       : "scale-100 hover:scale-105"
                   )}
                 >
-                  Profile
+                  <User className="h-6 w-6" />
+                  <span className="mt-1 text-[10px] font-medium">
+                    {user.firstName || user.email?.split("@")[0]}
+                  </span>
                 </Link>
               ) : (
                 <Link
@@ -485,6 +496,20 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                 <span className="font-medium">Vivy AI Chat</span>
               </Link>
 
+              {/* Upgrade Button - Mobile */}
+              <Link
+                href={`/${baseSegment}/upgrade`}
+                className="flex items-center space-x-3 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-3 text-slate-100 transition-all duration-200 hover:from-amber-600 hover:to-amber-700"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <div className="flex h-6 w-6 items-center justify-center rounded bg-amber-700">
+                  <Crown className="h-4 w-4 text-white" />
+                </div>
+                <span className="font-medium text-white">
+                  Upgrade to Premium
+                </span>
+              </Link>
+
               <div className="space-y-2">
                 <div className="px-4 py-2">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
@@ -540,7 +565,9 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <User className="h-5 w-5" />
-                    <span className="font-medium">Profile</span>
+                    <span className="font-medium">
+                      {user.firstName || user.email?.split("@")[0]}
+                    </span>
                   </Link>
                 ) : (
                   <Link

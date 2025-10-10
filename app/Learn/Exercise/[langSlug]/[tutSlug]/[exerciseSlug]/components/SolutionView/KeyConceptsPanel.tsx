@@ -9,8 +9,9 @@ import {
   Lightbulb,
   Tag,
   Target,
-  Zap,
 } from "lucide-react"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/KeyConceptsPanel.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/SolutionView/KeyConceptsPanel.tsx
 
@@ -36,27 +37,29 @@ const KeyConceptsPanel: React.FC<KeyConceptsPanelProps> = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div>
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+      <div className="rounded-lg border border-gray-300 bg-white p-3 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-gray-900">
+        <h3 className="text-lg font-bold text-black dark:text-white">
           {title}
         </h3>
-        <p className="text-sm text-slate-600 dark:text-slate-400">
+        <p className="text-sm font-medium text-black dark:text-white">
           Master the fundamental programming concepts used in this exercise
         </p>
       </div>
 
       {/* Learning Objectives */}
       {objectives && objectives.length > 0 && (
-        <div className="rounded-lg bg-gradient-to-r from-blue-50 to-sky-50 p-6 dark:from-blue-900/20 dark:to-sky-900/20">
-          <div className="mb-4 flex items-center gap-2">
-            <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            <h4 className="font-semibold text-blue-800 dark:text-blue-200">
+        <div className="rounded-lg border border-blue-200 bg-white p-3 shadow-lg dark:border-blue-800 dark:bg-gray-900">
+          <div className="mb-3 flex items-center gap-2">
+            <div className="rounded-md bg-black p-1 text-white shadow-sm dark:bg-white dark:text-black">
+              <Target className="h-4 w-4" />
+            </div>
+            <h4 className="font-bold text-blue-900 dark:text-blue-100">
               Learning Objectives Achieved
             </h4>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {objectives.map((objective: any, index: number) => (
               <div
                 key={
@@ -66,7 +69,7 @@ const KeyConceptsPanel: React.FC<KeyConceptsPanelProps> = ({
                 }
                 className="flex items-start gap-3"
               >
-                <div className="mt-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
+                <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
                   <svg
                     className="h-3 w-3 text-white"
                     fill="none"
@@ -81,7 +84,7 @@ const KeyConceptsPanel: React.FC<KeyConceptsPanelProps> = ({
                     />
                   </svg>
                 </div>
-                <p className="text-sm leading-relaxed text-blue-700 dark:text-blue-300">
+                <p className="text-sm font-medium leading-relaxed text-black dark:text-white">
                   {typeof objective === "string"
                     ? objective
                     : objective.objective}
@@ -94,22 +97,23 @@ const KeyConceptsPanel: React.FC<KeyConceptsPanelProps> = ({
 
       {/* Programming Tags */}
       {tags && tags.length > 0 && (
-        <div className="rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 p-6 dark:from-purple-900/20 dark:to-pink-900/20">
-          <div className="mb-4 flex items-center gap-2">
-            <Tag className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-            <h4 className="font-semibold text-purple-800 dark:text-purple-200">
+        <div className="rounded-lg border border-gray-300 bg-white p-3 shadow-lg dark:border-gray-600 dark:bg-gray-900">
+          <div className="mb-3 flex items-center gap-2">
+            <div className="rounded-md bg-black p-1 text-white shadow-sm dark:bg-white dark:text-black">
+              <Tag className="h-4 w-4" />
+            </div>
+            <h4 className="font-bold text-black dark:text-white">
               Programming Topics
             </h4>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {tags.map((tag: any, index: number) => (
               <span
                 key={
                   typeof tag === "string" ? `${tag}-${index}` : tag.id || index
                 }
-                className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-3 py-1 text-sm font-medium text-purple-800 dark:bg-purple-900/30 dark:text-purple-200"
+                className="inline-flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-bold text-blue-900 dark:border-blue-700 dark:bg-blue-900 dark:text-blue-100"
               >
-                <Zap className="h-3 w-3" />
                 {typeof tag === "string" ? tag : tag.tag}
               </span>
             ))}
@@ -119,69 +123,73 @@ const KeyConceptsPanel: React.FC<KeyConceptsPanelProps> = ({
 
       {/* Core Concepts */}
       {concepts && concepts.length > 0 ? (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-            <h4 className="font-semibold text-slate-900 dark:text-white">
-              Core Programming Concepts
-            </h4>
+        <div className="space-y-3">
+          <div className="rounded-lg border border-gray-300 bg-white p-3 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-gray-900">
+            <div className="flex items-center gap-2">
+              <div className="rounded-md bg-black p-1 text-white shadow-sm dark:bg-white dark:text-black">
+                <Brain className="h-4 w-4" />
+              </div>
+              <h4 className="font-bold text-black dark:text-white">
+                Core Programming Concepts
+              </h4>
+            </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {concepts.map((concept: any, index: number) => (
               <div
                 key={concept.name || index}
-                className="overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800"
+                className="overflow-hidden rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-900"
               >
                 <button
                   onClick={() => toggleConcept(index)}
-                  className="w-full p-4 text-left transition-colors hover:bg-slate-50 dark:hover:bg-slate-700/50"
+                  className="w-full p-3 text-left transition-colors hover:bg-blue-50 dark:hover:bg-blue-900"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30">
-                        <Lightbulb className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black text-white shadow-sm dark:bg-white dark:text-black">
+                        <Lightbulb className="h-4 w-4" />
                       </div>
                       <div>
-                        <h5 className="font-semibold text-slate-900 dark:text-white">
+                        <h5 className="font-bold text-black dark:text-white">
                           {concept.name}
                         </h5>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                        <p className="text-xs font-medium text-black dark:text-white">
                           Click to learn more
                         </p>
                       </div>
                     </div>
                     {expandedConcept === index ? (
-                      <ChevronUp className="h-5 w-5 text-slate-400" />
+                      <ChevronUp className="h-5 w-5 text-black dark:text-white" />
                     ) : (
-                      <ChevronDown className="h-5 w-5 text-slate-400" />
+                      <ChevronDown className="h-5 w-5 text-black dark:text-white" />
                     )}
                   </div>
                 </button>
 
                 {expandedConcept === index && (
-                  <div className="border-t border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-700/50">
-                    <div className="space-y-4">
+                  <div className="border-t border-gray-300 bg-white p-3 dark:border-gray-600 dark:bg-black">
+                    <div className="space-y-3">
                       <div>
-                        <h6 className="mb-2 font-medium text-slate-900 dark:text-white">
+                        <h6 className="mb-2 font-bold text-black dark:text-white">
                           Description
                         </h6>
-                        <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                        <p className="text-sm font-medium leading-relaxed text-black dark:text-white">
                           {concept.description}
                         </p>
                       </div>
 
                       {concept.visual_metaphor && (
-                        <div className="rounded-lg bg-gradient-to-r from-yellow-50 to-orange-50 p-4 dark:from-yellow-900/20 dark:to-orange-900/20">
+                        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-700 dark:bg-blue-900">
                           <div className="flex items-start gap-3">
                             <div className="mt-1">
                               <span className="text-lg">💭</span>
                             </div>
                             <div>
-                              <h6 className="mb-1 font-medium text-orange-800 dark:text-orange-200">
+                              <h6 className="mb-1 font-bold text-blue-900 dark:text-blue-100">
                                 Think of it like this:
                               </h6>
-                              <p className="text-sm italic text-orange-700 dark:text-orange-300">
+                              <p className="text-sm font-medium italic text-black dark:text-white">
                                 {concept.visual_metaphor}
                               </p>
                             </div>
@@ -197,12 +205,16 @@ const KeyConceptsPanel: React.FC<KeyConceptsPanelProps> = ({
         </div>
       ) : (
         /* Fallback when no concepts are provided */
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-            <h4 className="font-semibold text-slate-900 dark:text-white">
-              Core Programming Concepts
-            </h4>
+        <div className="space-y-3">
+          <div className="rounded-lg border border-gray-300 bg-white p-3 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:bg-gray-900">
+            <div className="flex items-center gap-2">
+              <div className="rounded-md bg-black p-1 text-white shadow-sm dark:bg-white dark:text-black">
+                <Brain className="h-4 w-4" />
+              </div>
+              <h4 className="font-bold text-black dark:text-white">
+                Core Programming Concepts
+              </h4>
+            </div>
           </div>
         </div>
       )}

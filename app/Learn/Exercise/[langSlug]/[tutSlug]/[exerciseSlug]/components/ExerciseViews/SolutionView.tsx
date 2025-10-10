@@ -1,30 +1,23 @@
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 "use client"
 
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import React, { useState } from "react"
 import { useUser } from "@/app/(payload)/_providers/UserProvider"
+import UnifiedMobileTabSwitcher from "@/app/Learn/Exercise/components/Mobile/UnifiedMobileTabSwitcher"
 import LoginModal from "@/app/Learn/components/LoginModal"
-import { useLanguage } from "@/app/contexts/LanguageContext"
-import { removeComments } from "@/app/utils/codeCommentUtils"
-import { getLocalizedContent } from "@/app/utils/exerciseHelpers"
 import {
   Code,
   FileText,
   Lightbulb,
   Lock,
-  MessageSquare,
   Network,
   Play,
-  Zap,
 } from "lucide-react"
-import EnhancedTabContainer, { TabConfig } from "../Shared/EnhancedTabContainer"
-import UnifiedCodeEditor from "../Shared/UnifiedCodeEditor"
+import SolutionCodePlayground from "../Shared/SolutionCodePlayground"
 import ExecutionStepsPanel from "../SolutionView/ExecutionStepsPanel"
 import ExplanationTabs from "../SolutionView/ExplanationTabs"
 import KeyConceptsPanel from "../SolutionView/KeyConceptsPanel"
 import MermaidViewer from "../SolutionView/MermaidViewer"
-
-// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
@@ -46,67 +39,19 @@ const SolutionView: React.FC<SolutionViewProps> = ({
   onPanelResize,
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>("explanation")
-  const [mobileActiveTab, setMobileActiveTab] = useState<
-    "explanation" | "code"
-  >("explanation")
-  const [currentCode, setCurrentCode] = useState(exercise.solution_code)
+  const [mobileActiveTab, setMobileActiveTab] = useState<"solution" | "code">(
+    "solution"
+  )
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [lockedFeature, setLockedFeature] = useState("")
-  const { language: currentLanguage } = useLanguage()
   const { user } = useUser()
 
-  // Reset code when exercise changes
-  useEffect(() => {
-    setCurrentCode(exercise.solution_code)
-  }, [exercise.solution_code])
-
-  // Get localized content based on selected language
-  const content = getLocalizedContent(exercise, currentLanguage)
-
-  // Handle solution code changes
-  const handleSolutionCodeChange = useCallback((code: string) => {
-    setCurrentCode(code)
-  }, [])
-
-  // Enhanced tabs configuration for solution code section
-  const solutionTabsConfig: TabConfig[] = useMemo(() => {
-    const solutionCode = exercise.solution_code || ""
-    const cleanSolutionCode = removeComments(solutionCode, language.slug)
-
-    return [
-      {
-        id: "with-explanation",
-        label: "With Explanation",
-        icon: <MessageSquare className="h-4 w-4" />,
-        content: (
-          <UnifiedCodeEditor
-            key="solution-explanation-editor"
-            exercise={exercise}
-            language={language}
-            code={currentCode}
-            onCodeChange={handleSolutionCodeChange}
-            mode="solution"
-          />
-        ),
-      },
-      {
-        id: "clean-solution",
-        label: "Clean Solution",
-        icon: <Zap className="h-4 w-4" />,
-        content: (
-          <UnifiedCodeEditor
-            key="solution-clean-editor"
-            exercise={exercise}
-            language={language}
-            code={cleanSolutionCode}
-            onCodeChange={() => {}} // Read-only
-            mode="solution"
-            isReadOnly={true}
-          />
-        ),
-      },
-    ]
-  }, [exercise, language, currentCode, handleSolutionCodeChange])
+  // Use exercise data directly (no multi-language support)
+  const content = {
+    title: exercise.title,
+    hints: exercise.hints,
+    explanation: exercise.explanation,
+  }
 
   // Check if premium features are locked
   const isPremiumLocked = !user
@@ -191,49 +136,48 @@ const SolutionView: React.FC<SolutionViewProps> = ({
     )
   }
 
+  // Mobile tabs configuration for UnifiedMobileTabSwitcher
+  const mobileTabs = [
+    {
+      id: "solution",
+      label: "Solution Guide",
+      icon: <FileText className="h-4 w-4" />,
+      description: "Detailed explanation with flowcharts and concepts",
+    },
+    {
+      id: "code",
+      label: "Solution Code",
+      icon: <Code className="h-4 w-4" />,
+      description: "Complete solution with comments",
+    },
+  ]
+
   return (
     <>
-      {/* Mobile Tab Switcher - Hidden on desktop */}
-      <div className="bg-white dark:bg-slate-900 lg:hidden">
-        <div className="flex">
-          <button
-            onClick={() => setMobileActiveTab("explanation")}
-            className={`flex flex-1 items-center justify-center gap-1 border-b-2 px-4 py-2 text-sm font-medium ${
-              mobileActiveTab === "explanation"
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-slate-500"
-            }`}
-          >
-            <FileText className="h-3 w-3" />
-            Explanation
-          </button>
-          <button
-            onClick={() => setMobileActiveTab("code")}
-            className={`flex flex-1 items-center justify-center gap-1 border-b-2 px-4 py-2 text-sm font-medium ${
-              mobileActiveTab === "code"
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-slate-500"
-            }`}
-          >
-            <Code className="h-3 w-3" />
-            Code
-          </button>
-        </div>
+      {/* Enhanced Mobile Tab Switcher - Hidden on desktop */}
+      <div className="lg:hidden">
+        <UnifiedMobileTabSwitcher
+          tabs={mobileTabs}
+          activeTab={mobileActiveTab}
+          onTabChange={(tabId) =>
+            setMobileActiveTab(tabId as "solution" | "code")
+          }
+          className="bg-white dark:bg-neutral-900"
+        />
       </div>
 
       {/* Responsive Layout */}
       <div
-        className={`lg:flex ${isFullscreen ? "h-screen" : "lg:h-[calc(100vh-10rem)]"}`}
+        className={`lg:flex ${isFullscreen ? "h-screen" : "h-[calc(100vh-8rem)]"}`}
       >
-        {/* Explanation Panel */}
+        {/* Solution Guide Panel - Left Side */}
         <div
-          className={`lg:border-r lg:border-slate-200 lg:bg-white lg:dark:border-slate-700 lg:dark:bg-slate-900 ${mobileActiveTab === "explanation" ? `block ${isFullscreen ? "h-screen" : "h-[calc(100vh-6rem)]"} overflow-y-auto` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2 lg:overflow-y-auto" : "lg:flex-none"}`}
+          className={`lg:border-r lg:border-gray-300 lg:bg-gradient-to-br lg:from-neutral-50 lg:to-white lg:dark:border-gray-600 lg:dark:from-neutral-900 lg:dark:to-neutral-800 ${mobileActiveTab === "solution" ? `block ${isFullscreen ? "h-screen" : "h-[calc(100vh-8rem)]"} overflow-y-auto` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2 lg:overflow-y-auto" : "lg:flex-none"}`}
           style={isFullscreen ? { width: `${panelWidth}%` } : {}}
         >
           <div className="flex h-full flex-col">
-            {/* Compact Header - Always visible */}
-            <div className="border-b border-slate-200 bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-800">
-              {/* Compact Tab Navigation */}
+            {/* Modern Tab Navigation - High Contrast Design */}
+            <div className="border-b border-gray-300 bg-white p-3 shadow-lg dark:border-gray-600 dark:bg-black">
               <div className="flex space-x-1 overflow-x-auto">
                 {tabs.map((tab) => {
                   const Icon = tab.icon
@@ -244,13 +188,13 @@ const SolutionView: React.FC<SolutionViewProps> = ({
                     <button
                       key={tab.id}
                       onClick={() => handleTabClick(tab.id)}
-                      className={`flex items-center gap-1 rounded px-2 py-1 text-xs font-medium transition-all ${
+                      className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold shadow-lg transition-all duration-200 hover:shadow-xl ${
                         activeTab === tab.id
-                          ? "bg-blue-600 text-white"
+                          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white"
                           : isLocked
-                            ? "text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-900/20"
-                            : "text-slate-600 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700"
-                      } ${isLocked ? "cursor-pointer" : ""}`}
+                            ? "border border-amber-200 bg-white text-amber-600 hover:bg-amber-50 dark:border-amber-700 dark:bg-gray-900 dark:text-amber-400 dark:hover:bg-amber-900/20"
+                            : "border border-gray-300 bg-white text-black hover:bg-blue-50 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:hover:bg-blue-900"
+                      }`}
                       title={
                         isLocked
                           ? `${tab.description} (Premium Feature)`
@@ -258,12 +202,12 @@ const SolutionView: React.FC<SolutionViewProps> = ({
                       }
                     >
                       {isLocked ? (
-                        <Lock className="h-3 w-3" />
+                        <Lock className="h-4 w-4" />
                       ) : (
-                        <Icon className="h-3 w-3" />
+                        <Icon className="h-4 w-4" />
                       )}
                       <span className="hidden sm:inline">{tab.label}</span>
-                      {isLocked && <Lock className="ml-1 h-2 w-2" />}
+                      {isLocked && <Lock className="ml-1 h-3 w-3" />}
                     </button>
                   )
                 })}
@@ -271,7 +215,7 @@ const SolutionView: React.FC<SolutionViewProps> = ({
             </div>
 
             {/* Tab Content */}
-            <div className="flex-1 overflow-y-auto p-2">
+            <div className="flex-1 overflow-y-auto p-2 lg:p-3">
               {renderTabContent()}
             </div>
           </div>
@@ -286,21 +230,14 @@ const SolutionView: React.FC<SolutionViewProps> = ({
           />
         )}
 
-        {/* Enhanced Solution Code Panel with Sub-tabs */}
+        {/* Solution Code Panel - Right Side (Like StudentPlayground) */}
         <div
-          className={`lg:bg-slate-900 ${mobileActiveTab === "code" ? `block ${isFullscreen ? "h-screen" : "h-[calc(100vh-6rem)]"}` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2 lg:overflow-y-auto" : "lg:flex-1"}`}
+          className={`${mobileActiveTab === "code" ? `block h-full` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2" : "lg:flex-1"}`}
           style={
             isFullscreen ? { width: `calc(${100 - panelWidth}% - 4px)` } : {}
           }
         >
-          <EnhancedTabContainer
-            tabs={solutionTabsConfig}
-            variant="secondary"
-            size="sm"
-            className="h-full bg-slate-900"
-            contentClassName="h-[calc(100%-3rem)]"
-            defaultTab="with-explanation"
-          />
+          <SolutionCodePlayground exercise={exercise} language={language} />
         </div>
       </div>
 
