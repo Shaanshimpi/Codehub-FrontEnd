@@ -38,6 +38,7 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
   const [showHints, setShowHints] = useState(false)
   const [showSolution, setShowSolution] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
+  const [attempts, setAttempts] = useState(0)
 
   React.useEffect(() => {
     if (data.questions.length > 0) {
@@ -58,6 +59,7 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
       setShowHints(false)
       setShowSolution(false)
       setIsComplete(false)
+      setAttempts(0)
     }
   }
 
@@ -139,7 +141,8 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
     if (isCorrect) {
       setIsComplete(true)
     } else {
-      setShowSolution(true)
+      setAttempts(prev => prev + 1)
+      setShowSolution(false)
     }
   }
 
@@ -210,26 +213,45 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
           🧩 Code Rearrangement: Arrange the Blocks
         </h3>
 
-        {/* Scenario */}
-        <div className="mb-6">
-          <h4 className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-            📋 Scenario:
-          </h4>
-          <p className="text-gray-700 dark:text-gray-300">
-            {currentQ.scenario}
-          </p>
-        </div>
 
-        {/* Target Output */}
+        {/* Your Task */}
         <div className="mb-6">
           <h4 className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-            🎯 Target Output:
+            🎯 Your Task:
           </h4>
-          <div className="rounded-lg bg-gray-900 p-4">
-            <pre className="overflow-x-auto text-sm text-gray-100">
-              <code>{currentQ.targetCode}</code>
-            </pre>
+          <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-4">
+            <p className="text-blue-800 dark:text-blue-200">
+              {currentQ.scenario}
+            </p>
           </div>
+          
+          {attempts >= 3 && (
+            <div className="mt-3">
+              <button
+                onClick={() => setShowSolution(!showSolution)}
+                className="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 text-sm dark:bg-yellow-900/20 dark:text-yellow-200 dark:hover:bg-yellow-900/30"
+              >
+                {showSolution ? 'Hide' : 'Show'} Solution
+              </button>
+              
+              {showSolution && (
+                <div className="mt-3 rounded-lg bg-gray-900 p-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-gray-400">Solution:</span>
+                    <button
+                      onClick={() => setShowSolution(false)}
+                      className="text-gray-400 hover:text-white text-sm"
+                    >
+                      ✕ Hide
+                    </button>
+                  </div>
+                  <pre className="overflow-x-auto text-sm text-gray-100">
+                    <code>{currentQ.targetCode}</code>
+                  </pre>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Mermaid Diagram */}
