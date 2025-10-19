@@ -26,7 +26,10 @@ interface MCQLessonProps {
   lessonTitle: string
 }
 
-const MCQLesson: React.FC<MCQLessonProps> = ({ data, lessonTitle }) => {
+const MCQLesson: React.FC<MCQLessonProps> = ({
+  data,
+  lessonTitle: _lessonTitle,
+}) => {
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const theme = useTheme()
   const [selectedAnswers, setSelectedAnswers] = useState<{
@@ -36,6 +39,18 @@ const MCQLesson: React.FC<MCQLessonProps> = ({ data, lessonTitle }) => {
     [key: number]: boolean
   }>({})
   const [quizComplete, setQuizComplete] = useState(false)
+
+  // Scroll to top when question changes
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }, [currentQuestion])
+
+  // Scroll to top when quiz completes
+  React.useEffect(() => {
+    if (quizComplete) {
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+  }, [quizComplete])
 
   const handleAnswerSelect = (questionIndex: number, optionIndex: number) => {
     setSelectedAnswers((prev) => ({
@@ -200,9 +215,9 @@ const MCQLesson: React.FC<MCQLessonProps> = ({ data, lessonTitle }) => {
   const showExplanation = showExplanations[currentQuestion]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Progress Bar */}
-      <div className="rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
+      <div className="rounded-lg bg-gray-100 p-3 dark:bg-gray-800 sm:p-4">
         <div className="mb-2 flex items-center justify-between">
           <Badge variant="info" size="sm">
             Question {currentQuestion + 1} of {data.questions.length}
@@ -220,7 +235,7 @@ const MCQLesson: React.FC<MCQLessonProps> = ({ data, lessonTitle }) => {
       </div>
 
       {/* Question */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+      <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:p-6">
         <div className="mb-4">
           <div className="mb-4 flex items-center gap-2">
             <span className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-200">
@@ -244,6 +259,7 @@ const MCQLesson: React.FC<MCQLessonProps> = ({ data, lessonTitle }) => {
               language="javascript"
               copyable
               showLineNumbers
+              showLanguageLabel={false}
             />
           </div>
         )}
@@ -271,7 +287,7 @@ const MCQLesson: React.FC<MCQLessonProps> = ({ data, lessonTitle }) => {
                   handleAnswerSelect(currentQuestion, optionIndex)
                 }
                 disabled={showExplanation}
-                className={`w-full rounded-lg border p-4 text-left transition-colors ${
+                className={`w-full rounded-lg border p-3 text-left transition-colors sm:p-4 ${
                   shouldShowCorrect
                     ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20"
                     : shouldShowIncorrect
@@ -334,7 +350,7 @@ const MCQLesson: React.FC<MCQLessonProps> = ({ data, lessonTitle }) => {
 
         {/* Explanation */}
         {showExplanation && (
-          <div className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+          <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20 sm:mt-6 sm:p-4">
             <div className="flex items-start gap-3">
               <Icon name="star" className="mt-1 text-blue-500" size="sm" />
               <div>

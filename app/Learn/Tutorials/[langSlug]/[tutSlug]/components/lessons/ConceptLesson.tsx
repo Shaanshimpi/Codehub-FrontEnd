@@ -27,7 +27,10 @@ interface ConceptLessonProps {
   lessonTitle: string
 }
 
-const ConceptLesson: React.FC<ConceptLessonProps> = ({ data, lessonTitle }) => {
+const ConceptLesson: React.FC<ConceptLessonProps> = ({
+  data,
+  lessonTitle: _lessonTitle,
+}) => {
   const [expandedSections, setExpandedSections] = useState<string[]>([])
   const [currentExampleIndex, setCurrentExampleIndex] = useState(0)
   const theme = useTheme()
@@ -38,19 +41,6 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({ data, lessonTitle }) => {
         ? prev.filter((id) => id !== sectionId)
         : [...prev, sectionId]
     )
-  }
-
-  const handleExampleSwipe = (direction: "left" | "right") => {
-    if (!data.codeExamples) return
-
-    if (
-      direction === "left" &&
-      currentExampleIndex < data.codeExamples.length - 1
-    ) {
-      setCurrentExampleIndex(currentExampleIndex + 1)
-    } else if (direction === "right" && currentExampleIndex > 0) {
-      setCurrentExampleIndex(currentExampleIndex - 1)
-    }
   }
 
   const renderMermaidDiagram = (
@@ -72,7 +62,7 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({ data, lessonTitle }) => {
     <div className="space-y-4 lg:space-y-6">
       {/* Main Explanation - Enhanced */}
       {data.explanation && (
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20 lg:p-6">
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20 sm:p-4 lg:p-6">
           <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-blue-900 dark:text-blue-100 sm:text-xl">
             <Icon
               name="book"
@@ -146,7 +136,7 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({ data, lessonTitle }) => {
                     {data.codeExamples.length}
                   </Badge>
                   <span className="text-sm text-gray-500 dark:text-gray-400">
-                    • Swipe or use arrows to navigate
+                    Use arrows to navigate
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -191,27 +181,7 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({ data, lessonTitle }) => {
                 if (!example) return null
 
                 return (
-                  <div
-                    className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800"
-                    onTouchStart={(e) => {
-                      const touch = e.touches[0]
-                      ;(e.currentTarget as any).startX = touch.clientX
-                    }}
-                    onTouchEnd={(e) => {
-                      const touch = e.changedTouches[0]
-                      const startX = (e.currentTarget as any).startX
-                      const diffX = startX - touch.clientX
-
-                      // Swipe threshold
-                      if (Math.abs(diffX) > 50) {
-                        if (diffX > 0) {
-                          handleExampleSwipe("left") // Swipe left = next
-                        } else {
-                          handleExampleSwipe("right") // Swipe right = previous
-                        }
-                      }
-                    }}
-                  >
+                  <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800">
                     {/* Enhanced Example Header */}
                     <div className="border-b border-gray-200 bg-gradient-to-r from-green-50 via-blue-50 to-indigo-50 px-4 py-6 dark:border-gray-700 dark:from-green-900/20 dark:via-blue-900/20 dark:to-indigo-900/20 sm:px-6">
                       <div className="flex items-start justify-between">
@@ -235,7 +205,7 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({ data, lessonTitle }) => {
                       </div>
                     </div>
 
-                    <div className="p-4 sm:p-6 lg:p-8">
+                    <div className="p-3 sm:p-6 lg:p-8">
                       {/* Responsive Layout - Stack on mobile, side-by-side on larger screens */}
                       <div className="space-y-6 lg:space-y-8">
                         {/* Code Section */}
@@ -389,7 +359,7 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({ data, lessonTitle }) => {
                     </div>
                   </div>
 
-                  <div className="p-4 sm:p-6 lg:p-8">
+                  <div className="p-3 sm:p-6 lg:p-8">
                     <div className="space-y-6 lg:space-y-8">
                       {/* Code Section */}
                       <div className="space-y-4">

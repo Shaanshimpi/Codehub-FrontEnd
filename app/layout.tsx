@@ -15,8 +15,6 @@ import { ThemeProvider } from "./contexts/theme-context"
 import { geistMono, geistSans } from "./fonts"
 import "./globals.css"
 
-const WALink = `https://wa.me/918637704621?text=I%20Want%20to%20learn%20coding%20and%20be%20successful%20Coder`
-
 export const metadata: Metadata = {
   title: "CodeHub",
   description:
@@ -89,6 +87,7 @@ export default function RootLayout({
 
       <body
         className={`relative ${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <ScrollToTop />
         <LanguageProvider defaultLanguage="en">

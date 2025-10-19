@@ -30,7 +30,7 @@ interface CodeRearrangeLessonProps {
 
 const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
   data,
-  lessonTitle,
+  lessonTitle: _lessonTitle,
 }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const theme = useTheme()
@@ -39,11 +39,17 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
   const [showHints, setShowHints] = useState(false)
   const [showSolution, setShowSolution] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
+  const [selectedBlock, setSelectedBlock] = useState<string | null>(null)
+  const [selectedAvailableBlock, setSelectedAvailableBlock] = useState<
+    string | null
+  >(null)
 
   React.useEffect(() => {
     if (data.questions.length > 0) {
       resetQuestion()
     }
+    // Scroll to top when question changes
+    window.scrollTo({ top: 0, behavior: "smooth" })
   }, [currentQuestion, data.questions])
 
   const resetQuestion = () => {
@@ -59,6 +65,8 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
       setShowHints(false)
       setShowSolution(false)
       setIsComplete(false)
+      setSelectedBlock(null)
+      setSelectedAvailableBlock(null)
     }
   }
 
@@ -84,6 +92,8 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
       // Move from solution back to available
       setUserOrder((prev) => prev.filter((code) => code !== blockCode))
       setAvailableBlocks((prev) => [...prev, blockCode])
+      setSelectedBlock(null)
+      setSelectedAvailableBlock(null)
     } else if (target === "solution" && source === "available") {
       setAvailableBlocks((prev) => prev.filter((code) => code !== blockCode))
       if (index !== undefined) {
@@ -95,6 +105,8 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
       } else {
         setUserOrder((prev) => [...prev, blockCode])
       }
+      setSelectedBlock(null)
+      setSelectedAvailableBlock(null)
     }
   }
 
@@ -125,6 +137,15 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
   const removeFromSolution = (blockCode: string) => {
     setUserOrder((prev) => prev.filter((code) => code !== blockCode))
     setAvailableBlocks((prev) => [...prev, blockCode])
+    if (selectedBlock === blockCode) {
+      setSelectedBlock(null)
+    }
+  }
+
+  const moveToSolution = (blockCode: string) => {
+    setAvailableBlocks((prev) => prev.filter((code) => code !== blockCode))
+    setUserOrder((prev) => [...prev, blockCode])
+    setSelectedAvailableBlock(null)
   }
 
   const checkSolution = () => {
@@ -184,9 +205,9 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
   const currentQ = data.questions[currentQuestion]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Progress Bar */}
-      <div className="rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
+      <div className="rounded-lg bg-gray-100 p-3 dark:bg-gray-800 sm:p-4">
         <div className="mb-2 flex items-center justify-between">
           <span className="text-sm font-medium text-gray-900 dark:text-white">
             Question {currentQuestion + 1} of {data.questions.length}
@@ -206,7 +227,7 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
       </div>
 
       {/* Question Content */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+      <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:p-6">
         <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
           🧩 Code Rearrangement: Arrange the Blocks
         </h3>
@@ -226,7 +247,7 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
           <h4 className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
             🎯 Target Output:
           </h4>
-          <div className="rounded-lg bg-gray-900 p-4">
+          <div className="rounded-lg bg-gray-900 p-3 sm:p-4">
             <pre className="overflow-x-auto text-sm text-gray-100">
               <code>{currentQ.targetCode}</code>
             </pre>
@@ -237,32 +258,66 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
         {currentQ.mermaid_code && renderMermaidDiagram(currentQ.mermaid_code)}
 
         {/* Drag and Drop Area */}
-        <div className="mb-6 grid grid-cols-2 gap-6">
+        <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Available Blocks */}
           <div>
             <h4 className="mb-3 text-sm font-medium text-gray-900 dark:text-white">
               Available Blocks:
             </h4>
             <div
-              className="min-h-32 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-700"
+              className="min-h-32 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-3 dark:border-gray-600 dark:bg-gray-700 sm:p-4"
               onDrop={(e) => handleDrop(e, "available")}
               onDragOver={handleDragOver}
             >
               <div className="space-y-2">
-                {availableBlocks.map((blockCode, index) => (
-                  <div
-                    key={`${blockCode}-${index}`}
-                    draggable
-                    onDragStart={(e) =>
-                      handleDragStart(e, blockCode, "available")
-                    }
-                    className="cursor-move rounded border border-gray-200 bg-white p-3 transition-shadow hover:shadow-md dark:border-gray-600 dark:bg-gray-800"
-                  >
-                    <code className="text-sm text-gray-800 dark:text-gray-200">
-                      {blockCode}
-                    </code>
-                  </div>
-                ))}
+                {availableBlocks.map((blockCode, index) => {
+                  const isSelected = selectedAvailableBlock === blockCode
+                  return (
+                    <div
+                      key={`${blockCode}-${index}`}
+                      draggable
+                      role="button"
+                      tabIndex={0}
+                      onDragStart={(e) =>
+                        handleDragStart(e, blockCode, "available")
+                      }
+                      onClick={() =>
+                        setSelectedAvailableBlock(isSelected ? null : blockCode)
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault()
+                          setSelectedAvailableBlock(
+                            isSelected ? null : blockCode
+                          )
+                        }
+                      }}
+                      className={`cursor-pointer touch-manipulation select-none rounded border p-3 transition-all hover:shadow-md ${
+                        isSelected
+                          ? "border-green-500 bg-green-100 shadow-lg ring-2 ring-green-400 dark:border-green-400 dark:bg-green-900/30 dark:ring-green-500"
+                          : "border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800"
+                      }`}
+                    >
+                      <div className="flex flex-col gap-2">
+                        <code className="select-none text-sm text-gray-800 dark:text-gray-200">
+                          {blockCode}
+                        </code>
+                        {isSelected && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              moveToSolution(blockCode)
+                            }}
+                            className="flex touch-manipulation items-center justify-center gap-2 rounded bg-green-600 py-2 text-sm font-medium text-white hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
+                          >
+                            <span>Move to Solution</span>
+                            <span>→</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -273,52 +328,86 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
               Your Solution:
             </h4>
             <div
-              className="min-h-32 rounded-lg border-2 border-dashed border-blue-300 bg-blue-50 p-4 dark:border-blue-700 dark:bg-blue-900/20"
+              className="min-h-32 rounded-lg border-2 border-dashed border-blue-300 bg-blue-50 p-3 dark:border-blue-700 dark:bg-blue-900/20 sm:p-4"
               onDrop={(e) => handleDrop(e, "solution")}
               onDragOver={handleDragOver}
             >
               <div className="space-y-2">
-                {userOrder.map((blockCode, index) => (
-                  <div
-                    key={`${blockCode}-${index}`}
-                    draggable
-                    onDragStart={(e) =>
-                      handleDragStart(e, blockCode, "solution")
-                    }
-                    className="group cursor-move rounded border border-blue-200 bg-blue-100 p-3 transition-shadow hover:shadow-md dark:border-blue-600 dark:bg-blue-800"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="mr-2 text-sm text-blue-900 dark:text-blue-100">
-                        {index + 1}.
-                      </span>
-                      <code className="flex-1 text-sm text-blue-800 dark:text-blue-200">
-                        {blockCode}
-                      </code>
-                      <div className="col flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                        <button
-                          onClick={() => moveBlock(blockCode, "up")}
-                          disabled={index === 0}
-                          className="p-1 text-blue-600 hover:text-blue-800 disabled:opacity-50"
-                        >
-                          ↑
-                        </button>
-                        <button
-                          onClick={() => moveBlock(blockCode, "down")}
-                          disabled={index === userOrder.length - 1}
-                          className="p-1 text-blue-600 hover:text-blue-800 disabled:opacity-50"
-                        >
-                          ↓
-                        </button>
-                        <button
-                          onClick={() => removeFromSolution(blockCode)}
-                          className="p-1 text-red-600 hover:text-red-800"
-                        >
-                          ×
-                        </button>
+                {userOrder.map((blockCode, index) => {
+                  const isSelected = selectedBlock === blockCode
+                  return (
+                    <div
+                      key={`${blockCode}-${index}`}
+                      draggable
+                      role="button"
+                      tabIndex={0}
+                      onDragStart={(e) =>
+                        handleDragStart(e, blockCode, "solution")
+                      }
+                      onClick={() =>
+                        setSelectedBlock(isSelected ? null : blockCode)
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault()
+                          setSelectedBlock(isSelected ? null : blockCode)
+                        }
+                      }}
+                      className={`group cursor-pointer touch-manipulation select-none rounded border p-3 transition-all hover:shadow-md ${
+                        isSelected
+                          ? "border-blue-500 bg-blue-200 shadow-lg ring-2 ring-blue-400 dark:border-blue-400 dark:bg-blue-700 dark:ring-blue-500"
+                          : "border-blue-200 bg-blue-100 dark:border-blue-600 dark:bg-blue-800"
+                      }`}
+                    >
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-start gap-2">
+                          <span className="select-none text-sm text-blue-900 dark:text-blue-100">
+                            {index + 1}.
+                          </span>
+                          <code className="flex-1 select-none break-all text-sm text-blue-800 dark:text-blue-200">
+                            {blockCode}
+                          </code>
+                        </div>
+                        {isSelected && (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                moveBlock(blockCode, "up")
+                              }}
+                              disabled={index === 0}
+                              className="flex h-9 flex-1 touch-manipulation items-center justify-center gap-1 rounded bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-30 dark:bg-blue-500 dark:hover:bg-blue-600"
+                            >
+                              <span className="text-base">↑</span>
+                              <span className="hidden sm:inline">Up</span>
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                moveBlock(blockCode, "down")
+                              }}
+                              disabled={index === userOrder.length - 1}
+                              className="flex h-9 flex-1 touch-manipulation items-center justify-center gap-1 rounded bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-30 dark:bg-blue-500 dark:hover:bg-blue-600"
+                            >
+                              <span className="text-base">↓</span>
+                              <span className="hidden sm:inline">Down</span>
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                removeFromSolution(blockCode)
+                              }}
+                              className="flex h-9 flex-1 touch-manipulation items-center justify-center gap-1 rounded bg-red-600 text-sm font-medium text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                            >
+                              <span className="text-lg">×</span>
+                              <span className="hidden sm:inline">Remove</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
                 {userOrder.length === 0 && (
                   <div className="py-8 text-center text-gray-500 dark:text-gray-400">
                     Drag code blocks here to build your solution
@@ -343,7 +432,7 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
               💡 {showHints ? "Hide" : "Show"} Hints
             </button>
             {showHints && (
-              <div className="mt-3 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
+              <div className="mt-3 rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-900/20 sm:p-4">
                 <ul className="space-y-2">
                   {currentQ.hints.map((hint, index) => (
                     <li key={index} className="flex items-start gap-2">
@@ -380,7 +469,7 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
 
         {/* Success Message */}
         {isComplete && (
-          <div className="mt-6 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
+          <div className="mt-4 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-900/20 sm:mt-6 sm:p-4">
             <div className="flex items-start gap-3">
               <span className="text-lg text-green-500">🎉</span>
               <div>
@@ -397,7 +486,7 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
 
         {/* Solution Display */}
         {showSolution && !isComplete && (
-          <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
+          <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/20 sm:mt-6 sm:p-4">
             <div className="flex items-start gap-3">
               <span className="text-lg text-red-500">💡</span>
               <div>

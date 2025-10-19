@@ -52,9 +52,12 @@ const FillBlanksLesson: React.FC<FillBlanksLessonProps> = ({
   const [checkedBlanks, setCheckedBlanks] = useState<{
     [key: number]: boolean
   }>({})
+  const [activeHint, setActiveHint] = useState<number | null>(null)
 
   React.useEffect(() => {
     resetQuestion()
+    // Scroll to top when question changes
+    window.scrollTo({ top: 0, behavior: "smooth" })
   }, [currentQuestion])
 
   const resetQuestion = () => {
@@ -63,6 +66,7 @@ const FillBlanksLesson: React.FC<FillBlanksLessonProps> = ({
     setShowSolution(false)
     setIsComplete(false)
     setCheckedBlanks({})
+    setActiveHint(null)
   }
 
   const handleAnswerChange = (blankIndex: number, value: string) => {
@@ -120,98 +124,130 @@ const FillBlanksLesson: React.FC<FillBlanksLessonProps> = ({
   }
 
   const renderCodeWithBlanks = (code: string, blanks: Blank[]) => {
+    // Use {{blank1}}, {{blank2}}, etc. as placeholders in the code
     const lines = code.split("\n")
 
     return lines.map((line, lineIndex) => {
-      let modifiedLine = line
-      const lineBlanks = blanks.filter((blank) => {
-        // Simple position-based blank detection
-        const linePosition =
-          lines.slice(0, lineIndex).join("\n").length + lineIndex
-        return (
-          blank.position >= linePosition &&
-          blank.position <= linePosition + line.length
-        )
-      })
+      const parts: React.ReactNode[] = []
+      let partIndex = 0
 
-      // Replace blanks in reverse order to maintain position accuracy
-      lineBlanks.reverse().forEach((blank, _blankIndex) => {
-        const globalBlankIndex = blanks.indexOf(blank)
-        const status = getBlankStatus(globalBlankIndex)
+      // Find all {{blankN}} patterns in the line
+      const blankPattern = /\{\{blank(\d+)\}\}/g
+      let match
+      let lastIndex = 0
 
-        if (blank.type === "dropdown" && blank.options) {
-          const selectClass = `inline-block mx-1 px-2 py-1 border rounded text-sm ${
-            status === "correct"
-              ? "bg-green-100 border-green-300 text-green-800"
-              : status === "incorrect"
-                ? "bg-red-100 border-red-300 text-red-800"
-                : "bg-yellow-100 border-yellow-300 text-gray-800"
-          }`
+      while ((match = blankPattern.exec(line)) !== null) {
+        const blankNumber = parseInt(match[1])
+        const blankIndex = blankNumber - 1 // Convert to 0-based index
 
-          const options = blank.options.map((opt) =>
-            typeof opt === "string" ? opt : opt.option
-          )
-
-          modifiedLine = modifiedLine.replace(
-            "_____",
-            `<select class="${selectClass}" data-blank="${globalBlankIndex}">
-              <option value="">Choose...</option>
-              ${options
-                .map(
-                  (option) =>
-                    `<option value="${option}" ${userAnswers[globalBlankIndex] === option ? "selected" : ""}>
-                  ${option}
-                </option>`
-                )
-                .join("")}
-            </select>`
-          )
-        } else {
-          const inputClass = `inline-block mx-1 px-2 py-1 border rounded text-sm ${
-            status === "correct"
-              ? "bg-green-100 border-green-300 text-green-800"
-              : status === "incorrect"
-                ? "bg-red-100 border-red-300 text-red-800"
-                : "bg-yellow-100 border-yellow-300 text-gray-800"
-          }`
-
-          modifiedLine = modifiedLine.replace(
-            "_____",
-            `<input type="text"
-              class="${inputClass}"
-              placeholder="Fill here"
-              data-blank="${globalBlankIndex}"
-              value="${userAnswers[globalBlankIndex] || ""}"
-              style="width: 120px;"
-            />`
+        // Add text before the blank
+        if (match.index > lastIndex) {
+          parts.push(
+            <span key={`text-${lineIndex}-${partIndex++}`}>
+              {line.substring(lastIndex, match.index)}
+            </span>
           )
         }
-      })
+
+        // Add the blank input/select with hint button
+        if (blankIndex < blanks.length) {
+          const blank = blanks[blankIndex]
+          const status = getBlankStatus(blankIndex)
+
+          parts.push(
+            <span
+              key={`blank-${lineIndex}-${blankIndex}`}
+              className="relative inline-flex items-center gap-1"
+            >
+              {blank.type === "dropdown" && blank.options ? (
+                <select
+                  value={userAnswers[blankIndex] || ""}
+                  onChange={(e) =>
+                    handleAnswerChange(blankIndex, e.target.value)
+                  }
+                  className={`inline-block rounded border px-2 py-1 text-sm ${
+                    status === "correct"
+                      ? "border-green-400 bg-green-100 text-green-900 dark:border-green-600 dark:bg-green-900/30 dark:text-green-100"
+                      : status === "incorrect"
+                        ? "border-red-400 bg-red-100 text-red-900 dark:border-red-600 dark:bg-red-900/30 dark:text-red-100"
+                        : "border-gray-300 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                  }`}
+                >
+                  <option value="">Choose...</option>
+                  {blank.options.map((opt, optIndex) => {
+                    const optionText =
+                      typeof opt === "string" ? opt : opt.option
+                    return (
+                      <option key={optIndex} value={optionText}>
+                        {optionText}
+                      </option>
+                    )
+                  })}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  value={userAnswers[blankIndex] || ""}
+                  onChange={(e) =>
+                    handleAnswerChange(blankIndex, e.target.value)
+                  }
+                  placeholder="Fill here"
+                  className={`inline-block w-28 rounded border px-2 py-1 text-sm ${
+                    status === "correct"
+                      ? "border-green-400 bg-green-100 text-green-900 dark:border-green-600 dark:bg-green-900/30 dark:text-green-100"
+                      : status === "incorrect"
+                        ? "border-red-400 bg-red-100 text-red-900 dark:border-red-600 dark:bg-red-900/30 dark:text-red-100"
+                        : "border-gray-300 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                  }`}
+                />
+              )}
+              {blank.hint && (
+                <span className="relative inline-flex">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setActiveHint(
+                        activeHint === blankIndex ? null : blankIndex
+                      )
+                    }
+                    onMouseEnter={() => setActiveHint(blankIndex)}
+                    onMouseLeave={() => setActiveHint(null)}
+                    className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-500 text-xs font-bold text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+                  >
+                    i
+                  </button>
+                  {activeHint === blankIndex && (
+                    <div className="absolute left-0 top-full z-10 mt-1 max-w-xs rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900 shadow-lg dark:border-blue-700 dark:bg-blue-900/90 dark:text-blue-100 sm:w-64">
+                      <div className="font-medium">💡 Hint:</div>
+                      <div className="mt-1 whitespace-normal break-words">
+                        {blank.hint}
+                      </div>
+                    </div>
+                  )}
+                </span>
+              )}
+            </span>
+          )
+        }
+
+        lastIndex = match.index + match[0].length
+      }
+
+      // Add remaining text after last blank
+      if (lastIndex < line.length) {
+        parts.push(
+          <span key={`text-${lineIndex}-end`}>{line.substring(lastIndex)}</span>
+        )
+      }
+
+      // If no blanks were found, just render the line
+      if (parts.length === 0) {
+        parts.push(<span key={`line-${lineIndex}`}>{line}</span>)
+      }
 
       return (
-        <div key={lineIndex} className="leading-6">
-          <div
-            role="presentation"
-            dangerouslySetInnerHTML={{ __html: modifiedLine }}
-            onClick={(e) => {
-              const target = e.target as HTMLElement
-              if (target.tagName === "INPUT") {
-                const input = target as HTMLInputElement
-                const blankIndex = parseInt(input.dataset.blank || "0")
-                input.addEventListener("input", (event) => {
-                  const inputTarget = event.target as HTMLInputElement
-                  handleAnswerChange(blankIndex, inputTarget.value)
-                })
-              } else if (target.tagName === "SELECT") {
-                const select = target as HTMLSelectElement
-                const blankIndex = parseInt(select.dataset.blank || "0")
-                select.addEventListener("change", (event) => {
-                  const selectTarget = event.target as HTMLSelectElement
-                  handleAnswerChange(blankIndex, selectTarget.value)
-                })
-              }
-            }}
-          />
+        <div key={lineIndex} className="leading-7">
+          {parts}
         </div>
       )
     })
@@ -248,9 +284,9 @@ const FillBlanksLesson: React.FC<FillBlanksLessonProps> = ({
   )
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Progress Bar */}
-      <div className="rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
+      <div className="rounded-lg bg-gray-100 p-3 dark:bg-gray-800 sm:p-4">
         <div className="mb-2 flex items-center justify-between">
           <span className="text-sm font-medium text-gray-900 dark:text-white">
             Question {currentQuestion + 1} of {data.questions.length}
@@ -270,7 +306,7 @@ const FillBlanksLesson: React.FC<FillBlanksLessonProps> = ({
       </div>
 
       {/* Question Content */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+      <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:p-6">
         <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
           ✏️ Fill in the Blanks: Complete the Program
         </h3>
@@ -293,85 +329,19 @@ const FillBlanksLesson: React.FC<FillBlanksLessonProps> = ({
           <h4 className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
             💻 Code Template:
           </h4>
-          <div className="overflow-x-auto rounded-lg bg-gray-900 p-4">
+          <p className="mb-3 text-xs text-gray-600 dark:text-gray-400">
+            Fill in the blanks directly in the code. Hover or click the{" "}
+            <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-xs font-bold text-white">
+              i
+            </span>{" "}
+            button for hints.
+          </p>
+          <div className="overflow-x-auto rounded-lg bg-gray-900 p-3 sm:p-4">
             <pre className="text-sm text-gray-100">
               <code>
                 {renderCodeWithBlanks(currentQ.code, currentQ.blanks)}
               </code>
             </pre>
-          </div>
-        </div>
-
-        {/* Fill in the Blanks Form */}
-        <div className="mb-6">
-          <h4 className="mb-3 text-sm font-medium text-gray-900 dark:text-white">
-            Fill in the blanks:
-          </h4>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {currentQ.blanks.map((blank, index) => {
-              const status = getBlankStatus(index)
-              return (
-                <div key={index} className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Blank {index + 1}:
-                    {blank.hint && (
-                      <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
-                        💡 {blank.hint}
-                      </span>
-                    )}
-                  </label>
-
-                  {blank.type === "dropdown" && blank.options ? (
-                    <select
-                      value={userAnswers[index] || ""}
-                      onChange={(e) =>
-                        handleAnswerChange(index, e.target.value)
-                      }
-                      className={`w-full rounded-lg border px-3 py-2 ${
-                        status === "correct"
-                          ? "border-green-300 bg-green-50 text-green-800"
-                          : status === "incorrect"
-                            ? "border-red-300 bg-red-50 text-red-800"
-                            : "border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700"
-                      }`}
-                    >
-                      <option value="">Choose an option...</option>
-                      {blank.options.map((option, optIndex) => {
-                        const optionText =
-                          typeof option === "string" ? option : option.option
-                        return (
-                          <option key={optIndex} value={optionText}>
-                            {optionText}
-                          </option>
-                        )
-                      })}
-                    </select>
-                  ) : (
-                    <input
-                      type="text"
-                      value={userAnswers[index] || ""}
-                      onChange={(e) =>
-                        handleAnswerChange(index, e.target.value)
-                      }
-                      placeholder="Enter your answer"
-                      className={`w-full rounded-lg border px-3 py-2 ${
-                        status === "correct"
-                          ? "border-green-300 bg-green-50 text-green-800"
-                          : status === "incorrect"
-                            ? "border-red-300 bg-red-50 text-red-800"
-                            : "border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700"
-                      }`}
-                    />
-                  )}
-
-                  {status === "incorrect" && blank.explanation && (
-                    <p className="text-xs text-red-600 dark:text-red-400">
-                      {blank.explanation}
-                    </p>
-                  )}
-                </div>
-              )
-            })}
           </div>
         </div>
 
@@ -385,7 +355,7 @@ const FillBlanksLesson: React.FC<FillBlanksLessonProps> = ({
               💡 {showHints ? "Hide" : "Show"} Hints
             </button>
             {showHints && (
-              <div className="mt-3 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
+              <div className="mt-3 rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-900/20 sm:p-4">
                 <ul className="space-y-2">
                   {currentQ.hints.map((hint, index) => (
                     <li key={index} className="flex items-start gap-2">
@@ -422,7 +392,7 @@ const FillBlanksLesson: React.FC<FillBlanksLessonProps> = ({
 
         {/* Success Message */}
         {isComplete && (
-          <div className="mt-6 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
+          <div className="mt-4 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-900/20 sm:mt-6 sm:p-4">
             <div className="flex items-start gap-3">
               <span className="text-lg text-green-500">🎉</span>
               <div>
@@ -454,7 +424,7 @@ const FillBlanksLesson: React.FC<FillBlanksLessonProps> = ({
 
         {/* Solution Display */}
         {showSolution && !isComplete && (
-          <div className="mt-6 rounded-lg border border-orange-200 bg-orange-50 p-4 dark:border-orange-800 dark:bg-orange-900/20">
+          <div className="mt-4 rounded-lg border border-orange-200 bg-orange-50 p-3 dark:border-orange-800 dark:bg-orange-900/20 sm:mt-6 sm:p-4">
             <div className="flex items-start gap-3">
               <span className="text-lg text-orange-500">💡</span>
               <div>

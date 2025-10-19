@@ -10,12 +10,17 @@ import { processCodeExample } from "../../helpers/contentHelpers"
  * Enhanced code block component with syntax highlighting and copy functionality
  */
 
+/**
+ * Enhanced code block component with syntax highlighting and copy functionality
+ */
+
 interface CodeBlockProps {
   code: string
   language?: string
   title?: string
   showLineNumbers?: boolean
   copyable?: boolean
+  showLanguageLabel?: boolean
   highlightLines?: number[]
   maxHeight?: string
   className?: string
@@ -27,6 +32,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
   title,
   showLineNumbers = false,
   copyable = true,
+  showLanguageLabel = true,
   highlightLines = [],
   maxHeight = "400px",
   className = "",
@@ -39,8 +45,9 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
       await navigator.clipboard.writeText(formatted)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
-      console.error("Failed to copy code:", err)
+    } catch {
+      // Silently fail if clipboard access is denied
+      setCopied(false)
     }
   }
 
@@ -69,7 +76,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
       className={`rounded-lg border border-gray-200 dark:border-gray-700 ${className}`}
     >
       {/* Header */}
-      {(title || copyable) && (
+      {(title || copyable || showLanguageLabel) && (
         <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-4 py-2 dark:border-gray-700 dark:bg-gray-800">
           <div className="flex items-center gap-3">
             {title && (
@@ -77,10 +84,12 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
                 {title}
               </h4>
             )}
-            <span className="rounded bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-400">
-              {getLanguageLabel(language)}
-            </span>
-            {lineCount > 1 && (
+            {showLanguageLabel && (
+              <span className="rounded bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                {getLanguageLabel(language)}
+              </span>
+            )}
+            {lineCount > 1 && showLanguageLabel && (
               <span className="text-xs text-gray-500 dark:text-gray-400">
                 {lineCount} lines
               </span>

@@ -10,7 +10,8 @@ import {
   formatDifficultyWithIcon,
   formatLessonType,
 } from "../utils"
-import BookmarkNotesPanel from "./BookmarkNotesPanel"
+// Temporarily disabled - Local storage features
+// import BookmarkNotesPanel from "./BookmarkNotesPanel"
 import MermaidRenderer from "./MermaidRenderer"
 import CodeRearrangeLesson from "./lessons/CodeRearrangeLesson"
 import ConceptLesson from "./lessons/ConceptLesson"
@@ -41,7 +42,8 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
   tutSlug,
 }) => {
   const [showReference, setShowReference] = useState(true)
-  const [showBookmarkPanel, setShowBookmarkPanel] = useState(false)
+  // Temporarily disabled - Local storage features
+  // const [showBookmarkPanel, setShowBookmarkPanel] = useState(false)
   const [showLessonInfo, setShowLessonInfo] = useState<string | null>(null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeReferenceTab, setActiveReferenceTab] = useState("introduction")
@@ -224,26 +226,12 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
     }
   }
 
-  // Touch gesture support for examples carousel
-  const handleExampleSwipe = (direction: "left" | "right") => {
-    if (!tutorial.reference?.examples) return
-
-    if (
-      direction === "left" &&
-      currentExampleIndex < tutorial.reference.examples.length - 1
-    ) {
-      setCurrentExampleIndex(currentExampleIndex + 1)
-    } else if (direction === "right" && currentExampleIndex > 0) {
-      setCurrentExampleIndex(currentExampleIndex - 1)
-    }
-  }
-
   // Keyboard navigation
   const { showKeyboardShortcutsHelp } = useKeyboardNavigation({
     onPreviousLesson: handlePreviousLesson,
     onNextLesson: handleNextLesson,
     onToggleBookmark: () => {},
-    onOpenNotes: () => setShowBookmarkPanel(true),
+    onOpenNotes: () => {}, // Temporarily disabled - Local storage
     onBackToReference: handleBackToReference,
     isLessonMode: !showReference,
     canGoNext: currentLessonIndex < (tutorial.lessons?.length || 0) - 1,
@@ -456,6 +444,7 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                         </div>
 
                         {/* Quick Actions - Mobile Optimized */}
+                        {/* Temporarily hidden - Local storage features
                         <div className="grid grid-cols-2 gap-3">
                           <Button
                             variant="outline"
@@ -483,6 +472,7 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                             <span className="text-sm font-medium">Notes</span>
                           </Button>
                         </div>
+                        */}
 
                         <Button
                           variant="ghost"
@@ -649,6 +639,7 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                   Quick Actions
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
+                  {/* Temporarily hidden - Local storage features
                   <Button
                     variant="outline"
                     size="sm"
@@ -665,6 +656,7 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                   >
                     Save
                   </Button>
+                  */}
                   <Button
                     variant="ghost"
                     size="sm"
@@ -1045,7 +1037,7 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                                       {tutorial.reference.examples.length}
                                     </Badge>
                                     <span className="text-sm text-gray-500 dark:text-gray-400">
-                                      • Swipe or use arrows to navigate
+                                      Use arrows to navigate
                                     </span>
                                   </div>
                                   <div className="flex items-center gap-2">
@@ -1099,29 +1091,7 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                                   if (!example) return null
 
                                   return (
-                                    <div
-                                      className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800"
-                                      onTouchStart={(e) => {
-                                        const touch = e.touches[0]
-                                        ;(e.currentTarget as any).startX =
-                                          touch.clientX
-                                      }}
-                                      onTouchEnd={(e) => {
-                                        const touch = e.changedTouches[0]
-                                        const startX = (e.currentTarget as any)
-                                          .startX
-                                        const diffX = startX - touch.clientX
-
-                                        // Swipe threshold
-                                        if (Math.abs(diffX) > 50) {
-                                          if (diffX > 0) {
-                                            handleExampleSwipe("left") // Swipe left = next
-                                          } else {
-                                            handleExampleSwipe("right") // Swipe right = previous
-                                          }
-                                        }
-                                      }}
-                                    >
+                                    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800">
                                       {/* Enhanced Example Header */}
                                       <div className="border-b border-gray-200 bg-gradient-to-r from-green-50 via-blue-50 to-indigo-50 px-4 py-6 dark:border-gray-700 dark:from-green-900/20 dark:via-blue-900/20 dark:to-indigo-900/20 sm:px-6">
                                         <div className="flex items-start justify-between">
@@ -2071,35 +2041,20 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
 
                     {/* Mobile Quick Actions */}
                     <div className="mt-4 border-t border-gray-200 pt-4 dark:border-gray-700 lg:hidden">
-                      <div className="grid grid-cols-3 gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleBackToReference}
-                          icon={<Icon name="home" size="sm" />}
-                          className="text-xs"
-                        >
-                          Reference
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {}}
-                          icon={<Icon name="bookmark" size="sm" />}
-                          className="text-xs"
-                        >
-                          Bookmark
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setShowBookmarkPanel(true)}
-                          icon={<Icon name="notes" size="sm" />}
-                          className="text-xs"
-                        >
-                          Notes
-                        </Button>
-                      </div>
+                      <Button
+                        variant="outline"
+                        size="md"
+                        onClick={handleBackToReference}
+                        icon={<Icon name="home" size="sm" />}
+                        fullWidth
+                        className="min-h-[44px] touch-manipulation text-sm font-medium"
+                      >
+                        Back to Reference
+                      </Button>
+                      {/* Temporarily hidden - Local storage features
+                      <Button icon={<Icon name="bookmark" />}>Bookmark</Button>
+                      <Button icon={<Icon name="notes" />}>Notes</Button>
+                      */}
                     </div>
                   </div>
                 </div>
@@ -2109,14 +2064,14 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
         </div>
       </div>
 
-      {/* Bookmark & Notes Panel */}
-      {showBookmarkPanel && (
+      {/* Bookmark & Notes Panel - Temporarily hidden */}
+      {/* {showBookmarkPanel && (
         <BookmarkNotesPanel
           tutorialId={tutorial.id.toString()}
           tutorialTitle={tutorial.title}
           onClose={() => setShowBookmarkPanel(false)}
         />
-      )}
+      )} */}
 
       {/* Lesson Info Modal */}
       {showLessonInfo && (
