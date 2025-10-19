@@ -122,7 +122,7 @@ export function ModelSelector({
       </button>
 
       {isOpen && (
-        <div className="absolute bottom-full left-0 right-0 z-50 mb-2 max-h-96 overflow-y-auto rounded-lg border border-gray-200 bg-white/95 shadow-xl backdrop-blur-sm dark:border-slate-600 dark:bg-slate-800/95">
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-lg border border-gray-200 bg-white/95 shadow-xl backdrop-blur-sm dark:border-slate-600 dark:bg-slate-800/95">
           {/* Current Model Header - Shown on Mobile */}
           <div className="border-b border-gray-200 bg-blue-50/50 p-3 dark:border-slate-600 dark:bg-blue-900/20 sm:hidden">
             <div className="flex items-center gap-2">

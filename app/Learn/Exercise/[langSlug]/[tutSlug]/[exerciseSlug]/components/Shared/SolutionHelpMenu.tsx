@@ -6,6 +6,8 @@ import { MessageSquare, RotateCcw, X } from "lucide-react"
 
 // Solution-specific help menu with explanation and clean solution
 
+// Solution-specific help menu with explanation and clean solution
+
 interface SolutionHelpMenuProps {
   isOpen: boolean
   onClose: () => void
@@ -110,7 +112,7 @@ const SolutionHelpMenu: React.FC<SolutionHelpMenuProps> = ({
       {/* Menu */}
       <div
         ref={menuRef}
-        className="help-menu-enter absolute bottom-full left-0 z-50 mb-2 w-64 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900 sm:w-72"
+        className="help-menu-enter absolute left-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900 sm:w-72"
         role="menu"
         aria-labelledby="solution-help-menu-title"
         aria-orientation="vertical"

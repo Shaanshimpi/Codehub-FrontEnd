@@ -90,7 +90,9 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({ data, lessonTitle }) => {
       )}
 
       {/* Main Mermaid Diagram */}
-      {data.mermaid_code && renderMermaidDiagram(data.mermaid_code)}
+      {data.mermaid_code &&
+        data.mermaid_code.length > 0 &&
+        renderMermaidDiagram(data.mermaid_code)}
 
       {/* Key Points - Responsive Grid */}
       {data.keyPoints && data.keyPoints.length > 0 && (
@@ -267,33 +269,34 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({ data, lessonTitle }) => {
                         </div>
 
                         {/* Diagram Section */}
-                        {example.mermaid_code && (
-                          <div className="space-y-4">
-                            <h5 className="flex items-center gap-2 text-base font-semibold text-gray-900 dark:text-white">
-                              <Icon
-                                name="puzzle"
-                                className="text-purple-500"
-                                size="sm"
-                              />
-                              Visual Flow
-                            </h5>
-                            <div className="rounded-xl border border-purple-200 bg-purple-50 p-6 dark:border-purple-800 dark:bg-purple-900/20">
-                              <MermaidRenderer
-                                code={
-                                  Array.isArray(example.mermaid_code)
-                                    ? typeof example.mermaid_code[0] ===
-                                      "string"
-                                      ? example.mermaid_code[0]
-                                      : example.mermaid_code[0]?.code || ""
-                                    : typeof example.mermaid_code === "string"
-                                      ? example.mermaid_code
-                                      : example.mermaid_code?.code || ""
-                                }
-                                theme={theme}
-                              />
+                        {example.mermaid_code &&
+                          example.mermaid_code.length > 0 && (
+                            <div className="space-y-4">
+                              <h5 className="flex items-center gap-2 text-base font-semibold text-gray-900 dark:text-white">
+                                <Icon
+                                  name="puzzle"
+                                  className="text-purple-500"
+                                  size="sm"
+                                />
+                                Visual Flow
+                              </h5>
+                              <div className="rounded-xl border border-purple-200 bg-purple-50 p-6 dark:border-purple-800 dark:bg-purple-900/20">
+                                <MermaidRenderer
+                                  code={
+                                    Array.isArray(example.mermaid_code)
+                                      ? typeof example.mermaid_code[0] ===
+                                        "string"
+                                        ? example.mermaid_code[0]
+                                        : example.mermaid_code[0]?.code || ""
+                                      : typeof example.mermaid_code === "string"
+                                        ? example.mermaid_code
+                                        : example.mermaid_code?.code || ""
+                                  }
+                                  theme={theme}
+                                />
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
                         {/* Output and Explanation Grid */}
                         <div className="grid gap-6 lg:grid-cols-2">
@@ -419,32 +422,34 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({ data, lessonTitle }) => {
                       </div>
 
                       {/* Diagram Section */}
-                      {example.mermaid_code && (
-                        <div className="space-y-4">
-                          <h5 className="flex items-center gap-2 text-base font-semibold text-gray-900 dark:text-white">
-                            <Icon
-                              name="puzzle"
-                              className="text-purple-500"
-                              size="sm"
-                            />
-                            Visual Flow
-                          </h5>
-                          <div className="rounded-xl border border-purple-200 bg-purple-50 p-6 dark:border-purple-800 dark:bg-purple-900/20">
-                            <MermaidRenderer
-                              code={
-                                Array.isArray(example.mermaid_code)
-                                  ? typeof example.mermaid_code[0] === "string"
-                                    ? example.mermaid_code[0]
-                                    : example.mermaid_code[0]?.code || ""
-                                  : typeof example.mermaid_code === "string"
-                                    ? example.mermaid_code
-                                    : example.mermaid_code?.code || ""
-                              }
-                              theme={theme}
-                            />
+                      {example.mermaid_code &&
+                        example.mermaid_code.length > 0 && (
+                          <div className="space-y-4">
+                            <h5 className="flex items-center gap-2 text-base font-semibold text-gray-900 dark:text-white">
+                              <Icon
+                                name="puzzle"
+                                className="text-purple-500"
+                                size="sm"
+                              />
+                              Visual Flow
+                            </h5>
+                            <div className="rounded-xl border border-purple-200 bg-purple-50 p-6 dark:border-purple-800 dark:bg-purple-900/20">
+                              <MermaidRenderer
+                                code={
+                                  Array.isArray(example.mermaid_code)
+                                    ? typeof example.mermaid_code[0] ===
+                                      "string"
+                                      ? example.mermaid_code[0]
+                                      : example.mermaid_code[0]?.code || ""
+                                    : typeof example.mermaid_code === "string"
+                                      ? example.mermaid_code
+                                      : example.mermaid_code?.code || ""
+                                }
+                                theme={theme}
+                              />
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
                       {/* Output and Explanation Grid */}
                       <div className="grid gap-6 lg:grid-cols-2">

@@ -355,31 +355,51 @@ const MCQLesson: React.FC<MCQLessonProps> = ({ data, lessonTitle }) => {
 
       {/* Navigation */}
       {showExplanation && (
-        <div className="flex items-center justify-between">
-          <Button
-            variant="outline"
-            size="md"
-            onClick={handlePreviousQuestion}
-            disabled={currentQuestion === 0}
-            icon={<Icon name="chevronLeft" size="sm" />}
-          >
-            Previous Question
-          </Button>
+        <div className="space-y-4">
+          {/* Progress Indicator */}
+          <div className="flex items-center justify-center">
+            <div className="flex items-center gap-2 rounded-full bg-blue-100 px-4 py-2 dark:bg-blue-900/30">
+              <Icon name="helpCircle" className="text-blue-600" size="sm" />
+              <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                Question {currentQuestion + 1} of {data.questions.length}
+              </span>
+            </div>
+          </div>
 
-          <Badge variant="info" size="sm">
-            {currentQuestion + 1} of {data.questions.length}
-          </Badge>
+          {/* Navigation Buttons */}
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePreviousQuestion}
+              disabled={currentQuestion === 0}
+              icon={<Icon name="chevronLeft" size="sm" />}
+              className="min-h-[48px] flex-1 touch-manipulation text-sm font-medium"
+            >
+              <span className="hidden sm:inline">Previous Question</span>
+              <span className="sm:hidden">Previous</span>
+            </Button>
 
-          <Button
-            variant="primary"
-            size="md"
-            onClick={handleNextQuestion}
-            icon={<Icon name="chevronRight" size="sm" />}
-          >
-            {currentQuestion === data.questions.length - 1
-              ? "Finish Quiz"
-              : "Next Question"}
-          </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleNextQuestion}
+              icon={<Icon name="chevronRight" size="sm" />}
+              iconPosition="right"
+              className="min-h-[48px] flex-1 touch-manipulation text-sm font-medium"
+            >
+              <span className="hidden sm:inline">
+                {currentQuestion === data.questions.length - 1
+                  ? "Finish Quiz"
+                  : "Next Question"}
+              </span>
+              <span className="sm:hidden">
+                {currentQuestion === data.questions.length - 1
+                  ? "Finish"
+                  : "Next"}
+              </span>
+            </Button>
+          </div>
         </div>
       )}
     </div>

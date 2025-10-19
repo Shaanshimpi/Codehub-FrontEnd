@@ -7,6 +7,8 @@ import { ChevronDown, Sparkles } from "lucide-react"
 
 // Unified Mobile Tab Switcher with enhanced touch targets and accessibility
 
+// Unified Mobile Tab Switcher with enhanced touch targets and accessibility
+
 interface MobileTab {
   id: string
   label: string
@@ -180,101 +182,105 @@ const UnifiedMobileTabSwitcher: React.FC<UnifiedMobileTabSwitcherProps> = ({
 
       {/* Enhanced Tab Dropdown */}
       {isExpanded && (
-        <div
-          className="absolute left-0 right-0 top-full z-50 mt-2"
-          data-tab-dropdown
-        >
+        <>
           {/* Backdrop */}
-          <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-neutral-900/50 via-neutral-800/50 to-neutral-900/50 backdrop-blur-sm" />
+          <button
+            type="button"
+            className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
+            onClick={() => setIsExpanded(false)}
+            aria-label="Close tab selector"
+          />
+          {/* Tab Dropdown - Fixed at bottom */}
+          <div className="fixed bottom-0 left-0 right-0 z-50" data-tab-dropdown>
+            {/* Tab options */}
+            <div className="overflow-hidden rounded-t-xl border-t border-neutral-200/70 bg-white/95 shadow-xl backdrop-blur-md dark:border-neutral-700/70 dark:bg-neutral-900/95">
+              {tabs.map((tab, index) => {
+                const isActive = tab.id === activeTab
+                const isDisabled = tab.disabled
 
-          {/* Tab options */}
-          <div className="relative overflow-hidden rounded-xl border border-neutral-200/70 bg-white/95 shadow-xl backdrop-blur-md dark:border-neutral-700/70 dark:bg-neutral-900/95">
-            {tabs.map((tab, index) => {
-              const isActive = tab.id === activeTab
-              const isDisabled = tab.disabled
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (!isDisabled) {
+                        onTabChange(tab.id)
+                        setIsExpanded(false)
+                      }
+                    }}
+                    disabled={isDisabled}
+                    className={`relative w-full overflow-hidden text-left transition-all duration-200 ${
+                      isActive
+                        ? "from-primary-100 to-primary-50 dark:from-primary-900/40 dark:to-primary-900/20 bg-gradient-to-r"
+                        : "hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
+                    } ${isDisabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"} ${index === 0 ? "rounded-t-xl" : ""} ${index === tabs.length - 1 ? "rounded-b-xl" : ""} `}
+                    aria-pressed={isActive}
+                    aria-disabled={isDisabled}
+                  >
+                    {/* Active indicator */}
+                    {isActive && (
+                      <div className="from-primary-500 to-primary-600 absolute bottom-0 left-0 top-0 w-1 bg-gradient-to-b" />
+                    )}
 
-              return (
-                <button
-                  key={tab.id}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    if (!isDisabled) {
-                      onTabChange(tab.id)
-                      setIsExpanded(false)
-                    }
-                  }}
-                  disabled={isDisabled}
-                  className={`relative w-full overflow-hidden text-left transition-all duration-200 ${
-                    isActive
-                      ? "from-primary-100 to-primary-50 dark:from-primary-900/40 dark:to-primary-900/20 bg-gradient-to-r"
-                      : "hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
-                  } ${isDisabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"} ${index === 0 ? "rounded-t-xl" : ""} ${index === tabs.length - 1 ? "rounded-b-xl" : ""} `}
-                  aria-pressed={isActive}
-                  aria-disabled={isDisabled}
-                >
-                  {/* Active indicator */}
-                  {isActive && (
-                    <div className="from-primary-500 to-primary-600 absolute bottom-0 left-0 top-0 w-1 bg-gradient-to-b" />
-                  )}
+                    <div className="p-4 pl-6">
+                      <div className="flex items-center gap-3">
+                        {/* Tab icon */}
+                        <div
+                          className={`rounded-lg p-2 transition-all duration-200 ${
+                            isActive
+                              ? "from-primary-500 to-primary-600 scale-110 bg-gradient-to-br text-white shadow-lg"
+                              : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
+                          }`}
+                        >
+                          {tab.icon}
+                        </div>
 
-                  <div className="p-4 pl-6">
-                    <div className="flex items-center gap-3">
-                      {/* Tab icon */}
-                      <div
-                        className={`rounded-lg p-2 transition-all duration-200 ${
-                          isActive
-                            ? "from-primary-500 to-primary-600 scale-110 bg-gradient-to-br text-white shadow-lg"
-                            : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
-                        }`}
-                      >
-                        {tab.icon}
-                      </div>
-
-                      {/* Tab info */}
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`font-semibold transition-colors duration-200 ${
-                              isActive
-                                ? "text-primary-700 dark:text-primary-300"
-                                : "text-neutral-700 dark:text-neutral-300"
-                            }`}
-                          >
-                            {tab.label}
-                          </span>
-                          {tab.badge && (
-                            <Badge
-                              variant={isActive ? "primary" : "neutral"}
-                              size="sm"
-                              className={isActive ? "animate-pulse" : ""}
+                        {/* Tab info */}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`font-semibold transition-colors duration-200 ${
+                                isActive
+                                  ? "text-primary-700 dark:text-primary-300"
+                                  : "text-neutral-700 dark:text-neutral-300"
+                              }`}
                             >
-                              {tab.badge}
-                            </Badge>
+                              {tab.label}
+                            </span>
+                            {tab.badge && (
+                              <Badge
+                                variant={isActive ? "primary" : "neutral"}
+                                size="sm"
+                                className={isActive ? "animate-pulse" : ""}
+                              >
+                                {tab.badge}
+                              </Badge>
+                            )}
+                          </div>
+                          {tab.description && (
+                            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                              {tab.description}
+                            </p>
                           )}
                         </div>
-                        {tab.description && (
-                          <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-                            {tab.description}
-                          </p>
+
+                        {/* Active checkmark */}
+                        {isActive && (
+                          <div className="bg-primary-500 h-2 w-2 animate-pulse rounded-full" />
                         )}
                       </div>
-
-                      {/* Active checkmark */}
-                      {isActive && (
-                        <div className="bg-primary-500 h-2 w-2 animate-pulse rounded-full" />
-                      )}
                     </div>
-                  </div>
 
-                  {/* Separator */}
-                  {index < tabs.length - 1 && (
-                    <div className="absolute bottom-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-neutral-200 to-transparent dark:via-neutral-700" />
-                  )}
-                </button>
-              )
-            })}
+                    {/* Separator */}
+                    {index < tabs.length - 1 && (
+                      <div className="absolute bottom-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-neutral-200 to-transparent dark:via-neutral-700" />
+                    )}
+                  </button>
+                )
+              })}
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Screen reader announcements */}

@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { useTheme } from "../../hooks/useTheme"
 import MermaidRenderer from "../MermaidRenderer"
+import { Icon } from "../ui"
 
 interface CodeBlockItem {
   code: string
@@ -423,26 +424,39 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={handlePreviousQuestion}
-          disabled={currentQuestion === 0}
-          className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-        >
-          ◀️ Previous Question
-        </button>
+      <div className="space-y-4">
+        {/* Progress Indicator */}
+        <div className="flex items-center justify-center">
+          <div className="flex items-center gap-2 rounded-full bg-purple-100 px-4 py-2 dark:bg-purple-900/30">
+            <Icon name="code" className="text-purple-600" size="sm" />
+            <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+              Question {currentQuestion + 1} of {data.questions.length}
+            </span>
+          </div>
+        </div>
 
-        <span className="text-sm text-gray-500 dark:text-gray-400">
-          {currentQuestion + 1} of {data.questions.length}
-        </span>
+        {/* Navigation Buttons */}
+        <div className="flex gap-3">
+          <button
+            onClick={handlePreviousQuestion}
+            disabled={currentQuestion === 0}
+            className="flex min-h-[48px] flex-1 touch-manipulation items-center justify-center gap-2 rounded-lg bg-gray-100 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+          >
+            <Icon name="chevronLeft" size="sm" />
+            <span className="hidden sm:inline">Previous Question</span>
+            <span className="sm:hidden">Previous</span>
+          </button>
 
-        <button
-          onClick={handleNextQuestion}
-          disabled={currentQuestion >= data.questions.length - 1}
-          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Next Question ▶️
-        </button>
+          <button
+            onClick={handleNextQuestion}
+            disabled={currentQuestion >= data.questions.length - 1}
+            className="flex min-h-[48px] flex-1 touch-manipulation items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <span className="hidden sm:inline">Next Question</span>
+            <span className="sm:hidden">Next</span>
+            <Icon name="chevronRight" size="sm" />
+          </button>
+        </div>
       </div>
     </div>
   )

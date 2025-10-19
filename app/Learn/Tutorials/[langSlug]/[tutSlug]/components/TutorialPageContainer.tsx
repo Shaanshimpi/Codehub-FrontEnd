@@ -2,18 +2,13 @@
 
 import React, { useState } from "react"
 import type { Language, Tutorial } from "@/app/Learn/types/TutorialTypes"
-import {
-  getNavigationUrls,
-  getRecommendedAction,
-} from "../helpers"
+import { useTheme } from "@/app/contexts/theme-context"
+import { getNavigationUrls, getRecommendedAction } from "../helpers"
 import { useKeyboardNavigation } from "../hooks/useKeyboardNavigation"
-import { useTutorialProgress } from "../hooks/useTutorialProgress"
 import {
   calculateEstimatedTime,
   formatDifficultyWithIcon,
   formatLessonType,
-  formatScoreWithGrade,
-  getProgressMessage,
 } from "../utils"
 import BookmarkNotesPanel from "./BookmarkNotesPanel"
 import MermaidRenderer from "./MermaidRenderer"
@@ -29,7 +24,6 @@ import {
   Icon,
   LessonCard,
   Modal,
-  ProgressBar,
   StatCard,
 } from "./ui"
 
@@ -46,15 +40,9 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
   langSlug,
   tutSlug,
 }) => {
-  // Console log the fetched tutorial object for debugging
-  console.log("📚 Fetched Tutorial Object:", tutorial)
-  console.log("🌐 Language Object:", language)
-  console.log("🔗 URL Params:", { langSlug, tutSlug })
   const [showReference, setShowReference] = useState(true)
   const [showBookmarkPanel, setShowBookmarkPanel] = useState(false)
-  const [showScoreDetails, setShowScoreDetails] = useState(false)
   const [showLessonInfo, setShowLessonInfo] = useState<string | null>(null)
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeReferenceTab, setActiveReferenceTab] = useState("introduction")
   const [currentExampleIndex, setCurrentExampleIndex] = useState(0)
@@ -74,43 +62,88 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
     }
   }, [])
 
+  // Listen for header mobile menu events to prevent conflicts
+  React.useEffect(() => {
+    const handleCloseTutorialMobileMenu = () => {
+      setIsMobileMenuOpen(false)
+    }
+
+    window.addEventListener(
+      "closeTutorialMobileMenu",
+      handleCloseTutorialMobileMenu
+    )
+
+    return () => {
+      window.removeEventListener(
+        "closeTutorialMobileMenu",
+        handleCloseTutorialMobileMenu
+      )
+    }
+  }, [])
+
   const handleTabChange = (tabId: string) => {
     setActiveReferenceTab(tabId)
     // Update URL fragment for bookmarking
     window.history.replaceState(null, "", `#${tabId}`)
+
+    // Scroll to tab content area
+    setTimeout(() => {
+      const tabContentElement = document.getElementById("tab-content-area")
+      if (tabContentElement) {
+        const yOffset = -80 // Offset for fixed header
+        const y =
+          tabContentElement.getBoundingClientRect().top +
+          window.pageYOffset +
+          yOffset
+        window.scrollTo({ top: y, behavior: "smooth" })
+      }
+    }, 100) // Small delay to ensure content is rendered
   }
-  const [adjacentTutorials, setAdjacentTutorials] = useState<{
+  const [adjacentTutorials] = useState<{
     previous: any | null
     next: any | null
   }>({ previous: null, next: null })
 
-  // Initialize progress tracking
-  const {
-    progress,
-    updateCurrentLesson,
-    markLessonCompleted,
-    toggleBookmark,
-    getProgressStats,
-    isLessonCompleted,
-    getLessonScore,
-  } = useTutorialProgress(tutorial.id.toString(), tutorial.lessons?.length || 0)
-
-  const [currentLessonIndex, setCurrentLessonIndex] = useState(
-    progress.currentLessonIndex
-  )
+  // Simple lesson navigation without progress tracking
+  const [currentLessonIndex, setCurrentLessonIndex] = useState(0)
   const currentLesson = tutorial.lessons?.[currentLessonIndex]
-  const stats = getProgressStats()
+  const { theme } = useTheme()
+
+  // Scroll to top whenever lesson index changes
+  React.useEffect(() => {
+    if (!showReference) {
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+  }, [currentLessonIndex, showReference])
+
+  // Helper function to check if mermaid code is valid and not empty
+  const hasValidMermaidCode = (mermaidCode: any): boolean => {
+    if (!mermaidCode) return false
+
+    let code = ""
+    if (Array.isArray(mermaidCode)) {
+      // Check if array is empty
+      if (mermaidCode.length === 0) return false
+
+      code =
+        typeof mermaidCode[0] === "string"
+          ? mermaidCode[0]
+          : mermaidCode[0]?.code || ""
+    } else if (typeof mermaidCode === "string") {
+      code = mermaidCode
+    } else {
+      code = mermaidCode?.code || ""
+    }
+
+    return code.trim().length > 0
+  }
 
   // Enhanced calculations using new helpers
   const navigationUrls = getNavigationUrls(langSlug, tutSlug)
   const difficultyInfo = formatDifficultyWithIcon(tutorial.difficulty)
-  const estimatedTime = calculateEstimatedTime(
-    tutorial.lessons?.length || 0,
-    stats.completedCount
-  )
-  const progressMessage = getProgressMessage(stats.progressPercentage)
+  const estimatedTime = calculateEstimatedTime(tutorial.lessons?.length || 0, 0)
   const recommendedAction = getRecommendedAction(
-    stats,
+    { completedCount: 0, progressPercentage: 0, averageScore: 0 },
     tutorial.lessons?.length || 0
   )
 
@@ -118,7 +151,6 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
     if (currentLessonIndex > 0) {
       const newIndex = currentLessonIndex - 1
       setCurrentLessonIndex(newIndex)
-      updateCurrentLesson(newIndex)
     }
   }
 
@@ -126,31 +158,23 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
     if (currentLessonIndex < (tutorial.lessons?.length || 0) - 1) {
       const newIndex = currentLessonIndex + 1
       setCurrentLessonIndex(newIndex)
-      updateCurrentLesson(newIndex)
     }
   }
 
   const handleLessonSelect = (lessonIndex: number) => {
     setCurrentLessonIndex(lessonIndex)
-    updateCurrentLesson(lessonIndex)
-  }
-
-  const handleLessonComplete = (score?: number, answers?: any) => {
-    if (currentLesson) {
-      markLessonCompleted(currentLesson.id, score, answers)
-    }
   }
 
   const handleStartLessons = () => {
     setShowReference(false)
-    // Start from saved progress or beginning
-    const startIndex = progress.currentLessonIndex
-    setCurrentLessonIndex(startIndex)
-    updateCurrentLesson(startIndex)
+    // Start from beginning
+    setCurrentLessonIndex(0)
   }
 
   const handleBackToReference = () => {
     setShowReference(true)
+    // Scroll to top when going back to reference
+    window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   // New handler functions for previously non-functional elements
@@ -166,23 +190,10 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
     }
   }
 
-  const handleProgressBarClick = (clickPosition: number) => {
-    const targetLessonIndex = Math.floor(
-      (clickPosition / 100) * (tutorial.lessons?.length || 0)
-    )
-    const clampedIndex = Math.max(
-      0,
-      Math.min(targetLessonIndex, (tutorial.lessons?.length || 0) - 1)
-    )
-    handleLessonSelect(clampedIndex)
-  }
-
-  const handleScoreClick = (lessonId: string) => {
-    setShowLessonInfo(lessonId)
-  }
-
   const handleMobileMenuToggle = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
+    // Close any header mobile menu by dispatching a custom event
+    window.dispatchEvent(new CustomEvent("closeHeaderMobileMenu"))
   }
 
   const handleCloseMobileMenu = () => {
@@ -197,7 +208,13 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
     }
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
       e.preventDefault()
-      const tabs = ["overview", "examples", "practice", "issues"]
+      const tabs = [
+        "introduction",
+        "keypoints",
+        "examples",
+        "syntax",
+        "mistakes",
+      ]
       const currentIndex = tabs.indexOf(activeReferenceTab)
       const newIndex =
         e.key === "ArrowLeft"
@@ -221,20 +238,11 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
     }
   }
 
-  const handleLessonTypeClick = (lessonType: string) => {
-    const typeInfo = formatLessonType(lessonType)
-    setShowLessonInfo(lessonType)
-  }
-
-  const handleTutorialStatsClick = () => {
-    setShowScoreDetails(true)
-  }
-
   // Keyboard navigation
   const { showKeyboardShortcutsHelp } = useKeyboardNavigation({
     onPreviousLesson: handlePreviousLesson,
     onNextLesson: handleNextLesson,
-    onToggleBookmark: toggleBookmark,
+    onToggleBookmark: () => {},
     onOpenNotes: () => setShowBookmarkPanel(true),
     onBackToReference: handleBackToReference,
     isLessonMode: !showReference,
@@ -244,16 +252,16 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu Overlay - Higher z-index to prevent conflicts */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+          className="fixed inset-0 z-[60] bg-black bg-opacity-50 lg:hidden"
           onClick={handleCloseMobileMenu}
           aria-hidden="true"
         />
       )}
       {/* Enhanced Breadcrumb */}
-      <div className="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+      <div className="border-b border-gray-200 bg-white pt-16 dark:border-gray-700 dark:bg-gray-800">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="py-4">
             <Breadcrumb
@@ -266,12 +274,12 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                 {
                   label: "Tutorials",
                   href: navigationUrls.tutorials,
-                  icon: <Icon name="computer" size="sm" />,
+                  icon: <Icon name="computer" size="md" />,
                 },
                 {
                   label: language.title,
                   href: navigationUrls.language,
-                  icon: <Icon name="book" size="sm" />,
+                  icon: <Icon name="book" size="md" />,
                 },
                 {
                   label: tutorial.title,
@@ -283,21 +291,24 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-        <div className="flex flex-col gap-4 sm:gap-6 lg:flex-row">
+      <div className="mx-auto max-w-7xl px-2 py-3 sm:px-4 sm:py-6 lg:px-8">
+        <div className="flex flex-col gap-3 sm:gap-6 lg:flex-row">
           {/* Enhanced Mobile Header */}
           <div className="lg:hidden">
             <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
               <button
                 onClick={handleMobileMenuToggle}
-                className="flex w-full items-center justify-between p-4 transition-shadow hover:shadow-md"
+                className="flex min-h-[60px] w-full touch-manipulation items-center justify-between p-4 transition-shadow hover:shadow-md"
                 aria-expanded={isMobileMenuOpen}
                 aria-controls="mobile-menu"
               >
-                <div className="flex items-center gap-3">
-                  <Icon name="book" className="text-blue-600" />
-                  <div>
-                    <div className="font-medium text-gray-900 dark:text-white">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <Icon name="book" className="flex-shrink-0 text-blue-600" />
+                  <div className="min-w-0 flex-1">
+                    <div
+                      className="max-w-[200px] truncate font-medium text-gray-900 dark:text-white sm:max-w-[300px]"
+                      title={tutorial.title}
+                    >
                       {tutorial.title}
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -309,22 +320,16 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                       {estimatedTime && !showReference && (
                         <>
                           <span>•</span>
-                          <span>{estimatedTime} left</span>
+                          <span className="xs:inline hidden">
+                            {estimatedTime} left
+                          </span>
+                          <span className="xs:hidden">{estimatedTime}</span>
                         </>
                       )}
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <ProgressBar
-                    progress={stats.progressPercentage}
-                    size="sm"
-                    className="w-16"
-                    animated
-                  />
-                  <Badge variant="info" size="sm">
-                    {stats.progressPercentage}%
-                  </Badge>
                   <Icon
                     name={isMobileMenuOpen ? "x" : "menu"}
                     className="text-gray-500"
@@ -333,139 +338,178 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                 </div>
               </button>
 
-              {/* Mobile Menu Panel */}
+              {/* Mobile Menu Panel - Fixed at bottom */}
               {isMobileMenuOpen && (
-                <div
-                  id="mobile-menu"
-                  className="border-t border-gray-200 p-4 dark:border-gray-700"
-                  role="menu"
-                  aria-labelledby="mobile-menu-button"
-                >
-                  {showReference ? (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 gap-3">
-                        <StatCard
-                          title="Lessons"
-                          value={tutorial.lessons?.length || 0}
-                          icon={<Icon name="book" />}
-                          color="blue"
-                          onClick={() => {
-                            handleTutorialStatsClick()
-                            handleCloseMobileMenu()
-                          }}
-                        />
-                        <StatCard
-                          title="Difficulty"
-                          value={difficultyInfo.label}
-                          subtitle="Recommended level"
-                          icon={<span>{difficultyInfo.icon}</span>}
-                          color="purple"
-                        />
-                        <StatCard
-                          title="Language"
-                          value={language.title}
-                          icon={<Icon name="code" />}
-                          color="green"
-                        />
-                      </div>
-                      <Button
-                        variant="primary"
-                        size="lg"
-                        fullWidth
-                        onClick={() => {
-                          handleStartLessons()
-                          handleCloseMobileMenu()
-                        }}
-                        icon={<Icon name="chevronRight" size="sm" />}
-                      >
-                        Start Learning
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {/* Mobile Lesson Navigation */}
-                      <div className="flex items-center justify-between">
+                <>
+                  {/* Backdrop */}
+                  <button
+                    type="button"
+                    className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-sm"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    aria-label="Close mobile menu"
+                  />
+                  {/* Menu Panel */}
+                  <div
+                    id="mobile-menu"
+                    className="fixed bottom-0 left-0 right-0 z-[70] border-t border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                    role="menu"
+                    aria-labelledby="mobile-menu-button"
+                  >
+                    {showReference ? (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 gap-3">
+                          <StatCard
+                            title="Lessons"
+                            value={tutorial.lessons?.length || 0}
+                            icon={<Icon name="book" />}
+                            color="blue"
+                            onClick={() => {
+                              handleCloseMobileMenu()
+                            }}
+                          />
+                          <StatCard
+                            title="Difficulty"
+                            value={difficultyInfo.label}
+                            subtitle="Recommended level"
+                            icon={<span>{difficultyInfo.icon}</span>}
+                            color="purple"
+                          />
+                          <StatCard
+                            title="Language"
+                            value={language.title}
+                            icon={<Icon name="code" />}
+                            color="green"
+                          />
+                        </div>
                         <Button
-                          variant="outline"
-                          size="sm"
+                          variant="primary"
+                          size="lg"
+                          fullWidth
                           onClick={() => {
-                            handlePreviousLesson()
+                            handleStartLessons()
                             handleCloseMobileMenu()
                           }}
-                          disabled={currentLessonIndex === 0}
-                          icon={<Icon name="chevronLeft" size="sm" />}
-                        >
-                          Previous
-                        </Button>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                          {currentLessonIndex + 1} of{" "}
-                          {tutorial.lessons?.length || 0}
-                        </span>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            handleNextLesson()
-                            handleCloseMobileMenu()
-                          }}
-                          disabled={
-                            currentLessonIndex >=
-                            (tutorial.lessons?.length || 0) - 1
-                          }
                           icon={<Icon name="chevronRight" size="sm" />}
                         >
-                          Next
+                          Start Learning
                         </Button>
                       </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {/* Mobile Lesson Navigation - Enhanced */}
+                        <div className="space-y-3">
+                          {/* Progress Indicator */}
+                          <div className="flex items-center justify-center">
+                            <div className="flex items-center gap-2 rounded-full bg-gray-100 px-4 py-2 dark:bg-gray-700">
+                              <Icon
+                                name="book"
+                                className="text-blue-600"
+                                size="sm"
+                              />
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Lesson {currentLessonIndex + 1} of{" "}
+                                {tutorial.lessons?.length || 0}
+                              </span>
+                            </div>
+                          </div>
 
-                      {/* Quick Actions */}
-                      <div className="grid grid-cols-2 gap-2">
+                          {/* Navigation Buttons */}
+                          <div className="flex gap-3">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                handlePreviousLesson()
+                                handleCloseMobileMenu()
+                              }}
+                              disabled={currentLessonIndex === 0}
+                              icon={<Icon name="chevronLeft" size="sm" />}
+                              className="min-h-[48px] flex-1 touch-manipulation text-sm font-medium"
+                            >
+                              <span className="hidden sm:inline">
+                                Previous Lesson
+                              </span>
+                              <span className="sm:hidden">Previous</span>
+                            </Button>
+
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              onClick={() => {
+                                handleNextLesson()
+                                handleCloseMobileMenu()
+                              }}
+                              disabled={
+                                currentLessonIndex >=
+                                (tutorial.lessons?.length || 0) - 1
+                              }
+                              icon={<Icon name="chevronRight" size="sm" />}
+                              iconPosition="right"
+                              className="min-h-[48px] flex-1 touch-manipulation text-sm font-medium"
+                            >
+                              <span className="hidden sm:inline">
+                                Next Lesson
+                              </span>
+                              <span className="sm:hidden">Next</span>
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Quick Actions - Mobile Optimized */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              handleCloseMobileMenu()
+                            }}
+                            icon={<Icon name="bookmark" size="sm" />}
+                            className="min-h-[44px] touch-manipulation"
+                          >
+                            <span className="text-sm font-medium">
+                              Bookmark
+                            </span>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setShowBookmarkPanel(true)
+                              handleCloseMobileMenu()
+                            }}
+                            icon={<Icon name="notes" size="sm" />}
+                            className="min-h-[44px] touch-manipulation"
+                          >
+                            <span className="text-sm font-medium">Notes</span>
+                          </Button>
+                        </div>
+
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
+                          fullWidth
                           onClick={() => {
-                            toggleBookmark(currentLesson?.id || "")
+                            handleBackToReference()
                             handleCloseMobileMenu()
                           }}
-                          icon={<Icon name="bookmark" size="sm" />}
+                          icon={<Icon name="home" size="sm" />}
+                          className="min-h-[44px] touch-manipulation"
                         >
-                          Bookmark
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setShowBookmarkPanel(true)
-                            handleCloseMobileMenu()
-                          }}
-                          icon={<Icon name="notes" size="sm" />}
-                        >
-                          Notes
+                          <span className="text-sm font-medium">
+                            Back to Overview
+                          </span>
                         </Button>
                       </div>
-
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        fullWidth
-                        onClick={() => {
-                          handleBackToReference()
-                          handleCloseMobileMenu()
-                        }}
-                        icon={<Icon name="home" size="sm" />}
-                      >
-                        Back to Overview
-                      </Button>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                </>
               )}
             </div>
           </div>
 
           {/* Sidebar */}
           <div className="hidden w-80 flex-shrink-0 lg:block">
-            <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
               {/* Enhanced Tutorial Header */}
               <div className="mb-6">
                 <div className="mb-3 flex items-start gap-3">
@@ -474,9 +518,6 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {tutorial.title}
                     </h2>
-                    <div className={`text-sm ${progressMessage.color}`}>
-                      {progressMessage.message}
-                    </div>
                   </div>
                 </div>
 
@@ -487,7 +528,7 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                       value={tutorial.lessons?.length || 0}
                       icon={<Icon name="book" />}
                       color="blue"
-                      onClick={handleTutorialStatsClick}
+                      onClick={() => {}}
                     />
                     <StatCard
                       title="Difficulty"
@@ -507,38 +548,14 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                   <div className="space-y-4">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
-                        Progress: {stats.completedCount}/
-                        {tutorial.lessons?.length || 0} completed
+                        {tutorial.lessons?.length || 0} lessons available
                       </span>
                       {estimatedTime && (
                         <Badge variant="info" size="sm">
-                          {estimatedTime} left
+                          {estimatedTime} estimated
                         </Badge>
                       )}
                     </div>
-                    <ProgressBar
-                      progress={stats.progressPercentage}
-                      size="lg"
-                      animated
-                      showLabel
-                      onClick={handleProgressBarClick}
-                    />
-                    {stats.averageScore > 0 && (
-                      <div
-                        className="cursor-pointer text-xs text-green-600 hover:underline dark:text-green-400"
-                        onClick={() => setShowScoreDetails(true)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault()
-                            setShowScoreDetails(true)
-                          }
-                        }}
-                        role="button"
-                        tabIndex={0}
-                      >
-                        Average Score: {stats.averageScore}% (Click for details)
-                      </div>
-                    )}
                   </div>
                 )}
               </div>
@@ -551,17 +568,13 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                   </h3>
                   <div className="space-y-2">
                     {tutorial.lessons?.map((lesson, index) => {
-                      const isCompleted = isLessonCompleted(lesson.id)
-                      const lessonScore = getLessonScore(lesson.id)
-
                       return (
                         <LessonCard
                           key={lesson.id || index}
                           lesson={lesson}
                           index={index}
                           isActive={index === currentLessonIndex}
-                          isCompleted={isCompleted}
-                          score={lessonScore}
+                          isCompleted={false}
                           onClick={() => handleLessonSelect(index)}
                           showPreview={false}
                         />
@@ -637,11 +650,7 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
                   <Button
-                    variant={
-                      stats.hasNotes || stats.isBookmarked
-                        ? "primary"
-                        : "outline"
-                    }
+                    variant="outline"
                     size="sm"
                     onClick={() => setShowBookmarkPanel(true)}
                     icon={<Icon name="notes" size="sm" />}
@@ -649,12 +658,12 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                     Notes
                   </Button>
                   <Button
-                    variant={stats.isBookmarked ? "primary" : "outline"}
+                    variant="outline"
                     size="sm"
-                    onClick={toggleBookmark}
+                    onClick={() => {}}
                     icon={<Icon name="bookmark" size="sm" />}
                   >
-                    {stats.isBookmarked ? "Saved" : "Save"}
+                    Save
                   </Button>
                   <Button
                     variant="ghost"
@@ -682,24 +691,24 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
           <div className="flex-1">
             <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
               {showReference ? (
-                /* Reference Content */
-                <div className="p-8">
-                  <div className="mb-8">
-                    <h1 className="mb-4 flex items-center gap-3 text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">
+                /* Reference Content - Optimized Layout */
+                <div className="p-3 sm:p-6 lg:p-8">
+                  <div className="mb-4 sm:mb-6 lg:mb-8">
+                    <h1 className="mb-4 flex flex-col gap-2 text-xl font-bold text-gray-900 dark:text-white sm:flex-row sm:items-center sm:gap-3 sm:text-2xl lg:text-3xl">
                       <Icon name="book" className="text-blue-500" size="md" />
-                      {tutorial.title}
+                      <span>{tutorial.title}</span>
                     </h1>
 
                     {tutorial.description && (
-                      <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
+                      <p className="mb-4 text-base text-gray-600 dark:text-gray-300 sm:mb-6 sm:text-lg">
                         {tutorial.description}
                       </p>
                     )}
 
-                    {/* Tutorial Stats */}
-                    <div className="mb-8 flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 sm:gap-6">
+                    {/* Tutorial Stats - Optimized */}
+                    <div className="mb-4 flex flex-col gap-2 text-sm text-gray-600 dark:text-gray-400 sm:mb-6 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 lg:mb-8 lg:gap-6">
                       <div className="flex items-center gap-2">
-                        <Icon name="book" className="text-blue-500" size="sm" />
+                        <Icon name="book" className="text-blue-500" size="md" />
                         <span>{tutorial.lessons?.length || 0} Lessons</span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -720,19 +729,21 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                       </div>
                     </div>
 
-                    {/* Learn Interactively Button - Top Position */}
-                    <div className="mb-8">
+                    {/* Learn Interactively Button - Optimized */}
+                    <div className="mb-4 sm:mb-6 lg:mb-8">
                       <Button
                         onClick={handleStartLessons}
                         variant="primary"
                         size="lg"
                         icon={<Icon name="star" size="sm" />}
-                        className="transform bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg transition-all duration-300 hover:scale-105 hover:from-blue-700 hover:to-purple-700 hover:shadow-xl"
+                        className="min-h-[56px] transform touch-manipulation bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg transition-all duration-300 hover:scale-105 hover:from-blue-700 hover:to-purple-700 hover:shadow-xl"
                         fullWidth
                       >
-                        Learn Interactively
+                        <span className="text-base font-semibold">
+                          Learn Interactively
+                        </span>
                       </Button>
-                      <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+                      <p className="mt-3 text-center text-sm text-gray-600 dark:text-gray-400">
                         {recommendedAction.message}
                       </p>
                     </div>
@@ -740,10 +751,10 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
 
                   {/* Enhanced Multi-Window Reference Interface */}
                   {tutorial.reference ? (
-                    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
-                      {/* Enhanced Tab Navigation - Multi-Window Style */}
+                    <div className="-mx-3 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 sm:-mx-6 lg:-mx-8">
+                      {/* Enhanced Tab Navigation - Mobile Optimized */}
                       <div className="border-b border-gray-200 bg-gradient-to-r from-gray-50 via-blue-50 to-indigo-50 dark:border-gray-700 dark:from-gray-800 dark:via-blue-900/20 dark:to-indigo-900/20">
-                        <div className="scrollbar-hidden flex overflow-x-auto">
+                        <div className="scrollbar-hidden flex overflow-x-auto px-2 sm:px-0">
                           {(() => {
                             const tabs = [
                               {
@@ -794,18 +805,18 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                                 onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
                                 role="tab"
                                 aria-selected={activeReferenceTab === tab.id}
-                                className={`group relative flex-shrink-0 px-3 py-4 text-sm font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:px-6 ${
+                                className={`group relative min-h-[60px] flex-shrink-0 touch-manipulation px-4 py-4 text-sm font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:min-h-[48px] ${
                                   activeReferenceTab === tab.id
                                     ? `border-b-3 border-${tab.color}-500 bg-white text-${tab.color}-700 scale-105 transform shadow-md dark:bg-gray-700 dark:text-${tab.color}-400`
                                     : "border-b-3 hover:scale-102 border-transparent text-gray-600 hover:bg-white/70 hover:text-gray-900 hover:shadow-sm dark:text-gray-400 dark:hover:bg-gray-700/50 dark:hover:text-gray-200"
                                 }`}
                                 style={{
-                                  minWidth: "120px",
+                                  minWidth: "100px",
                                 }}
                               >
-                                <div className="flex flex-col items-center gap-1 sm:flex-row sm:gap-2">
+                                <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-2">
                                   <div
-                                    className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors sm:h-6 sm:w-6 ${
+                                    className={`flex h-10 w-10 items-center justify-center rounded-lg transition-colors sm:h-6 sm:w-6 ${
                                       activeReferenceTab === tab.id
                                         ? `bg-${tab.color}-100 text-${tab.color}-600 dark:bg-${tab.color}-900/30 dark:text-${tab.color}-400`
                                         : "bg-gray-100 text-gray-500 group-hover:bg-gray-200 group-hover:text-gray-700 dark:bg-gray-700 dark:text-gray-400 dark:group-hover:bg-gray-600 dark:group-hover:text-gray-300"
@@ -813,11 +824,8 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                                   >
                                     <Icon name={tab.icon} size="sm" />
                                   </div>
-                                  <span className="hidden text-center text-xs sm:inline sm:text-sm">
+                                  <span className="text-center text-xs font-medium sm:text-sm">
                                     {tab.label}
-                                  </span>
-                                  <span className="text-center text-xs sm:hidden">
-                                    {tab.label.split(" ")[0]}
                                   </span>
                                 </div>
                                 {/* Active tab indicator */}
@@ -832,9 +840,10 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                         </div>
                       </div>
 
-                      {/* Tab Content - Responsive Layout */}
+                      {/* Tab Content - Optimized Layout */}
                       <div
-                        className="min-h-[500px] p-4 sm:p-6 lg:p-8"
+                        id="tab-content-area"
+                        className="min-h-[400px] p-3 sm:min-h-[500px] sm:p-6 lg:p-8"
                         role="tabpanel"
                         aria-labelledby={`${activeReferenceTab}-tab`}
                       >
@@ -842,13 +851,13 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                         {activeReferenceTab === "introduction" && (
                           <div className="space-y-6">
                             {tutorial.reference.introduction && (
-                              <div className="rounded-lg border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-8 dark:border-blue-700 dark:from-blue-900/20 dark:to-indigo-900/20">
-                                <div className="mb-6 flex items-center gap-3">
+                              <div className="rounded-lg border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-3 dark:border-blue-700 dark:from-blue-900/20 dark:to-indigo-900/20 sm:p-6 lg:p-8">
+                                <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center">
                                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500 text-white shadow-lg">
                                     <Icon name="book" size="md" />
                                   </div>
                                   <div>
-                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white sm:text-xl">
                                       Introduction
                                     </h3>
                                     <p className="text-sm text-blue-600 dark:text-blue-400">
@@ -858,13 +867,13 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                                 </div>
 
                                 <div className="prose prose-lg max-w-none text-gray-700 dark:text-gray-300">
-                                  <p className="text-lg leading-relaxed">
+                                  <p className="text-base leading-relaxed sm:text-lg">
                                     {tutorial.reference.introduction}
                                   </p>
                                 </div>
 
-                                {/* Tutorial Overview Stats */}
-                                <div className="mt-8 grid gap-4 sm:grid-cols-3">
+                                {/* Tutorial Overview Stats - Optimized */}
+                                <div className="mt-4 grid gap-3 sm:mt-6 sm:grid-cols-3 sm:gap-4 lg:mt-8">
                                   <div className="rounded-lg border border-blue-200 bg-white/80 p-4 dark:border-blue-700 dark:bg-gray-800/80">
                                     <div className="flex items-center gap-3">
                                       <Icon
@@ -962,7 +971,9 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                                               : point.point}
                                           </p>
                                           {typeof point === "object" &&
-                                            point.mermaid_code && (
+                                            hasValidMermaidCode(
+                                              point.mermaid_code
+                                            ) && (
                                               <div className="mt-4">
                                                 <MermaidRenderer
                                                   code={
@@ -1176,7 +1187,9 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                                           </div>
 
                                           {/* Diagram Section */}
-                                          {example.mermaid_code && (
+                                          {hasValidMermaidCode(
+                                            example.mermaid_code
+                                          ) && (
                                             <div className="space-y-4">
                                               <h5 className="flex items-center gap-2 text-base font-semibold text-gray-900 dark:text-white">
                                                 <Icon
@@ -1336,8 +1349,10 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                                         </code>
                                       </pre>
                                     </div>
-                                    {tutorial.reference.syntax_guide
-                                      .mermaid_code && (
+                                    {hasValidMermaidCode(
+                                      tutorial.reference.syntax_guide
+                                        .mermaid_code
+                                    ) && (
                                       <div className="mt-6">
                                         <h5 className="mb-3 text-sm font-medium text-purple-900 dark:text-purple-100">
                                           Visual Structure:
@@ -1509,13 +1524,13 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
 
                         {/* Common Mistakes Tab */}
                         {activeReferenceTab === "mistakes" && (
-                          <div className="space-y-6">
-                            <div className="mb-8 flex items-center gap-3">
-                              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-500 text-white shadow-lg">
+                          <div className="space-y-4">
+                            <div className="mb-4 flex flex-col gap-2 sm:mb-6 sm:flex-row sm:items-center sm:gap-3 lg:mb-8">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500 text-white shadow-lg sm:h-12 sm:w-12">
                                 <Icon name="x" size="md" />
                               </div>
                               <div>
-                                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white sm:text-xl">
                                   Common Mistakes & Solutions
                                 </h3>
                                 <p className="text-sm text-red-600 dark:text-red-400">
@@ -1526,21 +1541,21 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
 
                             {tutorial.reference.common_mistakes &&
                             tutorial.reference.common_mistakes.length > 0 ? (
-                              <div className="space-y-6">
+                              <div className="space-y-4 sm:space-y-6">
                                 {tutorial.reference.common_mistakes.map(
                                   (mistake, index) => (
                                     <div
                                       key={index}
-                                      className="rounded-xl border border-red-200 bg-gradient-to-br from-red-50 to-orange-50 p-6 shadow-sm dark:border-red-700 dark:from-red-900/20 dark:to-orange-900/20"
+                                      className="rounded-xl border border-red-200 bg-gradient-to-br from-red-50 to-orange-50 p-3 shadow-sm dark:border-red-700 dark:from-red-900/20 dark:to-orange-900/20 sm:p-6"
                                     >
-                                      <div className="mb-6 flex items-start gap-4">
-                                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-500 text-white shadow-sm">
-                                          <span className="text-lg font-bold">
+                                      <div className="mb-4 flex items-start gap-3 sm:mb-6 sm:gap-4">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500 text-white shadow-sm sm:h-12 sm:w-12">
+                                          <span className="text-base font-bold sm:text-lg">
                                             {index + 1}
                                           </span>
                                         </div>
                                         <div className="flex-1">
-                                          <h4 className="mb-3 text-lg font-semibold text-red-900 dark:text-red-100">
+                                          <h4 className="mb-2 text-base font-semibold text-red-900 dark:text-red-100 sm:mb-3 sm:text-lg">
                                             {typeof mistake === "string"
                                               ? mistake
                                               : mistake.mistake}
@@ -1548,8 +1563,8 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
 
                                           {typeof mistake === "object" &&
                                             mistake.why_wrong && (
-                                              <div className="mb-4 rounded-lg border border-red-300 bg-red-100 p-4 dark:border-red-700 dark:bg-red-900/30">
-                                                <h5 className="mb-2 flex items-center gap-2 text-sm font-semibold text-red-900 dark:text-red-100">
+                                              <div className="mb-3 rounded-lg border border-red-300 bg-red-100 p-3 dark:border-red-700 dark:bg-red-900/30 sm:mb-4 sm:p-4">
+                                                <h5 className="mb-1 flex items-center gap-2 text-xs font-semibold text-red-900 dark:text-red-100 sm:mb-2 sm:text-sm">
                                                   <Icon
                                                     name="x"
                                                     className="text-red-500"
@@ -1557,7 +1572,7 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                                                   />
                                                   Why it&apos;s problematic:
                                                 </h5>
-                                                <p className="text-sm leading-relaxed text-red-800 dark:text-red-200">
+                                                <p className="text-xs leading-relaxed text-red-800 dark:text-red-200 sm:text-sm">
                                                   {mistake.why_wrong}
                                                 </p>
                                               </div>
@@ -1581,7 +1596,9 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                                             )}
 
                                           {typeof mistake === "object" &&
-                                            mistake.mermaid_code && (
+                                            hasValidMermaidCode(
+                                              mistake.mermaid_code
+                                            ) && (
                                               <div className="mt-4">
                                                 <h5 className="mb-3 text-sm font-medium text-gray-900 dark:text-gray-100">
                                                   Visual Explanation:
@@ -1727,10 +1744,11 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                         <div className="mt-8 flex items-center justify-between border-t border-gray-200 pt-6 dark:border-gray-700">
                           {(() => {
                             const tabs = [
-                              "overview",
+                              "introduction",
+                              "keypoints",
                               "examples",
-                              "practice",
-                              "issues",
+                              "syntax",
+                              "mistakes",
                             ]
                             const currentIndex =
                               tabs.indexOf(activeReferenceTab)
@@ -1741,10 +1759,11 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
 
                             const getTabLabel = (tabId: string) => {
                               const tabMap = {
-                                overview: "Overview",
-                                examples: "Examples",
-                                practice: "Practice",
-                                issues: "Common Issues",
+                                introduction: "Introduction",
+                                keypoints: "Key Points",
+                                examples: "Code Examples",
+                                syntax: "Syntax Guide",
+                                mistakes: "Common Issues",
                               }
                               return (
                                 tabMap[tabId as keyof typeof tabMap] || tabId
@@ -1770,22 +1789,6 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                                 ) : (
                                   <div /> // Spacer
                                 )}
-
-                                {/* Progress Indicator */}
-                                <div className="flex items-center gap-2">
-                                  {tabs.map((_, index) => (
-                                    <div
-                                      key={index}
-                                      className={`h-2 w-2 rounded-full transition-colors ${
-                                        index === currentIndex
-                                          ? "bg-blue-500"
-                                          : index < currentIndex
-                                            ? "bg-green-500"
-                                            : "bg-gray-300 dark:bg-gray-600"
-                                      }`}
-                                    />
-                                  ))}
-                                </div>
 
                                 {/* Next Tab Button */}
                                 {!isLast ? (
@@ -2079,18 +2082,16 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                           Reference
                         </Button>
                         <Button
-                          variant={stats.isBookmarked ? "warning" : "outline"}
+                          variant="outline"
                           size="sm"
-                          onClick={() =>
-                            toggleBookmark(currentLesson?.id || "")
-                          }
+                          onClick={() => {}}
                           icon={<Icon name="bookmark" size="sm" />}
                           className="text-xs"
                         >
                           Bookmark
                         </Button>
                         <Button
-                          variant={stats.hasNotes ? "info" : "outline"}
+                          variant="outline"
                           size="sm"
                           onClick={() => setShowBookmarkPanel(true)}
                           icon={<Icon name="notes" size="sm" />}
@@ -2115,83 +2116,6 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
           tutorialTitle={tutorial.title}
           onClose={() => setShowBookmarkPanel(false)}
         />
-      )}
-
-      {/* Score Details Modal */}
-      {showScoreDetails && (
-        <Modal
-          isOpen={showScoreDetails}
-          onClose={() => setShowScoreDetails(false)}
-          title="Score Breakdown"
-          size="lg"
-        >
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <StatCard
-                title="Overall Progress"
-                value={`${stats.progressPercentage}%`}
-                icon={<Icon name="trophy" />}
-                color="blue"
-              />
-              <StatCard
-                title="Average Score"
-                value={`${stats.averageScore}%`}
-                icon={<Icon name="star" />}
-                color="green"
-              />
-            </div>
-
-            <div>
-              <h3 className="mb-3 font-medium text-gray-900 dark:text-white">
-                Lesson Scores
-              </h3>
-              <div className="space-y-2">
-                {tutorial.lessons?.map((lesson, index) => {
-                  const lessonScore = getLessonScore(lesson.id)
-                  const isCompleted = isLessonCompleted(lesson.id)
-                  const scoreInfo = lessonScore
-                    ? formatScoreWithGrade(lessonScore)
-                    : null
-
-                  return (
-                    <div
-                      key={lesson.id || index}
-                      className="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-800"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Icon
-                          name={isCompleted ? "check" : "clock"}
-                          size="sm"
-                          className={
-                            isCompleted ? "text-green-600" : "text-gray-400"
-                          }
-                        />
-                        <span className="font-medium">{lesson.title}</span>
-                      </div>
-                      {scoreInfo ? (
-                        <Badge
-                          variant={
-                            scoreInfo.score >= 80
-                              ? "success"
-                              : scoreInfo.score >= 60
-                                ? "warning"
-                                : "error"
-                          }
-                        >
-                          {scoreInfo.score}% ({scoreInfo.grade})
-                        </Badge>
-                      ) : isCompleted ? (
-                        <Badge variant="info">Completed</Badge>
-                      ) : (
-                        <Badge variant="default">Not Started</Badge>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
-        </Modal>
       )}
 
       {/* Lesson Info Modal */}

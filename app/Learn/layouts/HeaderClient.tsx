@@ -63,8 +63,23 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
       lastScrollY.current = currentScrollY
     }
 
+    const handleCloseHeaderMobileMenu = () => {
+      setIsMobileMenuOpen(false)
+    }
+
     window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    window.addEventListener(
+      "closeHeaderMobileMenu",
+      handleCloseHeaderMobileMenu
+    )
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      window.removeEventListener(
+        "closeHeaderMobileMenu",
+        handleCloseHeaderMobileMenu
+      )
+    }
   }, [])
 
   useEffect(() => {
@@ -431,7 +446,11 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
 
             {/* Mobile Menu Toggle */}
             <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={() => {
+                setIsMobileMenuOpen(!isMobileMenuOpen)
+                // Close any tutorial mobile menu by dispatching a custom event
+                window.dispatchEvent(new CustomEvent("closeTutorialMobileMenu"))
+              }}
               className={cn(
                 "flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 transition-all duration-200 hover:bg-white/20 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 md:hidden",
                 isShrunk
@@ -597,10 +616,10 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
         />
       )}
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu Overlay - Lower z-index to allow tutorial menu to appear above */}
       {isMobileMenuOpen && (
         <button
-          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
+          className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
