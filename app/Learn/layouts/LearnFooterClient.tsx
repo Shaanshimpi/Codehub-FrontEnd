@@ -1,5 +1,6 @@
-import React from "react"
-import { getLanguages } from "@/lib/getData"
+"use client"
+
+import React, { useEffect, useState } from "react"
 import { InstagramLogoIcon } from "@radix-ui/react-icons"
 import {
   BookOpen,
@@ -14,20 +15,32 @@ import {
 import Link from "next/link"
 import { FaWhatsapp, FaYoutube } from "react-icons/fa"
 
-const LearnFooter = async () => {
-  const currentYear = new Date().getFullYear()
+interface Language {
+  id: number
+  title: string
+  slug: string
+}
 
-  // Fetch top 4 languages from database
-  let topLanguages: Array<{ id: number; title: string; slug: string }> = []
-  try {
-    const languages = await getLanguages()
-    // Get top 4 languages by index (assuming they're ordered by popularity)
-    topLanguages = (languages || []).slice(0, 4)
-  } catch (error) {
-    console.error("Error fetching languages:", error)
-    // Fallback to empty array
-    topLanguages = []
-  }
+const LearnFooterClient = () => {
+  const currentYear = new Date().getFullYear()
+  const [topLanguages, setTopLanguages] = useState<Language[]>([])
+
+  useEffect(() => {
+    // Fetch languages on client side
+    const fetchLanguages = async () => {
+      try {
+        const response = await fetch("/api/languages")
+        if (response.ok) {
+          const languages = await response.json()
+          setTopLanguages(languages.slice(0, 4))
+        }
+      } catch (error) {
+        console.error("Error fetching languages:", error)
+      }
+    }
+
+    fetchLanguages()
+  }, [])
 
   return (
     <footer className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
@@ -222,7 +235,7 @@ const LearnFooter = async () => {
         </div>
       </div>
 
-      {/* Large Brand Text (Similar to original EndSection) */}
+      {/* Large Brand Text */}
       <div className="relative overflow-hidden">
         <div className="bg-gradient-to-t from-slate-900 to-transparent py-8 text-center">
           <div className="select-none text-4xl font-bold uppercase leading-none tracking-tighter text-slate-800 md:text-6xl lg:text-8xl">
@@ -234,4 +247,4 @@ const LearnFooter = async () => {
   )
 }
 
-export default LearnFooter
+export default LearnFooterClient

@@ -1,4 +1,7 @@
-import { getLanguageBySlug, getTutorialsByLanguageId } from "@/lib/getData"
+import {
+  getLanguageBySlug,
+  getTutorialsWithExercisesByLanguageId,
+} from "@/lib/getData"
 import { notFound } from "next/navigation"
 import LanguageHeader from "./components/LanguageHeader"
 import TutorialsGrid from "./components/TutorialsGrid"
@@ -20,7 +23,7 @@ export default async function ExerciseLanguagePage({
     notFound()
   }
 
-  const tutorials = await getTutorialsByLanguageId(language.id)
+  const tutorials = await getTutorialsWithExercisesByLanguageId(language.id)
 
   return (
     <div className="min-h-screen bg-slate-900 dark:bg-slate-950">

@@ -78,6 +78,43 @@ export async function getTutorialsByLanguageId(
   }
 }
 
+// Get only tutorials that have exercises for a specific language ID
+export async function getTutorialsWithExercisesByLanguageId(
+  languageId: string | number,
+): Promise<Tutorial[]> {
+  try {
+    // First get all tutorials for the language
+    const tutorials = await fetchCollection("tutorials", {
+      where: {
+        programmingLanguage: { equals: languageId },
+      },
+      sort: "index",
+      depth: 2,
+    });
+
+    // Filter tutorials that have exercises
+    const tutorialsWithExercises = await Promise.all(
+      tutorials.map(async (tutorial) => {
+        const exercises = await fetchCollection("exercises", {
+          where: {
+            tutorial: { equals: tutorial.id },
+          },
+          limit: 1, // Just check if at least one exists
+        });
+        return exercises.length > 0 ? tutorial : null;
+      }),
+    );
+
+    // Remove null values (tutorials without exercises)
+    return tutorialsWithExercises.filter(
+      (tutorial) => tutorial !== null,
+    ) as Tutorial[];
+  } catch (error) {
+    console.error("Error fetching tutorials with exercises:", error);
+    return [];
+  }
+}
+
 // Get all tutorials for a specific language by slug
 export async function getTutorialsByLanguage(
   langSlug: string,

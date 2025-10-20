@@ -26,7 +26,28 @@ export function ModelSelector({
   )
   const [isGoldUser, setIsGoldUser] = useState(userService.isGoldUser())
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [dropdownPosition, setDropdownPosition] = useState<"bottom" | "top">(
+    "bottom"
+  )
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+
+  // Check dropdown position when opening
+  const checkDropdownPosition = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      const viewportHeight = window.innerHeight
+      const spaceBelow = viewportHeight - rect.bottom
+      const spaceAbove = rect.top
+
+      // If there's not enough space below (less than 400px) and more space above, position above
+      if (spaceBelow < 400 && spaceAbove > spaceBelow) {
+        setDropdownPosition("top")
+      } else {
+        setDropdownPosition("bottom")
+      }
+    }
+  }
 
   // Load models on component mount and filter by authentication
   useEffect(() => {
@@ -84,9 +105,22 @@ export function ModelSelector({
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    const handleResize = () => {
+      if (isOpen) {
+        checkDropdownPosition()
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside)
+      window.addEventListener("resize", handleResize)
+
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside)
+        window.removeEventListener("resize", handleResize)
+      }
+    }
+  }, [isOpen])
 
   const groupedModels = {
     budget: models.filter((m) => m.tier === "budget"),
@@ -97,7 +131,13 @@ export function ModelSelector({
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => !disabled && setIsOpen(!isOpen)}
+        ref={buttonRef}
+        onClick={() => {
+          if (!disabled) {
+            checkDropdownPosition()
+            setIsOpen(!isOpen)
+          }
+        }}
         disabled={disabled}
         className={`flex items-center gap-3 rounded-lg border border-gray-200 bg-white/50 px-4 py-3 backdrop-blur-sm transition-all hover:bg-white dark:border-slate-600 dark:bg-slate-800/50 dark:hover:bg-slate-700 ${
           disabled
@@ -122,7 +162,11 @@ export function ModelSelector({
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-lg border border-gray-200 bg-white/95 shadow-xl backdrop-blur-sm dark:border-slate-600 dark:bg-slate-800/95">
+        <div
+          className={`absolute left-0 right-0 z-50 max-h-[50vh] overflow-y-auto overflow-x-hidden rounded-lg border border-gray-200 bg-white/95 shadow-xl backdrop-blur-sm dark:border-slate-600 dark:bg-slate-800/95 sm:max-h-[70vh] ${
+            dropdownPosition === "top" ? "bottom-full mb-2" : "top-full mt-2"
+          }`}
+        >
           {/* Current Model Header - Shown on Mobile */}
           <div className="border-b border-gray-200 bg-blue-50/50 p-3 dark:border-slate-600 dark:bg-blue-900/20 sm:hidden">
             <div className="flex items-center gap-2">
@@ -133,7 +177,11 @@ export function ModelSelector({
               </span>
             </div>
             <div className="mt-1 text-xs text-blue-600 dark:text-blue-400">
-              {selectedModel?.description || "No description"}
+              {selectedModel?.description
+                ? selectedModel.description.length > 80
+                  ? selectedModel.description.slice(0, 77) + "..."
+                  : selectedModel.description
+                : "No description"}
             </div>
           </div>
 
@@ -199,10 +247,10 @@ export function ModelSelector({
             return (
               <div
                 key={tier}
-                className="border-b border-gray-100 p-3 last:border-b-0 dark:border-slate-700"
+                className="border-b border-gray-100 p-2 last:border-b-0 dark:border-slate-700 sm:p-3"
               >
                 <div
-                  className={`mb-3 inline-block rounded-full bg-gradient-to-r px-3 py-1 text-xs font-semibold ${tier === "budget" ? "from-green-100 to-green-200 text-green-800 dark:from-green-900/50 dark:to-green-800/50 dark:text-green-300" : tier === "mid" ? "from-blue-100 to-blue-200 text-blue-800 dark:from-blue-900/50 dark:to-blue-800/50 dark:text-blue-300" : "from-purple-100 to-purple-200 text-purple-800 dark:from-purple-900/50 dark:to-purple-800/50 dark:text-purple-300"}`}
+                  className={`mb-2 inline-block rounded-full bg-gradient-to-r px-2 py-0.5 text-xs font-semibold sm:mb-3 sm:px-3 sm:py-1 ${tier === "budget" ? "from-green-100 to-green-200 text-green-800 dark:from-green-900/50 dark:to-green-800/50 dark:text-green-300" : tier === "mid" ? "from-blue-100 to-blue-200 text-blue-800 dark:from-blue-900/50 dark:to-blue-800/50 dark:text-blue-300" : "from-purple-100 to-purple-200 text-purple-800 dark:from-purple-900/50 dark:to-purple-800/50 dark:text-purple-300"}`}
                 >
                   {getTierDisplayName(tier as any)} Models
                 </div>
@@ -230,7 +278,7 @@ export function ModelSelector({
                             }
                           }
                         }}
-                        className={`group flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left transition-all ${
+                        className={`group flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left transition-all sm:gap-3 sm:px-3 sm:py-3 ${
                           canSelect
                             ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50"
                             : "cursor-pointer opacity-75 hover:bg-yellow-50 dark:hover:bg-yellow-900/20"
@@ -240,10 +288,12 @@ export function ModelSelector({
                             : "border border-transparent"
                         }`}
                       >
-                        <span className="text-lg">{getModelIcon(model)}</span>
-                        <div className="flex-1">
+                        <span className="text-base sm:text-lg">
+                          {getModelIcon(model)}
+                        </span>
+                        <div className="min-w-0 flex-1">
                           <div
-                            className={`flex items-center gap-2 text-base font-medium ${
+                            className={`flex items-center gap-2 text-sm font-medium sm:text-base ${
                               canSelect
                                 ? "text-gray-900 group-hover:text-blue-600 dark:text-slate-100 dark:group-hover:text-blue-400"
                                 : "text-gray-600 dark:text-slate-400"
@@ -254,8 +304,15 @@ export function ModelSelector({
                               <Lock className="h-3 w-3 text-yellow-600 dark:text-yellow-400" />
                             )}
                           </div>
-                          <div className="mt-1 text-xs text-gray-400 dark:text-slate-500">
-                            {model.description}
+                          <div className="mt-0.5 text-xs text-gray-400 dark:text-slate-500 sm:mt-1">
+                            <span className="block sm:hidden">
+                              {model.description.length > 80
+                                ? model.description.slice(0, 77) + "..."
+                                : model.description}
+                            </span>
+                            <span className="hidden sm:block">
+                              {model.description}
+                            </span>
                             {requiresGold && !canSelect && (
                               <span className="ml-2 font-medium text-yellow-600 dark:text-yellow-400">
                                 • Gold Required

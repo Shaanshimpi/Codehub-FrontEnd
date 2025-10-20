@@ -11,3 +11,17 @@ export { default as LessonCard } from "./LessonCard"
 export { default as Modal } from "./Modal"
 export { default as ProgressBar } from "./ProgressBar"
 export { default as StatCard } from "./StatCard"
+
+// New components for improved UX
+export {
+  default as SkeletonLoader,
+  TutorialSkeleton,
+  LessonListSkeleton,
+  CodeBlockSkeleton,
+} from "./SkeletonLoader"
+export {
+  default as ErrorState,
+  TutorialNotFoundError,
+  NetworkError,
+  PermissionError,
+} from "./ErrorState"

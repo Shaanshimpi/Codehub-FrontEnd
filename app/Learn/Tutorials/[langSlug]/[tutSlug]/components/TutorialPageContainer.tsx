@@ -5,6 +5,8 @@ import type { Language, Tutorial } from "@/app/Learn/types/TutorialTypes"
 import { useTheme } from "@/app/contexts/theme-context"
 import { getNavigationUrls, getRecommendedAction } from "../helpers"
 import { useKeyboardNavigation } from "../hooks/useKeyboardNavigation"
+// Import spacing system
+import "../styles/spacing.css"
 import {
   calculateEstimatedTime,
   formatDifficultyWithIcon,
@@ -46,6 +48,7 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
   // const [showBookmarkPanel, setShowBookmarkPanel] = useState(false)
   const [showLessonInfo, setShowLessonInfo] = useState<string | null>(null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [activeReferenceTab, setActiveReferenceTab] = useState("introduction")
   const [currentExampleIndex, setCurrentExampleIndex] = useState(0)
 
@@ -101,10 +104,6 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
       }
     }, 100) // Small delay to ensure content is rendered
   }
-  const [adjacentTutorials] = useState<{
-    previous: any | null
-    next: any | null
-  }>({ previous: null, next: null })
 
   // Simple lesson navigation without progress tracking
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0)
@@ -179,19 +178,6 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
-  // New handler functions for previously non-functional elements
-  const handleNavigateToPreviousTutorial = () => {
-    if (adjacentTutorials.previous) {
-      window.location.href = `/Learn/Tutorials/${langSlug}/${adjacentTutorials.previous.slug}`
-    }
-  }
-
-  const handleNavigateToNextTutorial = () => {
-    if (adjacentTutorials.next) {
-      window.location.href = `/Learn/Tutorials/${langSlug}/${adjacentTutorials.next.slug}`
-    }
-  }
-
   const handleMobileMenuToggle = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
     // Close any header mobile menu by dispatching a custom event
@@ -200,6 +186,14 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
 
   const handleCloseMobileMenu = () => {
     setIsMobileMenuOpen(false)
+  }
+
+  const handleToggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen)
+  }
+
+  const handleCloseSidebar = () => {
+    setIsSidebarOpen(false)
   }
 
   // Enhanced keyboard shortcuts for tabs
@@ -227,7 +221,7 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
   }
 
   // Keyboard navigation
-  const { showKeyboardShortcutsHelp } = useKeyboardNavigation({
+  useKeyboardNavigation({
     onPreviousLesson: handlePreviousLesson,
     onNextLesson: handleNextLesson,
     onToggleBookmark: () => {},
@@ -239,7 +233,7 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
   })
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900" role="main">
       {/* Mobile Menu Overlay - Higher z-index to prevent conflicts */}
       {isMobileMenuOpen && (
         <div
@@ -249,7 +243,10 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
         />
       )}
       {/* Enhanced Breadcrumb */}
-      <div className="border-b border-gray-200 bg-white pt-16 dark:border-gray-700 dark:bg-gray-800">
+      <nav
+        className="border-b border-gray-200 bg-white pt-16 dark:border-gray-700 dark:bg-gray-800"
+        aria-label="Breadcrumb navigation"
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="py-4">
             <Breadcrumb
@@ -277,10 +274,22 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
             />
           </div>
         </div>
-      </div>
+      </nav>
 
       <div className="mx-auto max-w-7xl px-2 py-3 sm:px-4 sm:py-6 lg:px-8">
-        <div className="flex flex-col gap-3 sm:gap-6 lg:flex-row">
+        <div
+          className="flex flex-col gap-3 sm:gap-6 lg:flex-row"
+          role="presentation"
+        >
+          {/* Mobile Sidebar Toggle - Floating Action Button */}
+          <button
+            onClick={handleToggleSidebar}
+            className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition-all hover:bg-blue-700 hover:shadow-xl lg:hidden"
+            aria-label="Toggle navigation sidebar"
+          >
+            <Icon name={isSidebarOpen ? "x" : "menu"} size="md" />
+          </button>
+
           {/* Enhanced Mobile Header */}
           <div className="lg:hidden">
             <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
@@ -446,32 +455,32 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                         {/* Quick Actions - Mobile Optimized */}
                         {/* Temporarily hidden - Local storage features
                         <div className="grid grid-cols-2 gap-3">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              handleCloseMobileMenu()
-                            }}
-                            icon={<Icon name="bookmark" size="sm" />}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            handleCloseMobileMenu()
+                          }}
+                          icon={<Icon name="bookmark" size="sm" />}
                             className="min-h-[44px] touch-manipulation"
-                          >
+                        >
                             <span className="text-sm font-medium">
-                              Bookmark
+                          Bookmark
                             </span>
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setShowBookmarkPanel(true)
-                              handleCloseMobileMenu()
-                            }}
-                            icon={<Icon name="notes" size="sm" />}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setShowBookmarkPanel(true)
+                            handleCloseMobileMenu()
+                          }}
+                          icon={<Icon name="notes" size="sm" />}
                             className="min-h-[44px] touch-manipulation"
-                          >
+                        >
                             <span className="text-sm font-medium">Notes</span>
-                          </Button>
-                        </div>
+                        </Button>
+                      </div>
                         */}
 
                         <Button
@@ -497,8 +506,155 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
             </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="hidden w-80 flex-shrink-0 lg:block">
+          {/* Mobile Slide-out Sidebar */}
+          {isSidebarOpen && (
+            <>
+              {/* Backdrop */}
+              <button
+                type="button"
+                className="fixed inset-0 z-[45] bg-black/40 backdrop-blur-sm lg:hidden"
+                onClick={handleCloseSidebar}
+                aria-label="Close sidebar"
+              />
+              {/* Sidebar Panel */}
+              <aside
+                className="fixed bottom-0 right-0 top-0 z-50 w-80 transform overflow-y-auto bg-white shadow-2xl transition-transform duration-300 ease-in-out dark:bg-gray-800 lg:hidden"
+                role="navigation"
+                aria-label="Tutorial navigation sidebar"
+              >
+                {/* Sidebar Header */}
+                <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-4 py-4 dark:border-gray-700 dark:bg-gray-800">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Navigation
+                  </h2>
+                  <button
+                    onClick={handleCloseSidebar}
+                    className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    aria-label="Close navigation"
+                  >
+                    <Icon name="x" size="sm" />
+                  </button>
+                </div>
+
+                {/* Sidebar Content */}
+                <div className="p-4">
+                  {/* Tutorial Info */}
+                  <div className="mb-6">
+                    <div className="mb-3 flex items-start gap-3">
+                      <Icon name="book" className="mt-0.5 text-blue-600" />
+                      <div className="flex-1">
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                          {tutorial.title}
+                        </h3>
+                      </div>
+                    </div>
+
+                    {showReference ? (
+                      <div className="grid grid-cols-1 gap-3">
+                        <StatCard
+                          title="Lessons"
+                          value={tutorial.lessons?.length || 0}
+                          icon={<Icon name="book" />}
+                          color="blue"
+                          onClick={() => {}}
+                        />
+                        <StatCard
+                          title="Difficulty"
+                          value={difficultyInfo.label}
+                          subtitle="Recommended level"
+                          icon={<span>{difficultyInfo.icon}</span>}
+                          color="purple"
+                        />
+                        <StatCard
+                          title="Language"
+                          value={language.title}
+                          icon={<Icon name="code" />}
+                          color="green"
+                        />
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600 dark:text-gray-400">
+                            {tutorial.lessons?.length || 0} lessons available
+                          </span>
+                          {estimatedTime && (
+                            <Badge variant="info" size="sm">
+                              {estimatedTime} estimated
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {!showReference && (
+                    /* Lesson List */
+                    <div className="mb-6">
+                      <h4 className="mb-3 text-sm font-medium text-gray-900 dark:text-white">
+                        Lessons
+                      </h4>
+                      <div className="space-y-2">
+                        {tutorial.lessons?.map((lesson, index) => {
+                          return (
+                            <LessonCard
+                              key={lesson.id || index}
+                              lesson={lesson}
+                              index={index}
+                              isActive={index === currentLessonIndex}
+                              isCompleted={false}
+                              onClick={() => {
+                                handleLessonSelect(index)
+                                handleCloseSidebar()
+                              }}
+                              showPreview={false}
+                            />
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {showReference && (
+                    /* Reference Mode Overview */
+                    <div className="mb-6">
+                      <h4 className="mb-3 text-sm font-medium text-gray-900 dark:text-white">
+                        What You&apos;ll Learn:
+                      </h4>
+                      <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                        {tutorial.lessons?.slice(0, 5).map((lesson, index) => (
+                          <div
+                            key={lesson.id || index}
+                            className="flex items-start gap-2"
+                          >
+                            <span className="mt-1 text-xs text-blue-500">
+                              •
+                            </span>
+                            <span>{lesson.title}</span>
+                          </div>
+                        ))}
+                        {(tutorial.lessons?.length || 0) > 5 && (
+                          <div className="flex items-start gap-2 text-xs">
+                            <span className="mt-1 text-blue-500">•</span>
+                            <span>
+                              And {(tutorial.lessons?.length || 0) - 5} more
+                              lessons...
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </aside>
+            </>
+          )}
+
+          {/* Desktop Sidebar */}
+          <aside
+            className="hidden w-80 flex-shrink-0 lg:block"
+            aria-label="Tutorial information sidebar"
+          >
             <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
               {/* Enhanced Tutorial Header */}
               <div className="mb-6">
@@ -602,86 +758,12 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                   </div>
                 </div>
               )}
-
-              {/* Enhanced Tutorial Navigation */}
-              <div className="border-t border-gray-200 pt-6 dark:border-gray-700">
-                <h3 className="mb-3 text-sm font-medium text-gray-900 dark:text-white">
-                  Tutorial Navigation
-                </h3>
-                <div className="space-y-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    fullWidth
-                    onClick={handleNavigateToPreviousTutorial}
-                    disabled={!adjacentTutorials.previous}
-                    icon={<Icon name="chevronLeft" size="sm" />}
-                  >
-                    Previous Tutorial
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    fullWidth
-                    onClick={handleNavigateToNextTutorial}
-                    disabled={!adjacentTutorials.next}
-                    icon={<Icon name="chevronRight" size="sm" />}
-                    iconPosition="right"
-                  >
-                    Next Tutorial
-                  </Button>
-                </div>
-              </div>
-
-              {/* Enhanced Quick Actions */}
-              <div className="mt-6 border-t border-gray-200 pt-6 dark:border-gray-700">
-                <h3 className="mb-3 text-sm font-medium text-gray-900 dark:text-white">
-                  Quick Actions
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {/* Temporarily hidden - Local storage features
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowBookmarkPanel(true)}
-                    icon={<Icon name="notes" size="sm" />}
-                  >
-                    Notes
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {}}
-                    icon={<Icon name="bookmark" size="sm" />}
-                  >
-                    Save
-                  </Button>
-                  */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={showKeyboardShortcutsHelp}
-                    icon={<Icon name="keyboard" size="sm" />}
-                    title="Keyboard shortcuts (Press ? for help)"
-                  >
-                    Shortcuts
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => (window.location.href = navigationUrls.home)}
-                    icon={<Icon name="home" size="sm" />}
-                  >
-                    Home
-                  </Button>
-                </div>
-              </div>
             </div>
-          </div>
+          </aside>
 
           {/* Main Content */}
-          <div className="flex-1">
-            <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+          <section className="flex-1" aria-label="Tutorial content">
+            <article className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
               {showReference ? (
                 /* Reference Content - Optimized Layout */
                 <div className="p-3 sm:p-6 lg:p-8">
@@ -790,14 +872,14 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                               },
                             ].filter((tab) => tab.available)
 
-                            return tabs.map((tab, index) => (
+                            return tabs.map((tab) => (
                               <button
                                 key={tab.id}
                                 onClick={() => handleTabChange(tab.id)}
                                 onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
                                 role="tab"
                                 aria-selected={activeReferenceTab === tab.id}
-                                className={`group relative min-h-[60px] flex-shrink-0 touch-manipulation px-4 py-4 text-sm font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:min-h-[48px] ${
+                                className={`group relative min-h-[72px] flex-shrink-0 touch-manipulation px-3 py-3 text-sm font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:min-h-[48px] ${
                                   activeReferenceTab === tab.id
                                     ? `border-b-3 border-${tab.color}-500 bg-white text-${tab.color}-700 scale-105 transform shadow-md dark:bg-gray-700 dark:text-${tab.color}-400`
                                     : "border-b-3 hover:scale-102 border-transparent text-gray-600 hover:bg-white/70 hover:text-gray-900 hover:shadow-sm dark:text-gray-400 dark:hover:bg-gray-700/50 dark:hover:text-gray-200"
@@ -816,7 +898,7 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                                   >
                                     <Icon name={tab.icon} size="sm" />
                                   </div>
-                                  <span className="text-center text-xs font-medium sm:text-sm">
+                                  <span className="max-w-[88px] truncate text-center text-xs font-medium sm:max-w-none sm:text-sm">
                                     {tab.label}
                                   </span>
                                 </div>
@@ -1004,6 +1086,13 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                                 <p className="text-gray-500 dark:text-gray-400">
                                   No key points available for this tutorial.
                                 </p>
+                              </div>
+                            )}
+                            {/* Empty state visual nudge */}
+                            {(!tutorial.reference.key_points ||
+                              tutorial.reference.key_points.length === 0) && (
+                              <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800 dark:border-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-200">
+                                No key points available yet. Check back soon.
                               </div>
                             )}
                           </div>
@@ -2059,8 +2148,8 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                   </div>
                 </div>
               )}
-            </div>
-          </div>
+            </article>
+          </section>
         </div>
       </div>
 
@@ -2143,7 +2232,7 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
           </div>
         </Modal>
       )}
-    </div>
+    </main>
   )
 }
 

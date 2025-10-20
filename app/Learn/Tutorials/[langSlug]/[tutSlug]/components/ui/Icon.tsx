@@ -1,20 +1,30 @@
 /**
- * Professional icon component to replace emojis
+ * Professional icon component with consistent sizing and tooltips
+ * Sizes based on CSS custom properties
  */
 import React from "react"
 
 interface IconProps {
   name: string
-  size?: "sm" | "md" | "lg" | "xl"
+  size?: "xs" | "sm" | "md" | "lg" | "xl"
   className?: string
+  title?: string
+  ariaLabel?: string
 }
 
-const Icon: React.FC<IconProps> = ({ name, size = "md", className = "" }) => {
+const Icon: React.FC<IconProps> = ({
+  name,
+  size = "md",
+  className = "",
+  title,
+  ariaLabel,
+}) => {
   const sizeClasses = {
-    sm: "h-4 w-4",
-    md: "h-5 w-5",
-    lg: "h-6 w-6",
-    xl: "h-8 w-8",
+    xs: "h-3 w-3", // 12px - for very small icons
+    sm: "h-4 w-4", // 16px - for inline text icons
+    md: "h-5 w-5", // 20px - default size
+    lg: "h-6 w-6", // 24px - for prominent icons
+    xl: "h-8 w-8", // 32px - for large feature icons
   }
 
   const iconPaths: { [key: string]: string } = {
@@ -39,8 +49,41 @@ const Icon: React.FC<IconProps> = ({ name, size = "md", className = "" }) => {
       "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z",
     chevronLeft: "M15 19l-7-7 7-7",
     chevronRight: "M9 5l7 7-7 7",
+    chevronUp: "M5 15l7-7 7 7",
+    chevronDown: "M19 9l-7 7-7-7",
     menu: "M4 6h16M4 12h16M4 18h16",
     x: "M6 18L18 6M6 6l12 12",
+    alert:
+      "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z",
+    info: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+    refresh:
+      "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15",
+  }
+
+  const iconTitles: { [key: string]: string } = {
+    home: "Home",
+    book: "Book",
+    computer: "Computer",
+    quiz: "Quiz",
+    code: "Code",
+    edit: "Edit",
+    star: "Star",
+    clock: "Clock",
+    check: "Check",
+    puzzle: "Puzzle",
+    bookmark: "Bookmark",
+    notes: "Notes",
+    keyboard: "Keyboard",
+    trophy: "Trophy",
+    chevronLeft: "Previous",
+    chevronRight: "Next",
+    chevronUp: "Collapse",
+    chevronDown: "Expand",
+    menu: "Menu",
+    x: "Close",
+    alert: "Warning",
+    info: "Information",
+    refresh: "Refresh",
   }
 
   const path = iconPaths[name]
@@ -49,6 +92,9 @@ const Icon: React.FC<IconProps> = ({ name, size = "md", className = "" }) => {
     return null
   }
 
+  const iconTitle = title || iconTitles[name] || name
+  const accessibleLabel = ariaLabel || iconTitle
+
   return (
     <svg
       className={`${sizeClasses[size]} ${className}`}
@@ -56,7 +102,11 @@ const Icon: React.FC<IconProps> = ({ name, size = "md", className = "" }) => {
       viewBox="0 0 24 24"
       stroke="currentColor"
       strokeWidth={2}
+      role="img"
+      aria-label={accessibleLabel}
+      title={iconTitle}
     >
+      <title>{iconTitle}</title>
       <path strokeLinecap="round" strokeLinejoin="round" d={path} />
     </svg>
   )
