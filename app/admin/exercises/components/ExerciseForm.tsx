@@ -73,14 +73,32 @@ const ExerciseForm: React.FC<ExerciseFormProps> = ({
 
   const [filteredTutorials, setFilteredTutorials] = useState<Tutorial[]>([])
 
+  // Generate URL-friendly slug from title
+  const generateSlug = (title: string): string => {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
+      .replace(/\s+/g, "-") // Replace spaces with hyphens
+      .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
+      .replace(/^-|-$/g, "") // Remove leading/trailing hyphens
+  }
+
   useEffect(() => {
     if (initialData) {
       console.log("📝 Setting initial form data:", initialData)
+
+      // Generate slug from title if slug is missing or empty
+      const autoSlug =
+        !initialData.slug && initialData.title
+          ? generateSlug(initialData.title)
+          : initialData.slug || ""
+
       // Ensure proper data structure when editing
       setFormData({
         title: initialData.title || "",
         description: initialData.description || "",
-        slug: initialData.slug || "",
+        slug: autoSlug,
         difficultyLevel: initialData.difficultyLevel || 1,
         programmingLanguage:
           initialData.programmingLanguage?.id?.toString() || "",
@@ -159,17 +177,6 @@ const ExerciseForm: React.FC<ExerciseFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     await onSubmit(formData)
-  }
-
-  // Generate URL-friendly slug from title
-  const generateSlug = (title: string): string => {
-    return title
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
-      .replace(/\s+/g, "-") // Replace spaces with hyphens
-      .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
-      .replace(/^-|-$/g, "") // Remove leading/trailing hyphens
   }
 
   // Handle title change and auto-generate slug

@@ -5,19 +5,14 @@ import React, { useState } from "react"
 import { useUser } from "@/app/(payload)/_providers/UserProvider"
 import UnifiedMobileTabSwitcher from "@/app/Learn/Exercise/components/Mobile/UnifiedMobileTabSwitcher"
 import LoginModal from "@/app/Learn/components/LoginModal"
-import {
-  Code,
-  FileText,
-  Lightbulb,
-  Lock,
-  Network,
-  Play,
-} from "lucide-react"
+import { Code, FileText, Lightbulb, Lock, Network, Play } from "lucide-react"
 import SolutionCodePlayground from "../Shared/SolutionCodePlayground"
 import ExecutionStepsPanel from "../SolutionView/ExecutionStepsPanel"
 import ExplanationTabs from "../SolutionView/ExplanationTabs"
 import KeyConceptsPanel from "../SolutionView/KeyConceptsPanel"
 import MermaidViewer from "../SolutionView/MermaidViewer"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
@@ -54,7 +49,8 @@ const SolutionView: React.FC<SolutionViewProps> = ({
   }
 
   // Check if premium features are locked
-  const isPremiumLocked = !user
+  // TEMPORARY: Disabled login requirement for flowchart and execution
+  const isPremiumLocked = false // !user
 
   // Premium feature names mapping
   const premiumFeatures = {

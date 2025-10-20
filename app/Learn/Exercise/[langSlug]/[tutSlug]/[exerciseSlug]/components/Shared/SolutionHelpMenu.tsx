@@ -8,6 +8,8 @@ import { MessageSquare, RotateCcw, X } from "lucide-react"
 
 // Solution-specific help menu with explanation and clean solution
 
+// Solution-specific help menu with explanation and clean solution
+
 interface SolutionHelpMenuProps {
   isOpen: boolean
   onClose: () => void
@@ -22,6 +24,29 @@ const SolutionHelpMenu: React.FC<SolutionHelpMenuProps> = ({
   onResetToCleanSolution,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null)
+  const [menuPosition, setMenuPosition] = React.useState<"top" | "bottom">(
+    "bottom"
+  )
+
+  // Calculate menu position based on available space
+  useEffect(() => {
+    if (isOpen && menuRef.current) {
+      const parentElement = menuRef.current.parentElement
+      if (parentElement) {
+        const rect = parentElement.getBoundingClientRect()
+        const viewportHeight = window.innerHeight
+        const spaceBelow = viewportHeight - rect.bottom
+        const spaceAbove = rect.top
+
+        // If less than 300px below and more space above, position above
+        if (spaceBelow < 300 && spaceAbove > spaceBelow) {
+          setMenuPosition("top")
+        } else {
+          setMenuPosition("bottom")
+        }
+      }
+    }
+  }, [isOpen])
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -112,7 +137,9 @@ const SolutionHelpMenu: React.FC<SolutionHelpMenuProps> = ({
       {/* Menu */}
       <div
         ref={menuRef}
-        className="help-menu-enter absolute left-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900 sm:w-72"
+        className={`help-menu-enter absolute left-0 z-50 w-64 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900 sm:w-72 ${
+          menuPosition === "top" ? "bottom-full mb-2" : "top-full mt-2"
+        }`}
         role="menu"
         aria-labelledby="solution-help-menu-title"
         aria-orientation="vertical"

@@ -218,6 +218,8 @@ export const EXERCISE_RESPONSE_SCHEMA = {
     "explanation",
     "visual_elements",
     "boilerplate_code",
+    "learning_objectives",
+    "tags",
   ],
   additionalProperties: false,
 } as const

@@ -30,8 +30,8 @@ const ExerciseHeader: React.FC<ExerciseHeaderProps> = ({
   }
 
   return (
-    <div className="border-b border-gray-300 bg-white pt-16 shadow-lg dark:border-gray-600 dark:bg-black">
-      <div className="mx-auto max-w-7xl px-4 py-3 lg:px-6">
+    <div className="border-b border-gray-300 bg-white shadow-sm dark:border-gray-600 dark:bg-black">
+      <div className="mx-auto max-w-7xl px-4 py-2 lg:px-6">
         {/* Compact Single Row Layout */}
         <div className="flex items-center justify-between gap-4">
           {/* Left: Title + Context */}

@@ -1,11 +1,10 @@
 "use client"
 
 import React from "react"
-import { BookOpen, Clock, PlayCircle } from "lucide-react"
+import { BookOpen, PlayCircle } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Language, Tutorial } from "../../../types/TutorialTypes"
-import { readTime } from "../../../utils"
 
 interface TutorialCardProps {
   tutorial: Tutorial
@@ -77,10 +76,6 @@ const TutorialCard: React.FC<TutorialCardProps> = ({
             <div className="flex items-center">
               <BookOpen className="mr-1 h-4 w-4" />
               Tutorials
-            </div>
-            <div className="flex items-center">
-              <Clock className="mr-1 h-4 w-4" />
-              {`~${readTime(plainTextContent)} min`}
             </div>
           </div>
 

@@ -2,8 +2,7 @@
 
 import React from "react"
 import { Language, Tutorial } from "@/app/Learn/types/TutorialTypes"
-import { readTime } from "@/app/Learn/utils"
-import { BookOpen, Clock, PlayCircle } from "lucide-react"
+import { BookOpen, PlayCircle } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -48,7 +47,7 @@ const TutorialCard: React.FC<TutorialCardProps> = ({
         {/* Header with index and icon */}
         <div className="mb-4 flex items-center justify-between">
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-blue-800 text-lg font-bold text-white dark:from-blue-500 dark:to-blue-600">
-            {tutorial.index || index}
+            {index}
           </div>
           <div className="rounded-full bg-blue-50 p-2 dark:bg-slate-700">
             <PlayCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -76,10 +75,6 @@ const TutorialCard: React.FC<TutorialCardProps> = ({
             <div className="flex items-center">
               <BookOpen className="mr-1 h-4 w-4" />
               Exercises
-            </div>
-            <div className="flex items-center">
-              <Clock className="mr-1 h-4 w-4" />
-              {`~${readTime(plainTextContent)} min`}
             </div>
           </div>
 

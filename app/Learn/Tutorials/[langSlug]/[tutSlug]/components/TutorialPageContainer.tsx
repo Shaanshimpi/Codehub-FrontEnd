@@ -7,11 +7,7 @@ import { getNavigationUrls, getRecommendedAction } from "../helpers"
 import { useKeyboardNavigation } from "../hooks/useKeyboardNavigation"
 // Import spacing system
 import "../styles/spacing.css"
-import {
-  calculateEstimatedTime,
-  formatDifficultyWithIcon,
-  formatLessonType,
-} from "../utils"
+import { formatDifficultyWithIcon, formatLessonType } from "../utils"
 // Temporarily disabled - Local storage features
 // import BookmarkNotesPanel from "./BookmarkNotesPanel"
 import MermaidRenderer from "./MermaidRenderer"
@@ -142,7 +138,6 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
   // Enhanced calculations using new helpers
   const navigationUrls = getNavigationUrls(langSlug, tutSlug)
   const difficultyInfo = formatDifficultyWithIcon(tutorial.difficulty)
-  const estimatedTime = calculateEstimatedTime(tutorial.lessons?.length || 0, 0)
   const recommendedAction = getRecommendedAction(
     { completedCount: 0, progressPercentage: 0, averageScore: 0 },
     tutorial.lessons?.length || 0
@@ -314,15 +309,6 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                           ? "Reference"
                           : `Lesson ${currentLessonIndex + 1}/${tutorial.lessons?.length || 0}`}
                       </span>
-                      {estimatedTime && !showReference && (
-                        <>
-                          <span>•</span>
-                          <span className="xs:inline hidden">
-                            {estimatedTime} left
-                          </span>
-                          <span className="xs:hidden">{estimatedTime}</span>
-                        </>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -578,11 +564,6 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                           <span className="text-gray-600 dark:text-gray-400">
                             {tutorial.lessons?.length || 0} lessons available
                           </span>
-                          {estimatedTime && (
-                            <Badge variant="info" size="sm">
-                              {estimatedTime} estimated
-                            </Badge>
-                          )}
                         </div>
                       </div>
                     )}
@@ -696,11 +677,6 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                       <span className="text-gray-600 dark:text-gray-400">
                         {tutorial.lessons?.length || 0} lessons available
                       </span>
-                      {estimatedTime && (
-                        <Badge variant="info" size="sm">
-                          {estimatedTime} estimated
-                        </Badge>
-                      )}
                     </div>
                   </div>
                 )}
