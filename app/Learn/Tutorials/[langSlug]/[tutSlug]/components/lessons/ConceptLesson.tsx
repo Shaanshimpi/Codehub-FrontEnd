@@ -181,7 +181,7 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({
                 if (!example) return null
 
                 return (
-                  <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800">
+                  <div className="rounded-xl border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800">
                     {/* Enhanced Example Header */}
                     <div className="border-b border-gray-200 bg-gradient-to-r from-green-50 via-blue-50 to-indigo-50 px-4 py-6 dark:border-gray-700 dark:from-green-900/20 dark:via-blue-900/20 dark:to-indigo-900/20 sm:px-6">
                       <div className="flex items-start justify-between">
@@ -231,9 +231,9 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({
                               Copy Code
                             </Button>
                           </div>
-                          <div className="rounded-xl bg-gray-900 p-4 shadow-inner sm:p-6">
-                            <pre className="overflow-x-auto text-sm leading-relaxed text-gray-100 sm:text-base">
-                              <code>{example.code}</code>
+                          <div className="overflow-x-auto rounded-xl bg-gray-900 p-4 shadow-inner sm:p-6">
+                            <pre className="text-sm leading-relaxed text-gray-100 sm:text-base">
+                              <code className="block">{example.code}</code>
                             </pre>
                           </div>
                         </div>
@@ -281,9 +281,11 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({
                                 />
                                 Expected Output
                               </h5>
-                              <div className="rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm dark:border-green-800 dark:bg-green-900/20 sm:p-6">
-                                <pre className="overflow-x-auto text-sm leading-relaxed text-green-800 dark:text-green-200 sm:text-base">
-                                  <code>{example.output}</code>
+                              <div className="overflow-x-auto rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm dark:border-green-800 dark:bg-green-900/20 sm:p-6">
+                                <pre className="text-sm leading-relaxed text-green-800 dark:text-green-200 sm:text-base">
+                                  <code className="block">
+                                    {example.output}
+                                  </code>
                                 </pre>
                               </div>
                             </div>
@@ -335,7 +337,7 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({
             (() => {
               const example = data.codeExamples[0]
               return (
-                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
                   {/* Enhanced Example Header */}
                   <div className="border-b border-gray-200 bg-gradient-to-r from-green-50 via-blue-50 to-indigo-50 px-4 py-6 dark:border-gray-700 dark:from-green-900/20 dark:via-blue-900/20 dark:to-indigo-900/20 sm:px-6">
                     <div className="flex items-start justify-between">
@@ -384,9 +386,9 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({
                             Copy Code
                           </Button>
                         </div>
-                        <div className="rounded-xl bg-gray-900 p-4 shadow-inner sm:p-6">
-                          <pre className="overflow-x-auto text-sm leading-relaxed text-gray-100 sm:text-base">
-                            <code>{example.code}</code>
+                        <div className="overflow-x-auto rounded-xl bg-gray-900 p-4 shadow-inner sm:p-6">
+                          <pre className="text-sm leading-relaxed text-gray-100 sm:text-base">
+                            <code className="block">{example.code}</code>
                           </pre>
                         </div>
                       </div>
@@ -434,9 +436,9 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({
                               />
                               Expected Output
                             </h5>
-                            <div className="rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm dark:border-green-800 dark:bg-green-900/20 sm:p-6">
-                              <pre className="overflow-x-auto text-sm leading-relaxed text-green-800 dark:text-green-200 sm:text-base">
-                                <code>{example.output}</code>
+                            <div className="overflow-x-auto rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm dark:border-green-800 dark:bg-green-900/20 sm:p-6">
+                              <pre className="text-sm leading-relaxed text-green-800 dark:text-green-200 sm:text-base">
+                                <code className="block">{example.output}</code>
                               </pre>
                             </div>
                           </div>

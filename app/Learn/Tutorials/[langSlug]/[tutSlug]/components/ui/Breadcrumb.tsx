@@ -3,12 +3,10 @@
  */
 "use client"
 
-import React from "react"
+import React, { useState, useTransition } from "react"
+import { Loader2 } from "lucide-react"
 import Link from "next/link"
-
-/**
- * Enhanced breadcrumb component with proper Next.js navigation
- */
+import { useRouter } from "next/navigation"
 
 /**
  * Enhanced breadcrumb component with proper Next.js navigation
@@ -27,9 +25,24 @@ interface BreadcrumbProps {
 }
 
 const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = "" }) => {
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+  const [loadingHref, setLoadingHref] = useState<string | null>(null)
+
   // Split items into non-current and current for mobile layout
   const nonCurrentItems = items.filter((item) => !item.current)
   const currentItem = items.find((item) => item.current)
+
+  const handleNavigation = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    e.preventDefault()
+    setLoadingHref(href)
+    startTransition(() => {
+      router.push(href)
+    })
+  }
 
   return (
     <nav className={`text-sm ${className}`} aria-label="Breadcrumb">
@@ -62,9 +75,17 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = "" }) => {
             ) : item.href ? (
               <Link
                 href={item.href}
+                onClick={(e) => handleNavigation(e, item.href!)}
                 className="flex items-center gap-1 text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
               >
-                {item.icon && <span aria-hidden="true">{item.icon}</span>}
+                {loadingHref === item.href ? (
+                  <Loader2
+                    className="h-3 w-3 animate-spin"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  item.icon && <span aria-hidden="true">{item.icon}</span>
+                )}
                 <span title={item.label}>{item.label}</span>
               </Link>
             ) : (
@@ -103,9 +124,17 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = "" }) => {
               {item.href ? (
                 <Link
                   href={item.href}
+                  onClick={(e) => handleNavigation(e, item.href!)}
                   className="flex items-center gap-1 text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
                 >
-                  {item.icon && <span aria-hidden="true">{item.icon}</span>}
+                  {loadingHref === item.href ? (
+                    <Loader2
+                      className="h-3 w-3 animate-spin"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    item.icon && <span aria-hidden="true">{item.icon}</span>
+                  )}
                   <span className="max-w-[80px] truncate" title={item.label}>
                     {item.label}
                   </span>

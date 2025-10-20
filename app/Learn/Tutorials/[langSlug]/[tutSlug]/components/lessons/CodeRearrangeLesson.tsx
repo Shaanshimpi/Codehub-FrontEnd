@@ -481,9 +481,9 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
                 <h4 className="mb-2 font-medium text-red-900 dark:text-red-100">
                   Here&apos;s the correct solution:
                 </h4>
-                <div className="mb-3 rounded bg-gray-900 p-3">
+                <div className="mb-3 overflow-x-auto rounded bg-gray-900 p-3">
                   <pre className="text-sm text-gray-100">
-                    <code>
+                    <code className="block">
                       {currentQ.blocks
                         .sort((a, b) => a.correctOrder - b.correctOrder)
                         .map((block) => block.code)

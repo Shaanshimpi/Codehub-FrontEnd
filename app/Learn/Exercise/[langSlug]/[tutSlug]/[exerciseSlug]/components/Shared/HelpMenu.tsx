@@ -10,6 +10,8 @@ import { BookOpen, Code2, RotateCcw, X } from "lucide-react"
 
 // Simple help menu with clear options
 
+// Simple help menu with clear options
+
 interface HelpMenuProps {
   isOpen: boolean
   onClose: () => void
@@ -29,10 +31,12 @@ const HelpMenu: React.FC<HelpMenuProps> = ({
   const [menuPosition, setMenuPosition] = React.useState<"top" | "bottom">(
     "bottom"
   )
+  const [isPositionCalculated, setIsPositionCalculated] = React.useState(false)
 
   // Calculate menu position based on available space
   useEffect(() => {
     if (isOpen && menuRef.current) {
+      setIsPositionCalculated(false)
       const parentElement = menuRef.current.parentElement
       if (parentElement) {
         const rect = parentElement.getBoundingClientRect()
@@ -46,6 +50,7 @@ const HelpMenu: React.FC<HelpMenuProps> = ({
         } else {
           setMenuPosition("bottom")
         }
+        setIsPositionCalculated(true)
       }
     }
   }, [isOpen])
@@ -139,9 +144,9 @@ const HelpMenu: React.FC<HelpMenuProps> = ({
       {/* Menu */}
       <div
         ref={menuRef}
-        className={`help-menu-enter absolute left-0 z-50 w-64 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900 sm:w-72 ${
+        className={`help-menu-enter absolute left-0 z-50 w-64 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg transition-opacity duration-150 dark:border-gray-700 dark:bg-gray-900 sm:w-72 ${
           menuPosition === "top" ? "bottom-full mb-2" : "top-full mt-2"
-        }`}
+        } ${isPositionCalculated ? "opacity-100" : "opacity-0"}`}
         role="menu"
         aria-labelledby="help-menu-title"
         aria-orientation="vertical"

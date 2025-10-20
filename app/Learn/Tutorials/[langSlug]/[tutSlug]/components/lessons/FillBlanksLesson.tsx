@@ -338,7 +338,7 @@ const FillBlanksLesson: React.FC<FillBlanksLessonProps> = ({
           </p>
           <div className="overflow-x-auto rounded-lg bg-gray-900 p-3 sm:p-4">
             <pre className="text-sm text-gray-100">
-              <code>
+              <code className="block">
                 {renderCodeWithBlanks(currentQ.code, currentQ.blanks)}
               </code>
             </pre>
@@ -407,9 +407,11 @@ const FillBlanksLesson: React.FC<FillBlanksLessonProps> = ({
                     <h5 className="mb-2 font-medium text-green-900 dark:text-green-100">
                       Complete Solution:
                     </h5>
-                    <div className="mb-2 rounded bg-gray-900 p-3">
-                      <pre className="overflow-x-auto text-sm text-gray-100">
-                        <code>{currentQ.solution.completeCode}</code>
+                    <div className="mb-2 overflow-x-auto rounded bg-gray-900 p-3">
+                      <pre className="text-sm text-gray-100">
+                        <code className="block">
+                          {currentQ.solution.completeCode}
+                        </code>
                       </pre>
                     </div>
                     <p className="text-sm text-green-800 dark:text-green-200">

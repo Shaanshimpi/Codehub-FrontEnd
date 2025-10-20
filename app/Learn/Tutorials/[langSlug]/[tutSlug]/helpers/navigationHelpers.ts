@@ -8,7 +8,7 @@ import type { Language, Tutorial } from "@/app/Learn/types/TutorialTypes"
  */
 export const getNavigationUrls = (langSlug: string, tutSlug: string) => {
   return {
-    home: "/",
+    home: "/Learn",
     tutorials: "/Learn/Tutorials",
     language: `/Learn/Tutorials/${langSlug}`,
     current: `/Learn/Tutorials/${langSlug}/${tutSlug}`,
