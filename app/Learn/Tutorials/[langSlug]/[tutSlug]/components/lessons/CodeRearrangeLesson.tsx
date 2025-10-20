@@ -242,18 +242,6 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
           </p>
         </div>
 
-        {/* Target Output */}
-        <div className="mb-6">
-          <h4 className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-            🎯 Target Output:
-          </h4>
-          <div className="rounded-lg bg-gray-900 p-3 sm:p-4">
-            <pre className="overflow-x-auto text-sm text-gray-100">
-              <code>{currentQ.targetCode}</code>
-            </pre>
-          </div>
-        </div>
-
         {/* Mermaid Diagram */}
         {currentQ.mermaid_code && renderMermaidDiagram(currentQ.mermaid_code)}
 
