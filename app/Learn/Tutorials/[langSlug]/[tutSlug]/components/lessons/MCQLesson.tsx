@@ -320,7 +320,7 @@ const MCQLesson: React.FC<MCQLessonProps> = ({
                     )}
                   </div>
                   <span
-                    className={`${
+                    className={`whitespace-pre-wrap ${
                       shouldShowCorrect
                         ? "text-green-800 dark:text-green-200"
                         : shouldShowIncorrect

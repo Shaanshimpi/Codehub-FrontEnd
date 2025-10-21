@@ -271,7 +271,7 @@ export const CONCEPT_CONTENT_SCHEMA = {
           diagram_data: {
             ...MERMAID_DIAGRAM_SCHEMA,
             description:
-              "HIGHLY RECOMMENDED: JSON diagram data for visualizing code flow, logic, or data structure. Will be converted to Mermaid diagrams. Use sequence type for interactions, flowchart type for algorithms. Include this in 80% of code examples for better learning visualization.",
+              "CONDITIONAL: Generate flowchart ONLY when code contains branching (if/else/switch), loops (for/while/do-while), or multiple execution paths. ALWAYS SET TO NULL for linear sequential code without conditional logic or loops. Must add educational value by visualizing complex control flow.",
           },
         },
         required: ["title", "code", "explanation"],
@@ -292,7 +292,7 @@ export const CONCEPT_CONTENT_SCHEMA = {
     diagram_data: {
       ...MERMAID_DIAGRAM_SCHEMA,
       description:
-        "RECOMMENDED: JSON diagram data for overall concept visualization. Will be converted to Mermaid diagrams. Use sequence type for interactions, flowchart type for algorithms. Include this in 70% of concept lessons to enhance understanding.",
+        "CONDITIONAL: Generate class diagram for OOP concepts OR flowchart for complex multi-step processes with branching/loops. SET TO NULL for simple concepts without structural relationships or control flow logic.",
     },
     commonMistakes: {
       type: "array",
@@ -341,7 +341,11 @@ export const MCQ_CONTENT_SCHEMA = {
                   type: "string",
                   description: "Option identifier (a, b, c, d)",
                 },
-                text: { type: "string", description: "Option text" },
+                text: {
+                  type: "string",
+                  description:
+                    "Option text. Use \\n for line breaks when showing multi-line output, code snippets, error messages, or formatted data structures. Single-line text for simple options.",
+                },
                 isCorrect: {
                   type: "boolean",
                   description: "Whether this option is correct",
@@ -372,7 +376,7 @@ export const MCQ_CONTENT_SCHEMA = {
           diagram_data: {
             ...MERMAID_DIAGRAM_SCHEMA,
             description:
-              "RECOMMENDED: JSON diagram data to visualize the code snippet or concept being tested. Will be converted to Mermaid diagrams. Use sequence type for interactions, flowchart type for algorithms. Include in 50% of MCQ questions with code snippets.",
+              "CONDITIONAL: Generate flowchart ONLY when code snippet contains loops, conditionals, or multiple execution paths. SET TO NULL for simple code without branching or loops. Only include when diagram aids understanding.",
           },
         },
         required: ["id", "question", "options", "explanation", "difficulty"],
@@ -406,7 +410,7 @@ export const CODE_BLOCK_REARRANGING_SCHEMA = {
           diagram_data: {
             ...MERMAID_DIAGRAM_SCHEMA,
             description:
-              "HIGHLY VALUABLE: JSON diagram data showing the expected code flow or logic structure. Will be converted to Mermaid diagrams. Use sequence type for interactions, flowchart type for algorithms. Include in 70% of code rearranging questions for better visualization.",
+              "CONDITIONAL: Generate flowchart ONLY when code involves loops, conditionals, or multi-step logic flow. SET TO NULL for simple linear code sequences. Must visualize complex control flow that aids understanding.",
           },
           codeBlocks: {
             type: "array",
@@ -416,15 +420,17 @@ export const CODE_BLOCK_REARRANGING_SCHEMA = {
                 id: { type: "string", description: "Unique block identifier" },
                 content: {
                   type: "string",
-                  description: "multi line Code block content",
+                  description:
+                    "Multi-line code block containing 2 or more lines of meaningful code. NEVER single closing braces, single statements, or duplicate blocks. Each block must be a logical unit (variable group, loop with body, if statement with body, function declaration, etc.).",
                 },
               },
               required: ["id", "content"],
               additionalProperties: false,
             },
-            description: "Code blocks to be rearranged",
+            description:
+              "Code blocks to be rearranged. Each block MUST contain 2+ lines and represent a logical unit. Maximum 5-7 blocks for optimal cognitive load.",
             minItems: 3,
-            maxItems: 8,
+            maxItems: 7,
           },
           correctOrder: {
             type: "array",
@@ -483,7 +489,7 @@ export const FILL_IN_BLANKS_SCHEMA = {
           diagram_data: {
             ...MERMAID_DIAGRAM_SCHEMA,
             description:
-              "STRONGLY RECOMMENDED: JSON diagram data showing the code structure or flow with blanks highlighted. Will be converted to Mermaid diagrams. Use sequence type for interactions, flowchart type for algorithms. Include in 75% of fill-in-blank questions for enhanced learning.",
+              "CONDITIONAL: Generate flowchart ONLY for complex algorithmic structures or multi-step logical flows with branching/loops. SET TO NULL for simple syntax completion, variable declarations, or basic method calls.",
           },
           blanks: {
             type: "array",
@@ -494,12 +500,21 @@ export const FILL_IN_BLANKS_SCHEMA = {
                   type: "string",
                   description: "Matches {{blank_id}} in template",
                 },
-                type: { type: "string", enum: ["text", "dropdown"] },
-                correctAnswer: { type: "string" },
+                type: {
+                  type: "string",
+                  enum: ["text", "dropdown"],
+                  description:
+                    "Use 'dropdown' when exact wording/syntax matters OR multiple valid options exist (string literals, format specifiers, keywords, operators, data types). Use 'text' when answer is mathematically/logically determinate with single correct numeric or keyword value.",
+                },
+                correctAnswer: {
+                  type: "string",
+                  description: "The correct answer for this blank",
+                },
                 options: {
                   type: "array",
                   items: { type: "string" },
-                  description: "Options for dropdown type",
+                  description:
+                    "REQUIRED for dropdown type with 3-5 options including correct answer and plausible distractors. MUST BE OMITTED or null for text type.",
                 },
                 hint: {
                   type: "string",
@@ -508,7 +523,8 @@ export const FILL_IN_BLANKS_SCHEMA = {
                 },
                 explanation: {
                   type: "string",
-                  description: "Why this is correct",
+                  description:
+                    "Why this is correct and why other options are wrong (for dropdown)",
                 },
               },
               required: ["id", "type", "correctAnswer", "explanation"],

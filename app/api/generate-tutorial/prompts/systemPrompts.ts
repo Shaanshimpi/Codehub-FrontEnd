@@ -43,38 +43,108 @@ LESSON TYPE SPECIFICATIONS:
    - NEVER generate just 1 question - always create multiple questions for comprehensive assessment
    - NEVER put code in questions.
 
-🚨 MCQ OPTION QUALITY GUIDELINES:
-   - Options can span multiple lines for code output or formatted text
-   - Use \\n for line breaks in options when showing:
-     * Console output with multiple lines
+🚨 MCQ OPTION FORMATTING - MULTILINE SUPPORT:
+   - Options can span multiple lines for complex answers
+   - Use \\n for line breaks in option text when showing:
+     * Console output spanning multiple lines
      * Multi-line code snippets as answer choices
      * Error messages with stack traces
-     * Formatted data structures (JSON, arrays, etc.)
+     * Formatted data structures (JSON, arrays, objects)
      * Program execution results across multiple lines
+   
+   MULTILINE OPTION EXAMPLES:
+   Good: {"text": "2\\n4\\n6\\n8", "isCorrect": true}  // Multi-line output
+   Good: {"text": "Error: Index out of bounds\\n    at line 15\\n    in main()", "isCorrect": false}
+   Good: {"text": "for (int i = 0; i < 5; i++) {\\n    printf('%d', i);\\n}", "isCorrect": true}
+   Good: {"text": "{\\n    'name': 'John',\\n    'age': 25\\n}", "isCorrect": false}
+   
+   Bad: {"text": "2 4 6 8", "isCorrect": true}  // Should be multiline when showing line-by-line output
+   Bad: {"text": "Error: Index out of bounds at line 15", "isCorrect": false}  // Loses stack trace formatting
 
-   Example MCQ options with multiline content:
-   Option A: "Hello\\nWorld\\nProgram completed successfully"
-   Option B: "for (int i = 0; i < 5; i++) {\\n    printf(\\"%d\\", i);\\n}"
-   Option C: "Error: Segmentation fault\\n    at line 15\\n    in function main()"
-   Option D: "{\\n    \\"name\\": \\"John\\",\\n    \\"age\\": 25\\n}"
+🎯 MCQ ANSWER CONCEALMENT - PREVENT REVEALING ANSWERS:
+   CRITICAL RULES TO PREVENT OBVIOUS ANSWERS:
+   ❌ NEVER create questions where:
+   - Exact output strings from printf/cout are visible in code AND used as answer
+   - Question asks about loop type when the keyword is shown in code
+   - Question asks about conditions when the exact comparison is displayed
+   - "What does this print?" when printf shows the exact string
+   - Answer can be determined by reading, not understanding
+   
+   ✅ ALWAYS create questions that require:
+   - Calculation or mathematical operations (sum, product, iterations)
+   - Execution tracing through multiple steps
+   - Understanding of control flow and logic
+   - Mental execution of code with transformations
+   - Analysis of variable state changes
+   
+   GOOD QUESTION PATTERNS:
+   ✓ "What is the final value of variable X?" (requires tracing)
+   ✓ "How many times will this loop execute?" (requires analysis)
+   ✓ "What numbers will be printed?" (requires understanding iteration)
+   ✓ "What is the value after this calculation?" (requires computation)
+   
+   BAD QUESTION PATTERNS:
+   ✗ "What does printf('Hello') print?" (answer is literally 'Hello')
+   ✗ "Which loop is used here?" (keyword visible in code)
+   ✗ "Is this an if statement?" (obvious from code structure)
+   
+   DISTRACTOR OPTIONS (Wrong Answers):
+   ✓ Common student mistakes (off-by-one errors, wrong operator precedence)
+   ✓ Results from similar but incorrect logic
+   ✓ Values from forgetting initialization or increment
+   ✓ Plausible but wrong outcomes from misunderstanding
+   ✗ Obviously absurd or random values
+   ✗ Answers that violate basic programming rules
 
 🎯 CODE BLOCK REARRANGING:
    - MANDATORY: Generate 2-7 code rearranging questions per lesson
    - Each question has real-world programming scenarios that students can relate to
-   - Code broken into at most 5 logical blocks possibly multiline blocks for drag-and-drop interaction
-   - MANDATORY: Code blocks should be unique and multiline
    - RECOMMENDED: JSON diagram data for multi-step processes, algorithms, loops, or branching logic
    - SKIP diagrams only for very simple linear sequences without logical flow
    - Students rearrange blocks to create working, functional code
-   - Progressive hints (1-10) to guide students when stuck for each question
+   - Progressive hints (1-3) to guide students when stuck for each question
    - Clear target code showing expected final result for each question
    - Progressive difficulty levels within the lesson (mix of easy, medium, hard)
    - NEVER generate just 1 question - always create multiple questions for comprehensive practice
 
+   🚨 CODE BLOCK SIZE AND COUNT REQUIREMENTS:
+   MANDATORY BLOCK RULES:
+   - Each code block MUST contain MINIMUM 2 LINES of code
+   - Maximum 5-7 blocks total per question (NEVER exceed 7)
+   - Each block must be a LOGICAL UNIT, not arbitrary splits
+   
+   ✅ VALID LOGICAL UNITS (Good Blocks):
+   - Variable declaration group (2-3 related variables with initialization)
+   - Loop with opening, body, and closing (while/for with content)
+   - If statement with condition, body, and closing
+   - Function declaration with parameters and opening brace
+   - Function body with multiple statements and closing
+   - Include statements grouped with function signature
+   - Return statement grouped with closing braces
+   
+   ❌ NEVER CREATE BLOCKS WITH ONLY:
+   - Single closing brace "}" alone
+   - Single opening brace "{" alone
+   - Single semicolon
+   - Single comment line
+   - Single variable declaration (group them!)
+   - Duplicate content (especially multiple "}" blocks)
+   
+   COGNITIVE LOAD GUIDELINES:
+   - 3-4 blocks: Beginner exercises (simple structure)
+   - 5-6 blocks: Intermediate exercises (moderate complexity)
+   - 6-7 blocks: Advanced exercises (maximum complexity)
+   - NEVER exceed 7 blocks (overwhelming for students)
+   
+   BLOCK UNIQUENESS:
+   - Each block must be distinguishable
+   - No two blocks should have identical content
+   - Closing braces should be grouped with preceding statements
+   - Opening braces should be grouped with control structures
+
 🎯 FILL IN THE BLANKS:
    - MANDATORY: Generate 2-7 fill-in-blank questions per lesson
    - Each question has code templates with strategic blanks (2-5 blanks per question)
-   - Multiple blank types: text input, dropdown selection
    - CONDITIONAL: JSON diagram data ONLY for complex algorithmic structures or multi-step logical flows
    - SKIP diagrams for simple syntax completion, variable declarations, or basic method calls
    - Each blank has correct answer, options (if dropdown), and explanation
@@ -83,6 +153,64 @@ LESSON TYPE SPECIFICATIONS:
    - Progressive difficulty levels within the lesson (mix of easy, medium, hard)
    - Don't use longer blanks as they are harder to verify correct answer
    - NEVER generate just 1 question - always create multiple questions for thorough practice
+
+   🚨 BLANK TYPE SELECTION - CRITICAL RULES:
+   
+   Use DROPDOWN (type: "dropdown") when:
+   ✅ String literals requiring exact wording (printf messages, prompts)
+   ✅ Format specifiers (%d, %f, %s, %c, %ld, %lf, etc.)
+   ✅ Function names from limited set (printf, scanf, strlen, strcmp, etc.)
+   ✅ Keywords from specific set (if, else, while, for, return, break, continue, switch, case)
+   ✅ Operator choices (+, -, *, /, %, ==, !=, <, >, <=, >=, &&, ||, !)
+   ✅ Boolean values (true, false, 0, 1)
+   ✅ Data types (int, float, char, double, long, short, void, unsigned)
+   ✅ Library includes (#include <stdio.h>, <stdlib.h>, <string.h>, <math.h>)
+   ✅ ANY answer where exact syntax/wording matters and multiple options exist
+   ✅ Comparison or logical operators in conditions
+   ✅ Loop keywords (for, while, do)
+   ✅ Access modifiers (public, private, protected)
+   
+   Use TEXT INPUT (type: "text") when:
+   ✅ Numeric values that are mathematically determinate (calculable from context)
+   ✅ Variable names where student creates the name (no specific requirement)
+   ✅ Array indices with clear context (obvious from array size or comment)
+   ✅ Loop counter values (obvious from loop logic or comments)
+   ✅ Mathematical expression results with one answer (2+3=5, 10/2=5)
+   ✅ Single obvious keyword with no alternatives in context
+   ✅ Values derivable through calculation or logic tracing
+   ✅ Answers with ONE objectively correct value
+   ✅ Final variable values after execution (determinable by tracing)
+   
+   DECISION RULE:
+   Ask: "Could a student provide a DIFFERENT but still CONCEPTUALLY CORRECT answer?"
+   → YES = Use dropdown (provide options)
+   → NO = Use text input (if answer is determinate)
+   
+   EXAMPLES - DROPDOWN (Correct Usage):
+   ✅ printf({{blank1}}, age);  // blank1 type: dropdown, options: ['"%d"', '"%f"', '"%s"', '"%c"']
+   ✅ if (x {{blank2}} 0)  // blank2 type: dropdown, options: [">", "<", "==", "!=", ">=", "<="]
+   ✅ {{blank3}} count = 0;  // blank3 type: dropdown, options: ["int", "float", "char", "double"]
+   ✅ printf({{blank4}});  // blank4 type: dropdown, options: ['"Number is even"', '"Number is odd"', '"Result: %d", num', '"Value: %d"']
+   ✅ {{blank5}} (i = 0; i < 10; i++)  // blank5 type: dropdown, options: ["for", "while", "do", "if"]
+   
+   EXAMPLES - TEXT INPUT (Correct Usage):
+   ✅ int x = {{blank1}};  // Given: y=10, sum=15, sum=x+y → blank1 type: text, answer: "5"
+   ✅ for (int i=0; i<{{blank2}}; i++)  // Comment says "loop 10 times" → blank2 type: text, answer: "10"
+   ✅ arr[{{blank3}}]  // Comment: "access last element of 5-element array" → blank3 type: text, answer: "4"
+   ✅ printf("%d", count);  // Output: {{blank4}} // Given: count increments 5 times → blank4 type: text, answer: "5"
+   
+   VALIDATION CHECKLIST:
+   For EACH blank, verify:
+   ✓ If type is "dropdown" → options array MUST exist with 3-5 items including correct answer
+   ✓ If type is "text" → options array MUST be null/omitted
+   ✓ If blank contains quotes ("") → MUST use "dropdown"
+   ✓ If blank is format specifier (%) → MUST use "dropdown"
+   ✓ If blank is operator (+, -, *, /, ==, etc.) → MUST use "dropdown"
+   ✓ If blank is keyword (if, while, for, etc.) → MUST use "dropdown"
+   ✓ If blank is data type → MUST use "dropdown"
+   ✓ If blank is numeric calculation result → MUST use "text"
+   ✓ All dropdown options must be plausible (include common mistakes)
+   ✓ Correct answer MUST be included in dropdown options array
 
 🎯 REFERENCE TUTORIAL REQUIREMENTS:
    - MANDATORY: Create a comprehensive W3Schools-style reference page for the main concept
@@ -192,40 +320,65 @@ DIAGRAM ARRAY RULES:
 DIAGRAM NECESSITY RULES:
 🎯 ONLY generate diagrams when they ADD SIGNIFICANT EDUCATIONAL VALUE:
 
-✅ WHEN TO INCLUDE DIAGRAMS (Required):
-- Loops and iteration (while, for, do-while) - show execution flow
-- Complex algorithms with 3+ steps (sorting, searching, recursion)
+⚠️ CRITICAL DECISION RULE:
+Before generating ANY diagram, ask: "Does this code have BRANCHING (if/else/switch), LOOPS (for/while), or MULTIPLE EXECUTION PATHS?"
+→ If NO = Set diagram_data to NULL (do not generate)
+→ If YES = Generate flowchart showing the branching/looping logic
+
+✅ GENERATE FLOWCHARTS ONLY FOR (Code with branching/loops):
+- Loops and iteration (while, for, do-while) - show execution flow with loop condition
+- Code with IF/ELSE branches showing multiple execution paths
+- Switch/case statements with multiple decision paths
+- Complex algorithms with 3+ steps involving loops or conditions
 - Decision trees with multiple branches and conditions
-- Object relationships (inheritance, composition, polymorphism)
 - Process flows with conditional logic and multiple paths
-- Error handling with try-catch-finally patterns
-- State transitions and workflow processes
-- Method overriding and polymorphism demonstrations
-- Data structure operations (array manipulation, tree traversal)
-- Multi-step code examples that involve logic flow
-- Conditional statements with branching (if-else chains)
-- Method calls and parameter passing workflows
-- ALL OOP concepts (classes, objects, inheritance, encapsulation, abstraction)
-- Constructor workflows and object initialization
-- Method interactions between multiple classes
-- Access modifiers and visibility demonstrations
+- Error handling with try-catch-finally (normal and exception flows)
+- Functions with multiple return paths based on conditions
+- Recursive function calls showing recursion flow
+- Nested conditionals or nested loops
+- Multi-step code examples that involve logic flow with decisions
+
+✅ GENERATE CLASS DIAGRAMS ONLY FOR (OOP structure):
+- Object relationships (inheritance, composition, polymorphism)
 - Interface implementations and abstract class relationships
+- Method overriding and polymorphism demonstrations
+- ALL OOP concepts (classes, objects, inheritance, encapsulation, abstraction)
+- Constructor workflows and object initialization with class hierarchy
+- Method interactions between multiple classes
+- Access modifiers and visibility demonstrations in class context
 
-❌ WHEN TO SKIP DIAGRAMS (No educational value):
-- Simple variable declarations without logic (int x = 5;)
-- Basic syntax questions about keywords or operators
-- Single print statements or basic output
-- Definition-only concepts that are purely text-based
-- Simple getter/setter methods with just return/assignment
-- Basic arithmetic operations without conditional logic
-- Single-line code completions for syntax practice
+❌ MANDATORY: DO NOT GENERATE DIAGRAMS FOR (Linear code):
+- Simple variable declarations (int x = 5; int y = 10;)
+- Sequential arithmetic operations (x + y, sum = a * b)
+- Basic print statements without logic (printf("Hello");)
+- Single function calls without branching
+- Getter/setter methods with just return/assignment
+- Variable assignments without conditions
+- Sequential code execution without any branching
+- Code with fewer than 3 logical decision points
+- Linear execution from top to bottom (no branching, no loops)
+- Simple input/output without validation or conditions
 
-🔍 EVALUATION CRITERIA:
-- Generate diagrams for any concept involving logical flow, relationships, or multi-step processes
-- Ask: "Does this diagram help students understand the PROCESS, FLOW, or RELATIONSHIP better than text alone?"
-- Prioritize diagrams for concepts students typically struggle to visualize
-- Focus on LOGICAL FLOW, STRUCTURAL RELATIONSHIPS, and OOP INTERACTIONS that benefit from visual representation
-- When in doubt, include the diagram - visual learning aids comprehension for most programming concepts
+🔍 MANDATORY EVALUATION CHECKLIST:
+For EACH code example, verify:
+1. ✓ Does it contain IF/ELSE, SWITCH, or conditional operators?
+2. ✓ Does it contain FOR, WHILE, DO-WHILE loops?
+3. ✓ Does it have MULTIPLE execution paths?
+4. ✓ Is there branching based on conditions?
+
+IF ALL 4 ARE FALSE → diagram_data = null (REQUIRED)
+IF ANY IS TRUE → Generate appropriate diagram
+
+EXAMPLES OF LINEAR CODE (NO DIAGRAM NEEDED):
+❌ int x = 5; int y = 10; int sum = x + y; printf("%d", sum);
+❌ float radius = 5.0; float area = 3.14 * radius * radius;
+❌ char name[20]; printf("Enter name: "); scanf("%s", name);
+❌ int result = calculateSum(a, b); printf("Result: %d", result);
+
+EXAMPLES REQUIRING DIAGRAMS:
+✅ while (i < 10) { if (i % 2 == 0) printf("%d", i); i++; }  // Loop + condition
+✅ if (score >= 90) grade = 'A'; else if (score >= 80) grade = 'B'; else grade = 'C';  // Multiple branches
+✅ for (int i = 0; i < n; i++) { sum += arr[i]; }  // Loop with iteration
 
 CRITICAL REQUIREMENTS FOR AI:
 - Generate diagram_data ONLY when it passes the necessity criteria above  

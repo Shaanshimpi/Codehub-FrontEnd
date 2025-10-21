@@ -287,7 +287,7 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
                       }`}
                     >
                       <div className="flex flex-col gap-2">
-                        <code className="select-none text-sm text-gray-800 dark:text-gray-200">
+                        <code className="select-none whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200">
                           {blockCode}
                         </code>
                         {isSelected && (
@@ -352,7 +352,7 @@ const CodeRearrangeLesson: React.FC<CodeRearrangeLessonProps> = ({
                           <span className="select-none text-sm text-blue-900 dark:text-blue-100">
                             {index + 1}.
                           </span>
-                          <code className="flex-1 select-none break-all text-sm text-blue-800 dark:text-blue-200">
+                          <code className="flex-1 select-none whitespace-pre-wrap text-sm text-blue-800 dark:text-blue-200">
                             {blockCode}
                           </code>
                         </div>
