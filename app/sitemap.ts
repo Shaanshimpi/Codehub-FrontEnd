@@ -1,106 +1,11 @@
+import {
+  getExercisesByTutorialId,
+  getLanguages,
+  getTutorialsByLanguageId,
+} from "@/lib/getData"
 import { type MetadataRoute } from "next"
 
 const BASE_URL = "https://codehubindia.in"
-const API_URL = process.env.NEXT_PUBLIC_STRAPI_API_URL
-const AUTH = process.env.NEXT_PUBLIC_STRAPI_API_AUTH
-
-const headers = {
-  Authorization: `Bearer ${AUTH}`,
-  "Content-Type": "application/json",
-}
-
-// Slug generator (safe)
-function generateSlug(name: string | undefined): string {
-  return (
-    name
-      ?.toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-") ?? ""
-  )
-}
-
-// Exercise slug (Title + ID)
-function generateExerciseSlug(post: any): string {
-  const title = post?.Title
-  const id = post?.documentId
-  return title && id ? `${generateSlug(title)}-${id}` : ""
-}
-
-// Tutorial slug
-function generateTutorialSlug(tutorial: any): string {
-  const title = tutorial?.Title
-  return generateSlug(title)
-}
-
-// Fetch exercises
-async function fetchExercises() {
-  try {
-    const res = await fetch(
-      `${API_URL}posts?populate=*&pagination[pageSize]=1000`,
-      {
-        headers,
-        next: { revalidate: 86400 },
-      }
-    )
-    const json = await res.json()
-    return Array.isArray(json?.data) ? json.data : []
-  } catch (e) {
-    console.error("Failed to fetch exercises", e)
-    return []
-  }
-}
-
-// Fetch languages
-async function fetchLanguages() {
-  try {
-    const res = await fetch(`${API_URL}programming-languages?populate=*`, {
-      headers,
-      next: { revalidate: 86400 },
-    })
-    const json = await res.json()
-    return Array.isArray(json?.data) ? json.data : []
-  } catch (e) {
-    console.error("Failed to fetch languages", e)
-    return []
-  }
-}
-
-// Fetch tutorials for a language
-async function fetchTutorialsByLang(langId: number) {
-  try {
-    const res = await fetch(
-      `${API_URL}tutorials?filters[programming_language][id][$eq]=${langId}&populate=*`,
-      {
-        headers,
-        next: { revalidate: 86400 },
-      }
-    )
-    const json = await res.json()
-    return Array.isArray(json?.data) ? json.data : []
-  } catch (e) {
-    console.error(`Failed to fetch tutorials for lang ${langId}`, e)
-    return []
-  }
-}
-
-// Fetch exercises for a tutorial
-async function fetchExercisesByTutorial(tutorialId: number) {
-  try {
-    const res = await fetch(
-      `${API_URL}posts?filters[tutorial][id][$eq]=${tutorialId}&populate=*&pagination[pageSize]=100`,
-      {
-        headers,
-        next: { revalidate: 86400 },
-      }
-    )
-    const json = await res.json()
-    return Array.isArray(json?.data) ? json.data : []
-  } catch (e) {
-    console.error(`Failed to fetch exercises for tutorial ${tutorialId}`, e)
-    return []
-  }
-}
 
 // Get priority based on path
 function getPriority(path: string): number {
@@ -127,76 +32,128 @@ function getChangeFrequency(
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const languages = await fetchLanguages()
+  console.log("🗺️ [SITEMAP] Starting sitemap generation...")
 
-  // Static pages (home, blog, etc.)
-  const staticPaths = ["", "Blog"]
+  try {
+    const languages = await getLanguages()
+    console.log(`🗺️ [SITEMAP] Fetched ${languages.length} languages`)
 
-  // Learn static pages (excluding Vivy-image)
-  const learnStaticPages = [
-    "Learn",
-    "Learn/Tutorials",
-    "Learn/Exercise",
-    "Learn/Vivy",
-    "Learn/upgrade",
-  ]
+    // Static pages (home, blog, etc.)
+    const staticPaths = ["", "Blog"]
 
-  // Dynamic paths
-  const tutorialPaths: string[] = []
-  const exercisePaths: string[] = []
-  const languageTutorialPages: string[] = []
-  const languageExercisePages: string[] = []
+    // Learn static pages (excluding Vivy-image)
+    const learnStaticPages = [
+      "Learn",
+      "Learn/Tutorials",
+      "Learn/Exercise",
+      "Learn/Vivy",
+      "Learn/upgrade",
+    ]
 
-  for (const lang of languages) {
-    const langName = lang?.Name
-    const langSlug = generateSlug(langName)
+    // Dynamic paths
+    const tutorialPaths: string[] = []
+    const exercisePaths: string[] = []
+    const languageTutorialPages: string[] = []
+    const languageExercisePages: string[] = []
 
-    if (!langSlug || !lang.id) continue
+    for (const lang of languages) {
+      const langSlug = lang?.slug
+      const langName = lang?.title
 
-    // Add language-level pages
-    languageTutorialPages.push(`Learn/Tutorials/${langSlug}`)
-    languageExercisePages.push(`Learn/Exercise/${langSlug}`)
+      if (!langSlug || !lang.id) {
+        console.log(`⚠️ [SITEMAP] Skipping language with missing slug or id`)
+        continue
+      }
 
-    const tutorials = await fetchTutorialsByLang(lang.id)
+      console.log(`🗺️ [SITEMAP] Processing language: ${langName} (${langSlug})`)
 
-    for (const tut of tutorials) {
-      const tutSlug = generateTutorialSlug(tut)
-      if (!tutSlug) continue
+      // Add language-level pages
+      languageTutorialPages.push(`Learn/Tutorials/${langSlug}`)
+      languageExercisePages.push(`Learn/Exercise/${langSlug}`)
 
-      // Add tutorial page (FIXED PATH)
-      tutorialPaths.push(`Learn/Tutorials/${langSlug}/${tutSlug}`)
+      const tutorials = await getTutorialsByLanguageId(lang.id)
+      console.log(
+        `🗺️ [SITEMAP] Found ${tutorials.length} tutorials for ${langName}`
+      )
 
-      // Add exercise tutorial listing page
-      exercisePaths.push(`Learn/Exercise/${langSlug}/${tutSlug}`)
-
-      // Fetch and add individual exercises
-      const tutorialExercises = await fetchExercisesByTutorial(tut.id)
-      for (const exercise of tutorialExercises) {
-        const exerciseSlug = generateExerciseSlug(exercise)
-        if (exerciseSlug) {
-          exercisePaths.push(
-            `Learn/Exercise/${langSlug}/${tutSlug}/${exerciseSlug}`
+      for (const tut of tutorials) {
+        const tutSlug = tut?.slug
+        if (!tutSlug) {
+          console.log(
+            `⚠️ [SITEMAP] Skipping tutorial with missing slug: ${tut?.title}`
           )
+          continue
+        }
+
+        // Add tutorial page
+        tutorialPaths.push(`Learn/Tutorials/${langSlug}/${tutSlug}`)
+
+        // Add exercise tutorial listing page
+        exercisePaths.push(`Learn/Exercise/${langSlug}/${tutSlug}`)
+
+        // Fetch and add individual exercises
+        const tutorialExercises = await getExercisesByTutorialId(tut.id)
+        if (tutorialExercises.length > 0) {
+          console.log(
+            `🗺️ [SITEMAP] Found ${tutorialExercises.length} exercises for tutorial: ${tut.title}`
+          )
+        }
+
+        for (const exercise of tutorialExercises) {
+          const exerciseSlug = exercise?.slug
+          if (exerciseSlug) {
+            exercisePaths.push(
+              `Learn/Exercise/${langSlug}/${tutSlug}/${exerciseSlug}`
+            )
+          }
         }
       }
     }
+
+    const allPaths = [
+      ...staticPaths,
+      ...learnStaticPages,
+      ...languageTutorialPages,
+      ...languageExercisePages,
+      ...tutorialPaths,
+      ...exercisePaths,
+    ]
+
+    console.log(`🗺️ [SITEMAP] Generated sitemap with ${allPaths.length} URLs:`)
+    console.log(`   - Static pages: ${staticPaths.length}`)
+    console.log(`   - Learn static pages: ${learnStaticPages.length}`)
+    console.log(`   - Language tutorial pages: ${languageTutorialPages.length}`)
+    console.log(`   - Language exercise pages: ${languageExercisePages.length}`)
+    console.log(`   - Tutorial pages: ${tutorialPaths.length}`)
+    console.log(`   - Exercise pages: ${exercisePaths.length}`)
+
+    return allPaths.map((path) => ({
+      url: `${BASE_URL}/${path}`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: getChangeFrequency(path),
+      priority: getPriority(path),
+    }))
+  } catch (error) {
+    console.error("❌ [SITEMAP] Error generating sitemap:", error)
+
+    // Return at least static pages if dynamic fetch fails
+    const fallbackPaths = [
+      "",
+      "Blog",
+      "Learn",
+      "Learn/Tutorials",
+      "Learn/Exercise",
+      "Learn/Vivy",
+      "Learn/upgrade",
+    ]
+
+    return fallbackPaths.map((path) => ({
+      url: `${BASE_URL}/${path}`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }))
   }
-
-  const allPaths = [
-    ...staticPaths,
-    ...learnStaticPages,
-    ...languageTutorialPages,
-    ...languageExercisePages,
-    ...tutorialPaths,
-    ...exercisePaths,
-  ]
-
-  return allPaths.map((path) => ({
-    url: `${BASE_URL}/${path}`,
-    lastModified: new Date().toISOString(),
-    changeFrequency: getChangeFrequency(path),
-    priority: getPriority(path),
-  }))
 }
 
 export const revalidate = 86400 // daily
