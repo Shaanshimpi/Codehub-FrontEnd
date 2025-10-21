@@ -48,28 +48,83 @@ export async function generateMetadata({ params }: TutorialPageProps) {
     const language = await getLanguageBySlug(langSlug)
     if (!language) {
       return {
-        title: "Tutorial Not Found",
+        title: "Tutorial Not Found | CodeHub",
         description: "The requested tutorial was not found.",
+        robots: { index: false, follow: true },
       }
     }
 
     const tutorial = await getTutorialBySlug(tutSlug, language.id)
     if (!tutorial) {
       return {
-        title: "Tutorial Not Found",
+        title: "Tutorial Not Found | CodeHub",
         description: "The requested tutorial was not found.",
+        robots: { index: false, follow: true },
       }
     }
 
+    const lessonCount = tutorial.lessons?.length || 0
+    const estimatedTime = lessonCount * 15 // minutes per lesson
+    const difficulty = tutorial.difficulty || "Beginner"
+
     return {
-      title: `${tutorial.title} - ${language.title} Interactive Tutorial`,
-      description: `Learn ${tutorial.title} in ${language.title} through interactive lessons, quizzes, and hands-on exercises.`,
-      keywords: `${language.title}, ${tutorial.title}, interactive tutorial, programming lessons, coding practice`,
+      title: `${tutorial.title} - ${language.title} Tutorial | CodeHub`,
+      description: `Learn ${tutorial.title} in ${language.title} with ${lessonCount} interactive lessons. Includes code examples, quizzes, and hands-on exercises. ${difficulty} level. Estimated time: ${estimatedTime} minutes.`,
+      keywords: `${language.title} ${tutorial.title}, ${tutorial.title} tutorial, learn ${tutorial.title} ${language.title}, ${tutorial.title} explained, ${language.title} ${tutorial.title} examples, ${tutorial.title} guide, ${difficulty} ${language.title}`,
+      openGraph: {
+        title: `${tutorial.title} - ${language.title} Tutorial`,
+        description: `Master ${tutorial.title} with ${lessonCount} interactive lessons and code examples`,
+        url: `https://codehubindia.in/Learn/Tutorials/${langSlug}/${tutSlug}`,
+        type: "article",
+        siteName: "CodeHub",
+        article: {
+          publishedTime: tutorial.createdAt,
+          modifiedTime: tutorial.updatedAt,
+          section: "Programming Tutorials",
+          tags: [
+            language.title,
+            tutorial.title,
+            "Programming",
+            "Coding",
+            difficulty,
+          ],
+        },
+        images: [
+          {
+            url:
+              tutorial.coverImage ||
+              "https://codehubindia.in/assets/logo-sqr.png",
+            width: 1200,
+            height: 630,
+            alt: `${tutorial.title} Tutorial Cover`,
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${tutorial.title} - ${language.title} Tutorial`,
+        description: `Master ${tutorial.title} with interactive lessons`,
+        images: [
+          tutorial.coverImage || "https://codehubindia.in/assets/logo-sqr.png",
+        ],
+      },
+      alternates: {
+        canonical: `https://codehubindia.in/Learn/Tutorials/${langSlug}/${tutSlug}`,
+      },
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+        },
+      },
     }
   } catch (error) {
     return {
-      title: "Tutorial Error",
+      title: "Tutorial Error | CodeHub",
       description: "There was an error loading the tutorial.",
+      robots: { index: false, follow: true },
     }
   }
 }

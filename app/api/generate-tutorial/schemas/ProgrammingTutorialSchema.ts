@@ -1,7 +1,7 @@
 export const TUTORIAL_TITLE_SCHEMA = {
   type: "string",
   description:
-    "Tutorial title in clear, engaging English that describes what students will learn",
+    "CRITICAL: Simple, direct title format: '[Language] [Topic]'. NEVER add subtitles, colons, or descriptive phrases. Examples: 'C if Statements', 'Python Loops', 'JavaScript Arrays'. NOT 'C if Statements: A Beginner Guide' or 'C if Statements - Conditional Logic'.",
 }
 
 export const TUTORIAL_DESCRIPTION_SCHEMA = {
@@ -271,7 +271,7 @@ export const CONCEPT_CONTENT_SCHEMA = {
           diagram_data: {
             ...MERMAID_DIAGRAM_SCHEMA,
             description:
-              "CONDITIONAL: Generate flowchart ONLY when code contains branching (if/else/switch), loops (for/while/do-while), or multiple execution paths. ALWAYS SET TO NULL for linear sequential code without conditional logic or loops. Must add educational value by visualizing complex control flow.",
+              "CRITICAL: Generate flowchart ONLY when code shows MULTI-BRANCH logic (if/else with both branches, loops with entry/exit, switch with multiple cases). MUST show AT LEAST 2 execution paths. SET TO NULL for: single-branch code (if without else), linear sequential code, or always-true conditions (if(1)). Flowchart must visualize actual branching decisions.",
           },
         },
         required: ["title", "code", "explanation"],
@@ -292,7 +292,7 @@ export const CONCEPT_CONTENT_SCHEMA = {
     diagram_data: {
       ...MERMAID_DIAGRAM_SCHEMA,
       description:
-        "CONDITIONAL: Generate class diagram for OOP concepts OR flowchart for complex multi-step processes with branching/loops. SET TO NULL for simple concepts without structural relationships or control flow logic.",
+        "CRITICAL: Generate ONLY for multi-branch logic. Class diagram for OOP structure OR flowchart showing AT LEAST 2 execution paths. SET TO NULL for: single-path code, linear sequences, simple if without else, always-true conditions.",
     },
     commonMistakes: {
       type: "array",
@@ -348,14 +348,15 @@ export const MCQ_CONTENT_SCHEMA = {
                 },
                 isCorrect: {
                   type: "boolean",
-                  description: "Whether this option is correct",
+                  description:
+                    "Whether this option is correct. CRITICAL: EXACTLY ONE option must have isCorrect=true, and THREE must have isCorrect=false. Never mark multiple options as correct.",
                 },
               },
               required: ["id", "text", "isCorrect"],
               additionalProperties: false,
             },
             description:
-              "Exactly 4 well-crafted options with one correct answer",
+              "EXACTLY 4 options with EXACTLY ONE correct answer (isCorrect=true) and THREE incorrect answers (isCorrect=false). Validate before finalizing.",
             minItems: 4,
             maxItems: 4,
           },
@@ -376,7 +377,7 @@ export const MCQ_CONTENT_SCHEMA = {
           diagram_data: {
             ...MERMAID_DIAGRAM_SCHEMA,
             description:
-              "CONDITIONAL: Generate flowchart ONLY when code snippet contains loops, conditionals, or multiple execution paths. SET TO NULL for simple code without branching or loops. Only include when diagram aids understanding.",
+              "CRITICAL: Generate ONLY for MULTI-BRANCH code showing AT LEAST 2 paths (if/else, loop entry/exit, switch cases). SET TO NULL for: single if without else, always-true conditions, linear code, simple operations.",
           },
         },
         required: ["id", "question", "options", "explanation", "difficulty"],
@@ -410,7 +411,7 @@ export const CODE_BLOCK_REARRANGING_SCHEMA = {
           diagram_data: {
             ...MERMAID_DIAGRAM_SCHEMA,
             description:
-              "CONDITIONAL: Generate flowchart ONLY when code involves loops, conditionals, or multi-step logic flow. SET TO NULL for simple linear code sequences. Must visualize complex control flow that aids understanding.",
+              "CRITICAL: Generate ONLY for MULTI-BRANCH logic with AT LEAST 2 execution paths visible. SET TO NULL for: single-branch code, linear sequences, simple rearrangements without decision points.",
           },
           codeBlocks: {
             type: "array",
@@ -421,14 +422,14 @@ export const CODE_BLOCK_REARRANGING_SCHEMA = {
                 content: {
                   type: "string",
                   description:
-                    "Multi-line code block containing 2 or more lines of meaningful code. NEVER single closing braces, single statements, or duplicate blocks. Each block must be a logical unit (variable group, loop with body, if statement with body, function declaration, etc.).",
+                    "CRITICAL: Multi-line code block with MINIMUM 2 lines. MUST contain \\n character. NEVER: single closing brace '}', single opening brace '{', single statement, or duplicate content. Each block must be unique and represent a logical unit. Blocks must be distinguishable from each other.",
                 },
               },
               required: ["id", "content"],
               additionalProperties: false,
             },
             description:
-              "Code blocks to be rearranged. Each block MUST contain 2+ lines and represent a logical unit. Maximum 5-7 blocks for optimal cognitive load.",
+              "VALIDATION REQUIRED: Each block MUST be 2+ lines (contain \\n), MUST be unique (no duplicate content), MUST be meaningful. NEVER create blocks with only braces. Maximum 5-7 blocks total.",
             minItems: 3,
             maxItems: 7,
           },
@@ -489,7 +490,7 @@ export const FILL_IN_BLANKS_SCHEMA = {
           diagram_data: {
             ...MERMAID_DIAGRAM_SCHEMA,
             description:
-              "CONDITIONAL: Generate flowchart ONLY for complex algorithmic structures or multi-step logical flows with branching/loops. SET TO NULL for simple syntax completion, variable declarations, or basic method calls.",
+              "CRITICAL: Generate ONLY for MULTI-BRANCH algorithmic logic showing AT LEAST 2 paths. SET TO NULL for: syntax completion, variable declarations, simple blanks, single-path code.",
           },
           blanks: {
             type: "array",
@@ -514,7 +515,7 @@ export const FILL_IN_BLANKS_SCHEMA = {
                   type: "array",
                   items: { type: "string" },
                   description:
-                    "REQUIRED for dropdown type with 3-5 options including correct answer and plausible distractors. MUST BE OMITTED or null for text type.",
+                    "REQUIRED for dropdown type. MUST have 3-5 UNIQUE options (no duplicates). Must include correct answer and plausible distractors. All options must be different from each other. MUST BE OMITTED or null for text type.",
                 },
                 hint: {
                   type: "string",
@@ -591,7 +592,11 @@ export const TUTORIAL_LESSON_SCHEMA = {
   type: "object",
   properties: {
     id: { type: "string", description: "Unique lesson identifier" },
-    title: { type: "string", description: "Lesson title in English" },
+    title: {
+      type: "string",
+      description:
+        "Simple, direct lesson title. NO colons, NO subtitles, NO descriptive phrases. Examples: 'Introduction to if Statements', 'Practice with Operators', 'Fill in Blanks Exercise'.",
+    },
     type: {
       type: "string",
       enum: ["concept", "mcq", "codeblock_rearranging", "fill_in_blanks"],
@@ -694,12 +699,12 @@ export const TUTORIAL_REFERENCE_SCHEMA = {
     title: {
       type: "string",
       description:
-        "Main concept title using the specific programming language (e.g., 'C while Loops', 'Python Functions', 'Java Classes') - NEVER use generic terms like 'Programming Language'",
+        "CRITICAL: Simple format '[Language] [Topic]' (e.g., 'C while Loops', 'Python Functions', 'Java Classes'). NO colons, NO subtitles. NEVER use generic terms like 'Programming Language'",
     },
     subtitle: {
       type: "string",
       description:
-        "Specific subtitle with the actual programming language (e.g., 'Mastering while Loop Control Flow in C Programming', 'Understanding Function Parameters in Python') - NEVER use 'Programming Language'",
+        "Brief subtitle with actual programming language (e.g., 'Loop Control in C', 'Function Basics in Python'). Keep it short and direct. NEVER use 'Programming Language'",
     },
     introduction: {
       type: "string",

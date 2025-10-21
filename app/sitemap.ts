@@ -27,7 +27,7 @@ function generateExerciseSlug(post: any): string {
   return title && id ? `${generateSlug(title)}-${id}` : ""
 }
 
-// Learn route slug
+// Tutorial slug
 function generateTutorialSlug(tutorial: any): string {
   const title = tutorial?.Title
   return generateSlug(title)
@@ -84,19 +84,68 @@ async function fetchTutorialsByLang(langId: number) {
   }
 }
 
+// Fetch exercises for a tutorial
+async function fetchExercisesByTutorial(tutorialId: number) {
+  try {
+    const res = await fetch(
+      `${API_URL}posts?filters[tutorial][id][$eq]=${tutorialId}&populate=*&pagination[pageSize]=100`,
+      {
+        headers,
+        next: { revalidate: 86400 },
+      }
+    )
+    const json = await res.json()
+    return Array.isArray(json?.data) ? json.data : []
+  } catch (e) {
+    console.error(`Failed to fetch exercises for tutorial ${tutorialId}`, e)
+    return []
+  }
+}
+
+// Get priority based on path
+function getPriority(path: string): number {
+  if (path === "" || path === "Learn") return 1.0
+  if (path.match(/^Learn\/(Tutorials|Exercise)$/)) return 0.9
+  if (path.match(/^Learn\/(Tutorials|Exercise)\/[^/]+$/)) return 0.8
+  if (path.match(/^Learn\/Tutorials\/[^/]+\/[^/]+$/)) return 0.7
+  if (path.match(/^Learn\/Exercise\/[^/]+\/[^/]+$/)) return 0.7
+  if (path.match(/^Learn\/Exercise\/[^/]+\/[^/]+\/[^/]+$/)) return 0.6
+  if (path.includes("Vivy")) return 0.6
+  if (path === "Learn/upgrade") return 0.7
+  return 0.5
+}
+
+// Get change frequency
+function getChangeFrequency(
+  path: string
+): "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never" {
+  if (path === "" || path === "Learn") return "daily"
+  if (path.match(/^Learn\/(Tutorials|Exercise)$/)) return "daily"
+  if (path.match(/^Learn\/(Tutorials|Exercise)\/[^/]+$/)) return "weekly"
+  if (path.includes("Tutorial") || path.includes("Exercise")) return "weekly"
+  return "monthly"
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [exercises, languages] = await Promise.all([
-    fetchExercises(),
-    fetchLanguages(),
-  ])
-  const staticPaths = ["", "Exercise", "Learn", "Blog"]
+  const languages = await fetchLanguages()
 
-  const exercisePaths = exercises
-    .map((post: any) => generateExerciseSlug(post))
-    .filter(Boolean)
-    .map((slug) => `Exercise/${slug}`)
+  // Static pages (home, blog, etc.)
+  const staticPaths = ["", "Blog"]
 
+  // Learn static pages (excluding Vivy-image)
+  const learnStaticPages = [
+    "Learn",
+    "Learn/Tutorials",
+    "Learn/Exercise",
+    "Learn/Vivy",
+    "Learn/upgrade",
+  ]
+
+  // Dynamic paths
   const tutorialPaths: string[] = []
+  const exercisePaths: string[] = []
+  const languageTutorialPages: string[] = []
+  const languageExercisePages: string[] = []
 
   for (const lang of languages) {
     const langName = lang?.Name
@@ -104,21 +153,49 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     if (!langSlug || !lang.id) continue
 
+    // Add language-level pages
+    languageTutorialPages.push(`Learn/Tutorials/${langSlug}`)
+    languageExercisePages.push(`Learn/Exercise/${langSlug}`)
+
     const tutorials = await fetchTutorialsByLang(lang.id)
 
     for (const tut of tutorials) {
       const tutSlug = generateTutorialSlug(tut)
-      if (tutSlug) {
-        tutorialPaths.push(`Learn/${langSlug}/${tutSlug}`)
+      if (!tutSlug) continue
+
+      // Add tutorial page (FIXED PATH)
+      tutorialPaths.push(`Learn/Tutorials/${langSlug}/${tutSlug}`)
+
+      // Add exercise tutorial listing page
+      exercisePaths.push(`Learn/Exercise/${langSlug}/${tutSlug}`)
+
+      // Fetch and add individual exercises
+      const tutorialExercises = await fetchExercisesByTutorial(tut.id)
+      for (const exercise of tutorialExercises) {
+        const exerciseSlug = generateExerciseSlug(exercise)
+        if (exerciseSlug) {
+          exercisePaths.push(
+            `Learn/Exercise/${langSlug}/${tutSlug}/${exerciseSlug}`
+          )
+        }
       }
     }
   }
 
-  const allPaths = [...staticPaths, ...exercisePaths, ...tutorialPaths]
+  const allPaths = [
+    ...staticPaths,
+    ...learnStaticPages,
+    ...languageTutorialPages,
+    ...languageExercisePages,
+    ...tutorialPaths,
+    ...exercisePaths,
+  ]
 
   return allPaths.map((path) => ({
     url: `${BASE_URL}/${path}`,
     lastModified: new Date().toISOString(),
+    changeFrequency: getChangeFrequency(path),
+    priority: getPriority(path),
   }))
 }
 

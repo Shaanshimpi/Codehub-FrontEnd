@@ -60,14 +60,50 @@ export async function generateMetadata({ params }: ExerciseLanguagePageProps) {
 
   if (!language) {
     return {
-      title: "Language Not Found",
+      title: "Language Not Found | CodeHub",
       description: "The requested programming language was not found.",
+      robots: { index: false, follow: true },
     }
   }
 
+  const tutorials = await getTutorialsWithExercisesByLanguageId(language.id)
+  const exerciseCount =
+    tutorials?.reduce(
+      (sum: number, t: any) => sum + (t.exercises?.length || 0),
+      0
+    ) || 0
+
   return {
-    title: `${language.title} Exercises - Practice Programming`,
-    description: `Practice ${language.title} programming with hands-on exercises, coding challenges, and step-by-step tutorials.`,
-    keywords: `${language.title}, programming exercises, coding practice, ${language.title} challenges, learn coding`,
+    title: `${language.title} Exercises - Practice Programming | CodeHub`,
+    description: `Practice ${language.title} programming with ${exerciseCount}+ hands-on exercises, coding challenges, and step-by-step tutorials. Build real skills with instant feedback.`,
+    keywords: `${language.title} exercises, ${language.title} programming exercises, coding practice ${language.title}, ${language.title} challenges, learn coding ${language.title}, ${language.title} practice problems`,
+    openGraph: {
+      title: `${language.title} Exercises - Practice Programming`,
+      description: `Practice ${language.title} with ${exerciseCount}+ hands-on exercises and coding challenges`,
+      url: `https://codehubindia.in/Learn/Exercise/${langSlug}`,
+      type: "website",
+      siteName: "CodeHub",
+      images: [
+        {
+          url: "https://codehubindia.in/assets/logo-sqr.png",
+          width: 1200,
+          height: 630,
+          alt: `${language.title} Programming Exercises`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${language.title} Exercises - Practice Programming`,
+      description: `Practice ${language.title} with hands-on exercises`,
+      images: ["https://codehubindia.in/assets/logo-sqr.png"],
+    },
+    alternates: {
+      canonical: `https://codehubindia.in/Learn/Exercise/${langSlug}`,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
   }
 }

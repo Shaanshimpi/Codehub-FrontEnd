@@ -13,6 +13,17 @@ CRITICAL REQUIREMENTS:
 7. Return valid JSON matching the exact schema structure provided
 8. Whatever fields are not required optional should mostly return data, they should contain data as many times as possible, avoid only if They are absolutely impossible.
 9. MANDATORY: Generate a comprehensive W3Schools-style reference tutorial in the 'reference' field - this is REQUIRED for every tutorial
+10. CRITICAL: Use SIMPLE, DIRECT TITLES - Format: "[Language] [Topic]" - NO colons, NO subtitles, NO descriptive phrases
+
+TITLE FORMAT RULES:
+✅ CORRECT: "C if Statements", "Python Loops", "JavaScript Arrays", "C Comparison Operators"
+❌ WRONG: "C if Statements: A Beginner's Guide", "C if Statements - Conditional Logic Fundamentals"
+❌ WRONG: "Mastering C if Statements", "Understanding Python Loops: Complete Guide"
+❌ WRONG: "C if Statements for Beginners", "Learn C Comparison Operators"
+
+LESSON TITLE FORMAT:
+✅ CORRECT: "Introduction to if Statements", "Practice with Operators", "Code Rearranging Exercise"
+❌ WRONG: "if Statement Practice: Constant Conditions", "Code Rearranging: Simple if Statements"
 
 
 LESSON TYPE SPECIFICATIONS:
@@ -30,7 +41,8 @@ LESSON TYPE SPECIFICATIONS:
 
 🎯 MCQ LESSONS:
    - MANDATORY: Generate 3-10 educational multiple choice questions per lesson
-   - Each question has exactly 4 options with one correct answer
+   - CRITICAL: Each question MUST have EXACTLY 4 options with EXACTLY ONE correct answer
+   - VALIDATION: Count isCorrect=true options - must be EXACTLY 1, not 0, not 2, not 3
    - Clear explanations for why answers are correct/incorrect
    - STRONGLY RECOMMENDED: Include code snippets for context in most questions
    - CRITICAL: When code is involved, put code ONLY in codeSnippet field, NOT in question text
@@ -42,6 +54,13 @@ LESSON TYPE SPECIFICATIONS:
    - Focus on understanding concepts, not memorization
    - NEVER generate just 1 question - always create multiple questions for comprehensive assessment
    - NEVER put code in questions.
+   
+   MCQ VALIDATION CHECKLIST (For EACH question):
+   ✓ Count options - must be exactly 4
+   ✓ Count isCorrect=true - must be EXACTLY 1 ❌ Not 0, not 2, not 3
+   ✓ Count isCorrect=false - must be exactly 3
+   ✓ Verify correct answer is logically correct for the question
+   ✓ Ensure distractors are plausible but incorrect
 
 🚨 MCQ OPTION FORMATTING - MULTILINE SUPPORT:
    - Options can span multiple lines for complex answers
@@ -108,39 +127,51 @@ LESSON TYPE SPECIFICATIONS:
    - NEVER generate just 1 question - always create multiple questions for comprehensive practice
 
    🚨 CODE BLOCK SIZE AND COUNT REQUIREMENTS:
-   MANDATORY BLOCK RULES:
-   - Each code block MUST contain MINIMUM 2 LINES of code
-   - Maximum 5-7 blocks total per question (NEVER exceed 7)
-   - Each block must be a LOGICAL UNIT, not arbitrary splits
    
-   ✅ VALID LOGICAL UNITS (Good Blocks):
-   - Variable declaration group (2-3 related variables with initialization)
-   - Loop with opening, body, and closing (while/for with content)
-   - If statement with condition, body, and closing
-   - Function declaration with parameters and opening brace
-   - Function body with multiple statements and closing
-   - Include statements grouped with function signature
-   - Return statement grouped with closing braces
+   CRITICAL MANDATORY RULES (AI MUST FOLLOW):
+   1. Each block MUST contain MINIMUM 2 LINES (must have \\n character)
+   2. Maximum 5-7 blocks total per question (NEVER exceed 7)
+   3. Each block must be UNIQUE (no duplicate content - check before adding)
+   4. Each block must be a LOGICAL UNIT, not arbitrary splits
    
-   ❌ NEVER CREATE BLOCKS WITH ONLY:
-   - Single closing brace "}" alone
-   - Single opening brace "{" alone
-   - Single semicolon
-   - Single comment line
-   - Single variable declaration (group them!)
-   - Duplicate content (especially multiple "}" blocks)
+   ✅ VALID LOGICAL UNITS (Required Pattern):
+   - Variable declarations + control structure: "int age = 25;\\nif (age >= 18) {"
+   - Loop body + closing: "    printf('%d ', i);\\n    i++;\\n}"
+   - If statement body + closing: "    std::cout << 'Eligible\\n';\\n}"
+   - Function signature + opening: "#include <stdio.h>\\n\\nint main() {"
+   - Multiple related statements: "int x = 5;\\nint y = 10;\\nint sum = x + y;"
+   
+   ❌ ABSOLUTELY FORBIDDEN (Will cause rejection):
+   - Single line without \\n: "int age = 25;" ❌
+   - Just closing brace: "}" ❌
+   - Just opening brace: "{" ❌
+   - Single statement: "std::cout << 'Hello\\n';" ❌
+   - Duplicate blocks: Two blocks with "}" ❌
+   - Any block that doesn't contain \\n character ❌
+   
+   VALIDATION CHECKLIST (Before finalizing each question):
+   ✓ Count \\n in each block - must have at least ONE
+   ✓ Check for duplicate content - blocks must be unique
+   ✓ Count total blocks - must be 3-7, not more
+   ✓ Verify no blocks contain only braces
+   ✓ Ensure each block is meaningful and necessary
    
    COGNITIVE LOAD GUIDELINES:
-   - 3-4 blocks: Beginner exercises (simple structure)
-   - 5-6 blocks: Intermediate exercises (moderate complexity)
-   - 6-7 blocks: Advanced exercises (maximum complexity)
-   - NEVER exceed 7 blocks (overwhelming for students)
+   - 3-4 blocks: Beginner (very simple programs)
+   - 5-6 blocks: Intermediate (moderate complexity)
+   - 6-7 blocks: Advanced (complex logic - use sparingly)
    
-   BLOCK UNIQUENESS:
-   - Each block must be distinguishable
-   - No two blocks should have identical content
-   - Closing braces should be grouped with preceding statements
-   - Opening braces should be grouped with control structures
+   EXAMPLE - CORRECT:
+   Block 1: "#include <iostream>\\n\\nint main() {"
+   Block 2: "    int age = 25;\\n    if (age >= 18) {"
+   Block 3: "        std::cout << 'Eligible\\n';\\n    }"
+   Block 4: "    return 0;\\n}"
+   
+   EXAMPLE - WRONG (DO NOT DO THIS):
+   Block 1: "int age = 25;" ❌ (single line)
+   Block 2: "if (age >= 18) {" ❌ (single line)  
+   Block 3: "std::cout << 'Eligible\\n';" ❌ (single line)
+   Block 4: "}" ❌ (just brace, single line)
 
 🎯 FILL IN THE BLANKS:
    - MANDATORY: Generate 2-7 fill-in-blank questions per lesson
@@ -187,21 +218,34 @@ LESSON TYPE SPECIFICATIONS:
    → NO = Use text input (if answer is determinate)
    
    EXAMPLES - DROPDOWN (Correct Usage):
-   ✅ printf({{blank1}}, age);  // blank1 type: dropdown, options: ['"%d"', '"%f"', '"%s"', '"%c"']
-   ✅ if (x {{blank2}} 0)  // blank2 type: dropdown, options: [">", "<", "==", "!=", ">=", "<="]
-   ✅ {{blank3}} count = 0;  // blank3 type: dropdown, options: ["int", "float", "char", "double"]
-   ✅ printf({{blank4}});  // blank4 type: dropdown, options: ['"Number is even"', '"Number is odd"', '"Result: %d", num', '"Value: %d"']
-   ✅ {{blank5}} (i = 0; i < 10; i++)  // blank5 type: dropdown, options: ["for", "while", "do", "if"]
+   ✅ printf({{blank1}}, age);  // blank1: dropdown, options: ['"%d"', '"%f"', '"%s"', '"%c"'] (4 DIFFERENT options)
+   ✅ if (x {{blank2}} 0)  // blank2: dropdown, options: [">", "<", "==", "!=", ">=", "<="] (6 DIFFERENT options)
+   ✅ {{blank3}} count = 0;  // blank3: dropdown, options: ["int", "float", "char", "double"] (4 DIFFERENT types)
+   ✅ printf({{blank4}});  // blank4: dropdown, options: ['"Number is even"', '"Number is odd"', '"Even"', '"Odd"'] (4 DIFFERENT strings)
+   ✅ {{blank5}} (i = 0; i < 10; i++)  // blank5: dropdown, options: ["for", "while", "do"] (3 DIFFERENT loops)
+   
+   ❌ WRONG DROPDOWN EXAMPLES (DO NOT DO):
+   ❌ std::cin >> {{blank1}};  // blank1: dropdown with ["number", "number", "number"] - ALL IDENTICAL!
+   ❌ number {{blank2}} 2  // blank2: dropdown with ["%", "%", "%", "%"] - ALL IDENTICAL!
    
    EXAMPLES - TEXT INPUT (Correct Usage):
-   ✅ int x = {{blank1}};  // Given: y=10, sum=15, sum=x+y → blank1 type: text, answer: "5"
-   ✅ for (int i=0; i<{{blank2}}; i++)  // Comment says "loop 10 times" → blank2 type: text, answer: "10"
-   ✅ arr[{{blank3}}]  // Comment: "access last element of 5-element array" → blank3 type: text, answer: "4"
-   ✅ printf("%d", count);  // Output: {{blank4}} // Given: count increments 5 times → blank4 type: text, answer: "5"
+   ✅ int x = {{blank1}};  // Given: y=10, sum=15, sum=x+y → blank1: text, answer: "5" (mathematically determinate)
+   ✅ for (int i=0; i<{{blank2}}; i++)  // Comment: "loop 10 times" → blank2: text, answer: "10" (obvious from comment)
+   ✅ arr[{{blank3}}]  // Comment: "last element of array[5]" → blank3: text, answer: "4" (array size - 1)
+   ✅ printf("%d", count);  // Output: {{blank4}} // count++ runs 5 times → blank4: text, answer: "5" (traceable)
+   
+   EDGE CASES - When to use TEXT vs DROPDOWN:
+   ✅ std::cin >> {{blank1}};  // If reading into an obvious variable → blank1: text, answer: "number" (context makes it obvious)
+   ❌ BUT if cin variable is ambiguous → Use dropdown with variable options
+   
+   CRITICAL RULE FOR CIN/SCANF:
+   - If the variable being read is obvious from context (only one variable declared) → Use TEXT
+   - If multiple variables exist or variable name matters for correctness → Use DROPDOWN
    
    VALIDATION CHECKLIST:
    For EACH blank, verify:
    ✓ If type is "dropdown" → options array MUST exist with 3-5 items including correct answer
+   ✓ If type is "dropdown" → ALL options MUST be DIFFERENT (no duplicates like ["number", "number", "number"])
    ✓ If type is "text" → options array MUST be null/omitted
    ✓ If blank contains quotes ("") → MUST use "dropdown"
    ✓ If blank is format specifier (%) → MUST use "dropdown"
@@ -211,6 +255,7 @@ LESSON TYPE SPECIFICATIONS:
    ✓ If blank is numeric calculation result → MUST use "text"
    ✓ All dropdown options must be plausible (include common mistakes)
    ✓ Correct answer MUST be included in dropdown options array
+   ✓ NEVER create dropdown with identical options (e.g., ["%", "%", "%", "%"]) ❌
 
 🎯 REFERENCE TUTORIAL REQUIREMENTS:
    - MANDATORY: Create a comprehensive W3Schools-style reference page for the main concept
@@ -320,10 +365,20 @@ DIAGRAM ARRAY RULES:
 DIAGRAM NECESSITY RULES:
 🎯 ONLY generate diagrams when they ADD SIGNIFICANT EDUCATIONAL VALUE:
 
-⚠️ CRITICAL DECISION RULE:
-Before generating ANY diagram, ask: "Does this code have BRANCHING (if/else/switch), LOOPS (for/while), or MULTIPLE EXECUTION PATHS?"
-→ If NO = Set diagram_data to NULL (do not generate)
-→ If YES = Generate flowchart showing the branching/looping logic
+⚠️ CRITICAL DECISION RULE - MULTI-BRANCH REQUIREMENT:
+Before generating ANY diagram, ask TWO questions:
+1. "Does this code have BRANCHING (if/else/switch), LOOPS (for/while), or MULTIPLE EXECUTION PATHS?"
+2. "Does the flowchart show AT LEAST 2 different execution paths (True/False branches, or loop iterations)?"
+
+→ If EITHER answer is NO = Set diagram_data to NULL (do not generate)
+→ If BOTH answers are YES = Generate flowchart showing the branching/looping logic
+
+CRITICAL: Flowcharts must show MULTIPLE BRANCHES. Single-path linear flowcharts are forbidden.
+- ✅ GOOD: if/else with True branch AND False branch
+- ✅ GOOD: Loop showing iteration path AND exit path
+- ❌ BAD: if(1) where condition is always true (no real branching)
+- ❌ BAD: Sequential steps without any decision points
+- ❌ BAD: Single path from start to end
 
 ✅ GENERATE FLOWCHARTS ONLY FOR (Code with branching/loops):
 - Loops and iteration (while, for, do-while) - show execution flow with loop condition
@@ -363,22 +418,36 @@ Before generating ANY diagram, ask: "Does this code have BRANCHING (if/else/swit
 For EACH code example, verify:
 1. ✓ Does it contain IF/ELSE, SWITCH, or conditional operators?
 2. ✓ Does it contain FOR, WHILE, DO-WHILE loops?
-3. ✓ Does it have MULTIPLE execution paths?
-4. ✓ Is there branching based on conditions?
+3. ✓ Does it have MULTIPLE execution paths (branching)?
+4. ✓ Will the flowchart show AT LEAST 2 different paths?
 
 IF ALL 4 ARE FALSE → diagram_data = null (REQUIRED)
-IF ANY IS TRUE → Generate appropriate diagram
+IF 1-3 ARE TRUE BUT 4 IS FALSE → diagram_data = null (no single-path diagrams)
+IF ALL 4 ARE TRUE → Generate multi-branch flowchart
 
-EXAMPLES OF LINEAR CODE (NO DIAGRAM NEEDED):
-❌ int x = 5; int y = 10; int sum = x + y; printf("%d", sum);
-❌ float radius = 5.0; float area = 3.14 * radius * radius;
-❌ char name[20]; printf("Enter name: "); scanf("%s", name);
-❌ int result = calculateSum(a, b); printf("Result: %d", result);
+EXAMPLES REQUIRING NULL (No diagram):
+❌ if(1) { ... } // Always true, no real branching
+❌ Sequential operations: a=5; b=10; c=a+b; // Linear flow
+❌ Single print statements
+❌ Variable declarations without logic
 
-EXAMPLES REQUIRING DIAGRAMS:
-✅ while (i < 10) { if (i % 2 == 0) printf("%d", i); i++; }  // Loop + condition
+EXAMPLES OF LINEAR CODE OR SINGLE-PATH (NO DIAGRAM):
+❌ int x = 5; int y = 10; int sum = x + y; printf("%d", sum);  // Linear, no branching
+❌ float radius = 5.0; float area = 3.14 * radius * radius;  // Sequential calculation
+❌ char name[20]; printf("Enter name: "); scanf("%s", name);  // Simple I/O
+❌ if (1) { printf("Always runs"); }  // Always true, single path only
+❌ if (age >= 18) { printf("Adult"); }  // No else, only one branch shown
+❌ Simple function calls without decisions
+
+EXAMPLES REQUIRING MULTI-BRANCH DIAGRAMS:
+✅ if (age >= 18) { printf("Adult"); } else { printf("Minor"); }  // True AND False paths
+✅ while (i < 10) { process(i); i++; }  // Loop iteration path AND exit path  
 ✅ if (score >= 90) grade = 'A'; else if (score >= 80) grade = 'B'; else grade = 'C';  // Multiple branches
-✅ for (int i = 0; i < n; i++) { sum += arr[i]; }  // Loop with iteration
+✅ switch(choice) { case 1: ...; case 2: ...; default: ...; }  // Multiple case paths
+
+SINGLE-BRANCH FLOWCHARTS ARE FORBIDDEN:
+❌ if (condition) with no else = Only shows True path = Single branch = NULL
+✅ if (condition) with else = Shows True AND False paths = Multi-branch = Generate
 
 CRITICAL REQUIREMENTS FOR AI:
 - Generate diagram_data ONLY when it passes the necessity criteria above  
@@ -533,7 +602,7 @@ This is EXACTLY how the complete tutorial should be structured. NEVER use placeh
 
 {
   "id": "c-while-loops-tutorial",
-  "title": "C While Loops: Complete Guide",
+  "title": "C While Loops",
   "description": "Master while loop control structures in C programming with practical examples, common patterns, and real-world applications for dynamic program flow control.",
   "learningObjectives": [
     "Understand while loop syntax and execution flow in C programming",
@@ -545,7 +614,7 @@ This is EXACTLY how the complete tutorial should be structured. NEVER use placeh
   "difficulty": 1,
   "reference": {
     "title": "C while Loops",
-    "subtitle": "Mastering Loop Control Flow in C Programming",
+    "subtitle": "Loop Control in C",
     "introduction": "The while loop in C is a fundamental control structure that executes a block of code repeatedly as long as a specified condition remains true. It provides precise control over program flow and is essential for creating dynamic, responsive applications that can handle varying amounts of data or user input.",
     "examples": [
       {
@@ -631,7 +700,7 @@ This is EXACTLY how the complete tutorial should be structured. NEVER use placeh
     },
     {
       "id": "while-loop-quiz",
-      "title": "While Loop Knowledge Check",
+      "title": "While Loop Practice",
       "type": "mcq",
       "content": {
         "questions": [
@@ -659,7 +728,7 @@ This is EXACTLY how the complete tutorial should be structured. NEVER use placeh
     },
     {
       "id": "while-loop-rearrange",
-      "title": "Arrange While Loop Code",
+      "title": "Code Rearranging Exercise",
       "type": "codeblock_rearranging",
       "content": {
         "questions": [
