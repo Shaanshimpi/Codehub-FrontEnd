@@ -113,6 +113,15 @@ const MCQLesson: React.FC<MCQLessonProps> = ({
     )
   }
 
+  // Ensure MCQ option text is separate from its index label (A/B/C/D)
+  const getOptionLetter = (optionIndex: number) =>
+    String.fromCharCode(65 + optionIndex)
+
+  const stripLeadingOptionIndex = (text: string) => {
+    const match = text.match(/^\s*([A-Da-d])[).:-]\s*(.*)$/)
+    return match ? match[2] : text
+  }
+
   if (quizComplete) {
     const correctAnswers = getCorrectAnswersCount()
     const totalQuestions = data.questions.length
@@ -193,12 +202,21 @@ const MCQLesson: React.FC<MCQLessonProps> = ({
                     <p className="mb-1 whitespace-pre-wrap text-gray-600 dark:text-gray-400">
                       Your answer:{" "}
                       {selectedOption !== undefined
-                        ? question.options[selectedOption].text
+                        ? `${getOptionLetter(selectedOption)}) ${stripLeadingOptionIndex(question.options[selectedOption].text)}`
                         : "Not answered"}
                     </p>
                     <p className="whitespace-pre-wrap text-green-600 dark:text-green-400">
                       Correct answer:{" "}
-                      {question.options.find((opt) => opt.isCorrect)?.text}
+                      {(() => {
+                        const correctIndex = question.options.findIndex(
+                          (opt) => opt.isCorrect
+                        )
+                        if (correctIndex === -1) return ""
+                        const correctText = stripLeadingOptionIndex(
+                          question.options[correctIndex].text
+                        )
+                        return `${getOptionLetter(correctIndex)}) ${correctText}`
+                      })()}
                     </p>
                   </div>
                 </div>
@@ -319,6 +337,9 @@ const MCQLesson: React.FC<MCQLessonProps> = ({
                       <span className="text-xs text-white">•</span>
                     )}
                   </div>
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded bg-gray-200 text-xs font-semibold text-gray-700 dark:bg-gray-600 dark:text-gray-200">
+                    {getOptionLetter(optionIndex)}
+                  </span>
                   <span
                     className={`whitespace-pre-wrap ${
                       shouldShowCorrect
@@ -328,7 +349,7 @@ const MCQLesson: React.FC<MCQLessonProps> = ({
                           : "text-gray-900 dark:text-white"
                     }`}
                   >
-                    {String.fromCharCode(65 + optionIndex)}) {option.text}
+                    {stripLeadingOptionIndex(option.text)}
                   </span>
                 </div>
               </button>
