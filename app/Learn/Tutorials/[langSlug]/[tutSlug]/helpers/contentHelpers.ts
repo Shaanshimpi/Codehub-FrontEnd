@@ -21,8 +21,9 @@ export const processCodeExample = (
   code: string,
   language: string = "javascript"
 ) => {
-  // Format code with proper line breaks
-  const formattedCode = code.replace(/\\n/g, "\n").replace(/\\"/g, '"')
+  // JSON parsing already handles escape sequences correctly
+  // No need to process further - display code as-is
+  const formattedCode = code
 
   return {
     formatted: formattedCode,

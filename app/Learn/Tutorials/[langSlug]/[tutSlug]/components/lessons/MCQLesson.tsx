@@ -190,13 +190,13 @@ const MCQLesson: React.FC<MCQLessonProps> = ({
                     </p>
                   </div>
                   <div className="ml-8 text-sm">
-                    <p className="mb-1 text-gray-600 dark:text-gray-400">
+                    <p className="mb-1 whitespace-pre-wrap text-gray-600 dark:text-gray-400">
                       Your answer:{" "}
                       {selectedOption !== undefined
                         ? question.options[selectedOption].text
                         : "Not answered"}
                     </p>
-                    <p className="text-green-600 dark:text-green-400">
+                    <p className="whitespace-pre-wrap text-green-600 dark:text-green-400">
                       Correct answer:{" "}
                       {question.options.find((opt) => opt.isCorrect)?.text}
                     </p>
