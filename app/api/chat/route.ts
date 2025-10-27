@@ -1,3 +1,4 @@
+import { logger } from "@/utils/logger"
 import { NextRequest, NextResponse } from "next/server"
 
 /**
@@ -14,18 +15,16 @@ export async function POST(request: NextRequest) {
       "http://localhost:3001"
     const chatEndpoint = `${serverUrl}/api/chat`
 
-    // Debug logs for production troubleshooting
-    console.log("🔍 ===== CLIENT PROXY DEBUG =====")
-    console.log("📍 Environment:", process.env.NODE_ENV)
-    console.log("🔗 PAYLOAD_API_URL:", process.env.PAYLOAD_API_URL || "NOT SET")
-    console.log("🌐 Server URL:", serverUrl)
-    console.log("📡 Chat Endpoint:", chatEndpoint)
-    console.log("🤖 Model:", body.model)
-    console.log("💬 Messages:", body.messages?.length || 0)
-    console.log("🍪 Cookie present:", !!request.headers.get("cookie"))
-    console.log("=================================")
+    logger.debug("===== CLIENT PROXY DEBUG =====")
+    logger.debug("Environment:", process.env.NODE_ENV)
+    logger.debug("PAYLOAD_API_URL:", process.env.PAYLOAD_API_URL || "NOT SET")
+    logger.debug("Server URL:", serverUrl)
+    logger.debug("Chat Endpoint:", chatEndpoint)
+    logger.debug("Model:", body.model)
+    logger.debug("Messages:", body.messages?.length || 0)
+    logger.debug("Cookie present:", !!request.headers.get("cookie"))
 
-    console.log(`🔄 Proxying chat request to: ${chatEndpoint}`)
+    logger.log(`Proxying chat request to: ${chatEndpoint}`)
 
     // Forward the request to the server with cookies for authentication
     const response = await fetch(chatEndpoint, {
@@ -38,27 +37,26 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(body),
     })
 
-    console.log("📥 Server response status:", response.status)
-    console.log("📥 Server response ok:", response.ok)
+    logger.debug("Server response status:", response.status)
+    logger.debug("Server response ok:", response.ok)
 
     const data = await response.json()
 
     if (!response.ok) {
-      console.error("❌ Server returned error response:", data)
+      logger.error("Server returned error response:", data)
     } else {
-      console.log("✅ Server response successful")
+      logger.debug("Server response successful")
     }
 
     return NextResponse.json(data, { status: response.status })
   } catch (error) {
-    console.error("❌ ===== CLIENT PROXY ERROR DEBUG =====")
-    console.error("📍 Error Type:", error?.constructor?.name)
-    console.error(
-      "💬 Error Message:",
+    logger.error("===== CLIENT PROXY ERROR DEBUG =====")
+    logger.error("Error Type:", error?.constructor?.name)
+    logger.error(
+      "Error Message:",
       error instanceof Error ? error.message : String(error)
     )
-    console.error("🔗 Stack:", error instanceof Error ? error.stack : "N/A")
-    console.error("=======================================")
+    logger.error("Stack:", error instanceof Error ? error.stack : "N/A")
 
     return NextResponse.json(
       {
