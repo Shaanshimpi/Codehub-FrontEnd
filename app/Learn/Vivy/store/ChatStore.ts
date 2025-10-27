@@ -169,6 +169,25 @@ export const useChatStore = create<ChatState>()(
 
           // Send to AI
           const currentMessages = [...get().messages, userMessage]
+
+          // Debug logs for production troubleshooting
+          console.log("🔍 ===== VIVY CHAT REQUEST DEBUG =====")
+          console.log("📍 Environment:", process.env.NODE_ENV)
+          console.log("🤖 Model:", selectedModel.id)
+          console.log("💬 Messages count:", currentMessages.length)
+          console.log(
+            "📝 Last message preview:",
+            currentMessages[currentMessages.length - 1]?.content?.substring(
+              0,
+              100
+            )
+          )
+          console.log(
+            "🌐 API Base URL:",
+            process.env.NEXT_PUBLIC_API_URL || "Not set"
+          )
+          console.log("=====================================")
+
           const response = await apiService.post<{
             content: string
             tokens?: {
@@ -188,6 +207,9 @@ export const useChatStore = create<ChatState>()(
             })),
             model: selectedModel.id,
           })
+
+          console.log("✅ VIVY Chat response received successfully")
+          console.log("📊 Response tokens:", response.tokens)
 
           // Add assistant message
           const assistantMessage = createAssistantMessage(
@@ -211,7 +233,17 @@ export const useChatStore = create<ChatState>()(
 
           return true
         } catch (error: any) {
-          console.log("❌ Chat error caught:", error)
+          console.error("❌ ===== VIVY CHAT ERROR DEBUG =====")
+          console.error("📍 Error Type:", error?.name)
+          console.error("💬 Error Message:", error?.message)
+          console.error("📊 Error Status:", error?.status)
+          console.error("🔗 Response Data:", error?.response)
+          console.error("📍 Environment:", process.env.NODE_ENV)
+          console.error(
+            "🌐 API Base URL:",
+            process.env.NEXT_PUBLIC_API_URL || "Not set"
+          )
+          console.error("=====================================")
           console.log("❌ Error response:", error?.response)
 
           // Check if it's a rate limit error with suggestions

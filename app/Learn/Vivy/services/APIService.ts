@@ -38,6 +38,14 @@ export class APIService {
           fullConfig.timeout
         )
 
+        // Debug logs for API requests
+        console.log("🔍 ===== API SERVICE DEBUG =====")
+        console.log("📡 Request URL:", url)
+        console.log("📦 Request body:", options.body?.substring(0, 200))
+        console.log("⏱️ Timeout:", fullConfig.timeout)
+        console.log("🔄 Attempt:", attempt + 1)
+        console.log("=================================")
+
         const response = await fetch(url, {
           ...options,
           headers: {
@@ -49,15 +57,22 @@ export class APIService {
 
         clearTimeout(timeoutId)
 
+        console.log("📥 Fetch response received")
+        console.log("📍 Status:", response.status)
+        console.log("✅ OK:", response.ok)
+
         if (!response.ok) {
           const errorData = await this.handleErrorResponse(response)
+          console.error("❌ API error response:", errorData)
           const error: any = new Error(errorData.error)
           error.response = errorData // Attach full response data to error
           error.status = response.status
           throw error
         }
 
-        return await response.json()
+        const responseData = await response.json()
+        console.log("✅ API request successful")
+        return responseData
       } catch (error) {
         lastError = error as Error
 
