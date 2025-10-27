@@ -763,6 +763,7 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
       const submissionData: TutorialData = {
         id: initialData?.id || crypto.randomUUID(),
         title: basicInfo.title,
+        slug: basicInfo.slug || generateSlug(basicInfo.title),
         description: basicInfo.description,
         videoUrl: basicInfo.videoUrl,
         learningObjectives: basicInfo.learningConfiguration.learningObjectives
@@ -775,6 +776,28 @@ const MultiLessonTutorialForm: React.FC<MultiLessonTutorialFormProps> = ({
         lessons: tutorialData.lessons.map((lesson, index) => ({
           ...lesson,
           order: index + 1,
+          // Ensure learningObjectives and keyTopics have at least 2 non-empty items
+          learningObjectives:
+            lesson.learningObjectives.filter((obj: string) => obj.trim() !== "")
+              .length >= 2
+              ? lesson.learningObjectives.filter(
+                  (obj: string) => obj.trim() !== ""
+                )
+              : lesson.learningObjectives.length === 1 &&
+                  lesson.learningObjectives[0].trim() !== ""
+                ? lesson.learningObjectives
+                : [
+                    "Understand the fundamental concepts",
+                    "Apply knowledge in practical scenarios",
+                  ],
+          keyTopics:
+            lesson.keyTopics.filter((topic: string) => topic.trim() !== "")
+              .length >= 2
+              ? lesson.keyTopics.filter((topic: string) => topic.trim() !== "")
+              : lesson.keyTopics.length === 1 &&
+                  lesson.keyTopics[0].trim() !== ""
+                ? lesson.keyTopics
+                : ["core concepts", "syntax", "implementation"],
         })),
         practicalApplications:
           basicInfo.learningConfiguration.practicalApplications

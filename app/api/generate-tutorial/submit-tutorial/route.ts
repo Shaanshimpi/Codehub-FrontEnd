@@ -279,9 +279,9 @@ export async function POST(request: NextRequest) {
                   position: blank.position || 0,
                   type: blank.type || "text",
                   correctAnswer: blank.correctAnswer || "",
-                  options: (blank.options || []).map((option: string) => ({
-                    option,
-                  })),
+                  options: (blank.options || []).map((option: any) =>
+                    typeof option === "string" ? { option } : option
+                  ),
                   hint: blank.hint || "",
                   explanation: blank.explanation || "",
                 })),

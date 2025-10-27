@@ -47,8 +47,10 @@ const LessonForm: React.FC<LessonFormProps> = ({
     description: lesson?.description || "",
     videoUrl: lesson?.videoUrl || "",
     order: lesson?.order || 1,
-    learningObjectives: lesson?.learningObjectives || [""],
-    keyTopics: lesson?.keyTopics || [""],
+    learningObjectives: lesson?.learningObjectives?.length
+      ? lesson.learningObjectives
+      : [""],
+    keyTopics: lesson?.keyTopics?.length ? lesson.keyTopics : [""],
     difficulty: lesson?.difficulty || (1 as 1 | 2 | 3),
   })
 

@@ -75,6 +75,47 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
+    // Validate lessons structure before transformation
+    if (!tutorialData.lessons || !Array.isArray(tutorialData.lessons)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Tutorial must contain lessons array",
+        },
+        { status: 400 }
+      )
+    }
+
+    // Validate each lesson has required fields
+    const lessonValidationErrors = []
+    tutorialData.lessons.forEach((lesson, index) => {
+      if (!lesson.title)
+        lessonValidationErrors.push(`Lesson ${index + 1}: missing title`)
+      if (!lesson.type)
+        lessonValidationErrors.push(`Lesson ${index + 1}: missing type`)
+      if (
+        !lesson.learningObjectives ||
+        lesson.learningObjectives.length === 0
+      ) {
+        lessonValidationErrors.push(
+          `Lesson ${index + 1}: missing learning objectives`
+        )
+      }
+      if (!lesson.keyTopics || lesson.keyTopics.length === 0) {
+        lessonValidationErrors.push(`Lesson ${index + 1}: missing key topics`)
+      }
+    })
+
+    if (lessonValidationErrors.length > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Lesson validation errors: ${lessonValidationErrors.join(", ")}`,
+        },
+        { status: 400 }
+      )
+    }
+
     // Transform lessons data to match conditional schema structure
     const transformedLessons = tutorialData.lessons.map((lesson: any) => {
       const baseLesson = {
@@ -189,7 +230,9 @@ export async function PATCH(request: NextRequest) {
                 correctAnswer: blank.correctAnswer || "",
                 hint: blank.hint || "",
                 explanation: blank.explanation || "",
-                options: blank.options || [],
+                options: (blank.options || []).map((option: any) =>
+                  typeof option === "string" ? { option } : option
+                ),
               })),
               hints: (q.hints || []).map((hint: any) =>
                 typeof hint === "string" ? { hint } : hint

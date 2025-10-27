@@ -959,6 +959,77 @@ const convertLessonContent = (content: any): any => {
   return converted
 }
 
+// Helper to generate default learning objectives based on lesson content
+const generateDefaultLearningObjectives = (lesson: any): string[] => {
+  const title = lesson.title?.toLowerCase() || ""
+  const type = lesson.type || ""
+
+  const defaults = []
+
+  if (title.includes("introduction") || title.includes("introduction to")) {
+    defaults.push("Understand the fundamental concepts and terminology")
+    defaults.push("Learn basic syntax and structure")
+  } else if (title.includes("practice") || title.includes("quiz")) {
+    defaults.push("Test understanding of key concepts")
+    defaults.push("Apply knowledge through practical exercises")
+  } else if (title.includes("rearrang") || title.includes("structure")) {
+    defaults.push("Organize code blocks in logical sequence")
+    defaults.push("Practice code structure and flow control")
+  } else {
+    defaults.push("Master the core programming concepts")
+    defaults.push("Apply knowledge in practical scenarios")
+  }
+
+  if (type === "mcq") {
+    defaults.push("Assess comprehension through multiple choice questions")
+  } else if (type === "codeblock_rearranging") {
+    defaults.push("Develop code organization skills")
+  } else if (type === "fill_in_blanks") {
+    defaults.push("Complete code templates accurately")
+  }
+
+  return defaults.slice(0, 3) // Return 2-3 items
+}
+
+// Helper to generate default key topics based on lesson content
+const generateDefaultKeyTopics = (lesson: any): string[] => {
+  const title = lesson.title?.toLowerCase() || ""
+  const type = lesson.type || ""
+
+  const defaults = []
+
+  // Extract keywords from title
+  const keywords = title
+    .replace(/^(introduction\s+to|learn|understanding|practice\s+with)/, "")
+    .split(/\s+/)
+    .filter(
+      (word) =>
+        word.length > 2 && !["the", "a", "an", "and", "or", "of"].includes(word)
+    )
+    .slice(0, 3)
+
+  if (keywords.length > 0) {
+    defaults.push(...keywords)
+  }
+
+  // Add type-specific topics
+  if (type === "mcq" && defaults.length === 0) {
+    defaults.push("assessment", "evaluation", "understanding")
+  } else if (type === "codeblock_rearranging" && defaults.length === 0) {
+    defaults.push("code organization", "syntax", "structure")
+  } else if (type === "fill_in_blanks" && defaults.length === 0) {
+    defaults.push(
+      "syntax completion",
+      "code templates",
+      "practical application"
+    )
+  }
+
+  return defaults.length >= 2
+    ? defaults
+    : ["programming concepts", "syntax", "implementation"].slice(0, 3)
+}
+
 // Convert to modern English-only format matching updated schema structure
 export const convertToModernFormat = (tutorial: any): any => {
   // Use AI-generated reference directly - our enhanced prompts ensure this is always present
@@ -971,17 +1042,37 @@ export const convertToModernFormat = (tutorial: any): any => {
     keyTopics: tutorial.keyTopics || [],
     difficulty: tutorial.difficulty || 1,
     lessons:
-      tutorial.lessons?.map((lesson: any, index: number) => ({
-        id: lesson.id || `lesson-${index + 1}`,
-        title: extractEnglishText(lesson.title),
-        type: lesson.type,
-        content: convertLessonContent(lesson.content), // Convert diagram_data to mermaid_code
-        learningObjectives: extractEnglishArray(
+      tutorial.lessons?.map((lesson: any, index: number) => {
+        // Validate and fix missing learningObjectives
+        let learningObjectives = extractEnglishArray(
           lesson.learningObjectives || []
-        ),
-        keyTopics: lesson.keyTopics || [],
-        order: lesson.order !== undefined ? lesson.order : index + 1,
-      })) || [],
+        )
+        if (learningObjectives.length < 2) {
+          console.warn(
+            `⚠️ Lesson "${lesson.title}" missing learningObjectives, generating defaults`
+          )
+          learningObjectives = generateDefaultLearningObjectives(lesson)
+        }
+
+        // Validate and fix missing keyTopics
+        let keyTopics = lesson.keyTopics || []
+        if (keyTopics.length < 2) {
+          console.warn(
+            `⚠️ Lesson "${lesson.title}" missing keyTopics, generating defaults`
+          )
+          keyTopics = generateDefaultKeyTopics(lesson)
+        }
+
+        return {
+          id: lesson.id || `lesson-${index + 1}`,
+          title: extractEnglishText(lesson.title),
+          type: lesson.type,
+          content: convertLessonContent(lesson.content), // Convert diagram_data to mermaid_code
+          learningObjectives,
+          keyTopics,
+          order: lesson.order !== undefined ? lesson.order : index + 1,
+        }
+      }) || [],
     practicalApplications: extractEnglishArray(
       tutorial.practicalApplications || []
     ),

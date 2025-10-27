@@ -914,6 +914,83 @@ The response MUST be a valid JSON object with this precise structure (English-on
       // CRITICAL: Every lesson MUST have both learningObjectives AND keyTopics arrays
     }
   ],
+  
+🚨 LESSON VALIDATION EXAMPLES - COPY THESE PATTERNS:
+
+✓ CORRECT CONCEPT LESSON:
+{
+  "id": "lesson-1",
+  "title": "Introduction to Variables",
+  "type": "concept",
+  "content": { /* complete concept content */ },
+  "learningObjectives": [
+    "Understand variable declaration syntax",
+    "Learn proper variable naming conventions",
+    "Apply type definitions in code"
+  ],
+  "keyTopics": ["variable declaration", "data types", "naming conventions"],
+  "order": 1
+}
+
+✓ CORRECT MCQ LESSON:
+{
+  "id": "lesson-2",
+  "title": "Variable Practice Quiz",
+  "type": "mcq",
+  "content": { /* complete MCQ content */ },
+  "learningObjectives": [
+    "Test understanding of variable syntax",
+    "Validate knowledge of type conversion",
+    "Assess application of variable scoping"
+  ],
+  "keyTopics": ["variable syntax", "type conversion", "variable scoping"],
+  "order": 2
+}
+
+✓ CORRECT CODE REARRANGING LESSON:
+{
+  "id": "lesson-3",
+  "title": "Code Structure Exercise",
+  "type": "codeblock_rearranging",
+  "content": { /* complete rearranging content */ },
+  "learningObjectives": [
+    "Organize code blocks in logical order",
+    "Apply control structure sequencing",
+    "Practice code organization skills"
+  ],
+  "keyTopics": ["code organization", "control flow", "sequencing"],
+  "order": 3
+}
+
+✓ CORRECT FILL-IN-BLANKS LESSON:
+{
+  "id": "lesson-4",
+  "title": "Complete the Code Exercise",
+  "type": "fill_in_blanks",
+  "content": { /* complete fill-in content */ },
+  "learningObjectives": [
+    "Complete code templates accurately",
+    "Apply syntax knowledge practically",
+    "Practice code completion skills"
+  ],
+  "keyTopics": ["syntax completion", "code templates", "practical application"],
+  "order": 4
+}
+
+❌ NEVER DO THIS - Missing learningObjectives and keyTopics:
+{
+  "id": "lesson-bad",
+  "title": "Bad Lesson Example",
+  "type": "concept",
+  "content": { /* content */ },
+  "order": 1
+  // ❌ MISSING learningObjectives and keyTopics - THIS WILL BE REJECTED!
+}
+
+🚨 PRE-SUBMISSION CHECKLIST - Verify EVERY lesson has:
+✓ learningObjectives: Array with 2-4 items
+✓ keyTopics: Array with 2-4 items
+✓ NO lessons missing these fields
   "practicalApplications": [
     "Application description in English",
     "Another application description in English"
@@ -1187,10 +1264,42 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 ⚡ ABSOLUTE REQUIREMENTS:
 - NEVER generate incomplete, truncated, or partial content in any section
 - ALWAYS include complete tutorial metadata with all required fields
-- 🚨 CRITICAL: Every lesson MUST have both "learningObjectives" AND "keyTopics" arrays - NEVER omit these fields
-- 🚨 VALIDATION: Response will be REJECTED if any lesson is missing learningObjectives or keyTopics
-- Each lesson's keyTopics should contain 2-4 specific programming concepts covered in that lesson
-- Each lesson's learningObjectives should contain 2-4 specific goals students will achieve
+
+🚨🚨🚨 CRITICAL LESSON FIELD REQUIREMENTS 🚨🚨🚨
+These fields are MANDATORY for EVERY lesson. Missing them will cause complete rejection:
+
+1. learningObjectives: Array with 2-4 educational goals
+   Example: ["Understand variable syntax", "Apply type conversion", "Practice scoping rules"]
+   
+2. keyTopics: Array with 2-4 programming concepts
+   Example: ["variable syntax", "type conversion", "variable scoping"]
+
+⚠️ VALIDATION RULES:
+- Response will be REJECTED if ANY lesson is missing learningObjectives
+- Response will be REJECTED if ANY lesson is missing keyTopics
+- Empty arrays [""] are REJECTED - must have 2-4 meaningful items
+- Single-item arrays are REJECTED - minimum is 2 items
+- All 4 lesson types (concept, mcq, codeblock_rearranging, fill_in_blanks) REQUIRE these fields
+
+✅ BEFORE SUBMITTING - Count these fields:
+- Count lessons in your response
+- For EACH lesson, verify:
+  * learningObjectives exists AND has 2-4 items
+  * keyTopics exists AND has 2-4 items
+- If ANY lesson fails these checks, DO NOT SUBMIT - FIX IT FIRST
+
+📋 CORRECT PATTERN TO FOLLOW:
+Every lesson object MUST have this exact structure:
+{
+  "id": "...",
+  "title": "...",
+  "type": "concept|mcq|codeblock_rearranging|fill_in_blanks",
+  "content": { /* lesson-specific content */ },
+  "learningObjectives": [/* 2-4 specific objectives */],
+  "keyTopics": [/* 2-4 specific topics */],
+  "order": number
+}
+
 - ALWAYS provide comprehensive, detailed lesson content for each lesson type
 - ALWAYS use the exact JSON schema structure provided above
 - ALWAYS maintain educational quality, technical accuracy, and cultural appropriateness
@@ -1199,6 +1308,13 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 - REFERENCE VALIDATION: Every code example in the reference field must be executable in the specified language
 - REFERENCE REQUIREMENT: Use the PERFECT REFERENCE FIELD EXAMPLE above as your template - NEVER deviate from this structure
 - REFERENCE LANGUAGE: The reference field must use ONLY the specified programming language throughout - NO generic terms
+
+🚨 FINAL VALIDATION CHECK BEFORE GENERATING:
+1. Review ALL lesson structures
+2. Verify EACH lesson has BOTH learningObjectives AND keyTopics
+3. Confirm each array has 2-4 items (not empty, not single item)
+4. Count total lessons match the required number: ${numLessons}
+5. If ANY lesson is incomplete, ADD the missing fields before submitting
 
 Generate a complete, comprehensive, professionally-designed programming tutorial that effectively teaches ${topic} concepts through diverse, interactive, and engaging lessons that prepare students for real-world application.
 
@@ -1291,10 +1407,42 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 - NEVER generate incomplete, truncated, or partial content in any section
 - Make sure all the code and logic is in ${language} and nothing else.
 - ALWAYS include complete tutorial metadata with all required fields
-- 🚨 CRITICAL: Every lesson MUST have both "learningObjectives" AND "keyTopics" arrays - NEVER omit these fields
-- 🚨 VALIDATION: Response will be REJECTED if any lesson is missing learningObjectives or keyTopics
-- Each lesson's keyTopics should contain 2-4 specific programming concepts covered in that lesson
-- Each lesson's learningObjectives should contain 2-4 specific goals students will achieve
+
+🚨🚨🚨 CRITICAL LESSON FIELD REQUIREMENTS 🚨🚨🚨
+These fields are MANDATORY for EVERY lesson. Missing them will cause complete rejection:
+
+1. learningObjectives: Array with 2-4 educational goals
+   Example: ["Understand variable syntax", "Apply type conversion", "Practice scoping rules"]
+   
+2. keyTopics: Array with 2-4 programming concepts
+   Example: ["variable syntax", "type conversion", "variable scoping"]
+
+⚠️ VALIDATION RULES:
+- Response will be REJECTED if ANY lesson is missing learningObjectives
+- Response will be REJECTED if ANY lesson is missing keyTopics
+- Empty arrays [""] are REJECTED - must have 2-4 meaningful items
+- Single-item arrays are REJECTED - minimum is 2 items
+- All 4 lesson types (concept, mcq, codeblock_rearranging, fill_in_blanks) REQUIRE these fields
+
+✅ BEFORE SUBMITTING - Count these fields:
+- Count lessons in your response
+- For EACH lesson, verify:
+  * learningObjectives exists AND has 2-4 items
+  * keyTopics exists AND has 2-4 items
+- If ANY lesson fails these checks, DO NOT SUBMIT - FIX IT FIRST
+
+📋 CORRECT PATTERN TO FOLLOW:
+Every lesson object MUST have this exact structure:
+{
+  "id": "...",
+  "title": "...",
+  "type": "concept|mcq|codeblock_rearranging|fill_in_blanks",
+  "content": { /* lesson-specific content */ },
+  "learningObjectives": [/* 2-4 specific objectives */],
+  "keyTopics": [/* 2-4 specific topics */],
+  "order": number
+}
+
 - ALWAYS provide comprehensive, detailed lesson content for each lesson type
 - ALWAYS use the exact JSON schema structure provided above
 - ALWAYS maintain educational quality, technical accuracy, and cultural appropriateness
@@ -1304,6 +1452,13 @@ Number of Lessons: ${numLessons}${focusAreasSection}${exclusionsSection}
 - REFERENCE VALIDATION: Every code example in the reference field must be executable in ${language}
 - REFERENCE REQUIREMENT: Use the PERFECT REFERENCE FIELD EXAMPLE above as your template - NEVER deviate from this structure
 - REFERENCE LANGUAGE: The reference field must use ONLY ${language} throughout - NO generic terms like "Programming Language"
+
+🚨 FINAL VALIDATION CHECK BEFORE GENERATING:
+1. Review ALL lesson structures
+2. Verify EACH lesson has BOTH learningObjectives AND keyTopics
+3. Confirm each array has 2-4 items (not empty, not single item)
+4. Count total lessons match the required number: ${numLessons}
+5. If ANY lesson is incomplete, ADD the missing fields before submitting
 
 Generate a complete, comprehensive, professionally-designed programming tutorial that effectively teaches ${topic} concepts through diverse, interactive, and engaging lessons that prepare students for real-world application.
 
