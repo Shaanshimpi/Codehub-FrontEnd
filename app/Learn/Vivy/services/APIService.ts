@@ -1,3 +1,4 @@
+import { logger } from "@/utils/logger"
 import { APIError, APIRequestConfig } from "../types"
 import { API_CONFIG, ERROR_MESSAGES } from "../utils"
 
@@ -39,12 +40,11 @@ export class APIService {
         )
 
         // Debug logs for API requests
-        console.log("🔍 ===== API SERVICE DEBUG =====")
-        console.log("📡 Request URL:", url)
-        console.log("📦 Request body:", options.body?.substring(0, 200))
-        console.log("⏱️ Timeout:", fullConfig.timeout)
-        console.log("🔄 Attempt:", attempt + 1)
-        console.log("=================================")
+        logger.debug("===== API SERVICE DEBUG =====")
+        logger.debug("Request URL:", url)
+        logger.debug("Request body:", options.body?.substring(0, 200))
+        logger.debug("Timeout:", fullConfig.timeout)
+        logger.debug("Attempt:", attempt + 1)
 
         const response = await fetch(url, {
           ...options,
@@ -57,13 +57,13 @@ export class APIService {
 
         clearTimeout(timeoutId)
 
-        console.log("📥 Fetch response received")
-        console.log("📍 Status:", response.status)
-        console.log("✅ OK:", response.ok)
+        logger.debug("Fetch response received")
+        logger.debug("Status:", response.status)
+        logger.debug("OK:", response.ok)
 
         if (!response.ok) {
           const errorData = await this.handleErrorResponse(response)
-          console.error("❌ API error response:", errorData)
+          logger.error("API error response:", errorData)
           const error: any = new Error(errorData.error)
           error.response = errorData // Attach full response data to error
           error.status = response.status
@@ -71,7 +71,7 @@ export class APIService {
         }
 
         const responseData = await response.json()
-        console.log("✅ API request successful")
+        logger.debug("API request successful")
         return responseData
       } catch (error) {
         lastError = error as Error
