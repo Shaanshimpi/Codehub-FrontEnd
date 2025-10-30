@@ -50,14 +50,14 @@ const ExerciseList: React.FC<ExerciseListProps> = ({
   const [showBulkActions, setShowBulkActions] = useState(false)
   const [bulkActionLoading, setBulkActionLoading] = useState(false)
 
-  // Build sort string for API
+  // Build sort state (used for client-side sorting)
   const sortString = useMemo(() => {
     return `${sortOrder === "desc" ? "-" : ""}${sortField}`
   }, [sortField, sortOrder])
 
-  // Fetch exercises with current filters
+  // Fetch exercises once; filtering/searching happens locally
   const {
-    exercises,
+    exercises: allExercises,
     loading,
     error,
     totalDocs,
@@ -66,12 +66,50 @@ const ExerciseList: React.FC<ExerciseListProps> = ({
     bulkDelete,
     bulkUpdate,
   } = useExercises({
-    programmingLanguage:
-      selectedLanguage === "all" ? undefined : selectedLanguage,
-    search: searchQuery || undefined,
-    sort: sortString,
-    limit: 50, // Show more exercises per page for admin
+    // request a larger page to have enough records client-side
+    limit: 1000,
   })
+
+  // Local filter + sort over fetched exercises
+  const exercises = useMemo(() => {
+    const byLanguage = (e: Exercise) =>
+      selectedLanguage === "all" ||
+      e.programmingLanguage?.id?.toString() === selectedLanguage
+    const q = searchQuery.trim().toLowerCase()
+    const bySearch = (e: Exercise) =>
+      q === "" ||
+      e.title?.toLowerCase().includes(q) ||
+      e.description?.toLowerCase().includes(q)
+
+    const sorted = [...allExercises].filter((e) => byLanguage(e) && bySearch(e))
+
+    sorted.sort((a, b) => {
+      const dir = sortOrder === "asc" ? 1 : -1
+      switch (sortField) {
+        case "title":
+          return a.title.localeCompare(b.title) * dir
+        case "difficultyLevel":
+          return (a.difficultyLevel - b.difficultyLevel) * dir
+        case "createdAt":
+          return (
+            (new Date(a.createdAt).getTime() -
+              new Date(b.createdAt).getTime()) *
+            dir
+          )
+        case "updatedAt":
+          return (
+            (new Date(a.updatedAt).getTime() -
+              new Date(b.updatedAt).getTime()) *
+            dir
+          )
+        case "index":
+        default:
+          return (a.index - b.index) * dir
+      }
+    })
+
+    return sorted
+  }, [allExercises, selectedLanguage, searchQuery, sortField, sortOrder])
 
   // Handle sorting
   const handleSort = (field: SortField) => {
@@ -224,7 +262,7 @@ const ExerciseList: React.FC<ExerciseListProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Exercises ({totalDocs})
+            Exercises ({exercises.length})
           </h2>
           <p className="text-slate-600 dark:text-slate-400">
             Manage programming exercises and challenges

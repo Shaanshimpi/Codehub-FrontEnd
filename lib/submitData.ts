@@ -364,13 +364,34 @@ export const submitTutorial = async (tutorialData: any): Promise<any> => {
       throw new Error("Slug is required");
     }
 
+    // Strip all client-supplied nested ids; let Payload generate row IDs
+    const sanitizeIds = (input: any): any => {
+      const strip = (obj: any, isRoot = true): any => {
+        if (obj === null || obj === undefined) return obj;
+        if (Array.isArray(obj)) return obj.map((item) => strip(item, false));
+        if (typeof obj !== "object") return obj;
+        const out: any = {};
+        Object.keys(obj).forEach((key) => {
+          if (key === "id" && !isRoot) {
+            // drop nested ids
+            return;
+          }
+          out[key] = strip(obj[key], false);
+        });
+        return out;
+      };
+      return strip(input, true);
+    };
+
+    const cleaned = sanitizeIds(tutorialData);
+
     // Use our internal API endpoint which handles the transformation
     const response = await fetch("/api/generate-tutorial/submit-tutorial", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(tutorialData),
+      body: JSON.stringify(cleaned),
     });
 
     if (!response.ok) {

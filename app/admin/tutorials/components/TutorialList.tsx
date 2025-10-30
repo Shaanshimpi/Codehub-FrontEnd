@@ -42,14 +42,14 @@ const TutorialList: React.FC<TutorialListProps> = ({
   const [showBulkActions, setShowBulkActions] = useState(false)
   const [bulkActionLoading, setBulkActionLoading] = useState(false)
 
-  // Build sort string for API
+  // Build sort state (now used for client-side sorting)
   const sortString = useMemo(() => {
     return `${sortOrder === "desc" ? "-" : ""}${sortField}`
   }, [sortField, sortOrder])
 
-  // Fetch tutorials with current filters
+  // Fetch tutorials once; filtering/searching happens locally
   const {
-    tutorials,
+    tutorials: allTutorials,
     loading,
     error,
     totalDocs,
@@ -58,12 +58,56 @@ const TutorialList: React.FC<TutorialListProps> = ({
     bulkDelete,
     bulkUpdate,
   } = useTutorials({
-    programmingLanguage:
-      selectedLanguage === "all" ? undefined : selectedLanguage,
-    search: searchQuery || undefined,
-    sort: sortString,
-    limit: 50, // Show more tutorials per page for admin
+    // request a larger page to have enough records client-side
+    limit: 1000,
   })
+
+  // Local filter + sort over fetched tutorials
+  const tutorials = useMemo(() => {
+    const byLanguage = (t: Tutorial) =>
+      selectedLanguage === "all" ||
+      t.programmingLanguage?.id?.toString() === selectedLanguage
+    const q = searchQuery.trim().toLowerCase()
+    const bySearch = (t: Tutorial) =>
+      q === "" ||
+      t.title?.toLowerCase().includes(q) ||
+      t.description?.toLowerCase().includes(q)
+
+    const sorted = [...allTutorials].filter((t) => byLanguage(t) && bySearch(t))
+
+    sorted.sort((a, b) => {
+      const dir = sortOrder === "asc" ? 1 : -1
+      switch (sortField) {
+        case "title":
+          return a.title.localeCompare(b.title) * dir
+        case "difficulty": {
+          const ai = parseInt(a.difficulty as unknown as string, 10) || 0
+          const bi = parseInt(b.difficulty as unknown as string, 10) || 0
+          return (ai - bi) * dir
+        }
+        case "createdAt":
+          return (
+            (new Date(a.createdAt).getTime() -
+              new Date(b.createdAt).getTime()) *
+            dir
+          )
+        case "updatedAt":
+          return (
+            (new Date(a.updatedAt).getTime() -
+              new Date(b.updatedAt).getTime()) *
+            dir
+          )
+        case "index":
+        default:
+          return (
+            ((a.index as unknown as number) - (b.index as unknown as number)) *
+            dir
+          )
+      }
+    })
+
+    return sorted
+  }, [allTutorials, selectedLanguage, searchQuery, sortField, sortOrder])
 
   // Handle sorting
   const handleSort = (field: SortField) => {
@@ -208,7 +252,7 @@ const TutorialList: React.FC<TutorialListProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Tutorials ({totalDocs})
+            Tutorials ({tutorials.length})
           </h2>
           <p className="text-slate-600 dark:text-slate-400">
             Manage programming tutorials and lessons
