@@ -13,6 +13,8 @@ import { ExplanationModal } from "./SolutionModals"
 
 // Solution code playground component exactly like StudentPlayground
 
+// Solution code playground component exactly like StudentPlayground
+
 interface SolutionPlaygroundState {
   mode: "with-explanation" | "clean-solution"
   showHelpMenu: boolean
@@ -25,11 +27,13 @@ interface SolutionPlaygroundState {
 interface SolutionCodePlaygroundProps {
   exercise: any
   language: any
+  onOpenAIHelp?: () => void
 }
 
 const SolutionCodePlayground: React.FC<SolutionCodePlaygroundProps> = ({
   exercise,
   language,
+  onOpenAIHelp,
 }) => {
   // Simple, predictable state matching StudentPlayground pattern
   const [playgroundState, setPlaygroundState] =
@@ -376,6 +380,7 @@ const SolutionCodePlayground: React.FC<SolutionCodePlaygroundProps> = ({
           }
           onShowCodeWithComments={handleShowCodeWithComments}
           onResetToCleanSolution={handleResetToCleanSolution}
+          onOpenAIHelp={onOpenAIHelp}
         />
       </div>
 

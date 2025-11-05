@@ -12,6 +12,8 @@ import SimpleToolbar from "./SimpleToolbar"
 
 // New simplified student playground component
 
+// New simplified student playground component
+
 interface PlaygroundState {
   mode: "empty" | "starter" | "working"
   code: string
@@ -27,6 +29,8 @@ interface StudentPlaygroundProps {
   code: string
   onCodeChange?: (code: string) => void
   onRunCode?: () => void
+  onOutputChange?: (output: string) => void
+  onOpenAIHelp?: () => void
   mode?: "problem" | "solution"
   isReadOnly?: boolean
 }
@@ -37,6 +41,8 @@ const StudentPlayground: React.FC<StudentPlaygroundProps> = ({
   code,
   onCodeChange,
   onRunCode,
+  onOutputChange,
+  onOpenAIHelp,
   mode = "problem",
   isReadOnly = false,
 }) => {
@@ -160,6 +166,11 @@ const StudentPlayground: React.FC<StudentPlaygroundProps> = ({
 
         setOutput(outputText)
 
+        // Notify parent of output change
+        if (onOutputChange) {
+          onOutputChange(outputText)
+        }
+
         // Call parent callback for progress tracking
         if (onRunCode) onRunCode()
       } else {
@@ -175,11 +186,20 @@ const StudentPlayground: React.FC<StudentPlaygroundProps> = ({
         }
 
         setOutput(errorText)
+
+        // Notify parent of output change (error)
+        if (onOutputChange) {
+          onOutputChange(errorText)
+        }
       }
     } catch (error) {
-      setOutput(
-        `❌ Network Error\n\nFailed to execute code: ${error instanceof Error ? error.message : "Unknown error"}\n\nPlease check your connection and try again.`
-      )
+      const errorOutput = `❌ Network Error\n\nFailed to execute code: ${error instanceof Error ? error.message : "Unknown error"}\n\nPlease check your connection and try again.`
+      setOutput(errorOutput)
+
+      // Notify parent of output change (error)
+      if (onOutputChange) {
+        onOutputChange(errorOutput)
+      }
     } finally {
       setIsRunning(false)
     }
@@ -450,6 +470,7 @@ const StudentPlayground: React.FC<StudentPlaygroundProps> = ({
           onLoadStarter={handleLoadStarter}
           onShowInstructions={handleShowInstructions}
           onReset={handleReset}
+          onOpenAIHelp={onOpenAIHelp}
         />
       </div>
 

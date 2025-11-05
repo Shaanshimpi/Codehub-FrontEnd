@@ -3,7 +3,7 @@ import { Check, ChevronDown, Cpu, Loader2, Lock, User, X } from "lucide-react"
 import { createPortal } from "react-dom"
 import { AIModel, getAllModels, getModelIcon } from "../constants/models"
 import { modelService, userService } from "../services"
-import { getTierColors, getTierDisplayName } from "../utils/models"
+import { getTierDisplayName } from "../utils/models"
 
 interface ModelSelectorProps {
   selectedModel: AIModel
@@ -178,8 +178,8 @@ export function ModelSelector({
             </div>
             <div className="mt-1 text-xs text-blue-600 dark:text-blue-400">
               {selectedModel?.description
-                ? selectedModel.description.length > 80
-                  ? selectedModel.description.slice(0, 77) + "..."
+                ? selectedModel.description.length > 60
+                  ? selectedModel.description.slice(0, 57) + "..."
                   : selectedModel.description
                 : "No description"}
             </div>
@@ -243,7 +243,6 @@ export function ModelSelector({
           )}
 
           {Object.entries(groupedModels).map(([tier, models]) => {
-            const tierColors = getTierColors(tier as any)
             return (
               <div
                 key={tier}
@@ -306,12 +305,14 @@ export function ModelSelector({
                           </div>
                           <div className="mt-0.5 text-xs text-gray-400 dark:text-slate-500 sm:mt-1">
                             <span className="block sm:hidden">
-                              {model.description.length > 80
-                                ? model.description.slice(0, 77) + "..."
+                              {model.description.length > 60
+                                ? model.description.slice(0, 57) + "..."
                                 : model.description}
                             </span>
                             <span className="hidden sm:block">
-                              {model.description}
+                              {model.description.length > 100
+                                ? model.description.slice(0, 97) + "..."
+                                : model.description}
                             </span>
                             {requiresGold && !canSelect && (
                               <span className="ml-2 font-medium text-yellow-600 dark:text-yellow-400">

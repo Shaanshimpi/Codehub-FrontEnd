@@ -11,6 +11,9 @@ import ExecutionStepsPanel from "../SolutionView/ExecutionStepsPanel"
 import ExplanationTabs from "../SolutionView/ExplanationTabs"
 import KeyConceptsPanel from "../SolutionView/KeyConceptsPanel"
 import MermaidViewer from "../SolutionView/MermaidViewer"
+import ExerciseAIAssistant from "../ai/ExerciseAIAssistant"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/SolutionView.tsx
 
@@ -39,6 +42,7 @@ const SolutionView: React.FC<SolutionViewProps> = ({
   )
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [lockedFeature, setLockedFeature] = useState("")
+  const [showAIHelp, setShowAIHelp] = useState(false)
   const { user } = useUser()
 
   // Use exercise data directly (no multi-language support)
@@ -160,6 +164,20 @@ const SolutionView: React.FC<SolutionViewProps> = ({
           }
           className="bg-white dark:bg-neutral-900"
         />
+        {/* Phase 4: Mobile Toggle Button for AI Help */}
+        {mobileActiveTab === "solution" && (
+          <div className="border-t border-gray-200 bg-gray-50 p-2 dark:border-gray-700 dark:bg-gray-900">
+            <button
+              onClick={() => setShowAIHelp(!showAIHelp)}
+              className="w-full rounded bg-blue-600 px-3 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600"
+              aria-label={
+                showAIHelp ? "Switch to solution view" : "Switch to AI help"
+              }
+            >
+              {showAIHelp ? "← Back to Solution" : "🤖 AI Help"}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Responsive Layout */}
@@ -168,53 +186,63 @@ const SolutionView: React.FC<SolutionViewProps> = ({
       >
         {/* Solution Guide Panel - Left Side */}
         <div
-          className={`lg:border-r lg:border-gray-300 lg:bg-gradient-to-br lg:from-neutral-50 lg:to-white lg:dark:border-gray-600 lg:dark:from-neutral-900 lg:dark:to-neutral-800 ${mobileActiveTab === "solution" ? `block ${isFullscreen ? "h-screen" : "h-[calc(100vh-8rem)]"} overflow-y-auto` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2 lg:overflow-y-auto" : "lg:flex-none"}`}
+          className={`lg:border-r lg:border-gray-300 lg:bg-gradient-to-br lg:from-neutral-50 lg:to-white lg:dark:border-gray-600 lg:dark:from-neutral-900 lg:dark:to-neutral-800 ${mobileActiveTab === "solution" ? `block ${isFullscreen ? "h-screen" : "h-[calc(100vh-8rem)]"} overflow-hidden` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2" : "lg:flex-none"}`}
           style={isFullscreen ? { width: `${panelWidth}%` } : {}}
         >
-          <div className="flex h-full flex-col">
-            {/* Modern Tab Navigation - High Contrast Design */}
-            <div className="border-b border-gray-300 bg-white p-3 shadow-lg dark:border-gray-600 dark:bg-black">
-              <div className="flex space-x-1 overflow-x-auto">
-                {tabs.map((tab) => {
-                  const Icon = tab.icon
-                  const isLocked =
-                    isPremiumLocked &&
-                    (tab.id === "flowchart" || tab.id === "execution")
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => handleTabClick(tab.id)}
-                      className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold shadow-lg transition-all duration-200 hover:shadow-xl ${
-                        activeTab === tab.id
-                          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white"
-                          : isLocked
-                            ? "border border-amber-200 bg-white text-amber-600 hover:bg-amber-50 dark:border-amber-700 dark:bg-gray-900 dark:text-amber-400 dark:hover:bg-amber-900/20"
-                            : "border border-gray-300 bg-white text-black hover:bg-blue-50 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:hover:bg-blue-900"
-                      }`}
-                      title={
-                        isLocked
-                          ? `${tab.description} (Premium Feature)`
-                          : tab.description
-                      }
-                    >
-                      {isLocked ? (
-                        <Lock className="h-4 w-4" />
-                      ) : (
-                        <Icon className="h-4 w-4" />
-                      )}
-                      <span className="hidden sm:inline">{tab.label}</span>
-                      {isLocked && <Lock className="ml-1 h-3 w-3" />}
-                    </button>
-                  )
-                })}
+          {showAIHelp ? (
+            <ExerciseAIAssistant
+              exercise={exercise}
+              language={language}
+              currentCode={exercise.solution_code || exercise.code}
+              viewType="solution"
+              onClose={() => setShowAIHelp(false)}
+            />
+          ) : (
+            <div className="flex h-full flex-col">
+              {/* Modern Tab Navigation - High Contrast Design */}
+              <div className="relative border-b border-gray-300 bg-white p-3 shadow-lg dark:border-gray-600 dark:bg-black">
+                <div className="flex space-x-1 overflow-x-auto">
+                  {tabs.map((tab) => {
+                    const Icon = tab.icon
+                    const isLocked =
+                      isPremiumLocked &&
+                      (tab.id === "flowchart" || tab.id === "execution")
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => handleTabClick(tab.id)}
+                        className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold shadow-lg transition-all duration-200 hover:shadow-xl ${
+                          activeTab === tab.id
+                            ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white"
+                            : isLocked
+                              ? "border border-amber-200 bg-white text-amber-600 hover:bg-amber-50 dark:border-amber-700 dark:bg-gray-900 dark:text-amber-400 dark:hover:bg-amber-900/20"
+                              : "border border-gray-300 bg-white text-black hover:bg-blue-50 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:hover:bg-blue-900"
+                        }`}
+                        title={
+                          isLocked
+                            ? `${tab.description} (Premium Feature)`
+                            : tab.description
+                        }
+                      >
+                        {isLocked ? (
+                          <Lock className="h-4 w-4" />
+                        ) : (
+                          <Icon className="h-4 w-4" />
+                        )}
+                        <span className="hidden sm:inline">{tab.label}</span>
+                        {isLocked && <Lock className="ml-1 h-3 w-3" />}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Tab Content */}
+              <div className="flex-1 overflow-y-auto p-2 lg:p-3">
+                {renderTabContent()}
               </div>
             </div>
-
-            {/* Tab Content */}
-            <div className="flex-1 overflow-y-auto p-2 lg:p-3">
-              {renderTabContent()}
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Resize Handle - Only visible on desktop in fullscreen */}
@@ -233,7 +261,11 @@ const SolutionView: React.FC<SolutionViewProps> = ({
             isFullscreen ? { width: `calc(${100 - panelWidth}% - 4px)` } : {}
           }
         >
-          <SolutionCodePlayground exercise={exercise} language={language} />
+          <SolutionCodePlayground
+            exercise={exercise}
+            language={language}
+            onOpenAIHelp={() => setShowAIHelp(true)}
+          />
         </div>
       </div>
 

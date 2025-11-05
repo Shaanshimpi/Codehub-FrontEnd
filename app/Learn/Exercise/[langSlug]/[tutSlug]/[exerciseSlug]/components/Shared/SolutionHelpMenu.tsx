@@ -2,7 +2,9 @@
 "use client"
 
 import React, { useEffect, useRef } from "react"
-import { MessageSquare, RotateCcw, X } from "lucide-react"
+import { MessageSquare, RotateCcw, Sparkles, X } from "lucide-react"
+
+// Solution-specific help menu with explanation and clean solution
 
 // Solution-specific help menu with explanation and clean solution
 
@@ -17,6 +19,7 @@ interface SolutionHelpMenuProps {
   onClose: () => void
   onShowCodeWithComments: () => void
   onResetToCleanSolution: () => void
+  onOpenAIHelp?: () => void
 }
 
 const SolutionHelpMenu: React.FC<SolutionHelpMenuProps> = ({
@@ -24,6 +27,7 @@ const SolutionHelpMenu: React.FC<SolutionHelpMenuProps> = ({
   onClose,
   onShowCodeWithComments,
   onResetToCleanSolution,
+  onOpenAIHelp,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null)
   const [menuPosition, setMenuPosition] = React.useState<"top" | "bottom">(
@@ -193,6 +197,34 @@ const SolutionHelpMenu: React.FC<SolutionHelpMenuProps> = ({
               </div>
             </div>
           </button>
+
+          {/* AI Help */}
+          {onOpenAIHelp && (
+            <button
+              onClick={() => {
+                onOpenAIHelp()
+                onClose()
+              }}
+              className="focus-ring group mt-1 flex w-full items-center gap-3 rounded-lg p-3 transition-all duration-300 hover:scale-[1.02] hover:bg-purple-50 dark:hover:bg-purple-900/20"
+              role="menuitem"
+              aria-describedby="ai-help-desc"
+            >
+              <div className="flex-shrink-0 rounded-lg bg-gradient-to-br from-purple-100 to-indigo-100 p-2 transition-colors group-hover:from-purple-200 group-hover:to-indigo-200 dark:from-purple-900/50 dark:to-indigo-900/50 dark:group-hover:from-purple-900 dark:group-hover:to-indigo-900">
+                <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div className="flex-1 text-left">
+                <div className="text-sm font-bold text-black dark:text-white">
+                  AI Help
+                </div>
+                <div
+                  id="ai-help-desc"
+                  className="text-xs font-medium text-black dark:text-white"
+                >
+                  Get AI-powered assistance
+                </div>
+              </div>
+            </button>
+          )}
 
           {/* Reset to Clean Solution */}
           <button

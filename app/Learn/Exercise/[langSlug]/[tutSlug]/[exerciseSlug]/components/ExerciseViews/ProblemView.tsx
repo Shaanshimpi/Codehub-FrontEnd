@@ -6,6 +6,9 @@ import UnifiedMobileTabSwitcher from "@/app/Learn/Exercise/components/Mobile/Uni
 import { BookOpen, Code } from "lucide-react"
 import QuestionPanel from "../ProblemView/QuestionPanel"
 import StudentPlayground from "../Shared/StudentPlayground"
+import ExerciseAIAssistant from "../ai/ExerciseAIAssistant"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/ProblemView.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseViews/ProblemView.tsx
 
@@ -40,6 +43,8 @@ const ProblemView: React.FC<ProblemViewProps> = ({
   const [mobileActiveTab, setMobileActiveTab] = useState<"question" | "code">(
     "question"
   )
+  const [showAIHelp, setShowAIHelp] = useState(false)
+  const [codeOutput, setCodeOutput] = useState<string>("")
 
   // Generate boilerplate code based on language
   const getBoilerplateCode = useCallback(() => {
@@ -200,18 +205,43 @@ main();`
           }
           className="bg-white dark:bg-neutral-900"
         />
+        {/* Phase 4: Mobile Toggle Button for AI Help */}
+        {mobileActiveTab === "question" && (
+          <div className="border-t border-gray-200 bg-gray-50 p-2 dark:border-gray-700 dark:bg-gray-900">
+            <button
+              onClick={() => setShowAIHelp(!showAIHelp)}
+              className="w-full rounded bg-blue-600 px-3 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600"
+              aria-label={
+                showAIHelp ? "Switch to problem view" : "Switch to AI help"
+              }
+            >
+              {showAIHelp ? "← Back to Problem" : "🤖 AI Help"}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Responsive Layout */}
       <div
         className={`lg:flex ${isFullscreen ? "h-screen" : "h-[calc(100vh-8rem)]"}`}
       >
-        {/* Question Panel */}
+        {/* Question Panel or AI Assistant */}
         <div
-          className={`lg:border-r lg:border-slate-200 lg:bg-sky-50 lg:dark:border-slate-700 lg:dark:bg-slate-800 ${mobileActiveTab === "question" ? `block ${isFullscreen ? "h-screen" : "h-[calc(100vh-8rem)]"} overflow-y-auto` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2 lg:overflow-y-auto" : "lg:flex-none"}`}
+          className={`lg:border-r lg:border-slate-200 lg:bg-sky-50 lg:dark:border-slate-700 lg:dark:bg-slate-800 ${mobileActiveTab === "question" ? `block ${isFullscreen ? "h-screen" : "h-[calc(100vh-8rem)]"} overflow-hidden` : "hidden lg:block"} ${!isFullscreen ? "lg:h-full lg:w-1/2" : "lg:flex-none"}`}
           style={isFullscreen ? { width: `${panelWidth}%` } : {}}
         >
-          <QuestionPanel exercise={exercise} language={language} />
+          {showAIHelp ? (
+            <ExerciseAIAssistant
+              exercise={exercise}
+              language={language}
+              currentCode={playgroundCode}
+              codeOutput={codeOutput}
+              viewType="problem"
+              onClose={() => setShowAIHelp(false)}
+            />
+          ) : (
+            <QuestionPanel exercise={exercise} language={language} />
+          )}
         </div>
 
         {/* Resize Handle - Only visible on desktop in fullscreen */}
@@ -239,6 +269,8 @@ main();`
             onCodeChange={handlePlaygroundCodeChange}
             onRunCode={handleRunCode}
             mode="problem"
+            onOutputChange={setCodeOutput}
+            onOpenAIHelp={() => setShowAIHelp(true)}
           />
         </div>
       </div>
