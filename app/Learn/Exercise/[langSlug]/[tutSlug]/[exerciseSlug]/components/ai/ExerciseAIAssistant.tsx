@@ -54,12 +54,23 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
   const contextUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Phase 4: Performance - Memoize available models
-  const availableModels = useMemo(
-    () => getAllModels().filter((m) => m.capabilities.coding && m.isActive),
-    []
-  )
+  // Prioritize free models for unauthenticated users
+  const isAuth = userService.isAuthenticated()
+  const availableModels = useMemo(() => {
+    const allModels = getAllModels().filter(
+      (m) => m.capabilities.coding && m.isActive
+    )
+    // If not authenticated, prioritize free models
+    if (!isAuth) {
+      const freeModels = allModels.filter(
+        (m) => m.pricing.input === 0 && m.pricing.output === 0
+      )
+      return freeModels.length > 0 ? freeModels : allModels
+    }
+    return allModels
+  }, [isAuth])
 
-  // Initialize model on mount
+  // Initialize model on mount - default to first available (preferably free)
   useEffect(() => {
     if (!selectedModel && availableModels.length > 0) {
       handleModelChange(availableModels[0])
@@ -232,6 +243,8 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
   const isAuthenticated = userService.isAuthenticated()
 
   // Check if user can use selected model
+  // Free models are available to everyone (authenticated or not)
+  // Paid models require Gold subscription
   const canUseModel = !requiresGold || isGoldUser
 
   // Phase 3: Context-Aware Suggestions based on exercise state

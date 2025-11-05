@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { MarkdownRenderer } from "@/app/Learn/Vivy/components/MarkdownRenderer"
 import { ModelSelector } from "@/app/Learn/Vivy/components/ModelSelector"
 import { getAllModels, getModelIcon } from "@/app/Learn/Vivy/constants/models"
@@ -48,10 +48,21 @@ const PlaygroundAIAssistant: React.FC<PlaygroundAIAssistantProps> = ({
   const contextRef = useRef<string>("")
   const [showModelSelector, setShowModelSelector] = useState(false)
 
-  // Get available coding models
-  const availableModels = getAllModels().filter(
-    (m) => m.capabilities.coding && m.isActive
-  )
+  // Get available coding models - prioritize free models for unauthenticated users
+  const isAuth = userService.isAuthenticated()
+  const availableModels = useMemo(() => {
+    const allModels = getAllModels().filter(
+      (m) => m.capabilities.coding && m.isActive
+    )
+    // If not authenticated, prioritize free models
+    if (!isAuth) {
+      const freeModels = allModels.filter(
+        (m) => m.pricing.input === 0 && m.pricing.output === 0
+      )
+      return freeModels.length > 0 ? freeModels : allModels
+    }
+    return allModels
+  }, [isAuth])
 
   // Initialize model on mount
   useEffect(() => {
@@ -201,6 +212,8 @@ const PlaygroundAIAssistant: React.FC<PlaygroundAIAssistantProps> = ({
   const isAuthenticated = userService.isAuthenticated()
 
   // Check if user can use selected model
+  // Free models are available to everyone (authenticated or not)
+  // Paid models require Gold subscription
   const canUseModel = !requiresGold || isGoldUser
 
   return (
