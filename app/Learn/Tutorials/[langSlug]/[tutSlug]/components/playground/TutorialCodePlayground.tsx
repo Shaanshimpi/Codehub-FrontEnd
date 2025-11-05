@@ -54,7 +54,8 @@ const TutorialCodePlayground: React.FC<TutorialCodePlaygroundProps> = ({
         if (typeof parsed.input === "string") setInput(parsed.input)
       }
     } catch (error) {
-      console.error("Error loading persisted code//input:", error)
+      console.error("Error loading persisted code input:", error)
+      console.error("Error loading persisted code input:", error)
     }
   }, [storageKey])
 
