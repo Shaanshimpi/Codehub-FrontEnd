@@ -139,7 +139,19 @@ const PlaygroundAIAssistant: React.FC<PlaygroundAIAssistantProps> = ({
 
         // Provide user-friendly error messages
         if (response.status === 401) {
-          throw new Error("Please log in to use this feature")
+          // Only show login required for premium models
+          const isFreeModel =
+            selectedModel?.id?.includes("deepseek") ||
+            selectedModel?.id?.includes(":free")
+          if (isFreeModel) {
+            throw new Error(
+              "Service temporarily unavailable. Please try again."
+            )
+          } else {
+            throw new Error(
+              "This premium model requires login. Switch to a free model to continue without login."
+            )
+          }
         } else if (response.status === 403) {
           throw new Error(
             "This model requires a Gold subscription. Please upgrade or switch to a free model."
@@ -242,13 +254,13 @@ const PlaygroundAIAssistant: React.FC<PlaygroundAIAssistantProps> = ({
               errors, or guide you through the tutorial.
             </p>
 
-            {/* Show auth warning if needed */}
-            {requiresGold && !isGoldUser && (
+            {/* Show auth warning only for premium models */}
+            {requiresGold && !isGoldUser && selectedModel && (
               <div className="mb-3 max-w-sm rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-800 dark:bg-amber-900/20">
                 <p className="text-xs text-amber-800 dark:text-amber-200">
                   {!isAuthenticated
-                    ? "Log in with a Gold account to use this premium model."
-                    : "This model requires a Gold subscription. Upgrade to use it."}
+                    ? "This premium model requires login. Free models are available without login."
+                    : "This model requires a Gold subscription. Switch to a free model or upgrade."}
                 </p>
               </div>
             )}
@@ -359,11 +371,11 @@ const PlaygroundAIAssistant: React.FC<PlaygroundAIAssistantProps> = ({
           </div>
         )}
 
-        {/* Model selection hint */}
-        {!canUseModel && (
+        {/* Model selection hint - only show for premium models */}
+        {!canUseModel && selectedModel && requiresGold && (
           <div className="mb-2 rounded border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
             {!isAuthenticated
-              ? "Please log in with a Gold account to use this model. Free models are available."
+              ? "This premium model requires login. Switch to a free model to continue without login."
               : "This model requires a Gold subscription. Switch to a free model or upgrade."}
           </div>
         )}

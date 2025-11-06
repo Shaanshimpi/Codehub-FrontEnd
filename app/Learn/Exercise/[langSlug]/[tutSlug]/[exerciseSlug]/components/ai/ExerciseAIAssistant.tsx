@@ -170,7 +170,19 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
 
         // Provide user-friendly error messages
         if (response.status === 401) {
-          throw new Error("Please log in to use this feature")
+          // Only show login required for premium models
+          const isFreeModel =
+            selectedModel?.id?.includes("deepseek") ||
+            selectedModel?.id?.includes(":free")
+          if (isFreeModel) {
+            throw new Error(
+              "Service temporarily unavailable. Please try again."
+            )
+          } else {
+            throw new Error(
+              "This premium model requires login. Switch to a free model to continue without login."
+            )
+          }
         } else if (response.status === 403) {
           throw new Error(
             "This model requires a Gold subscription. Please upgrade or switch to a free model."
@@ -342,13 +354,13 @@ const ExerciseAIAssistant: React.FC<ExerciseAIAssistantProps> = ({
                 : "I can help you understand the solution, explain concepts, clarify the approach, or answer questions about the code."}
             </p>
 
-            {/* Show auth warning if needed */}
-            {requiresGold && !isGoldUser && (
+            {/* Show auth warning only for premium models */}
+            {requiresGold && !isGoldUser && selectedModel && (
               <div className="mb-3 max-w-sm rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-800 dark:bg-amber-900/20">
                 <p className="text-xs text-amber-800 dark:text-amber-200">
                   {!isAuthenticated
-                    ? "Log in with a Gold account to use this premium model."
-                    : "This model requires a Gold subscription. Upgrade to use it."}
+                    ? "This premium model requires login. Free models are available without login."
+                    : "This model requires a Gold subscription. Switch to a free model or upgrade."}
                 </p>
               </div>
             )}
