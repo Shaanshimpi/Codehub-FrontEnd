@@ -21,16 +21,6 @@ const TutorialLanguageView = ({
         tutorialCount={tutorials.length}
       />
       <div className="mx-auto max-w-6xl px-6 py-12">
-        <div className="mb-8">
-          <h2 className="mb-4 text-3xl font-bold text-white dark:text-gray-100">
-            {language.title} Learning Tutorials
-          </h2>
-          <p className="text-lg text-sky-100 dark:text-sky-200">
-            Learn {language.title} with comprehensive tutorials and interactive
-            lessons.
-          </p>
-        </div>
-
         {tutorials.length > 0 ? (
           <TutorialGrid tutorials={tutorials} language={language} />
         ) : (
