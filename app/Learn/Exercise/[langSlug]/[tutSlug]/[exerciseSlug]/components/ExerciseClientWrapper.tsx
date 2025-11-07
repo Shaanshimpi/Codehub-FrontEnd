@@ -18,7 +18,8 @@ import ExerciseHeader from "./ExerciseHeader"
 import ProblemView from "./ExerciseViews/ProblemView"
 import SolutionView from "./ExerciseViews/SolutionView"
 import SolutionConfirmModal from "./Shared/SolutionConfirmModal"
-import ViewSwitcher from "./Shared/ViewSwitcher"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseClientWrapper.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ExerciseClientWrapper.tsx
 
@@ -177,6 +178,9 @@ const ExerciseClientWrapper: React.FC<ExerciseClientWrapperProps> = ({
           language={language}
           tutorial={tutorial}
           params={params}
+          onToggleFullscreen={toggleFullscreen}
+          isFullscreen={isFullscreen}
+          isSwitchDisabled
         />
         <LockedExerciseView
           exercise={exercise}
@@ -198,19 +202,22 @@ const ExerciseClientWrapper: React.FC<ExerciseClientWrapperProps> = ({
             language={language}
             tutorial={tutorial}
             params={params}
-          />
-          <ViewSwitcher
             currentView={currentView}
             onViewChange={handleViewChange}
+            onToggleFullscreen={toggleFullscreen}
+            isFullscreen={isFullscreen}
           />
         </>
       )}
 
-      {/* Fullscreen Toggle Button */}
-      <FullscreenToggle
-        isFullscreen={isFullscreen}
-        onToggle={toggleFullscreen}
-      />
+      {/* Floating toggle only in fullscreen to exit */}
+      {isFullscreen && (
+        <FullscreenToggle
+          isFullscreen={isFullscreen}
+          onToggle={toggleFullscreen}
+          className="top-4"
+        />
+      )}
 
       {/* Main content area */}
       {currentView === "problem" ? (

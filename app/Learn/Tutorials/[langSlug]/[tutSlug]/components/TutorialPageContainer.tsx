@@ -1,8 +1,9 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import type { Language, Tutorial } from "@/app/Learn/types/TutorialTypes"
 import { useTheme } from "@/app/contexts/theme-context"
+import { useRouter } from "next/navigation"
 import { getNavigationUrls, getRecommendedAction } from "../helpers"
 import { useKeyboardNavigation } from "../hooks/useKeyboardNavigation"
 // Import spacing system
@@ -33,6 +34,45 @@ interface TutorialPageContainerProps {
   language: Language
   langSlug: string
   tutSlug: string
+}
+
+const resolveExerciseCount = (
+  tutorialData: Tutorial & { [key: string]: any }
+): number => {
+  if (!tutorialData) {
+    return 0
+  }
+
+  const { exercises } = tutorialData as { exercises?: any }
+
+  if (Array.isArray(exercises)) {
+    return exercises.length
+  }
+
+  if (exercises && typeof exercises === "object") {
+    if (Array.isArray(exercises.docs)) {
+      return exercises.docs.length
+    }
+    if (typeof exercises.totalDocs === "number") {
+      return exercises.totalDocs
+    }
+  }
+
+  const fallbackKeys = [
+    "exerciseCount",
+    "exercisesCount",
+    "exercise_count",
+    "exercises_count",
+  ] as const
+
+  for (const key of fallbackKeys) {
+    const value = (tutorialData as Record<string, unknown>)[key]
+    if (typeof value === "number") {
+      return value
+    }
+  }
+
+  return 0
 }
 
 const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
@@ -108,6 +148,19 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0)
   const currentLesson = tutorial.lessons?.[currentLessonIndex]
   const { theme } = useTheme()
+  const router = useRouter()
+  const exerciseCount = useMemo(
+    () => resolveExerciseCount(tutorial),
+    [tutorial]
+  )
+  const hasExercises = exerciseCount > 0
+
+  const handleGoToExercises = useCallback(() => {
+    if (!hasExercises) {
+      return
+    }
+    router.push(`/Learn/Exercise/${langSlug}/${tutSlug}`)
+  }, [hasExercises, router, langSlug, tutSlug])
 
   // Scroll to top whenever lesson index changes
   React.useEffect(() => {
@@ -600,6 +653,19 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                           )
                         })}
                       </div>
+                      <div className="mt-4">
+                        <Button
+                          type="button"
+                          variant="primary"
+                          size="md"
+                          onClick={handleGoToExercises}
+                          disabled={!hasExercises}
+                          icon={<Icon name="code" size="sm" />}
+                          fullWidth
+                        >
+                          Practice Exercises ({exerciseCount})
+                        </Button>
+                      </div>
                     </div>
                   )}
 
@@ -710,6 +776,19 @@ const TutorialPageContainer: React.FC<TutorialPageContainerProps> = ({
                           />
                         )
                       })}
+                    </div>
+                    <div className="mt-4">
+                      <Button
+                        type="button"
+                        variant="primary"
+                        size="md"
+                        onClick={handleGoToExercises}
+                        disabled={!hasExercises}
+                        icon={<Icon name="code" size="sm" />}
+                        fullWidth
+                      >
+                        Practice Exercises ({exerciseCount})
+                      </Button>
                     </div>
                   </div>
                 )}

@@ -14,6 +14,8 @@ import SimpleToolbar from "./SimpleToolbar"
 
 // New simplified student playground component
 
+// New simplified student playground component
+
 interface PlaygroundState {
   mode: "empty" | "starter" | "working"
   code: string
@@ -43,7 +45,7 @@ const StudentPlayground: React.FC<StudentPlaygroundProps> = ({
   onRunCode,
   onOutputChange,
   onOpenAIHelp,
-  mode = "problem",
+  mode: _mode = "problem",
   isReadOnly = false,
 }) => {
   // Simple, predictable state
@@ -59,7 +61,8 @@ const StudentPlayground: React.FC<StudentPlaygroundProps> = ({
   const [output, setOutput] = useState("")
   const [isRunning, setIsRunning] = useState(false)
   const [isEditorReady, setIsEditorReady] = useState(false)
-  const [fontSize, setFontSize] = useState(14)
+  const [editorFontSize, setEditorFontSize] = useState(14)
+  const [outputFontSize, setOutputFontSize] = useState(12)
   const editorRef = useRef<any>(null)
 
   // Update internal state when external code changes
@@ -133,10 +136,10 @@ const StudentPlayground: React.FC<StudentPlaygroundProps> = ({
 
   // Handle code changes
   const handleCodeChange = (newCode: string) => {
-    const updatedState = {
+    const updatedState: PlaygroundState = {
       ...playgroundState,
       code: newCode,
-      mode: newCode.trim() ? "working" : ("empty" as const),
+      mode: newCode.trim() ? "working" : "empty",
     }
     setPlaygroundState(updatedState)
     if (onCodeChange) onCodeChange(newCode)
@@ -314,8 +317,8 @@ const StudentPlayground: React.FC<StudentPlaygroundProps> = ({
 
   const editorOptions = {
     minimap: { enabled: false },
-    fontSize: fontSize,
-    lineHeight: 20,
+    fontSize: editorFontSize,
+    lineHeight: Math.round(editorFontSize * 1.4),
     fontFamily:
       "'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace",
     wordWrap: "on" as const,
@@ -384,10 +387,21 @@ const StudentPlayground: React.FC<StudentPlaygroundProps> = ({
 // Start typing your ${getMonacoLanguage()} code here...
 
 // Need help getting started?
-// Click "Need Help?" below for starter code and instructions
-
-// Pro tip: Use Ctrl+Enter to run your code quickly!`
+// Click "Need Help?" below for starter code and instructions`
       : ""
+
+  const adjustEditorFontSize = (delta: number) => {
+    setEditorFontSize((size) => Math.min(30, Math.max(10, size + delta)))
+  }
+
+  const adjustOutputFontSize = (delta: number) => {
+    setOutputFontSize((size) => Math.min(24, Math.max(10, size + delta)))
+  }
+
+  const resetZoom = () => {
+    setEditorFontSize(14)
+    setOutputFontSize(12)
+  }
 
   return (
     <div className="relative flex h-full flex-col">
@@ -454,11 +468,16 @@ const StudentPlayground: React.FC<StudentPlaygroundProps> = ({
           canRun={!!playgroundState.code.trim() && isEditorReady}
           isRunning={isRunning}
           isHelpOpen={playgroundState.showHelpMenu}
-          language={language}
           codeLength={playgroundState.code.length}
           showInputSection={playgroundState.showInputSection}
           onToggleInput={handleToggleInput}
           hasInput={!!playgroundState.userInput.trim()}
+          onEditorZoomIn={() => adjustEditorFontSize(1)}
+          onEditorZoomOut={() => adjustEditorFontSize(-1)}
+          onOutputZoomIn={() => adjustOutputFontSize(1)}
+          onOutputZoomOut={() => adjustOutputFontSize(-1)}
+          onResetZoom={resetZoom}
+          isEditorReady={isEditorReady}
         />
 
         {/* Help Menu */}
@@ -528,6 +547,10 @@ const StudentPlayground: React.FC<StudentPlaygroundProps> = ({
               <pre
                 className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-green-400 dark:text-green-600"
                 aria-label="Code execution results"
+                style={{
+                  fontSize: `${outputFontSize}px`,
+                  lineHeight: `${Math.round(outputFontSize * 1.4)}px`,
+                }}
               >
                 {output}
               </pre>

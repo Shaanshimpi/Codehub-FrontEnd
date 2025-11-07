@@ -15,6 +15,8 @@ import { ExplanationModal } from "./SolutionModals"
 
 // Solution code playground component exactly like StudentPlayground
 
+// Solution code playground component exactly like StudentPlayground
+
 interface SolutionPlaygroundState {
   mode: "with-explanation" | "clean-solution"
   showHelpMenu: boolean
@@ -50,6 +52,8 @@ const SolutionCodePlayground: React.FC<SolutionCodePlaygroundProps> = ({
   const [output, setOutput] = useState("")
   const [isRunning, setIsRunning] = useState(false)
   const [currentCode, setCurrentCode] = useState("")
+  const [editorFontSize, setEditorFontSize] = useState(14)
+  const [outputFontSize, setOutputFontSize] = useState(12)
   const editorRef = useRef<any>(null)
 
   // Get solution codes
@@ -105,6 +109,19 @@ const SolutionCodePlayground: React.FC<SolutionCodePlaygroundProps> = ({
     })
   }
 
+  const adjustEditorFontSize = (delta: number) => {
+    setEditorFontSize((size) => Math.min(30, Math.max(10, size + delta)))
+  }
+
+  const adjustOutputFontSize = (delta: number) => {
+    setOutputFontSize((size) => Math.min(24, Math.max(10, size + delta)))
+  }
+
+  const resetZoom = () => {
+    setEditorFontSize(14)
+    setOutputFontSize(12)
+  }
+
   // Handle run code
   const handleRunCode = async () => {
     if (!currentCode.trim() || isRunning) return
@@ -155,8 +172,8 @@ const SolutionCodePlayground: React.FC<SolutionCodePlaygroundProps> = ({
   // Editor options (same as StudentPlayground)
   const editorOptions = {
     minimap: { enabled: false },
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: editorFontSize,
+    lineHeight: Math.round(editorFontSize * 1.4),
     fontFamily:
       "'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace",
     wordWrap: "on" as const,
@@ -363,13 +380,18 @@ const SolutionCodePlayground: React.FC<SolutionCodePlaygroundProps> = ({
           canRun={!!currentCode.trim() && isEditorReady}
           isRunning={isRunning}
           isHelpOpen={playgroundState.showHelpMenu}
-          language={language}
           codeLength={currentCode.length}
           showInputSection={playgroundState.showInputSection}
           onToggleInput={handleToggleInput}
           hasInput={playgroundState.programInput.length > 0}
           showRunButton={true} // Show run button in solution view
           showInputButton={true} // Show input button in solution view
+          onEditorZoomIn={() => adjustEditorFontSize(1)}
+          onEditorZoomOut={() => adjustEditorFontSize(-1)}
+          onOutputZoomIn={() => adjustOutputFontSize(1)}
+          onOutputZoomOut={() => adjustOutputFontSize(-1)}
+          onResetZoom={resetZoom}
+          isEditorReady={isEditorReady}
         />
 
         {/* Solution Help Menu - positioned like StudentPlayground help menu */}
@@ -438,6 +460,10 @@ const SolutionCodePlayground: React.FC<SolutionCodePlaygroundProps> = ({
               <pre
                 className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-green-400 dark:text-green-600"
                 aria-label="Code execution results"
+                style={{
+                  fontSize: `${outputFontSize}px`,
+                  lineHeight: `${Math.round(outputFontSize * 1.4)}px`,
+                }}
               >
                 {output}
               </pre>

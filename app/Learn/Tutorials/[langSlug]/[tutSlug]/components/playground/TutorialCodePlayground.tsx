@@ -4,7 +4,14 @@ import React, { useEffect, useMemo, useRef, useState } from "react"
 import type { Language, Tutorial } from "@/app/Learn/types/TutorialTypes"
 import { executeCode, supportsInput } from "@/app/utils/codeExecution"
 import { Editor } from "@monaco-editor/react"
-import { HelpCircle, Play, Terminal } from "lucide-react"
+import {
+  HelpCircle,
+  Minus,
+  Play,
+  Plus,
+  RefreshCcw,
+  Terminal,
+} from "lucide-react"
 import PlaygroundAIAssistant from "../ai/PlaygroundAIAssistant"
 import { Icon } from "../ui"
 
@@ -37,6 +44,14 @@ const TutorialCodePlayground: React.FC<TutorialCodePlaygroundProps> = ({
   const [showAI, setShowAI] = useState(false)
   const [showInputSection, setShowInputSection] = useState(false)
   const editorRef = useRef<any>(null)
+  const [outputHeight, setOutputHeight] = useState(160)
+  const resizeStateRef = useRef({
+    isResizing: false,
+    startY: 0,
+    startHeight: 160,
+  })
+  const [editorFontSize, setEditorFontSize] = useState(14)
+  const [outputFontSize, setOutputFontSize] = useState(11)
 
   // Build a stable storage key per tutorial/language
   const storageKey = useMemo(
@@ -71,6 +86,78 @@ const TutorialCodePlayground: React.FC<TutorialCodePlaygroundProps> = ({
     return () => clearTimeout(id)
   }, [storageKey, code, input])
 
+  const clamp = (value: number, min: number, max: number) =>
+    Math.min(max, Math.max(min, value))
+
+  const adjustEditorFontSize = (delta: number) => {
+    setEditorFontSize((size) => clamp(size + delta, 10, 30))
+  }
+
+  const adjustOutputFontSize = (delta: number) => {
+    setOutputFontSize((size) => clamp(size + delta, 9, 24))
+  }
+
+  const resetZoom = () => {
+    setEditorFontSize(14)
+    setOutputFontSize(11)
+  }
+
+  const zoomDisabled = showAI
+
+  const stopResizing = () => {
+    if (!resizeStateRef.current.isResizing) return
+    resizeStateRef.current.isResizing = false
+    document.removeEventListener("mousemove", handleMouseMove)
+    document.removeEventListener("mouseup", handleMouseUp)
+    document.removeEventListener("touchmove", handleTouchMove)
+    document.removeEventListener("touchend", handleTouchEnd)
+    document.body.style.cursor = ""
+  }
+
+  const handleMouseMove = (event: MouseEvent) => {
+    if (!resizeStateRef.current.isResizing) return
+    const delta = resizeStateRef.current.startY - event.clientY
+    setOutputHeight(clamp(resizeStateRef.current.startHeight + delta, 96, 400))
+  }
+
+  const handleTouchMove = (event: TouchEvent) => {
+    if (!resizeStateRef.current.isResizing || event.touches.length === 0) return
+    const delta = resizeStateRef.current.startY - event.touches[0].clientY
+    setOutputHeight(clamp(resizeStateRef.current.startHeight + delta, 96, 400))
+  }
+
+  const handleMouseUp = () => stopResizing()
+  const handleTouchEnd = () => stopResizing()
+
+  const handleResizeStart = (clientY: number) => {
+    resizeStateRef.current = {
+      isResizing: true,
+      startY: clientY,
+      startHeight: outputHeight,
+    }
+    document.addEventListener("mousemove", handleMouseMove)
+    document.addEventListener("mouseup", handleMouseUp)
+    document.addEventListener("touchmove", handleTouchMove)
+    document.addEventListener("touchend", handleTouchEnd)
+    document.body.style.cursor = "row-resize"
+  }
+
+  const onResizeMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    handleResizeStart(event.clientY)
+  }
+
+  const onResizeTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (event.touches.length === 0) return
+    handleResizeStart(event.touches[0].clientY)
+  }
+
+  useEffect(() => {
+    return () => {
+      stopResizing()
+    }
+  }, [])
+
   // Get Monaco language identifier from language slug
   const getMonacoLanguage = (): string => {
     const langMap: Record<string, string> = {
@@ -91,58 +178,60 @@ const TutorialCodePlayground: React.FC<TutorialCodePlaygroundProps> = ({
   }
 
   // Monaco Editor configuration
-  const editorOptions = {
-    minimap: { enabled: false },
-    fontSize: 14,
-    lineHeight: 20,
-    fontFamily:
-      "'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace",
-    wordWrap: "on" as const,
-    automaticLayout: true,
-    scrollBeyondLastLine: false,
-    renderLineHighlight: "gutter" as const,
-    selectOnLineNumbers: true,
-    lineNumbers: "on" as const,
-    glyphMargin: false,
-    folding: true,
-    lineDecorationsWidth: 0,
-    lineNumbersMinChars: 3,
-    renderWhitespace: "selection" as const,
-    tabSize: 2,
-    insertSpaces: true,
-    detectIndentation: false,
-    bracketPairColorization: { enabled: true },
-    guides: {
-      bracketPairs: true,
-      indentation: true,
-    },
-    suggestOnTriggerCharacters: true,
-    acceptSuggestionOnEnter: "on" as const,
-    quickSuggestions: {
-      other: true,
-      comments: true,
-      strings: true,
-    },
-    parameterHints: { enabled: true },
-    hover: { enabled: true },
-    contextmenu: true,
-    mouseWheelZoom: true,
-    cursorBlinking: "blink" as const,
-    cursorSmoothCaretAnimation: "on" as const,
-    smoothScrolling: true,
-    scrollbar: {
-      vertical: "visible" as const,
-      horizontal: "visible" as const,
-      useShadows: false,
-      verticalHasArrows: false,
-      horizontalHasArrows: false,
-      verticalScrollbarSize: 10,
-      horizontalScrollbarSize: 10,
-    },
-  }
+  const editorOptions = useMemo(
+    () => ({
+      minimap: { enabled: false },
+      fontSize: editorFontSize,
+      lineHeight: Math.round(editorFontSize * 1.4),
+      fontFamily:
+        "'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace",
+      wordWrap: "on" as const,
+      automaticLayout: true,
+      scrollBeyondLastLine: false,
+      renderLineHighlight: "gutter" as const,
+      selectOnLineNumbers: true,
+      lineNumbers: "on" as const,
+      glyphMargin: false,
+      folding: true,
+      lineDecorationsWidth: 0,
+      lineNumbersMinChars: 3,
+      renderWhitespace: "selection" as const,
+      tabSize: 2,
+      insertSpaces: true,
+      detectIndentation: false,
+      bracketPairColorization: { enabled: true },
+      guides: {
+        bracketPairs: true,
+        indentation: true,
+      },
+      suggestOnTriggerCharacters: true,
+      acceptSuggestionOnEnter: "on" as const,
+      quickSuggestions: {
+        other: true,
+        comments: true,
+        strings: true,
+      },
+      parameterHints: { enabled: true },
+      hover: { enabled: true },
+      contextmenu: true,
+      mouseWheelZoom: !zoomDisabled,
+      cursorBlinking: "blink" as const,
+      cursorSmoothCaretAnimation: "on" as const,
+      smoothScrolling: true,
+      scrollbar: {
+        vertical: "visible" as const,
+        horizontal: "visible" as const,
+        useShadows: false,
+        verticalHasArrows: false,
+        horizontalHasArrows: false,
+        verticalScrollbarSize: 10,
+        horizontalScrollbarSize: 10,
+      },
+    }),
+    [editorFontSize, zoomDisabled]
+  )
 
   const placeholder = `// Write your ${getMonacoLanguage()} code here...
-// Use Ctrl+Enter to run your code quickly!
 
 `
 
@@ -314,14 +403,14 @@ const TutorialCodePlayground: React.FC<TutorialCodePlaygroundProps> = ({
                     isRunning
                       ? "Running code..."
                       : isEditorReady && code.trim()
-                        ? "Run your code (Ctrl+Enter)"
+                        ? "Run your code"
                         : "Write some code first"
                   }
                   aria-label={
                     isRunning
                       ? "Code is running"
                       : isEditorReady && code.trim()
-                        ? "Run your code. Keyboard shortcut: Control plus Enter"
+                        ? "Run your code"
                         : "Write some code first before running"
                   }
                   aria-describedby="run-button-status"
@@ -398,12 +487,58 @@ const TutorialCodePlayground: React.FC<TutorialCodePlaygroundProps> = ({
               </div>
 
               {/* Right: Code Info */}
-              <div className="flex items-center gap-4 text-xs font-medium text-gray-600 dark:text-gray-400">
-                <div className="hidden items-center gap-3 sm:flex">
-                  <span className="hidden font-semibold text-blue-600 dark:text-blue-400 md:inline">
-                    Ctrl+Enter to run
-                  </span>
-                </div>
+              <div className="flex flex-wrap items-center justify-end gap-3 text-xs font-medium text-gray-600 dark:text-gray-400">
+                {!showAI && (
+                  <div className="flex items-center gap-1 rounded border border-gray-300 p-1 text-gray-600 dark:border-gray-600 dark:text-gray-300">
+                    <button
+                      onClick={() => adjustEditorFontSize(-1)}
+                      className="rounded p-1 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+                      title="Zoom out editor"
+                      aria-label="Zoom out editor"
+                      disabled={!isEditorReady || zoomDisabled}
+                    >
+                      <Minus className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => adjustEditorFontSize(1)}
+                      className="rounded p-1 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+                      title="Zoom in editor"
+                      aria-label="Zoom in editor"
+                      disabled={!isEditorReady || zoomDisabled}
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                    </button>
+                    <span className="mx-1 h-4 w-px bg-gray-200 dark:bg-gray-600" />
+                    <button
+                      onClick={() => adjustOutputFontSize(-1)}
+                      className="rounded p-1 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+                      title="Zoom out output"
+                      aria-label="Zoom out output"
+                      disabled={zoomDisabled}
+                    >
+                      <Minus className="h-3 w-3" />
+                    </button>
+                    <button
+                      onClick={() => adjustOutputFontSize(1)}
+                      className="rounded p-1 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+                      title="Zoom in output"
+                      aria-label="Zoom in output"
+                      disabled={zoomDisabled}
+                    >
+                      <Plus className="h-3 w-3" />
+                    </button>
+                    <span className="mx-1 h-4 w-px bg-gray-200 dark:bg-gray-600" />
+                    <button
+                      onClick={resetZoom}
+                      className="rounded p-1 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+                      title="Reset editor and output zoom"
+                      aria-label="Reset zoom"
+                      disabled={zoomDisabled}
+                    >
+                      <RefreshCcw className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -423,14 +558,31 @@ const TutorialCodePlayground: React.FC<TutorialCodePlaygroundProps> = ({
                 </button>
               )}
             </div>
-            <div className="max-h-32 overflow-y-auto p-2">
+            <div
+              className="flex cursor-row-resize justify-center border-t border-transparent px-2"
+              onMouseDown={onResizeMouseDown}
+              onTouchStart={onResizeTouchStart}
+              role="presentation"
+            >
+              <div className="my-1 h-1 w-10 rounded-full bg-slate-300 dark:bg-slate-600" />
+            </div>
+            <div
+              className="overflow-y-auto px-2 pb-2"
+              style={{ height: `${outputHeight}px` }}
+            >
               {isRunning ? (
                 <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
                   <div className="h-2.5 w-2.5 animate-spin rounded-full border border-blue-600 border-t-transparent" />
                   <span className="text-[10px]">Executing...</span>
                 </div>
               ) : output ? (
-                <pre className="whitespace-pre-wrap font-mono text-[10px] leading-relaxed text-slate-800 dark:text-slate-200">
+                <pre
+                  className="whitespace-pre-wrap font-mono text-slate-800 dark:text-slate-200"
+                  style={{
+                    fontSize: `${outputFontSize}px`,
+                    lineHeight: `${Math.round(outputFontSize * 1.4)}px`,
+                  }}
+                >
                   {output}
                 </pre>
               ) : (

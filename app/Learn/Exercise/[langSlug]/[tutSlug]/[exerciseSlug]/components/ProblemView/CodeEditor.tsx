@@ -1,10 +1,21 @@
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ProblemView/CodeEditor.tsx
 "use client"
 
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { executeCode, supportsInput } from "@/app/utils/codeExecution"
 import { Editor } from "@monaco-editor/react"
-import { Code2, Copy, Play, RotateCcw, Settings } from "lucide-react"
+import {
+  Code2,
+  Copy,
+  Minus,
+  Play,
+  Plus,
+  RefreshCcw,
+  RotateCcw,
+  Settings,
+} from "lucide-react"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ProblemView/CodeEditor.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/ProblemView/CodeEditor.tsx
 
@@ -22,7 +33,7 @@ interface CodeEditorProps {
 }
 
 const CodeEditor: React.FC<CodeEditorProps> = ({
-  exercise,
+  exercise: _exercise,
   language,
   userCode,
   onCodeChange,
@@ -36,6 +47,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   const [input, setInput] = useState("")
   const [isEditorReady, setIsEditorReady] = useState(false)
   const editorRef = useRef<any>(null)
+  const [editorFontSize, setEditorFontSize] = useState(14)
+  const [outputFontSize, setOutputFontSize] = useState(12)
 
   // Local state to track if boilerplate was loaded in this session
   const [localBoilerplateLoaded, setLocalBoilerplateLoaded] =
@@ -122,6 +135,22 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     }
   }
 
+  const clamp = (value: number, min: number, max: number) =>
+    Math.min(max, Math.max(min, value))
+
+  const adjustEditorFontSize = (delta: number) => {
+    setEditorFontSize((size) => clamp(size + delta, 10, 30))
+  }
+
+  const adjustOutputFontSize = (delta: number) => {
+    setOutputFontSize((size) => clamp(size + delta, 10, 24))
+  }
+
+  const resetZoom = () => {
+    setEditorFontSize(14)
+    setOutputFontSize(12)
+  }
+
   const getMonacoLanguage = () => {
     switch (language.slug) {
       case "c-programming":
@@ -151,27 +180,6 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     }
   }
 
-  const getLanguageFileExtension = () => {
-    switch (language.slug) {
-      case "c-programming":
-      case "c":
-        return ".c"
-      case "cpp":
-      case "c++":
-        return ".cpp"
-      case "java":
-        return ".java"
-      case "python":
-        return ".py"
-      case "javascript":
-        return ".js"
-      case "typescript":
-        return ".ts"
-      default:
-        return ".txt"
-    }
-  }
-
   const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor
     setIsEditorReady(true)
@@ -191,60 +199,61 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     editor.focus()
   }
 
-  const editorOptions = {
-    minimap: { enabled: false },
-    fontSize: 14,
-    lineHeight: 20,
-    fontFamily:
-      "'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace",
-    wordWrap: "on",
-    automaticLayout: true,
-    scrollBeyondLastLine: false,
-    renderLineHighlight: "gutter",
-    selectOnLineNumbers: true,
-    lineNumbers: "on",
-    glyphMargin: false,
-    folding: true,
-    lineDecorationsWidth: 0,
-    lineNumbersMinChars: 3,
-    renderWhitespace: "selection",
-    tabSize: 2,
-    insertSpaces: true,
-    detectIndentation: false,
-    bracketPairColorization: { enabled: true },
-    guides: {
-      bracketPairs: true,
-      indentation: true,
-    },
-    suggestOnTriggerCharacters: true,
-    acceptSuggestionOnEnter: "on",
-    quickSuggestions: {
-      other: true,
-      comments: true,
-      strings: true,
-    },
-    parameterHints: { enabled: true },
-    hover: { enabled: true },
-    contextmenu: true,
-    mouseWheelZoom: true,
-    cursorBlinking: "blink",
-    cursorSmoothCaretAnimation: "on",
-    smoothScrolling: true,
-    scrollbar: {
-      vertical: "visible",
-      horizontal: "visible",
-      useShadows: false,
-      verticalHasArrows: false,
-      horizontalHasArrows: false,
-      verticalScrollbarSize: 10,
-      horizontalScrollbarSize: 10,
-    },
-  }
+  const editorOptions = useMemo(
+    () => ({
+      minimap: { enabled: false },
+      fontSize: editorFontSize,
+      lineHeight: Math.round(editorFontSize * 1.4),
+      fontFamily:
+        "'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace",
+      wordWrap: "on" as const,
+      automaticLayout: true,
+      scrollBeyondLastLine: false,
+      renderLineHighlight: "gutter" as const,
+      selectOnLineNumbers: true,
+      lineNumbers: "on" as const,
+      glyphMargin: false,
+      folding: true,
+      lineDecorationsWidth: 0,
+      lineNumbersMinChars: 3,
+      renderWhitespace: "selection" as const,
+      tabSize: 2,
+      insertSpaces: true,
+      detectIndentation: false,
+      bracketPairColorization: { enabled: true },
+      guides: {
+        bracketPairs: true,
+        indentation: true,
+      },
+      suggestOnTriggerCharacters: true,
+      acceptSuggestionOnEnter: "on" as const,
+      quickSuggestions: {
+        other: true,
+        comments: true,
+        strings: true,
+      },
+      parameterHints: { enabled: true },
+      hover: { enabled: true },
+      contextmenu: true,
+      mouseWheelZoom: true,
+      cursorBlinking: "blink" as const,
+      cursorSmoothCaretAnimation: "on" as const,
+      smoothScrolling: true,
+      scrollbar: {
+        vertical: "visible" as const,
+        horizontal: "visible" as const,
+        useShadows: false,
+        verticalHasArrows: false,
+        horizontalHasArrows: false,
+        verticalScrollbarSize: 10,
+        horizontalScrollbarSize: 10,
+      },
+    }),
+    [editorFontSize]
+  )
 
   const placeholder = `// Click "Load Boilerplate" to get started
-// Or write your ${getMonacoLanguage()} code from scratch...
-
-// Pro tip: Use Ctrl+Enter to run your code quickly!`
+// Or write your ${getMonacoLanguage()} code from scratch...`
 
   // Determine if we should show the Load button
   const shouldShowLoadButton = !localBoilerplateLoaded && !userCode.trim()
@@ -296,7 +305,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         )}
 
         {/* Action Row */}
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Primary Actions */}
           {shouldShowLoadButton && (
             <button
@@ -312,7 +321,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             onClick={handleRunCode}
             disabled={!userCode.trim() || isRunning || !isEditorReady}
             className="flex flex-1 items-center justify-center gap-1 rounded bg-green-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
-            title="Ctrl+Enter to run"
+            title="Run code"
           >
             <Play className="h-3.5 w-3.5" />
             {isRunning ? "Running..." : "Run Code"}
@@ -347,19 +356,61 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
           >
             <Settings className="h-3.5 w-3.5" />
           </button>
+
+          <div className="ml-auto flex items-center">
+            <div className="flex items-center gap-1 rounded border border-slate-300 p-1 text-slate-600 dark:border-slate-600 dark:text-slate-300">
+              <button
+                onClick={() => adjustEditorFontSize(-1)}
+                className="rounded p-1 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-slate-700"
+                title="Zoom out editor"
+                aria-label="Zoom out editor"
+                disabled={!isEditorReady}
+              >
+                <Minus className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => adjustEditorFontSize(1)}
+                className="rounded p-1 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-slate-700"
+                title="Zoom in editor"
+                aria-label="Zoom in editor"
+                disabled={!isEditorReady}
+              >
+                <Plus className="h-3.5 w-3.5" />
+              </button>
+              <span className="mx-1 h-4 w-px bg-slate-200 dark:bg-slate-600" />
+              <button
+                onClick={() => adjustOutputFontSize(-1)}
+                className="rounded p-1 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-slate-700"
+                title="Zoom out output"
+                aria-label="Zoom out output"
+              >
+                <Minus className="h-3 w-3" />
+              </button>
+              <button
+                onClick={() => adjustOutputFontSize(1)}
+                className="rounded p-1 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-slate-700"
+                title="Zoom in output"
+                aria-label="Zoom in output"
+              >
+                <Plus className="h-3 w-3" />
+              </button>
+              <span className="mx-1 h-4 w-px bg-slate-200 dark:bg-slate-600" />
+              <button
+                onClick={resetZoom}
+                className="rounded p-1 transition-colors hover:bg-slate-200 dark:hover:bg-slate-700"
+                title="Reset editor and output zoom"
+                aria-label="Reset zoom"
+              >
+                <RefreshCcw className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Editor Status */}
         {isEditorReady && (
-          <div className="mt-2 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-            <div className="flex items-center gap-3">
-              <span>Language: {getMonacoLanguage()}</span>
-              <span>Lines: {userCode.split("\n").length}</span>
-              <span>Characters: {userCode.length}</span>
-            </div>
-            <div className="text-xs opacity-70">
-              Ctrl+Enter to run • Ctrl+S to save
-            </div>
+          <div className="mt-2 text-right text-xs text-slate-400 dark:text-slate-500">
+            Ctrl+S to save
           </div>
         )}
       </div>
@@ -387,7 +438,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                 <span className="text-xs">Executing code...</span>
               </div>
             ) : (
-              <pre className="whitespace-pre-wrap font-mono text-xs text-slate-800 dark:text-slate-200">
+              <pre
+                className="whitespace-pre-wrap font-mono text-slate-800 dark:text-slate-200"
+                style={{
+                  fontSize: `${outputFontSize}px`,
+                  lineHeight: `${Math.round(outputFontSize * 1.4)}px`,
+                }}
+              >
                 {output}
               </pre>
             )}

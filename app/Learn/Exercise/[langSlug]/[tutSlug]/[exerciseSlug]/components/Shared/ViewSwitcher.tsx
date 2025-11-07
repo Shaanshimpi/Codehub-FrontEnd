@@ -7,6 +7,8 @@ import { BookOpen, Code } from "lucide-react"
 
 // Enhanced ViewSwitcher using unified design system
 
+// Enhanced ViewSwitcher using unified design system
+
 interface ViewSwitcherProps {
   currentView: "problem" | "solution"
   onViewChange: (view: "problem" | "solution") => void
@@ -93,37 +95,44 @@ const ViewSwitcher: React.FC<ViewSwitcherProps> = memo(
       <div
         role="toolbar"
         aria-label="View switcher"
-        className={`border-b border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900 ${className}`}
+        className={`bg-transparent ${className}`}
         onKeyDown={handleKeyDown}
         tabIndex={0}
       >
-        <div className="relative flex max-w-full">
+        <div className="relative flex items-center justify-center py-3">
           {/* Loading overlay */}
           {(isLoading || transitioning) && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-75 dark:bg-neutral-900 dark:bg-opacity-75">
+            <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg border border-neutral-200 bg-white/90 backdrop-blur dark:border-neutral-700 dark:bg-neutral-900/80">
               <LoadingSpinner size="sm" />
             </div>
           )}
 
-          {/* Tab buttons */}
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => handleViewChange(tab.id)}
-              disabled={tab.disabled}
-              data-view={tab.id}
-              className={`focus:ring-primary-500 flex flex-1 items-center justify-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                currentView === tab.id
-                  ? "border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400"
-                  : "border-transparent text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
-              } ${tab.disabled ? "cursor-not-allowed opacity-50" : ""} `}
-              aria-pressed={currentView === tab.id}
-              aria-label={`Switch to ${tab.label} view (${tab.id === "problem" ? "Ctrl+1" : "Ctrl+2"})`}
-            >
-              {tab.icon}
-              <span>{tab.label}</span>
-            </button>
-          ))}
+          <div className="inline-flex w-full max-w-md items-center justify-center gap-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50 p-1 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+            {tabs.map((tab, index) => (
+              <button
+                key={tab.id}
+                onClick={() => handleViewChange(tab.id)}
+                disabled={tab.disabled}
+                data-view={tab.id}
+                className={`focus-visible:ring-primary-500 inline-flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-neutral-900 ${
+                  index === 0
+                    ? "md:rounded-l-md"
+                    : index === tabs.length - 1
+                      ? "md:rounded-r-md"
+                      : ""
+                } ${
+                  currentView === tab.id
+                    ? "bg-primary-600 dark:bg-primary-500 text-white shadow-sm dark:text-neutral-900"
+                    : "bg-transparent text-neutral-600 hover:bg-white hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-white"
+                } ${tab.disabled ? "cursor-not-allowed opacity-50" : ""}`}
+                aria-pressed={currentView === tab.id}
+                aria-label={`Switch to ${tab.label} view (${tab.id === "problem" ? "Ctrl+1" : "Ctrl+2"})`}
+              >
+                {tab.icon}
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Keyboard navigation hint */}

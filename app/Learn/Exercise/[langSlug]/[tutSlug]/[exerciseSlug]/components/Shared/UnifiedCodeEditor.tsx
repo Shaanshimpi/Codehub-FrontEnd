@@ -7,13 +7,16 @@ import { Editor } from "@monaco-editor/react"
 import {
   Code2,
   Copy,
+  Minus,
   Play,
+  Plus,
+  RefreshCcw,
   RotateCcw,
   Settings,
   Terminal,
-  ZoomIn,
-  ZoomOut,
 } from "lucide-react"
+
+// app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/Shared/UnifiedCodeEditor.tsx
 
 // app/Learn/Exercise/[langSlug]/[tutSlug]/[exerciseSlug]/components/Shared/UnifiedCodeEditor.tsx
 
@@ -50,7 +53,8 @@ const UnifiedCodeEditor: React.FC<UnifiedCodeEditorProps> = ({
   const [isRunning, setIsRunning] = useState(false)
   const [input, setInput] = useState("")
   const [isEditorReady, setIsEditorReady] = useState(false)
-  const [fontSize, setFontSize] = useState(14)
+  const [editorFontSize, setEditorFontSize] = useState(14)
+  const [outputFontSize, setOutputFontSize] = useState(12)
   const [showLineNumbers, setShowLineNumbers] = useState(true)
   const [copied, setCopied] = useState(false)
   const [showAdvancedControls, setShowAdvancedControls] = useState(false)
@@ -369,16 +373,17 @@ main();`
     }
   }
 
-  const increaseFontSize = () => {
-    setFontSize(Math.min(fontSize + 2, 20))
+  const adjustEditorFontSize = (delta: number) => {
+    setEditorFontSize((size) => Math.min(30, Math.max(10, size + delta)))
   }
 
-  const decreaseFontSize = () => {
-    setFontSize(Math.max(fontSize - 2, 10))
+  const adjustOutputFontSize = (delta: number) => {
+    setOutputFontSize((size) => Math.min(24, Math.max(10, size + delta)))
   }
 
-  const resetFontSize = () => {
-    setFontSize(14)
+  const resetZoom = () => {
+    setEditorFontSize(14)
+    setOutputFontSize(12)
   }
 
   // Clean code functionality - removes comments based on language
@@ -456,8 +461,8 @@ main();`
 
   const editorOptions = {
     minimap: { enabled: false },
-    fontSize: fontSize,
-    lineHeight: 20,
+    fontSize: editorFontSize,
+    lineHeight: Math.round(editorFontSize * 1.4),
     fontFamily:
       "'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace",
     wordWrap: "on",
@@ -506,9 +511,7 @@ main();`
   }
 
   const placeholder = `// Click "Load Boilerplate" to get started
-// Or write your ${getMonacoLanguage()} code from scratch...
-
-// Pro tip: Use Ctrl+Enter to run your code quickly!`
+// Or write your ${getMonacoLanguage()} code from scratch...`
 
   // Determine if we should show the Load button (problem mode only)
   const shouldShowLoadButton = mode === "problem"
@@ -606,7 +609,14 @@ main();`
                   ? "cursor-not-allowed bg-gray-400 opacity-50"
                   : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:scale-110 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl hover:shadow-blue-500/25 active:scale-95"
               } ${isRunning ? "animate-pulse" : ""}`}
-              title="Ctrl+Enter to run"
+              title="Run code"
+              aria-label={
+                isRunning
+                  ? "Code is running"
+                  : !code.trim() || !isEditorReady
+                    ? "Write some code first"
+                    : "Run code"
+              }
             >
               <Play
                 className={`h-3 w-3 transition-transform duration-300 ${!isRunning ? "group-hover:scale-110" : "animate-spin"}`}
@@ -620,26 +630,55 @@ main();`
             </button>
           </div>
 
-          {/* Center: Quick Info - Responsive */}
-          {isEditorReady && (
-            <div className="hidden items-center gap-2 text-xs font-medium text-blue-900 transition-opacity duration-300 dark:text-blue-100 md:flex">
-              <span className="relative">
-                {getMonacoLanguage()}
-                <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 bg-blue-500 transition-all duration-300 group-hover:w-full" />
-              </span>
-              <span className="opacity-50">•</span>
-              <span className="tabular-nums">
-                {code.split("\n").length} lines
-              </span>
-              <span className="hidden opacity-50 lg:inline">•</span>
-              <span className="hidden tabular-nums lg:inline">
-                {code.length} chars
-              </span>
-            </div>
-          )}
-
           {/* Right: Secondary Actions + Advanced Toggle */}
           <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 rounded border border-gray-300 p-1 text-slate-600 dark:border-gray-600 dark:text-slate-300">
+              <button
+                onClick={() => adjustEditorFontSize(-1)}
+                className="rounded p-1 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+                title="Zoom out editor"
+                aria-label="Zoom out editor"
+                disabled={!isEditorReady}
+              >
+                <Minus className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => adjustEditorFontSize(1)}
+                className="rounded p-1 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+                title="Zoom in editor"
+                aria-label="Zoom in editor"
+                disabled={!isEditorReady}
+              >
+                <Plus className="h-3.5 w-3.5" />
+              </button>
+              <span className="mx-1 h-4 w-px bg-gray-200 dark:bg-gray-600" />
+              <button
+                onClick={() => adjustOutputFontSize(-1)}
+                className="rounded p-1 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+                title="Zoom out output"
+                aria-label="Zoom out output"
+              >
+                <Minus className="h-3 w-3" />
+              </button>
+              <button
+                onClick={() => adjustOutputFontSize(1)}
+                className="rounded p-1 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+                title="Zoom in output"
+                aria-label="Zoom in output"
+              >
+                <Plus className="h-3 w-3" />
+              </button>
+              <span className="mx-1 h-4 w-px bg-gray-200 dark:bg-gray-600" />
+              <button
+                onClick={resetZoom}
+                className="rounded p-1 transition-colors hover:bg-gray-200 dark:hover:bg-gray-700"
+                title="Reset zoom"
+                aria-label="Reset zoom"
+              >
+                <RefreshCcw className="h-3.5 w-3.5" />
+              </button>
+            </div>
+
             <button
               onClick={handleCopyCode}
               disabled={!code || !isEditorReady}
@@ -681,37 +720,68 @@ main();`
         >
           <div className="mt-2 space-y-3 border-t border-gray-200 pt-3 dark:border-gray-700">
             {/* Font Size Controls */}
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-black dark:text-white">
-                Font Size:
-              </span>
-              <div className="flex items-center gap-1 rounded-lg bg-gray-50 p-1 dark:bg-gray-800">
-                <button
-                  onClick={decreaseFontSize}
-                  disabled={fontSize <= 10}
-                  className="group rounded p-1 text-black transition-all duration-300 hover:scale-110 hover:bg-blue-100 hover:text-blue-900 disabled:cursor-not-allowed disabled:opacity-50 dark:text-white dark:hover:bg-blue-800 dark:hover:text-blue-100"
-                >
-                  <ZoomOut className="h-3 w-3 transition-transform duration-300 group-hover:scale-110" />
-                </button>
-                <span className="w-8 rounded bg-blue-100 px-1 py-0.5 text-center text-xs font-bold tabular-nums text-black dark:bg-blue-800 dark:text-white">
-                  {fontSize}
+            <div className="grid gap-2 sm:grid-cols-2">
+              <div className="flex items-center justify-between rounded-lg bg-gray-50 p-2 dark:bg-gray-800">
+                <span className="text-xs font-semibold text-black dark:text-white">
+                  Editor font
                 </span>
-                <button
-                  onClick={increaseFontSize}
-                  disabled={fontSize >= 20}
-                  className="group rounded p-1 text-black transition-all duration-300 hover:scale-110 hover:bg-blue-100 hover:text-blue-900 disabled:cursor-not-allowed disabled:opacity-50 dark:text-white dark:hover:bg-blue-800 dark:hover:text-blue-100"
-                >
-                  <ZoomIn className="h-3 w-3 transition-transform duration-300 group-hover:scale-110" />
-                </button>
-                <div className="mx-1 h-4 w-px bg-gray-300 dark:bg-gray-600" />
-                <button
-                  onClick={resetFontSize}
-                  className="group rounded p-1 text-black transition-all duration-300 hover:scale-110 hover:bg-blue-100 hover:text-blue-900 dark:text-white dark:hover:bg-blue-800 dark:hover:text-blue-100"
-                  title="Reset font size"
-                >
-                  <RotateCcw className="h-3 w-3 transition-transform duration-300 group-hover:rotate-180 group-hover:scale-110" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => adjustEditorFontSize(-1)}
+                    className="rounded p-1 text-black transition-colors hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-white dark:hover:bg-blue-800"
+                    disabled={editorFontSize <= 10}
+                    aria-label="Decrease editor font"
+                  >
+                    <Minus className="h-3.5 w-3.5" />
+                  </button>
+                  <span className="w-10 rounded bg-white px-1 py-0.5 text-center text-xs font-bold tabular-nums text-black shadow-sm dark:bg-gray-900 dark:text-white">
+                    {editorFontSize}px
+                  </span>
+                  <button
+                    onClick={() => adjustEditorFontSize(1)}
+                    className="rounded p-1 text-black transition-colors hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-white dark:hover:bg-blue-800"
+                    disabled={editorFontSize >= 30}
+                    aria-label="Increase editor font"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
+              <div className="flex items-center justify-between rounded-lg bg-gray-50 p-2 dark:bg-gray-800">
+                <span className="text-xs font-semibold text-black dark:text-white">
+                  Output font
+                </span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => adjustOutputFontSize(-1)}
+                    className="rounded p-1 text-black transition-colors hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-white dark:hover:bg-blue-800"
+                    disabled={outputFontSize <= 10}
+                    aria-label="Decrease output font"
+                  >
+                    <Minus className="h-3 w-3" />
+                  </button>
+                  <span className="w-10 rounded bg-white px-1 py-0.5 text-center text-xs font-bold tabular-nums text-black shadow-sm dark:bg-gray-900 dark:text-white">
+                    {outputFontSize}px
+                  </span>
+                  <button
+                    onClick={() => adjustOutputFontSize(1)}
+                    className="rounded p-1 text-black transition-colors hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-white dark:hover:bg-blue-800"
+                    disabled={outputFontSize >= 24}
+                    aria-label="Increase output font"
+                  >
+                    <Plus className="h-3 w-3" />
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={resetZoom}
+                className="flex items-center gap-1 rounded bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-900 transition-colors hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-100 dark:hover:bg-blue-800"
+              >
+                <RefreshCcw className="h-3.5 w-3.5" />
+                Reset zoom
+              </button>
             </div>
 
             {/* Input Controls - Only show for supported languages */}
@@ -732,23 +802,23 @@ main();`
             )}
 
             {/* Status Info */}
-            <div className="flex items-center justify-between text-xs font-medium text-black dark:text-white">
-              <div className="flex items-center gap-2">
-                <span>Characters: {code.length}</span>
-                {showBoilerplatePreview && (
-                  <span className="font-bold text-purple-600 dark:text-purple-400">
-                    (Previewing with Comments)
-                  </span>
-                )}
-                {showInstructions && (
-                  <span className="font-bold text-green-600 dark:text-green-400">
-                    (Clean Code Loaded)
-                  </span>
-                )}
-              </div>
-              <div className="text-xs font-bold text-blue-900 dark:text-blue-100">
-                Ctrl+Enter to run
-              </div>
+            <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-black dark:text-white">
+              <span>Characters: {code.length}</span>
+              {showBoilerplatePreview && (
+                <span className="font-bold text-purple-600 dark:text-purple-400">
+                  Previewing with comments
+                </span>
+              )}
+              {showInstructions && (
+                <span className="font-bold text-green-600 dark:text-green-400">
+                  Clean code loaded
+                </span>
+              )}
+              {showPreviewSuccess && (
+                <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                  Clean code restored
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -785,7 +855,13 @@ main();`
                 </span>
               </div>
             ) : (
-              <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-green-400 dark:text-green-600">
+              <pre
+                className="whitespace-pre-wrap font-mono text-green-400 dark:text-green-600"
+                style={{
+                  fontSize: `${outputFontSize}px`,
+                  lineHeight: `${Math.round(outputFontSize * 1.4)}px`,
+                }}
+              >
                 {output}
               </pre>
             )}

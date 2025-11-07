@@ -1,5 +1,9 @@
 import React from "react"
-import { getLanguageBySlug, getTutorialBySlug } from "@/lib/getData"
+import {
+  getExercisesByTutorialId,
+  getLanguageBySlug,
+  getTutorialBySlug,
+} from "@/lib/getData"
 import { notFound } from "next/navigation"
 import TutorialPageContainer from "./components/TutorialPageContainer"
 
@@ -27,9 +31,11 @@ export default async function NewTutorialPage({ params }: TutorialPageProps) {
       notFound()
     }
 
+    const exercises = await getExercisesByTutorialId(tutorial.id)
+
     return (
       <TutorialPageContainer
-        tutorial={tutorial}
+        tutorial={{ ...tutorial, exercises }}
         language={language}
         langSlug={langSlug}
         tutSlug={tutSlug}
@@ -63,17 +69,19 @@ export async function generateMetadata({ params }: TutorialPageProps) {
       }
     }
 
+    const exercises = await getExercisesByTutorialId(tutorial.id)
+    const exerciseCount = exercises?.length || 0
     const lessonCount = tutorial.lessons?.length || 0
     const estimatedTime = lessonCount * 15 // minutes per lesson
     const difficulty = tutorial.difficulty || "Beginner"
 
     return {
       title: `${tutorial.title} - ${language.title} Tutorial | CodeHub`,
-      description: `Learn ${tutorial.title} in ${language.title} with ${lessonCount} interactive lessons. Includes code examples, quizzes, and hands-on exercises. ${difficulty} level. Estimated time: ${estimatedTime} minutes.`,
-      keywords: `${language.title} ${tutorial.title}, ${tutorial.title} tutorial, learn ${tutorial.title} ${language.title}, ${tutorial.title} explained, ${language.title} ${tutorial.title} examples, ${tutorial.title} guide, ${difficulty} ${language.title}`,
+      description: `Learn ${tutorial.title} in ${language.title} with ${lessonCount} interactive lessons and ${exerciseCount} practice exercises. Includes code examples, quizzes, and hands-on challenges. ${difficulty} level. Estimated time: ${estimatedTime} minutes.`,
+      keywords: `${language.title} ${tutorial.title}, ${tutorial.title} tutorial, learn ${tutorial.title} ${language.title}, ${tutorial.title} explained, ${language.title} ${tutorial.title} examples, ${tutorial.title} guide, ${difficulty} ${language.title}, ${tutorial.title} exercises`,
       openGraph: {
         title: `${tutorial.title} - ${language.title} Tutorial`,
-        description: `Master ${tutorial.title} with ${lessonCount} interactive lessons and code examples`,
+        description: `Master ${tutorial.title} with ${lessonCount} interactive lessons and ${exerciseCount} practice exercises`,
         url: `https://codehubindia.in/Learn/Tutorials/${langSlug}/${tutSlug}`,
         type: "article",
         siteName: "CodeHub",

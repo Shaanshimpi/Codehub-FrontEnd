@@ -2,7 +2,16 @@
 "use client"
 
 import React from "react"
-import { HelpCircle, Play, Terminal } from "lucide-react"
+import {
+  HelpCircle,
+  Minus,
+  Play,
+  Plus,
+  RefreshCcw,
+  Terminal,
+} from "lucide-react"
+
+// Simple toolbar with Run + Help buttons
 
 // Simple toolbar with Run + Help buttons
 
@@ -12,13 +21,18 @@ interface SimpleToolbarProps {
   canRun: boolean
   isRunning: boolean
   isHelpOpen: boolean
-  language: any
   codeLength: number
   showInputSection: boolean
   onToggleInput: () => void
   hasInput: boolean
   showInputButton?: boolean
   showRunButton?: boolean
+  onEditorZoomIn: () => void
+  onEditorZoomOut: () => void
+  onOutputZoomIn: () => void
+  onOutputZoomOut: () => void
+  onResetZoom: () => void
+  isEditorReady: boolean
 }
 
 const SimpleToolbar: React.FC<SimpleToolbarProps> = ({
@@ -34,36 +48,13 @@ const SimpleToolbar: React.FC<SimpleToolbarProps> = ({
   hasInput,
   showInputButton = true,
   showRunButton = true,
+  onEditorZoomIn,
+  onEditorZoomOut,
+  onOutputZoomIn,
+  onOutputZoomOut,
+  onResetZoom,
+  isEditorReady,
 }) => {
-  const getMonacoLanguage = () => {
-    switch (language.slug) {
-      case "c-programming":
-      case "c":
-        return "c"
-      case "cpp":
-      case "c++":
-        return "cpp"
-      case "java":
-        return "java"
-      case "python":
-        return "python"
-      case "javascript":
-        return "javascript"
-      case "typescript":
-        return "typescript"
-      case "html":
-        return "html"
-      case "css":
-        return "css"
-      case "json":
-        return "json"
-      case "sql":
-        return "sql"
-      default:
-        return "plaintext"
-    }
-  }
-
   return (
     <div className="toolbar-enter border-t border-gray-300 bg-white px-3 py-2 shadow-lg dark:border-gray-600 dark:bg-black">
       <div className="flex items-center justify-between">
@@ -83,14 +74,14 @@ const SimpleToolbar: React.FC<SimpleToolbarProps> = ({
                 isRunning
                   ? "Running code..."
                   : canRun
-                    ? "Run your code (Ctrl+Enter)"
+                    ? "Run your code"
                     : "Write some code first"
               }
               aria-label={
                 isRunning
                   ? "Code is running"
                   : canRun
-                    ? "Run your code. Keyboard shortcut: Control plus Enter"
+                    ? "Run your code"
                     : "Write some code first before running"
               }
               aria-describedby="run-button-status"
@@ -167,29 +158,57 @@ const SimpleToolbar: React.FC<SimpleToolbarProps> = ({
           </div>
         </div>
 
-        {/* Right: Code Info */}
-        <div className="flex items-center gap-4 text-xs font-medium text-gray-600 dark:text-gray-400">
-          <div className="hidden items-center gap-3 sm:flex">
-            <span className="flex items-center gap-1">
-              <span
-                className="font-semibold text-blue-600 dark:text-blue-400"
-                aria-label={`Programming language: ${getMonacoLanguage()}`}
-              >
-                {getMonacoLanguage()}
-              </span>
-            </span>
-            <span className="opacity-50">•</span>
-            <span
-              className="tabular-nums"
-              aria-label={`Code length: ${codeLength} characters`}
+        {/* Right: Zoom Controls */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 rounded border border-gray-300 p-1 text-gray-600 dark:border-gray-600 dark:text-gray-300">
+            <button
+              onClick={onEditorZoomOut}
+              className="rounded p-1 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+              title="Zoom out editor"
+              aria-label="Zoom out editor"
+              disabled={!isEditorReady}
             >
-              {codeLength} characters
-            </span>
-            <span className="hidden opacity-50 md:inline">•</span>
-            <span className="hidden font-semibold text-blue-600 dark:text-blue-400 md:inline">
-              Ctrl+Enter to run
-            </span>
+              <Minus className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={onEditorZoomIn}
+              className="rounded p-1 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+              title="Zoom in editor"
+              aria-label="Zoom in editor"
+              disabled={!isEditorReady}
+            >
+              <Plus className="h-3.5 w-3.5" />
+            </button>
+            <span className="mx-1 h-4 w-px bg-gray-200 dark:bg-gray-600" />
+            <button
+              onClick={onOutputZoomOut}
+              className="rounded p-1 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+              title="Zoom out output"
+              aria-label="Zoom out output"
+            >
+              <Minus className="h-3 w-3" />
+            </button>
+            <button
+              onClick={onOutputZoomIn}
+              className="rounded p-1 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+              title="Zoom in output"
+              aria-label="Zoom in output"
+            >
+              <Plus className="h-3 w-3" />
+            </button>
+            <span className="mx-1 h-4 w-px bg-gray-200 dark:bg-gray-600" />
+            <button
+              onClick={onResetZoom}
+              className="rounded p-1 transition-colors hover:bg-gray-200 dark:hover:bg-gray-700"
+              title="Reset zoom"
+              aria-label="Reset zoom"
+            >
+              <RefreshCcw className="h-3.5 w-3.5" />
+            </button>
           </div>
+          <span className="hidden text-xs font-medium text-gray-500 dark:text-gray-400 sm:inline">
+            {codeLength} chars
+          </span>
         </div>
       </div>
     </div>
