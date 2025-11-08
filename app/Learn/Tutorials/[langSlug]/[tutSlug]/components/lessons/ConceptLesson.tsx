@@ -231,8 +231,8 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({
                               Copy Code
                             </Button>
                           </div>
-                          <div className="overflow-x-auto rounded-xl bg-gray-900 p-4 shadow-inner sm:p-6">
-                            <pre className="text-sm leading-relaxed text-gray-100 sm:text-base">
+                          <div className="w-full max-w-full overflow-x-auto rounded-xl bg-gray-900 p-4 shadow-inner sm:p-6">
+                            <pre className="w-full min-w-0 text-sm leading-relaxed text-gray-100 sm:text-base">
                               <code className="block">{example.code}</code>
                             </pre>
                           </div>
@@ -281,8 +281,8 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({
                                 />
                                 Expected Output
                               </h5>
-                              <div className="overflow-x-auto rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm dark:border-green-800 dark:bg-green-900/20 sm:p-6">
-                                <pre className="text-sm leading-relaxed text-green-800 dark:text-green-200 sm:text-base">
+                              <div className="w-full max-w-full overflow-x-auto rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm dark:border-green-800 dark:bg-green-900/20 sm:p-6">
+                                <pre className="w-full min-w-0 text-sm leading-relaxed text-green-800 dark:text-green-200 sm:text-base">
                                   <code className="block">
                                     {example.output}
                                   </code>
@@ -386,8 +386,8 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({
                             Copy Code
                           </Button>
                         </div>
-                        <div className="overflow-x-auto rounded-xl bg-gray-900 p-4 shadow-inner sm:p-6">
-                          <pre className="text-sm leading-relaxed text-gray-100 sm:text-base">
+                        <div className="w-full max-w-full overflow-x-auto rounded-xl bg-gray-900 p-4 shadow-inner sm:p-6">
+                          <pre className="w-full min-w-0 text-sm leading-relaxed text-gray-100 sm:text-base">
                             <code className="block">{example.code}</code>
                           </pre>
                         </div>
@@ -436,8 +436,8 @@ const ConceptLesson: React.FC<ConceptLessonProps> = ({
                               />
                               Expected Output
                             </h5>
-                            <div className="overflow-x-auto rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm dark:border-green-800 dark:bg-green-900/20 sm:p-6">
-                              <pre className="text-sm leading-relaxed text-green-800 dark:text-green-200 sm:text-base">
+                            <div className="w-full max-w-full overflow-x-auto rounded-xl border border-green-200 bg-green-50 p-4 shadow-sm dark:border-green-800 dark:bg-green-900/20 sm:p-6">
+                              <pre className="w-full min-w-0 text-sm leading-relaxed text-green-800 dark:text-green-200 sm:text-base">
                                 <code className="block">{example.output}</code>
                               </pre>
                             </div>
