@@ -385,6 +385,32 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
               <span className="font-medium text-white">Upgrade</span>
             </Link>
 
+            {/* Live Platform - Desktop Only */}
+            <a
+              href="https://live.codehubindia.in"
+              target="_blank"
+              rel="noreferrer"
+              className={cn(
+                "group relative hidden items-center space-x-2 rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-medium text-white transition-all duration-200 hover:from-emerald-600 hover:to-emerald-700 md:flex",
+                isShrunk ? "h-8" : "h-10"
+              )}
+            >
+              Live
+            </a>
+
+            {/* Resources - Desktop Only */}
+            <a
+              href="https://resources.codehubindia.in"
+              target="_blank"
+              rel="noreferrer"
+              className={cn(
+                "group relative hidden items-center space-x-2 rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 text-sm font-medium text-white transition-all duration-200 hover:from-indigo-600 hover:to-indigo-700 md:flex",
+                isShrunk ? "h-8" : "h-10"
+              )}
+            >
+              Resources
+            </a>
+
             {/* Auth Button - Desktop Only */}
             <div className="hidden items-center space-x-3 md:flex">
               {isLoading ? (
@@ -514,6 +540,33 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
                 </div>
                 <span className="font-medium">Vivy AI Chat</span>
               </Link>
+
+              {/* Live & Resources - Mobile */}
+              <a
+                href="https://live.codehubindia.in"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center space-x-3 rounded-lg px-4 py-3 text-slate-100 transition-all duration-200 hover:bg-white/10"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <div className="flex h-6 w-6 items-center justify-center rounded bg-emerald-600">
+                  <Code2 className="h-4 w-4 text-white" />
+                </div>
+                <span className="font-medium">Live</span>
+              </a>
+
+              <a
+                href="https://resources.codehubindia.in"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center space-x-3 rounded-lg px-4 py-3 text-slate-100 transition-all duration-200 hover:bg-white/10"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <div className="flex h-6 w-6 items-center justify-center rounded bg-indigo-600">
+                  <BookOpen className="h-4 w-4 text-white" />
+                </div>
+                <span className="font-medium">Resources</span>
+              </a>
 
               {/* Upgrade Button - Mobile */}
               <Link

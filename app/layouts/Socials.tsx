@@ -40,6 +40,16 @@ export default function Socials() {
     { href: "/", label: "Home.", showMd: false },
     { href: "/Learn", label: "Learn.", showMd: true },
     {
+      href: "https://live.codehubindia.in",
+      label: "Live.",
+      showMd: true,
+    },
+    {
+      href: "https://resources.codehubindia.in",
+      label: "Resources.",
+      showMd: true,
+    },
+    {
       href: "https://www.instagram.com/code.hub.india/",
       label: "Instagram.",
       showMd: false,

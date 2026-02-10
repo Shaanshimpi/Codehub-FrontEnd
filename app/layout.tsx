@@ -23,6 +23,15 @@ export const metadata: Metadata = {
   applicationName: "CodeHub",
   referrer: "origin-when-cross-origin",
   metadataBase: new URL("https://codehubindia.in/"),
+  icons: {
+    icon: "/logo-sqr.png",
+    shortcut: "/logo-sqr.png",
+    apple: "/logo-sqr.png",
+    other: {
+      rel: "icon",
+      url: "/logo-sqr.png",
+    },
+  },
   keywords: [
     // ... keyword list unchanged ...
   ],
