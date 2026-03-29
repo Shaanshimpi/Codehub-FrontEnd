@@ -1,0 +1,3787 @@
+## Pending C++ Topics - Tutorial Planning (Language: C++)
+
+### Meta
+
+- **Target language**: `cpp`
+- **Audience**: Absolute beginners to lower-intermediate
+- **Goal**: Step-by-step, concept-first tutorials with lots of small code examples and practice
+- **Exclusions**: Each topic has an **Exclusions** subsection listing what must not be taught or mentioned in that topic. When prompting an AI to generate content for a topic, copy that topic's full Exclusions block into the prompt so the AI stays within scope. Each request is standalone; do not refer to other topics or sections.
+
+## 5. Loops - Repetition (C++)
+
+### 5.1 `do-while` loop - Tutorial spec for AI (C++)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: `for` loop; functions (defining or calling); recursion; arrays; strings (beyond basic console input/output); pointers; classes/objects/structs; enums.
+  - Do **not** introduce: `break` or `continue` unless this topic explicitly includes them.
+  - Use only: variables, `std::cout`, `std::cin`, `if`/`else`, and `while` loop.
+- **Positioning and comparison**
+  - Clearly contrast `while` vs `do-while`:
+    - `while`: condition checked **before** body (may run 0 times).
+    - `do-while`: body runs **at least once**, then condition is checked.
+  - Include a simple natural-language analogy (e.g., show a menu at least once, then keep showing while the user continues).
+- **Syntax and flow (Concept lesson)**
+  - Canonical syntax:
+    - `do { /* body */ } while (condition);`
+  - Include a mermaid `flowchart TD` diagram highlighting:
+    - Execute body once -> check condition -> repeat or exit.
+- **Menu-driven example (core example)**
+  - Include one complete menu program using `do-while`:
+    - Menu prints once.
+    - Reads user choice with `cin`.
+    - Repeats until user chooses Exit.
+  - Include: explanation, common mistakes, best practices.
+- **Lesson breakdown (match existing pattern)**
+  - Concept -> MCQ -> codeblock_rearranging -> fill_in_blanks
+  - Include `mermaid_code`, `keyPoints`, `commonMistakes`, `bestPractices`, `practiceHints`.
+- **e.g codes**
+
+```cpp
+// 1. Print numbers from 1 to 100 using do-while
+#include <iostream>
+using namespace std;
+
+int main() {
+    int i = 1;
+    do {
+        cout << i << " ";
+        i++;
+    } while (i <= 100);
+    return 0;
+}
+```
+
+```cpp
+// 2. Print numbers from 100 down to 1 using do-while
+#include <iostream>
+using namespace std;
+
+int main() {
+    int i = 100;
+    do {
+        cout << i << " ";
+        i--;
+    } while (i >= 1);
+    return 0;
+}
+```
+
+```cpp
+// 3. Demonstrate: do-while executes at least once
+#include <iostream>
+using namespace std;
+
+int main() {
+    int i = 100;
+    do {
+        cout << i << "\n"; // prints once even though i < 10 is false
+    } while (i < 10);
+    return 0;
+}
+```
+
+```cpp
+// 4. Sum numbers from 1 to 10 using do-while
+#include <iostream>
+using namespace std;
+
+int main() {
+    int sum = 0, i = 1;
+    do {
+        sum += i;
+        i++;
+    } while (i <= 10);
+    cout << "Sum = " << sum << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 5. Keep adding numbers until user enters 0
+#include <iostream>
+using namespace std;
+
+int main() {
+    int num, sum = 0;
+    do {
+        cout << "Enter a number (0 to quit): ";
+        cin >> num;
+        sum += num;
+    } while (num != 0);
+    cout << "Total sum = " << sum << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 6. Input validation: value between 1 and 5
+#include <iostream>
+using namespace std;
+
+int main() {
+    int val;
+    do {
+        cout << "Enter a number between 1 and 5: ";
+        cin >> val;
+    } while (val < 1 || val > 5);
+    cout << "You entered: " << val << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 7. Factorials of numbers from 1 to 10 using nested do-while
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n = 1;
+    do {
+        long long fact = 1;
+        int j = 1;
+
+        do {
+            fact *= j;
+            j++;
+        } while (j <= n);
+
+        cout << "Factorial of " << n << " = " << fact << "\n";
+        n++;
+    } while (n <= 10);
+
+    return 0;
+}
+```
+
+---
+
+
+---
+
+## 6. Functions - Tutorial specs for AI (C++)
+
+#### 6.1 Topic - Introduction to Functions (void, no parameters)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: function parameters; return types other than `void`; returning values; recursion; arrays; strings (beyond `cout/cin`); pointers; classes/objects; templates; references.
+  - Use only: `void functionName()` with empty parentheses, calling from `main`, and basic control flow/loops inside the function body. Any input must be read inside the function (not passed as parameters).
+
+```cpp
+// 1. Function defined but not called
+#include <iostream>
+using namespace std;
+
+void hello() {
+    cout << "Hello Codehub\n";
+}
+
+int main() {
+    // hello(); // not called
+    return 0;
+}
+```
+
+```cpp
+// 2. Calling a simple void function once
+#include <iostream>
+using namespace std;
+
+void hello() {
+    cout << "Hello Codehub\n";
+}
+
+int main() {
+    hello();
+    return 0;
+}
+```
+
+```cpp
+// 3. Reusing the same function multiple times
+#include <iostream>
+using namespace std;
+
+void hello() {
+    cout << "Hello Codehub\n";
+}
+
+int main() {
+    hello();
+    hello();
+    hello();
+    hello();
+    return 0;
+}
+```
+
+```cpp
+// 4. Changing function implementation once, all calls updated
+#include <iostream>
+using namespace std;
+
+void hello() {
+    cout << "Welcome to Codehub!\n";
+}
+
+int main() {
+    hello();
+    hello();
+    hello();
+    hello();
+    return 0;
+}
+```
+
+```cpp
+// 5. Function to check voting eligibility (no parameters)
+#include <iostream>
+using namespace std;
+
+void checkVoting() {
+    int age;
+    cout << "Enter your age: ";
+    cin >> age;
+
+    if (age >= 18) {
+        cout << "You are eligible to vote.\n";
+    } else {
+        cout << "You are not eligible to vote.\n";
+    }
+}
+
+int main() {
+    checkVoting();
+    return 0;
+}
+```
+
+```cpp
+// 6. Function to print numbers from 1 to 100 (no parameters)
+#include <iostream>
+using namespace std;
+
+void printOneToHundred() {
+    for (int i = 1; i <= 100; i++) {
+        cout << i << " ";
+    }
+    cout << "\n";
+}
+
+int main() {
+    printOneToHundred();
+    return 0;
+}
+```
+
+#### 6.2 Topic - Functions with Parameters (no return yet)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: return statements returning a value; non-void return types; recursion; passing arrays; passing strings; pointers; references; function overloading; default parameters.
+  - Use only: `void func(int a, int b)` style parameters, passing arguments, and printing results inside the function.
+
+```cpp
+// 2. Function with two parameters: print sum
+#include <iostream>
+using namespace std;
+
+void printSum(int a, int b) {
+    cout << "Sum = " << (a + b) << "\n";
+}
+
+int main() {
+    printSum(3, 5);
+    return 0;
+}
+```
+
+```cpp
+// 3. Function with one parameter: print the value
+#include <iostream>
+using namespace std;
+
+void printValue(int x) {
+    cout << "Value = " << x << "\n";
+}
+
+int main() {
+    printValue(10);
+    printValue(25);
+    return 0;
+}
+```
+
+```cpp
+// 4. Function with one parameter: print square
+#include <iostream>
+using namespace std;
+
+void printSquare(int x) {
+    cout << "Square of " << x << " = " << (x * x) << "\n";
+}
+
+int main() {
+    printSquare(4);
+    printSquare(7);
+    return 0;
+}
+```
+
+```cpp
+// 5. Multiple void functions in one program (no return values)
+#include <iostream>
+using namespace std;
+
+void printSquare(int x) {
+    cout << "Square: " << (x * x) << "\n";
+}
+
+void printAdd(int a, int b) {
+    cout << "Add: " << (a + b) << "\n";
+}
+
+void printSub(int a, int b) {
+    cout << "Sub: " << (a - b) << "\n";
+}
+
+void printMul(int a, int b) {
+    cout << "Mul: " << (a * b) << "\n";
+}
+
+int main() {
+    printSquare(5);
+    printAdd(10, 3);
+    printSub(10, 3);
+    printMul(4, 6);
+    return 0;
+}
+```
+
+#### 6.3 Topic - Functions with Return Values (using function output)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: recursion; passing arrays; passing strings; pointers; references; templates.
+  - Use only: parameters (ints), non-void return types (e.g. `int`, `long long`), and using return values in `main`.
+
+```cpp
+// 3. Function that returns square
+#include <iostream>
+using namespace std;
+
+int square(int x) {
+    return x * x;
+}
+
+int main() {
+    cout << square(7) << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 4. Function that returns the same value
+#include <iostream>
+using namespace std;
+
+int getValue(int x) {
+    return x;
+}
+
+int main() {
+    int num = getValue(42);
+    cout << "Returned value = " << num << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 5. Function with two parameters: return sum (used in expression)
+#include <iostream>
+using namespace std;
+
+int add(int a, int b) {
+    return a + b;
+}
+
+int main() {
+    int x = 5, y = 7;
+    int s = add(x, y);
+    cout << "Sum = " << s << "\n";
+    cout << "Sum + 10 = " << (add(x, y) + 10) << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 6. Multiple returning functions in one program
+#include <iostream>
+using namespace std;
+
+int square(int x) {
+  return x * x; 
+}
+int add(int a, int b) {
+  return a + b; 
+}
+int sub(int a, int b) {
+  return a - b; 
+}
+int mul(int a, int b) {
+  return a * b; 
+}
+
+int main() {
+    int x = 5, y = 3;
+    cout << "square(" << x << ") = " << square(x) << "\n";
+    cout << "add(" << x << ", " << y << ") = " << add(x, y) << "\n";
+    cout << "sub(" << x << ", " << y << ") = " << sub(x, y) << "\n";
+    cout << "mul(" << x << ", " << y << ") = " << mul(x, y) << "\n";
+    return 0;
+}
+```
+
+#### 6.4 Topic - Predicate and Helper Functions
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: recursion; passing arrays; passing strings; pointers; references; templates.
+  - Use only: functions with parameters and return values returning 0/1 (or `bool` only if explicitly introduced in this topic) and helpers like `max2`.
+
+```cpp
+// 4. Predicate function: isEven
+#include <iostream>
+using namespace std;
+
+int isEven(int x) {
+    return x % 2 == 0;
+}
+
+int main() {
+    int n;
+    cout << "Enter n: ";
+    cin >> n;
+    if (isEven(n)) {
+        cout << "Even\n";
+    } else {
+        cout << "Odd\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 5. Helper function: max2
+#include <iostream>
+using namespace std;
+
+int max2(int a, int b) {
+    if (a > b) {
+        return a;
+    } else {
+        return b;
+    }
+}
+
+int main() {
+    int x = 10, y = 20;
+    cout << "Max = " << max2(x, y) << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 6. Using isEven in a loop: count evens from 1 to n
+#include <iostream>
+using namespace std;
+
+int isEven(int x) {
+    return x % 2 == 0;
+}
+
+int main() {
+    int n;
+    cout << "Enter n: ";
+    cin >> n;
+
+    int count = 0;
+    for (int i = 1; i <= n; i++) {
+        if (isEven(i)) {
+            count++;
+        }
+    }
+
+    cout << "There are " << count << " even numbers from 1 to " << n << "\n";
+    return 0;
+}
+```
+
+---
+
+## 7. Recursion - Tutorial specs for AI (C++)
+
+#### 7.1 Topic - Recursion Basics (hello Codehub, counters, simple printing)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: arrays; strings as parameters; pointers; references; classes/objects; dynamic memory; return-value recursion for computation (sum/factorial return).
+  - Use only: recursion with `void` functions, base cases, and printing/counting with `cout`.
+
+- **Example snippets**
+
+```cpp
+// 1. Infinite recursion example (DO NOT RUN AS-IS)
+#include <iostream>
+using namespace std;
+
+void helloRec() {
+    cout << "Hello Codehub\n";
+    helloRec();
+}
+
+int main() {
+    // helloRec(); // calling this will keep calling itself until the program crashes
+    return 0;
+}
+```
+
+```cpp
+// 2. Controlled recursion using a counter
+#include <iostream>
+using namespace std;
+
+void helloRec(int count) {
+    if (count == 0) {
+        return;
+    }
+    cout << "Hello Codehub\n";
+    helloRec(count - 1);
+}
+
+int main() {
+    helloRec(5);
+    return 0;
+}
+```
+
+```cpp
+// 3. Print from n down to 0 using recursion
+#include <iostream>
+using namespace std;
+
+void printDown(int n) {
+    if (n < 0) {
+        return;
+    }
+    cout << n << "\n";
+    printDown(n - 1);
+}
+
+int main() {
+    printDown(5);
+    return 0;
+}
+```
+
+```cpp
+// 4. Print from start down to end
+#include <iostream>
+using namespace std;
+
+void printDownRange(int start, int end) {
+    if (start < end) {
+        return;
+    }
+    cout << start << "\n";
+    printDownRange(start - 1, end);
+}
+
+int main() {
+    printDownRange(10, 3);
+    return 0;
+}
+```
+
+```cpp
+// 5. Print from start up to end (forward recursion)
+#include <iostream>
+using namespace std;
+
+void printUpRange(int start, int end) {
+    if (start > end) {
+        return;
+    }
+    cout << start << "\n";
+    printUpRange(start + 1, end);
+}
+
+int main() {
+    printUpRange(3, 10);
+    return 0;
+}
+```
+
+#### 7.2 Topic - Classic Recursive Problems (sum, factorial, and more)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: arrays; strings as parameters; pointers; references; classes/objects; dynamic memory.
+  - Use only: scalar parameters and return values for classic problems (sum, factorial, power, sum of digits).
+
+- **Example snippets**
+
+```cpp
+// 6. Recursive sum of numbers from 1 to n
+#include <iostream>
+using namespace std;
+
+int sumToN(int n) {
+    if (n <= 0) {
+        return 0;
+    }
+    return n + sumToN(n - 1);
+}
+
+int main() {
+    int n;
+    cout << "Enter n: ";
+    cin >> n;
+    cout << "Sum from 1 to " << n << " = " << sumToN(n) << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 7. Recursive factorial function
+#include <iostream>
+using namespace std;
+
+long long factorial(int n) {
+    if (n <= 1) {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+
+int main() {
+    int n;
+    cout << "Enter n: ";
+    cin >> n;
+    cout << "Factorial of " << n << " = " << factorial(n) << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 8. Recursive power: compute a^b
+#include <iostream>
+using namespace std;
+
+long long power(int a, int b) {
+    if (b == 0) {
+        return 1;
+    }
+    return a * power(a, b - 1);
+}
+
+int main() {
+    int a, b;
+    cout << "Enter base (a): ";
+    cin >> a;
+    cout << "Enter exponent (b): ";
+    cin >> b;
+    cout << a << "^" << b << " = " << power(a, b) << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 9. Recursive sum of digits
+#include <iostream>
+using namespace std;
+
+int sumOfDigits(int n) {
+    if (n == 0) {
+        return 0;
+    }
+    return (n % 10) + sumOfDigits(n / 10);
+}
+
+int main() {
+    int n;
+    cout << "Enter a number: ";
+    cin >> n;
+    cout << "Sum of digits = " << sumOfDigits(n) << "\n";
+    return 0;
+}
+```
+
+---
+
+## 8. Arrays - Tutorial specs for AI (C++)
+
+> These array topics are for **raw C-style arrays** first (e.g. `int nums[10]`), not `std::vector`.
+
+#### 8.1 Topic - Intro to 1D Arrays (declaration, initialization, index access)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: `std::vector`; passing arrays to functions; strings as a topic; pointers (except `&` with `cin` is not used); classes/structs; dynamic allocation.
+  - Use only: fixed-size C-style `int` arrays, index-based read/write first, then a simple loop to print.
+
+- **Example snippets**
+
+```cpp
+// 1. Declare and initialize an array, read/write using index (no loops first)
+#include <iostream>
+using namespace std;
+
+int main() {
+    int nums[] = {10, 20, 30, 40, 50};
+
+    cout << "First element = " << nums[0] << "\n";
+    cout << "Second element = " << nums[1] << "\n";
+
+    nums[2] = 99;
+    cout << "Updated third element = " << nums[2] << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 2. Print all elements using a for loop
+#include <iostream>
+using namespace std;
+
+int main() {
+    int nums[] = {10, 20, 30, 40, 50};
+    int size = 5;
+
+    for (int i = 0; i < size; i++) {
+        cout << "nums[" << i << "] = " << nums[i] << "\n";
+    }
+    return 0;
+}
+```
+
+#### 8.2 Topic - Fixed-size Arrays with Loops (read, write, print)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: `std::vector`; passing arrays to functions; pointers; classes/structs; dynamic allocation.
+  - Use only: `int nums[10]`, reading with `cin`, printing with loops.
+
+- **Example snippets**
+
+```cpp
+// 3. Read 10 integers into an array and print them (forward + backward)
+#include <iostream>
+using namespace std;
+
+int main() {
+    int nums[10];
+
+    for (int i = 0; i < 10; i++) {
+        cout << "Enter element " << i << ": ";
+        cin >> nums[i];
+    }
+
+    cout << "Array elements (forward):\n";
+    for (int i = 0; i < 10; i++) {
+        cout << nums[i] << " ";
+    }
+    cout << "\n";
+
+    cout << "Array elements (backward):\n";
+    for (int i = 9; i >= 0; i--) {
+        cout << nums[i] << " ";
+    }
+    cout << "\n";
+
+    return 0;
+}
+```
+
+```cpp
+// 4. Print only even elements of an array
+#include <iostream>
+using namespace std;
+
+int main() {
+    int nums[10];
+
+    for (int i = 0; i < 10; i++) {
+        cout << "Enter element " << i << ": ";
+        cin >> nums[i];
+    }
+
+    cout << "Even elements:\n";
+    for (int i = 0; i < 10; i++) {
+        if (nums[i] % 2 == 0) {
+            cout << nums[i] << " ";
+        }
+    }
+    cout << "\n";
+    return 0;
+}
+```
+
+#### 8.3 Topic - Simple Algorithms on Arrays (max, min, bubble sort)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: `std::sort`; `std::vector`; passing arrays to functions; pointers; dynamic allocation; other sorting algorithms.
+  - Use only: loops + swapping + bubble sort; max/min scan.
+
+- **Example snippets**
+
+```cpp
+// 5. Find maximum in an array
+#include <iostream>
+using namespace std;
+
+int main() {
+    int nums[100];
+    int n;
+    cout << "Enter number of elements (max 100): ";
+    cin >> n;
+
+    for (int i = 0; i < n; i++) {
+        cout << "Enter element " << i << ": ";
+        cin >> nums[i];
+    }
+
+    int mx = nums[0];
+    for (int i = 1; i < n; i++) {
+        if (nums[i] > mx) {
+            mx = nums[i];
+        }
+    }
+
+    cout << "Maximum value = " << mx << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 6. Find minimum in an array
+#include <iostream>
+using namespace std;
+
+int main() {
+    int nums[100];
+    int n;
+    cout << "Enter number of elements (max 100): ";
+    cin >> n;
+
+    for (int i = 0; i < n; i++) {
+        cout << "Enter element " << i << ": ";
+        cin >> nums[i];
+    }
+
+    int mn = nums[0];
+    for (int i = 1; i < n; i++) {
+        if (nums[i] < mn) {
+            mn = nums[i];
+        }
+    }
+
+    cout << "Minimum value = " << mn << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 7. Bubble sort in ascending order
+#include <iostream>
+using namespace std;
+
+int main() {
+    int nums[100];
+    int n;
+    cout << "Enter number of elements (max 100): ";
+    cin >> n;
+
+    for (int i = 0; i < n; i++) {
+        cout << "Enter element " << i << ": ";
+        cin >> nums[i];
+    }
+
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - 1 - i; j++) {
+            if (nums[j] > nums[j + 1]) {
+                int temp = nums[j];
+                nums[j] = nums[j + 1];
+                nums[j + 1] = temp;
+            }
+        }
+    }
+
+    cout << "Sorted array:\n";
+    for (int i = 0; i < n; i++) {
+        cout << nums[i] << " ";
+    }
+    cout << "\n";
+    return 0;
+}
+```
+
+#### 8.4 Topic - 2D Arrays (brief intro)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: `std::vector<vector<int>>`; passing arrays to functions; pointers to rows; dynamic allocation.
+  - Use only: fixed small `int a[2][3]` style arrays, nested loops, `cin/cout`.
+
+- **Example snippets**
+
+```cpp
+// 1. Declare and initialize a 2x3 array, then print it
+#include <iostream>
+using namespace std;
+
+int main() {
+    int nums[2][3] = {
+        {1, 2, 3},
+        {4, 5, 6}
+    };
+
+    cout << "2x3 matrix values:\n";
+    for (int row = 0; row < 2; row++) {
+        for (int col = 0; col < 3; col++) {
+            cout << nums[row][col] << " ";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 2. Read values into a 2x3 array from user, then print
+#include <iostream>
+using namespace std;
+
+int main() {
+    int nums[2][3];
+
+    for (int row = 0; row < 2; row++) {
+        for (int col = 0; col < 3; col++) {
+            cout << "Enter element [" << row << "][" << col << "]: ";
+            cin >> nums[row][col];
+        }
+    }
+
+    cout << "You entered:\n";
+    for (int row = 0; row < 2; row++) {
+        for (int col = 0; col < 3; col++) {
+            cout << nums[row][col] << " ";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+---
+
+## 9. Strings (C++)
+
+### 9.1 Topic - `std::string` Basics (recommended C++ string)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: C-style strings (`char[]`, `'\0'`, `<cstring>`); advanced `getline` edge cases; pointers.
+  - Use only: `std::string`, `cin >> s`, `cout << s`, indexing `s[i]`, and `s.size()`.
+
+```cpp
+// 1. Basic std::string
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string name = "Codehub";
+    cout << name << "\n";
+    cout << "Length = " << name.size() << "\n";
+    name[0] = 'c';
+    cout << name << "\n";
+    return 0;
+}
+```
+
+### 9.2 Topic - Common `std::string` Operations
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: `<cstring>` functions (`strlen`, `strcpy`, etc.); pointers; complex searching algorithms.
+  - Use only: `size()`, `+` concatenation, `==` comparison, `find()` (optional), and simple substring via `substr()` (optional).
+
+---
+
+## 10. Pointers - Tutorial specs for AI (C++)
+
+### 10.1 Topic - Addresses and Basic int Pointers
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: pointer arithmetic; arrays-and-pointers relationship; references; passing pointers to functions (pass-by-reference); pointers to classes/structs; `new/delete`; smart pointers.
+  - Use only: `&` (address-of), `*` (dereference), `int *p`, printing addresses with `cout` (or `printf("%p")` only if explicitly allowed in this topic), and changing a single `int` through a pointer.
+
+- **Example snippets**
+
+```cpp
+// 1. Print address of a variable
+#include <iostream>
+using namespace std;
+
+int main() {
+    int x = 10;
+    cout << "Value of x = " << x << "\n";
+    cout << "Address of x = " << &x << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 2. Storing an address in a pointer
+#include <iostream>
+using namespace std;
+
+int main() {
+    int x = 10;
+    int *ptr = &x;
+
+    cout << "Value of x = " << x << "\n";
+    cout << "Value via *ptr = " << *ptr << "\n";
+    cout << "Address of x = " << &x << "\n";
+    cout << "Value of ptr = " << ptr << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 3. Two normal variables: copying values (independent)
+#include <iostream>
+using namespace std;
+
+int main() {
+    int a = 10;
+    int b = a;
+
+    cout << "Initially: a = " << a << ", b = " << b << "\n";
+    a = 20;
+    cout << "After changing a: a = " << a << ", b = " << b << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 4. Pointer: changing through pointer affects original variable
+#include <iostream>
+using namespace std;
+
+int main() {
+    int a = 10;
+    int *p = &a;
+
+    cout << "Initially: a = " << a << ", *p = " << *p << "\n";
+    *p = 20;
+    cout << "After *p = 20: a = " << a << ", *p = " << *p << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 5. Using pointer to copy value from one variable to another
+#include <iostream>
+using namespace std;
+
+int main() {
+    int source = 42;
+    int dest = 0;
+    int *p = &source;
+
+    cout << "Before copy: source = " << source << ", dest = " << dest << "\n";
+    dest = *p;
+    cout << "After copy: source = " << source << ", dest = " << dest << "\n";
+
+    source = 100;
+    cout << "After changing source: source = " << source << ", dest = " << dest << "\n";
+    return 0;
+}
+```
+
+---
+
+## 11. Structures / Classes - Tutorial specs for AI (C++)
+
+### 11.1 Topic - Why `struct`? (grouping related data)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: classes with methods; constructors; private/public details beyond basics; pointers to structs; `->`; dynamic allocation; inheritance.
+  - Use only: `struct` with public fields, `.` member access, arrays of structs, read/print fields with `cin/cout`.
+
+- **Example snippets**
+
+```cpp
+// 1. Managing student data with separate variables (hard to scale)
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string student1Name = "Alice";
+    int student1Age = 18;
+    float student1Marks = 92.5f;
+
+    string student2Name = "Bob";
+    int student2Age = 19;
+    float student2Marks = 85.0f;
+
+    cout << "Student 1: " << student1Name << ", Age: " << student1Age << ", Marks: " << student1Marks << "\n";
+    cout << "Student 2: " << student2Name << ", Age: " << student2Age << ", Marks: " << student2Marks << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 2. Using struct to group student data
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Student {
+    string name;
+    int age;
+    float marks;
+};
+
+int main() {
+    Student s1 = {"Alice", 18, 92.5f};
+    Student s2 = {"Bob", 19, 85.0f};
+
+    cout << "Student 1: " << s1.name << ", Age: " << s1.age << ", Marks: " << s1.marks << "\n";
+    cout << "Student 2: " << s2.name << ", Age: " << s2.age << ", Marks: " << s2.marks << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 3. Array of structures: multiple students
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Student {
+    string name;
+    int age;
+    float marks;
+};
+
+int main() {
+    Student students[3] = {
+        {"Alice", 18, 92.5f},
+        {"Bob", 19, 85.0f},
+        {"Carol", 20, 78.0f}
+    };
+
+    for (int i = 0; i < 3; i++) {
+        cout << "Student " << (i + 1) << ": " << students[i].name
+             << ", Age: " << students[i].age
+             << ", Marks: " << students[i].marks << "\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 4. Reading one student from user input
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Student {
+    string name;
+    int age;
+    float marks;
+};
+
+int main() {
+    Student s;
+    cout << "Enter name: ";
+    cin >> s.name;
+    cout << "Enter age: ";
+    cin >> s.age;
+    cout << "Enter marks: ";
+    cin >> s.marks;
+
+    cout << "You entered: " << s.name << ", Age: " << s.age << ", Marks: " << s.marks << "\n";
+    return 0;
+}
+```
+
+### 11.2 Topic - More `struct` Examples (Car, Animal, etc.)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: `->`; pointers to structs; dynamic allocation; member functions; operator overloading.
+  - Use only: plain `struct` with fields and loops over arrays of structs.
+
+- **Example snippets**
+
+```cpp
+// 5. Struct example: Car
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Car {
+    string brand;
+    string model;
+    int year;
+    float price;
+};
+
+int main() {
+    Car car1 = {"Toyota", "Corolla", 2020, 15000.0f};
+    Car car2 = {"Honda", "Civic", 2019, 14000.0f};
+
+    cout << "Car 1: " << car1.brand << " " << car1.model << ", Year: " << car1.year << ", Price: " << car1.price << "\n";
+    cout << "Car 2: " << car2.brand << " " << car2.model << ", Year: " << car2.year << ", Price: " << car2.price << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 6. Array of cars
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Car {
+    string brand;
+    string model;
+    int year;
+    float price;
+};
+
+int main() {
+    Car cars[3] = {
+        {"Toyota", "Corolla", 2020, 15000.0f},
+        {"Honda", "Civic", 2019, 14000.0f},
+        {"Ford", "Focus", 2018, 12000.0f}
+    };
+
+    for (int i = 0; i < 3; i++) {
+        cout << "Car " << (i + 1) << ": " << cars[i].brand << " " << cars[i].model
+             << ", Year: " << cars[i].year << ", Price: " << cars[i].price << "\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 7. Struct example: Animal
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Animal {
+    string species;
+    int age;
+    float weight;
+};
+
+int main() {
+    Animal a1 = {"Dog", 3, 12.5f};
+    Animal a2 = {"Cat", 2, 4.0f};
+
+    cout << "Animal 1: " << a1.species << ", Age: " << a1.age << ", Weight: " << a1.weight << "\n";
+    cout << "Animal 2: " << a2.species << ", Age: " << a2.age << ", Weight: " << a2.weight << "\n";
+    return 0;
+}
+```
+
+---
+
+## 12. Enums - Tutorial specs for AI (C++)
+
+### 12.1 Topic - Basic Enums (named integer constants)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: `enum class`; `typedef`/`using` aliases; bit flags/bitwise operators; using enums across multiple files; pointer-to-enum; advanced casting.
+  - Use only: `enum Name { ... }`, enum variables, comparisons in `if`/`switch`, and printing simple messages (do not teach mapping tables yet).
+
+```cpp
+// 1. Basic enum for days
+#include <iostream>
+using namespace std;
+
+enum Day { MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY };
+
+int main() {
+    Day today = WEDNESDAY;
+    cout << "Today (as number) = " << today << "\n";
+    if (today == FRIDAY) {
+        cout << "Weekend soon!\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 2. Enum with explicit values
+#include <iostream>
+using namespace std;
+
+enum Status { STATUS_OK = 1, STATUS_WARNING = 2, STATUS_ERROR = 3 };
+
+int main() {
+    Status s = STATUS_WARNING;
+    if (s == STATUS_WARNING) {
+        cout << "Warning!\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 3. Using enum for menu choice
+#include <iostream>
+using namespace std;
+
+enum MenuOption { MENU_ADD = 1, MENU_SUB = 2, MENU_MUL = 3, MENU_EXIT = 4 };
+
+int main() {
+    int choice;
+    cout << "1. Add\n2. Sub\n3. Mul\n4. Exit\n";
+    cout << "Enter choice: ";
+    cin >> choice;
+
+    if (choice == MENU_EXIT) {
+        cout << "Goodbye\n";
+    } else {
+        cout << "You chose: " << choice << "\n";
+    }
+    return 0;
+}
+```
+
+---
+
+## 13. OOP - Tutorial specs for AI (C++)
+
+> **Pending tutorials requested here**: create **1 intro OOP tutorial**, with **4"6 lessons**, that introduces: what OOP means at a beginner level, **classes vs structs in C++**, and **classes and objects**. Follow the lesson structure: concept -> mcq -> codeblock_rearranging -> fill_in_blanks, with small C++ snippets, `keyPoints`, `commonMistakes`, `bestPractices`, and `practiceHints`.
+
+### 13.1 Topic - Intro to OOP: Classes vs Structs, Classes & Objects
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: access specifiers as a full topic (`private`, `protected`, "access control rules", getters/setters, encapsulation); constructors/destructors; member function overloading; `this` pointer; inheritance/polymorphism; templates; `new/delete`; smart pointers.
+  - Use only: `class` and `struct` definitions with **public** members (use the `public` keyword inside classes), creating objects, assigning to fields, reading fields, and printing results with `cout`. You may mention that classes/structs differ in defaults in a single sentence, but do not teach access specifiers here.
+- **Core concepts**
+  - OOP idea for beginners: "model real-world things as objects with data."
+  - A **class** is a blueprint; an **object** is a variable created from that blueprint.
+  - In C++, both `struct` and `class` can hold data members; beginners often start with `struct`, but `class` is commonly used for OOP.
+  - In this topic, always use `public` so learners can access fields without learning access control yet.
+- **Lesson breakdown (4"6 lessons)**
+  - L1 (concept): What is a class? What is an object? Create 1 object and print its fields.
+  - L2 (concept): Class vs struct with the same example; show that both can store grouped data.
+  - L3 (concept): Multiple objects of the same class; changing one object doesn't change another.
+  - L4 (mcq): Predict output / choose correct declaration / identify object vs class.
+  - L5 (codeblock_rearranging): Rearrange blocks to build a minimal class + object program.
+  - L6 (fill_in_blanks): Fill missing `class`, `public`, object name, member access `.`.
+- **Common mistakes**
+  - Forgetting the semicolon after the class/struct definition (`};`).
+  - Forgetting `public:` inside a `class` and then being unable to access members.
+  - Confusing the class name with an object (e.g., trying to use `Student.name` instead of `s.name`).
+- **Best practices (for this beginner topic)**
+  - Use meaningful names (`Student`, `Car`).
+  - Keep examples tiny: 2"3 fields, 1"2 objects.
+  - Always use braces `{ ... }` for `if`/`for` bodies in examples.
+
+- **Example snippets**
+
+```cpp
+// 1. Class and object (use public keyword)
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Student {
+public:
+    string name;
+    int age;
+    float marks;
+};
+
+int main() {
+    Student s;
+    s.name = "Alice";
+    s.age = 18;
+    s.marks = 92.5f;
+
+    cout << "Name: " << s.name << ", Age: " << s.age << ", Marks: " << s.marks << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 2. Struct vs class: both group related data
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct ProductStruct {
+    string name;
+    int price;
+};
+
+class ProductClass {
+public:
+    string name;
+    int price;
+};
+
+int main() {
+    ProductStruct p1;
+    p1.name = "Pen";
+    p1.price = 10;
+
+    ProductClass p2;
+    p2.name = "Notebook";
+    p2.price = 50;
+
+    cout << p1.name << " costs " << p1.price << "\n";
+    cout << p2.name << " costs " << p2.price << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 3. Multiple objects from the same class
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Car {
+public:
+    string brand;
+    int year;
+};
+
+int main() {
+    Car c1;
+    c1.brand = "Toyota";
+    c1.year = 2020;
+
+    Car c2;
+    c2.brand = "Honda";
+    c2.year = 2019;
+
+    c1.year = 2021; // change only c1
+
+    cout << "Car 1: " << c1.brand << " " << c1.year << "\n";
+    cout << "Car 2: " << c2.brand << " " << c2.year << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 4. Input into an object (still public fields, no constructors)
+#include <iostream>
+#include <string>
+using namespace std;
+
+class User {
+public:
+    string username;
+    int age;
+};
+
+int main() {
+    User u;
+    cout << "Enter username: ";
+    cin >> u.username;
+    cout << "Enter age: ";
+    cin >> u.age;
+
+    cout << "User: " << u.username << ", Age: " << u.age << "\n";
+    return 0;
+}
+```
+
+---
+
+### 13.2 Topic - Class Methods (member functions): no params/return -> params/return -> setAll + display
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: constructors/destructors; inheritance/polymorphism; virtual functions; templates; `this` pointer (as a separate concept); operator overloading; `new/delete`; smart pointers.
+  - Do **not** teach "access specifiers" as a theory topic (public/private/protected rules in depth).
+  - Use only: classes with member functions, calling methods on objects with `.`, methods with:
+    - no parameters + no return (`void`)
+    - parameters only (`void`)
+    - return only (no parameters)
+    - both parameters and return
+  - Do **not** use `private` in examples. Keep fields public and demonstrate a single "set all values" method + a single display method.
+
+- **Core concepts**
+  - A **method** (member function) is a function written **inside** a class and called using an object: `obj.method();`
+  - Methods let you keep "related behavior" next to the data (class fields).
+  - Progression for beginners:
+    - `void` method: does something (prints)
+    - method with parameters: takes input
+    - method with return: gives output
+    - set-all + display methods: update and show object data
+
+- **Lesson breakdown (4"6 lessons)**
+  - L1 (concept): Method with **no parameters and no return** (demo class).
+  - L2 (concept): Method with **parameters only** (prints or updates something).
+  - L3 (concept): Method with **return only** (simple computed value).
+  - L4 (concept): Method with **parameters + return** (e.g., calculate total price).
+  - L5 (concept): Meaningful "set all values" + "display" methods on `Student`.
+  - L6 (concept): Meaningful "set all values" + "display" methods on `Car`.
+  - Add MCQ + rearranging + fill-in-blanks exercises after each concept chunk.
+
+- **Common mistakes**
+  - Forgetting parentheses when calling a method (writing `obj.print;` instead of `obj.print();`).
+  - Forgetting the class semicolon `};`.
+  - Writing a method outside the class but forgetting `ClassName::` (you can mention this exists, but keep examples inside the class for now).
+
+- **Best practices (for this beginner topic)**
+  - Keep method names verb-like: `display`, `setData`, `printInfo`.
+  - Keep methods short; use braces for every `if` and loop.
+  - Prefer meaningful examples (Student, Car) over random math-only methods.
+
+- **Example snippets**
+
+```cpp
+// 1. Demo class method: no parameters, no return (void)
+#include <iostream>
+using namespace std;
+
+class Greeter {
+public:
+    void sayHello() {
+        cout << "Hello Codehub\n";
+    }
+};
+
+int main() {
+    Greeter g;
+    g.sayHello();
+    g.sayHello();
+    return 0;
+}
+```
+
+```cpp
+// 2. Method with parameter only (void)
+#include <iostream>
+using namespace std;
+
+class Printer {
+public:
+    void printNTimes(int n) {
+        for (int i = 1; i <= n; i++) {
+            cout << "Hello\n";
+        }
+    }
+};
+
+int main() {
+    Printer p;
+    p.printNTimes(3);
+    return 0;
+}
+```
+
+```cpp
+// 3. Method with return only (no parameters)
+#include <iostream>
+using namespace std;
+
+class Dice {
+public:
+    int getFixedRoll() {
+        return 6;
+    }
+};
+
+int main() {
+    Dice d;
+    cout << "Roll = " << d.getFixedRoll() << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 4. Method with parameters + return
+#include <iostream>
+using namespace std;
+
+class Calculator {
+public:
+    int add(int a, int b) {
+        return a + b;
+    }
+};
+
+int main() {
+    Calculator c;
+    cout << "Sum = " << c.add(10, 20) << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 5. Student: one setData() + one display() (no private)
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Student {
+public:
+    string name;
+    int age;
+    float marks;
+
+    void setData(string newName, int newAge, float newMarks) {
+        name = newName;
+        age = newAge;
+        marks = newMarks;
+    }
+
+    void display() {
+        cout << "Name: " << name << ", Age: " << age << ", Marks: " << marks << "\n";
+    }
+};
+
+int main() {
+    Student s;
+    s.setData("Alice", 18, 92.5f);
+    s.display();
+    return 0;
+}
+```
+
+```cpp
+// 6. Car: one setData() + one display() (no private)
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Car {
+public:
+    string brand;
+    int year;
+    float price;
+
+    void setData(string newBrand, int newYear, float newPrice) {
+        brand = newBrand;
+        year = newYear;
+        price = newPrice;
+    }
+
+    void display() {
+        cout << "Car: " << brand << ", Year: " << year << ", Price: " << price << "\n";
+    }
+};
+
+int main() {
+    Car c;
+    c.setData("Toyota", 2020, 15000.0f);
+    c.display();
+    return 0;
+}
+```
+
+---
+
+### 13.3 Topic - Constructors (object creation + constructor runs automatically)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: destructors; copy constructor; copy assignment; move semantics; `this` pointer (as a separate concept); inheritance/polymorphism; templates; `new/delete`; smart pointers.
+  - Do **not** teach "access specifiers" as a theory topic (public/private/protected rules in depth). Keep everything `public` in examples.
+  - Use only: default constructor (no parameters) and parameterized constructor (sets fields), object creation, and a simple `display()` method.
+
+- **Core concepts**
+  - A **constructor** is a special function with the **same name as the class**.
+  - Constructor has **no return type** (not even `void`).
+  - A constructor runs **automatically when an object is created**.
+  - Goal for beginners: see "constructor runs on object creation" clearly, then use constructors to set initial values.
+
+- **Lesson breakdown (4"6 lessons)**
+  - L1 (concept): Default constructor prints a message like "Object created" to prove it runs on creation.
+  - L2 (concept): Parameterized constructor sets all fields (like a "setter constructor") + `display()`.
+  - L3 (concept): Create multiple objects; show constructor runs each time.
+  - L4 (mcq): Predict output order: constructor message vs display output; identify valid constructor syntax.
+  - L5 (codeblock_rearranging): Rearrange blocks to build a class with constructor + display.
+  - L6 (fill_in_blanks): Fill missing constructor name, parentheses, object creation line, and `display()` call.
+
+- **Common mistakes**
+  - Writing a return type for the constructor (`void Student()`) - invalid.
+  - Forgetting `;` after class definition.
+  - Naming constructor incorrectly (must match class name exactly).
+
+- **Best practices (for this beginner topic)**
+  - Keep constructors simple: just set fields and maybe print a short message for learning.
+  - Use meaningful classes like `Student`, `Car`.
+  - Keep examples small (2"3 fields) and always use braces for loops/if bodies.
+
+- **Example snippets**
+
+```cpp
+// 1. Default constructor demo: runs automatically on object creation
+#include <iostream>
+using namespace std;
+
+class Demo {
+public:
+    Demo() {
+        cout << "Demo object created\n";
+    }
+
+    void display() {
+        cout << "display() called\n";
+    }
+};
+
+int main() {
+    Demo d;        // constructor runs here
+    d.display();
+    return 0;
+}
+```
+
+```cpp
+// 2. Student: parameterized constructor sets all values + display
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Student {
+public:
+    string name;
+    int age;
+    float marks;
+
+    Student(string n, int a, float m) {
+        cout << "Student object created\n";
+        name = n;
+        age = a;
+        marks = m;
+    }
+
+    void display() {
+        cout << "Name: " << name << ", Age: " << age << ", Marks: " << marks << "\n";
+    }
+};
+
+int main() {
+    Student s("Alice", 18, 92.5f);
+    s.display();
+    return 0;
+}
+```
+
+```cpp
+// 3. Car: parameterized constructor + multiple objects
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Car {
+public:
+    string brand;
+    int year;
+    float price;
+
+    Car(string b, int y, float p) {
+        cout << "Car object created\n";
+        brand = b;
+        year = y;
+        price = p;
+    }
+
+    void display() {
+        cout << "Car: " << brand << ", Year: " << year << ", Price: " << price << "\n";
+    }
+};
+
+int main() {
+    Car c1("Toyota", 2020, 15000.0f);
+    Car c2("Honda", 2019, 14000.0f);
+
+    c1.display();
+    c2.display();
+    return 0;
+}
+```
+
+```cpp
+// 4. Default + parameterized constructors together (intro)
+#include <iostream>
+#include <string>
+using namespace std;
+
+class User {
+public:
+    string username;
+    int age;
+
+    User() {
+        cout << "User object created (default)\n";
+        username = "unknown";
+        age = 0;
+    }
+
+    User(string u, int a) {
+        cout << "User object created (with data)\n";
+        username = u;
+        age = a;
+    }
+
+    void display() {
+        cout << "User: " << username << ", Age: " << age << "\n";
+    }
+};
+
+int main() {
+    User u1;               // default constructor
+    User u2("Rahul", 20);  // parameterized constructor
+
+    u1.display();
+    u2.display();
+    return 0;
+}
+```
+
+---
+
+### 13.4 Topic - Encapsulation: `public` vs `private` (why private matters)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: `protected` (save it for after inheritance); inheritance/polymorphism; virtual functions; operator overloading; templates; `new/delete`; smart pointers.
+  - Use only: `public` and `private`, simple classes, object creation, and public methods that safely change private data.
+
+- **Core concepts**
+  - `public`: members can be accessed from outside the class using `obj.member` or `obj.method()`.
+  - `private`: members cannot be accessed from outside the class. Only class methods can use them.
+  - Why `private` is needed: it prevents "anyone can change anything" and forces updates through valid actions (deposit/withdraw, updateMarks with validation, applyDiscount, etc.).
+
+- **Lesson breakdown (4"6 lessons)**
+  - L1 (concept): Demo class showing what works with `public` and what is blocked with `private`.
+  - L2 (concept): Student example: keep marks private, change through a public method (basic validation).
+  - L3 (concept): Car example: keep price private, update using a public method (basic validation).
+  - L4 (concept): Real-world analogy: ATM balance cannot be changed directly; only deposit/withdraw are allowed.
+  - L5 (mcq): Choose correct access, predict which lines cause compile error.
+  - L6 (rearrange + FIB): Build a class with one private field and two public methods.
+
+- **Common mistakes**
+  - Expecting `obj.privateField` to work (it won't compile).
+  - Putting everything in `public` and losing control of data changes.
+  - Forgetting `private:` / `public:` labels or forgetting the class semicolon `};`.
+
+- **Best practices (for this beginner topic)**
+  - Make important values private (balance, marks, price, password).
+  - Provide public methods that represent valid actions (deposit/withdraw, updateMarks, applyDiscount, changePassword).
+  - Keep validations simple at this stage.
+
+- **Example snippets**
+
+```cpp
+// 1. Demo: public vs private
+#include <iostream>
+using namespace std;
+
+class DemoAccess {
+public:
+    int publicValue;
+
+private:
+    int secretValue;
+
+public:
+    void setSecretValue(int v) {
+        secretValue = v;
+    }
+
+    void display() {
+        cout << "publicValue = " << publicValue << "\n";
+        cout << "secretValue = " << secretValue << "\n";
+    }
+};
+
+int main() {
+    DemoAccess d;
+    d.publicValue = 10;     // OK (public)
+    // d.secretValue = 99;  // NOT OK (private) - would not compile
+
+    d.setSecretValue(99);   // OK (public method)
+    d.display();
+    return 0;
+}
+```
+
+```cpp
+// 2. Student: keep marks private, update via public method (simple validation)
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Student {
+public:
+    string name;
+    int age;
+
+private:
+    float marks;
+
+public:
+    Student(string n, int a, float m) {
+        name = n;
+        age = a;
+        marks = m;
+    }
+
+    void updateMarks(float newMarks) {
+        if (newMarks < 0.0f || newMarks > 100.0f) {
+            cout << "Invalid marks\n";
+            return;
+        }
+        marks = newMarks;
+    }
+
+    void display() {
+        cout << "Name: " << name << ", Age: " << age << ", Marks: " << marks << "\n";
+    }
+};
+
+int main() {
+    Student s("Alice", 18, 92.5f);
+    // s.marks = 200; // NOT OK (private)
+    s.updateMarks(95.0f);
+    s.display();
+    return 0;
+}
+```
+
+```cpp
+// 3. Car: keep price private, update via public method
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Car {
+public:
+    string brand;
+    int year;
+
+private:
+    float price;
+
+public:
+    Car(string b, int y, float p) {
+        brand = b;
+        year = y;
+        price = p;
+    }
+
+    void applyDiscount(float percent) {
+        if (percent < 0.0f || percent > 100.0f) {
+            cout << "Invalid discount\n";
+            return;
+        }
+        price = price - (price * percent / 100.0f);
+    }
+
+    void display() {
+        cout << "Car: " << brand << ", Year: " << year << ", Price: " << price << "\n";
+    }
+};
+
+int main() {
+    Car c("Toyota", 2020, 15000.0f);
+    // c.price = 1; // NOT OK (private)
+    c.applyDiscount(10.0f);
+    c.display();
+    return 0;
+}
+```
+
+```cpp
+// 4. Meaningful example: ATM balance cannot be changed directly
+#include <iostream>
+using namespace std;
+
+class ATMAccount {
+private:
+    int balance;
+
+public:
+    ATMAccount(int initialBalance) {
+        balance = initialBalance;
+    }
+
+    void deposit(int amount) {
+        if (amount <= 0) {
+            cout << "Invalid deposit amount\n";
+            return;
+        }
+        balance += amount;
+    }
+
+    void withdraw(int amount) {
+        if (amount <= 0) {
+            cout << "Invalid withdraw amount\n";
+            return;
+        }
+        if (amount > balance) {
+            cout << "Insufficient balance\n";
+            return;
+        }
+        balance -= amount;
+    }
+
+    void showBalance() {
+        cout << "Balance = " << balance << "\n";
+    }
+};
+
+int main() {
+    ATMAccount acc(1000);
+    // acc.balance = 999999; // NOT OK (private)
+
+    acc.showBalance();
+    acc.deposit(500);
+    acc.withdraw(200);
+    acc.showBalance();
+    return 0;
+}
+```
+
+```cpp
+// 5. Another meaningful example: password should not be directly readable/changed
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Account {
+private:
+    string password;
+
+public:
+    Account(string initialPassword) {
+        password = initialPassword;
+    }
+
+    int checkPassword(string input) {
+        return input == password;
+    }
+
+    void changePassword(string oldPass, string newPass) {
+        if (oldPass != password) {
+            cout << "Wrong old password\n";
+            return;
+        }
+        password = newPass;
+        cout << "Password changed\n";
+    }
+};
+
+int main() {
+    Account a("codehub123");
+    // cout << a.password; // NOT OK (private)
+
+    if (a.checkPassword("codehub123")) {
+        cout << "Login success\n";
+    } else {
+        cout << "Login failed\n";
+    }
+
+    a.changePassword("codehub123", "newpass");
+    return 0;
+}
+```
+ 
+## 14. Inheritance - Tutorial specs for AI (C++)
+
+> **Pending tutorials requested here**: create **3"4 inheritance tutorials**, each with **4"6 lessons**, that introduce inheritance step-by-step with small, beginner-friendly C++ examples. Start with single inheritance and reusability (one base -> many derived), then multilevel inheritance, then multiple inheritance, then teach the `protected` specifier after learners understand inheritance. Keep methods multi-line and use examples with multiple meaningful properties.
+
+### 14.1 Topic - Inheritance Basics (Single inheritance + reusability)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: multilevel inheritance; multiple inheritance; `protected` (separate topic later); virtual functions; overriding keywords (`override`, `final`); polymorphism; abstract classes; constructors in inheritance (base/derived constructor chaining); templates; `new/delete`.
+  - Use only: `class Base { ... }`, `class Derived : public Base { ... }`, public inheritance, calling base methods from derived objects, and showing "code reuse".
+
+- **Core concepts**
+  - Inheritance means: a child class **reuses** (inherits) fields/methods from a parent class.
+  - Syntax: `class Child : public Parent { ... };`
+  - Reusability: when many types share common data/behavior (Student/Teacher share User fields), put common parts in the base class.
+
+- **Lesson breakdown (4"6 lessons)**
+  - L1 (concept): DemoParent -> DemoChild basic inheritance.
+  - L2 (concept): User -> Student.
+  - L3 (concept): Vehicle -> Car.
+  - L4 (concept): One base -> many derived: User -> Student/Teacher and Vehicle -> Car/Bike/Truck.
+  - L5 (mcq): identify base vs derived; which members are inherited; predict output.
+  - L6 (rearrange + FIB): build base+derived skeleton and fill `: public Base`.
+
+- **Example snippets**
+
+```cpp
+// 1. DemoParent and DemoChild (single inheritance)
+#include <iostream>
+using namespace std;
+
+class DemoParent {
+public:
+    void parentMsg() {
+        cout << "I am Parent\n";
+    }
+};
+
+class DemoChild : public DemoParent {
+public:
+    void childMsg() {
+        cout << "I am Child\n";
+    }
+};
+
+int main() {
+    DemoChild c;
+    c.parentMsg();
+    c.childMsg();
+    return 0;
+}
+```
+
+```cpp
+// 2. Application: User-Student (multiple properties)
+#include <iostream>
+#include <string>
+using namespace std;
+
+class User {
+public:
+    string name;
+    int age;
+    string phone;
+
+    void setUser(string n, int a, string p) {
+        name = n;
+        age = a;
+        phone = p;
+    }
+
+    void displayUser() {
+        cout << "Name: " << name << ", Age: " << age << ", Phone: " << phone << "\n";
+    }
+};
+
+class Student : public User {
+public:
+    int rollNo;
+    float marks;
+
+    void setStudent(int r, float m) {
+        rollNo = r;
+        marks = m;
+    }
+
+    void displayStudent() {
+        displayUser();
+        cout << "RollNo: " << rollNo << ", Marks: " << marks << "\n";
+    }
+};
+
+int main() {
+    Student s;
+    s.setUser("Alice", 18, "9999999999");
+    s.setStudent(101, 92.5f);
+    s.displayStudent();
+    return 0;
+}
+```
+
+```cpp
+// 3. Application: Vehicle-Car (multiple properties)
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Vehicle {
+public:
+    string brand;
+    int wheels;
+    int speed;
+
+    void setVehicle(string b, int w, int s) {
+        brand = b;
+        wheels = w;
+        speed = s;
+    }
+
+    void displayVehicle() {
+        cout << "Brand: " << brand << ", Wheels: " << wheels << ", Speed: " << speed << "\n";
+    }
+};
+
+class Car : public Vehicle {
+public:
+    int doors;
+    string fuel;
+
+    void setCar(int d, string f) {
+        doors = d;
+        fuel = f;
+    }
+
+    void displayCar() {
+        displayVehicle();
+        cout << "Doors: " << doors << ", Fuel: " << fuel << "\n";
+    }
+};
+
+int main() {
+    Car c;
+    c.setVehicle("Toyota", 4, 120);
+    c.setCar(4, "Petrol");
+    c.displayCar();
+    return 0;
+}
+```
+
+```cpp
+// 4. One base, many children: User-Student-Teacher and Vehicle-Car-Bike-Truck
+#include <iostream>
+#include <string>
+using namespace std;
+
+class User {
+public:
+    string name;
+    int age;
+    string city;
+
+    void setUser(string n, int a, string c) {
+        name = n;
+        age = a;
+        city = c;
+    }
+
+    void displayUser() {
+        cout << "Name: " << name << ", Age: " << age << ", City: " << city << "\n";
+    }
+};
+
+class Student : public User {
+public:
+    int rollNo;
+    string course;
+
+    void setStudent(int r, string c) {
+        rollNo = r;
+        course = c;
+    }
+
+    void displayStudent() {
+        displayUser();
+        cout << "RollNo: " << rollNo << ", Course: " << course << "\n";
+    }
+};
+
+class Teacher : public User {
+public:
+    string subject;
+    int experienceYears;
+
+    void setTeacher(string sub, int exp) {
+        subject = sub;
+        experienceYears = exp;
+    }
+
+    void displayTeacher() {
+        displayUser();
+        cout << "Subject: " << subject << ", Experience: " << experienceYears << " years\n";
+    }
+};
+
+class Vehicle {
+public:
+    string brand;
+    int wheels;
+    int maxSpeed;
+
+    void setVehicle(string b, int w, int s) {
+        brand = b;
+        wheels = w;
+        maxSpeed = s;
+    }
+
+    void displayVehicle() {
+        cout << "Brand: " << brand << ", Wheels: " << wheels << ", MaxSpeed: " << maxSpeed << "\n";
+    }
+};
+
+class Car : public Vehicle {
+public:
+    int doors;
+    string fuel;
+
+    void setCar(int d, string f) {
+        doors = d;
+        fuel = f;
+    }
+
+    void displayCar() {
+        displayVehicle();
+        cout << "Doors: " << doors << ", Fuel: " << fuel << "\n";
+    }
+};
+
+class Bike : public Vehicle {
+public:
+    int cc;
+    int hasGear;
+
+    void setBike(int engineCc, int gear) {
+        cc = engineCc;
+        hasGear = gear;
+    }
+
+    void displayBike() {
+        displayVehicle();
+        cout << "CC: " << cc << ", GearBike: ";
+        if (hasGear) {
+            cout << "Yes";
+        } else {
+            cout << "No";
+        }
+        cout << "\n";
+    }
+};
+
+class Truck : public Vehicle {
+public:
+    int loadCapacityKg;
+    int axles;
+
+    void setTruck(int loadKg, int a) {
+        loadCapacityKg = loadKg;
+        axles = a;
+    }
+
+    void displayTruck() {
+        displayVehicle();
+        cout << "Load: " << loadCapacityKg << "kg, Axles: " << axles << "\n";
+    }
+};
+
+int main() {
+    Student s;
+    s.setUser("Ravi", 19, "Pune");
+    s.setStudent(10, "C++");
+    s.displayStudent();
+
+    Teacher t;
+    t.setUser("Meena", 30, "Delhi");
+    t.setTeacher("Math", 7);
+    t.displayTeacher();
+
+    Car c;
+    c.setVehicle("Toyota", 4, 180);
+    c.setCar(4, "Petrol");
+    c.displayCar();
+
+    Bike b;
+    b.setVehicle("Yamaha", 2, 140);
+    b.setBike(150, 1);
+    b.displayBike();
+
+    Truck tr;
+    tr.setVehicle("Tata", 6, 120);
+    tr.setTruck(8000, 2);
+    tr.displayTruck();
+
+    return 0;
+}
+```
+
+---
+
+### 14.2 Topic - Multilevel Inheritance (Parent -> Child -> GrandChild)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: multiple inheritance; `protected` (separate topic later); virtual functions/polymorphism; constructors chaining; templates; `new/delete`.
+  - Use only: `class A`, `class B : public A`, `class C : public B`, and reuse across 3 levels.
+
+- **Core concepts**
+  - Multilevel inheritance means: a class inherits from a class that already inherits from another.
+  - GrandChild gets features from both Parent and Child.
+
+- **Example snippets**
+
+```cpp
+// 1. DemoParent -> DemoChild -> DemoGrandChild
+#include <iostream>
+using namespace std;
+
+class DemoParent {
+public:
+    void msgParent() {
+        cout << "Parent\n";
+    }
+};
+
+class DemoChild : public DemoParent {
+public:
+    void msgChild() {
+        cout << "Child\n";
+    }
+};
+
+class DemoGrandChild : public DemoChild {
+public:
+    void msgGrandChild() {
+        cout << "GrandChild\n";
+    }
+};
+
+int main() {
+    DemoGrandChild g;
+    g.msgParent();
+    g.msgChild();
+    g.msgGrandChild();
+    return 0;
+}
+```
+
+```cpp
+// 2. Application: User -> Student -> TopperStudent (multiple properties)
+#include <iostream>
+#include <string>
+using namespace std;
+
+class User {
+public:
+    string name;
+    int age;
+    string city;
+
+    void setUser(string n, int a, string c) {
+        name = n;
+        age = a;
+        city = c;
+    }
+
+    void displayUser() {
+        cout << "Name: " << name << ", Age: " << age << ", City: " << city << "\n";
+    }
+};
+
+class Student : public User {
+public:
+    int rollNo;
+    float marks;
+
+    void setStudent(int r, float m) {
+        rollNo = r;
+        marks = m;
+    }
+
+    void displayStudent() {
+        displayUser();
+        cout << "RollNo: " << rollNo << ", Marks: " << marks << "\n";
+    }
+};
+
+class TopperStudent : public Student {
+public:
+    int rank;
+    string scholarship;
+
+    void setTopper(int r, string s) {
+        rank = r;
+        scholarship = s;
+    }
+
+    void displayTopper() {
+        displayStudent();
+        cout << "Rank: " << rank << ", Scholarship: " << scholarship << "\n";
+    }
+};
+
+int main() {
+    TopperStudent ts;
+    ts.setUser("Aman", 18, "Mumbai");
+    ts.setStudent(5, 98.5f);
+    ts.setTopper(1, "Merit");
+    ts.displayTopper();
+    return 0;
+}
+```
+
+```cpp
+// 3. Application: Vehicle -> Car -> SportsCar (multiple properties)
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Vehicle {
+public:
+    string brand;
+    int wheels;
+
+    void setVehicle(string b, int w) {
+        brand = b;
+        wheels = w;
+    }
+
+    void displayVehicle() {
+        cout << "Brand: " << brand << ", Wheels: " << wheels << "\n";
+    }
+};
+
+class Car : public Vehicle {
+public:
+    int doors;
+    string fuel;
+
+    void setCar(int d, string f) {
+        doors = d;
+        fuel = f;
+    }
+
+    void displayCar() {
+        displayVehicle();
+        cout << "Doors: " << doors << ", Fuel: " << fuel << "\n";
+    }
+};
+
+class SportsCar : public Car {
+public:
+    int topSpeed;
+    float zeroToHundred;
+
+    void setSports(int s, float z) {
+        topSpeed = s;
+        zeroToHundred = z;
+    }
+
+    void displaySportsCar() {
+        displayCar();
+        cout << "TopSpeed: " << topSpeed << ", 0-100: " << zeroToHundred << "s\n";
+    }
+};
+
+int main() {
+    SportsCar sc;
+    sc.setVehicle("Ferrari", 4);
+    sc.setCar(2, "Petrol");
+    sc.setSports(320, 3.2f);
+    sc.displaySportsCar();
+    return 0;
+}
+```
+
+---
+
+### 14.3 Topic - Multiple Inheritance (one child inherits from two parents)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: diamond problem; virtual inheritance; `protected` (separate topic later); polymorphism; templates; `new/delete`.
+  - Use only: simple two-parent multiple inheritance with non-conflicting member names.
+
+- **Core concepts**
+  - Multiple inheritance means: `class Child : public Parent1, public Parent2 { ... };`
+  - Child can use members from both parents.
+  - Keep examples simple and avoid name conflicts at this stage.
+
+- **Example snippets**
+
+```cpp
+// 1. Demo: Child inherits from two parents
+#include <iostream>
+using namespace std;
+
+class DemoA {
+public:
+    void msgA() {
+        cout << "From A\n";
+    }
+};
+
+class DemoB {
+public:
+    void msgB() {
+        cout << "From B\n";
+    }
+};
+
+class DemoChild : public DemoA, public DemoB {
+public:
+    void msgChild() {
+        cout << "From Child\n";
+    }
+};
+
+int main() {
+    DemoChild d;
+    d.msgA();
+    d.msgB();
+    d.msgChild();
+    return 0;
+}
+```
+
+```cpp
+// 2. Practical example: PersonInfo + AcademicInfo -> StudentProfile
+#include <iostream>
+#include <string>
+using namespace std;
+
+class PersonInfo {
+public:
+    string name;
+    int age;
+    string city;
+
+    void setPerson(string n, int a, string c) {
+        name = n;
+        age = a;
+        city = c;
+    }
+
+    void displayPerson() {
+        cout << "Name: " << name << ", Age: " << age << ", City: " << city << "\n";
+    }
+};
+
+class AcademicInfo {
+public:
+    int rollNo;
+    float marks;
+    string course;
+
+    void setAcademic(int r, float m, string c) {
+        rollNo = r;
+        marks = m;
+        course = c;
+    }
+
+    void displayAcademic() {
+        cout << "RollNo: " << rollNo << ", Marks: " << marks << ", Course: " << course << "\n";
+    }
+};
+
+class StudentProfile : public PersonInfo, public AcademicInfo {
+public:
+    void displayProfile() {
+        displayPerson();
+        displayAcademic();
+    }
+};
+
+int main() {
+    StudentProfile sp;
+    sp.setPerson("Neha", 19, "Jaipur");
+    sp.setAcademic(12, 91.5f, "C++");
+    sp.displayProfile();
+    return 0;
+}
+```
+
+```cpp
+// 3. Another example: VehicleInfo + PricingInfo -> CarDetails
+#include <iostream>
+#include <string>
+using namespace std;
+
+class VehicleInfo {
+public:
+    string brand;
+    int year;
+    int wheels;
+
+    void setVehicle(string b, int y, int w) {
+        brand = b;
+        year = y;
+        wheels = w;
+    }
+
+    void displayVehicle() {
+        cout << "Brand: " << brand << ", Year: " << year << ", Wheels: " << wheels << "\n";
+    }
+};
+
+class PricingInfo {
+public:
+    float price;
+    float taxPercent;
+
+    void setPrice(float p, float tax) {
+        price = p;
+        taxPercent = tax;
+    }
+
+    float totalPrice() {
+        return price + (price * taxPercent / 100.0f);
+    }
+
+    void displayPrice() {
+        cout << "Price: " << price << ", Tax: " << taxPercent << "%, Total: " << totalPrice() << "\n";
+    }
+};
+
+class CarDetails : public VehicleInfo, public PricingInfo {
+public:
+    void displayAll() {
+        displayVehicle();
+        displayPrice();
+    }
+};
+
+int main() {
+    CarDetails c;
+    c.setVehicle("Toyota", 2020, 4);
+    c.setPrice(15000.0f, 12.0f);
+    c.displayAll();
+    return 0;
+}
+```
+
+---
+
+### 14.4 Topic - `protected` Specifier (after inheritance)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: polymorphism; virtual functions; virtual inheritance; templates; `new/delete`.
+  - Use only: `public`, `private`, `protected`, and inheritance examples that show why `protected` exists.
+
+- **Core concepts**
+  - `private`: only the same class can access.
+  - `public`: everyone (outside + derived classes) can access.
+  - `protected`: derived classes can access, but outside code cannot.
+  - `protected` is useful when you want child classes to reuse a value, but you don't want direct access from outside.
+
+- **Example snippets**
+
+```cpp
+// 1. Demo: protected can be accessed in child, not from main directly
+#include <iostream>
+using namespace std;
+
+class DemoParent {
+protected:
+    int secret;
+
+public:
+    void setSecret(int v) {
+        secret = v;
+    }
+};
+
+class DemoChild : public DemoParent {
+public:
+    void showSecret() {
+        cout << "secret = " << secret << "\n";
+    }
+};
+
+int main() {
+    DemoChild c;
+    c.setSecret(10);
+    // cout << c.secret; // NOT OK (protected)
+    c.showSecret();
+    return 0;
+}
+```
+
+```cpp
+// 2. User -> Student: protected name usable in derived
+#include <iostream>
+#include <string>
+using namespace std;
+
+class User {
+protected:
+    string name;
+    int age;
+
+public:
+    void setUser(string n, int a) {
+        name = n;
+        age = a;
+    }
+};
+
+class Student : public User {
+public:
+    void introduce() {
+        cout << "Hi, I am " << name << ", Age: " << age << "\n";
+    }
+};
+
+int main() {
+    Student s;
+    s.setUser("Aman", 18);
+    s.introduce();
+    return 0;
+}
+```
+
+```cpp
+// 3. Vehicle -> Car: protected brand reusable in derived
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Vehicle {
+protected:
+    string brand;
+    int wheels;
+
+public:
+    void setVehicle(string b, int w) {
+        brand = b;
+        wheels = w;
+    }
+};
+
+class Car : public Vehicle {
+public:
+    void show() {
+        cout << "Brand: " << brand << ", Wheels: " << wheels << "\n";
+    }
+};
+
+int main() {
+    Car c;
+    c.setVehicle("Toyota", 4);
+    c.show();
+    return 0;
+}
+```
+
+---\n
+
+## 15. Polymorphism - Tutorial specs for AI (C++)
+
+### 15.1 Topic - Polymorphism Intro (Meaning + two types)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: templates; STL containers; `new/delete`; smart pointers; exceptions; operator overloading; multiple inheritance; virtual inheritance.
+  - Do **not** go deep into memory model, vtables, or `typeid`/RTTI.
+  - Keep code beginner-friendly: `class`, `public`, simple functions, `cout`, `string`, `int`, `float`.
+
+- **Core concepts**
+  - Polymorphism means **one name, many forms**.
+  - In C++ (beginner view):
+    - **Compile-time polymorphism**: function overloading (decided by compiler).
+    - **Run-time polymorphism**: virtual functions + overriding (decided at runtime).
+  - Teach: first understand the idea with tiny examples, then implement it in later topics.
+
+- **Mermaid flow (tiny)**
+
+```mermaid
+flowchart TD
+  A[Polymorphism] --> B[Compile-time]
+  A --> C[Run-time]
+  B --> D[Function overloading]
+  C --> E[virtual + override]
+```
+
+- **Lesson structure requirements (same drill)**
+  - Concept -> MCQ -> codeblock_rearranging -> fill_in_blanks
+  - Use very small code snippets per lesson.
+
+- **Example snippets**
+
+```cpp
+// 1. Same function name, different parameter lists (preview)
+#include <iostream>
+using namespace std;
+
+int add(int a, int b) {
+    return a + b;
+}
+
+float add(float a, float b) {
+    return a + b;
+}
+
+int main() {
+    cout << add(2, 3) << "\n";
+    cout << add(2.5f, 3.5f) << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 2. Same method name, different parameter counts (preview)
+#include <iostream>
+using namespace std;
+
+class Printer {
+public:
+    void show(int x) {
+        cout << "int: " << x << "\n";
+    }
+
+    void show(int x, int y) {
+        cout << "two ints: " << x << ", " << y << "\n";
+    }
+};
+
+int main() {
+    Printer p;
+    p.show(10);
+    p.show(10, 20);
+    return 0;
+}
+```
+
+---
+
+### 15.2 Topic - Compile-time Polymorphism (Function Overloading)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: virtual functions; `override`; base pointers; runtime dispatch; pure virtual; abstract classes; inheritance as the main focus.
+  - Do **not** introduce: templates; default parameters; function pointers; lambdas.
+  - Do **not** introduce operator overloading here.
+
+- **What to teach**
+  - Overloading = same function name, different parameter list.
+  - Return type alone cannot overload (mention with one counterexample).
+  - Keep overloads meaningful and beginner-friendly.
+
+- **Mini-lesson sequence (4-6 lessons)**
+  - L1: Overload `add(int,int)` vs `add(float,float)`
+  - L2: Overload with different count: `area(int side)` vs `area(int l, int w)`
+  - L3: Overload in a class: `print(int)` vs `print(string)`
+  - L4: Common mistake: ambiguous call (use explicit `f` for float)
+  - L5: Practice: build `calculate(...)` overloads (sum/product)
+
+- **MCQ ideas**
+  - Which calls match which overload?
+  - Is `int f(int)` and `float f(int)` valid overloading? (No.)
+
+- **Code-rearrange ideas**
+  - Rearrange overloaded function definitions + `main()` calls to compile.
+
+- **Fill-in-the-blanks ideas**
+  - Fill parameter types (`int` vs `float`) and suffix `f` in `2.5f`.
+
+- **Example snippets**
+
+```cpp
+// 1. add() overloads
+#include <iostream>
+using namespace std;
+
+int add(int a, int b) {
+    return a + b;
+}
+
+float add(float a, float b) {
+    return a + b;
+}
+
+int main() {
+    int x = add(10, 20);
+    float y = add(1.5f, 2.5f);
+    cout << x << "\n";
+    cout << y << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 2. area() overloads (count differs)
+#include <iostream>
+using namespace std;
+
+int area(int side) {
+    return side * side;
+}
+
+int area(int length, int width) {
+    return length * width;
+}
+
+int main() {
+    cout << area(5) << "\n";
+    cout << area(4, 6) << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 3. Class method overloading
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Report {
+public:
+    void print(int marks) {
+        cout << "Marks: " << marks << "\n";
+    }
+
+    void print(string name) {
+        cout << "Name: " << name << "\n";
+    }
+};
+
+int main() {
+    Report r;
+    r.print("Riya");
+    r.print(92);
+    return 0;
+}
+```
+
+- **Key points**
+  - Overloading is decided at **compile-time**.
+  - Parameter list must differ (type/count/order).
+
+- **Common mistakes**
+  - Confusing overloading with overriding.
+  - Writing `add(2.5, 3.5)` without `f` and getting an unexpected match.
+
+- **Best practices**
+  - Keep overloads consistent in meaning (same “intent”).
+  - Prefer clear names over too many overloads.
+
+---
+
+### 15.3 Topic - Run-time Polymorphism (Virtual Functions + Overriding)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: templates; operator overloading; exceptions; RTTI (`typeid`, `dynamic_cast`); virtual inheritance; multiple inheritance.
+  - Do **not** discuss vtables, memory layout, or deep “how virtual works internally”.
+  - Avoid `new/delete`. Use stack objects and references/pointers that point to existing objects.
+
+- **What to teach**
+  - Overriding happens in inheritance: child provides its own version of a base method.
+  - `virtual` in base enables runtime dispatch when using base pointer/reference.
+  - Use `override` keyword for clarity.
+  - Show the difference between:
+    - Calling through a **base object** (base version),
+    - Calling through **base reference/pointer** to a derived object (derived version if virtual).
+
+- **Mermaid flow (runtime dispatch)**
+
+```mermaid
+flowchart TD
+  A[Base pointer/reference] --> B{virtual?}
+  B -->|Yes| C[Call derived override]
+  B -->|No| D[Call base method]
+```
+
+- **Mini-lesson sequence (4-6 lessons)**
+  - L1: DemoParent/DemoChild with `virtual displayRole()`
+  - L2: Same demo without `virtual` to show “wrong” behavior (short contrast)
+  - L3: User -> Student/Teacher overrides `showProfile()`
+  - L4: Vehicle -> Car/Bike/Truck overrides `showType()`
+  - L5: Common mistakes: forgetting `virtual`, signature mismatch, not using `override`
+
+- **Example snippets (same examples, multiple properties, multiline methods)**
+
+```cpp
+// 1. Demo: base pointer calls derived method (virtual)
+#include <iostream>
+using namespace std;
+
+class DemoParent {
+public:
+    virtual void show() {
+        cout << "DemoParent show()\n";
+    }
+};
+
+class DemoChild : public DemoParent {
+public:
+    void show() override {
+        cout << "DemoChild show()\n";
+    }
+};
+
+int main() {
+    DemoChild child;
+    DemoParent* ptr = &child;
+    ptr->show();
+    return 0;
+}
+```
+
+```cpp
+// 2. User -> Student/Teacher: override showProfile()
+#include <iostream>
+#include <string>
+using namespace std;
+
+class User {
+public:
+    string name;
+    int age;
+    string city;
+
+    void setUser(string n, int a, string c) {
+        name = n;
+        age = a;
+        city = c;
+    }
+
+    virtual void showProfile() {
+        cout << "User: " << name << ", Age: " << age << ", City: " << city << "\n";
+    }
+};
+
+class Student : public User {
+public:
+    int rollNo;
+    string course;
+
+    void setStudent(int r, string crs) {
+        rollNo = r;
+        course = crs;
+    }
+
+    void showProfile() override {
+        cout << "Student: " << name << ", Age: " << age << ", City: " << city << "\n";
+        cout << "RollNo: " << rollNo << ", Course: " << course << "\n";
+    }
+};
+
+class Teacher : public User {
+public:
+    string subject;
+    int experienceYears;
+
+    void setTeacher(string sub, int exp) {
+        subject = sub;
+        experienceYears = exp;
+    }
+
+    void showProfile() override {
+        cout << "Teacher: " << name << ", Age: " << age << ", City: " << city << "\n";
+        cout << "Subject: " << subject << ", Experience: " << experienceYears << " years\n";
+    }
+};
+
+int main() {
+    Student s;
+    s.setUser("Aman", 18, "Delhi");
+    s.setStudent(101, "C++");
+
+    Teacher t;
+    t.setUser("Neha", 29, "Pune");
+    t.setTeacher("Math", 6);
+
+    User* p1 = &s;
+    User* p2 = &t;
+
+    p1->showProfile();
+    p2->showProfile();
+    return 0;
+}
+```
+
+```cpp
+// 3. Vehicle -> Car/Bike/Truck: override showType()
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Vehicle {
+public:
+    string brand;
+    int wheels;
+    int maxSpeed;
+
+    void setVehicle(string b, int w, int speed) {
+        brand = b;
+        wheels = w;
+        maxSpeed = speed;
+    }
+
+    virtual void showType() {
+        cout << "Vehicle: " << brand << ", Wheels: " << wheels << ", MaxSpeed: " << maxSpeed << "\n";
+    }
+};
+
+class Car : public Vehicle {
+public:
+    int doors;
+    string fuel;
+
+    void setCar(int d, string f) {
+        doors = d;
+        fuel = f;
+    }
+
+    void showType() override {
+        cout << "Car: " << brand << ", Wheels: " << wheels << ", MaxSpeed: " << maxSpeed << "\n";
+        cout << "Doors: " << doors << ", Fuel: " << fuel << "\n";
+    }
+};
+
+class Bike : public Vehicle {
+public:
+    int cc;
+    bool hasGear;
+
+    void setBike(int c, bool gear) {
+        cc = c;
+        hasGear = gear;
+    }
+
+    void showType() override {
+        cout << "Bike: " << brand << ", Wheels: " << wheels << ", MaxSpeed: " << maxSpeed << "\n";
+        cout << "CC: " << cc << ", HasGear: ";
+        if (hasGear) {
+            cout << "Yes";
+        } else {
+            cout << "No";
+        }
+        cout << "\n";
+    }
+};
+
+class Truck : public Vehicle {
+public:
+    int loadCapacityKg;
+    int axles;
+
+    void setTruck(int cap, int ax) {
+        loadCapacityKg = cap;
+        axles = ax;
+    }
+
+    void showType() override {
+        cout << "Truck: " << brand << ", Wheels: " << wheels << ", MaxSpeed: " << maxSpeed << "\n";
+        cout << "Load: " << loadCapacityKg << " kg, Axles: " << axles << "\n";
+    }
+};
+
+int main() {
+    Car c;
+    c.setVehicle("Toyota", 4, 180);
+    c.setCar(4, "Petrol");
+
+    Bike b;
+    b.setVehicle("Honda", 2, 120);
+    b.setBike(160, true);
+
+    Truck tr;
+    tr.setVehicle("Tata", 6, 90);
+    tr.setTruck(8000, 3);
+
+    Vehicle* v1 = &c;
+    Vehicle* v2 = &b;
+    Vehicle* v3 = &tr;
+
+    v1->showType();
+    v2->showType();
+    v3->showType();
+    return 0;
+}
+```
+
+- **MCQ ideas**
+  - If base method is not `virtual`, which version runs when calling through `Base*`?
+  - What does `override` help catch? (Signature mismatch.)
+
+- **Code-rearrange ideas**
+  - Rearrange: base class with `virtual`, derived override, base pointer calls.
+
+- **Fill-in-the-blanks ideas**
+  - Fill `virtual`, `override`, and pointer type `Vehicle*`.
+
+- **Key points**
+  - Runtime polymorphism needs: **inheritance + virtual + overriding + base pointer/reference**.
+
+- **Common mistakes**
+  - Forgetting `virtual` in base.
+  - Changing the function signature accidentally (so it doesn’t override).
+  - Expecting polymorphism when calling via a base **object** (not pointer/reference).
+
+- **Best practices**
+  - Use `override` on derived methods.
+  - Keep method names and signatures consistent across base/derived.
+
+
+### 5.2 `for` loop - Tutorial spec for AI (C++)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: functions; recursion; arrays; strings (beyond basic console input/output); pointers; classes/objects/structs; enums.
+  - Do **not** include star/shape patterns in this section.
+  - Use only: variables, `std::cout`, `std::cin`, `if`/`else`, `while`, `do-while`, and `for` loops.
+
+> **Pending tutorials requested here**: create **3"4 `for`-loop tutorials**, each with **4"6 lessons**, covering counting, numeric patterns (sum, factorial, tables, power), and nested loops (numeric only). Follow the lesson structure: concept -> mcq -> codeblock_rearranging -> fill_in_blanks, with mermaid flowcharts, `keyPoints`, `commonMistakes`, `bestPractices`, and multiple small code snippets.
+
+#### 5.2.A Topic - `for` Loop Basics (Counting)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: functions; recursion; arrays; strings (beyond basic console input/output); pointers; classes/objects/structs; enums; star/shape patterns.
+  - Use only: loops, counters, and console I/O with `cout`/`cin`.
+- **Example snippets**
+
+```cpp
+// 1. Print numbers from 1 to 100
+#include <iostream>
+using namespace std;
+
+int main() {
+    for (int i = 1; i <= 100; i++) {
+        cout << i << " ";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 2. Print numbers from 100 down to 1
+#include <iostream>
+using namespace std;
+
+int main() {
+    for (int i = 100; i >= 1; i--) {
+        cout << i << " ";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 3. Print from user start to user end (inclusive)
+#include <iostream>
+using namespace std;
+
+int main() {
+    int start, end;
+    cout << "Enter start: ";
+    cin >> start;
+    cout << "Enter end: ";
+    cin >> end;
+
+    for (int i = start; i <= end; i++) {
+        cout << i << " ";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 4. Even numbers from 2 to 100
+#include <iostream>
+using namespace std;
+
+int main() {
+    for (int i = 2; i <= 100; i += 2) {
+        cout << i << " ";
+    }
+    return 0;
+}
+```
+
+- **Exercises / other lesson types**
+  - MCQ: identify init/condition/increment; predict output.
+  - Code-rearrange: build a 1->100 loop, 100->1 loop.
+  - Fill-in-the-blanks: missing init/condition/increment.
+
+#### 5.2.B Topic - `for` Loop for Numeric Patterns (Sum, Factorial, Tables, Power)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: functions; recursion; arrays; strings (beyond basic console input/output); pointers; classes/objects/structs; enums; star/shape patterns.
+  - Use only: loops, accumulators, and console I/O.
+- **Example snippets**
+
+```cpp
+// 5. Sum 1 to n
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter n: ";
+    cin >> n;
+
+    int sum = 0;
+    for (int i = 1; i <= n; i++) {
+        sum += i;
+    }
+    cout << "Sum = " << sum << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 6. Factorial of n
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter n: ";
+    cin >> n;
+
+    long long fact = 1;
+    for (int i = 1; i <= n; i++) {
+        fact *= i;
+    }
+    cout << "Factorial of " << n << " = " << fact << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 7. Multiplication table (1 to 10)
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter a number: ";
+    cin >> n;
+
+    for (int i = 1; i <= 10; i++) {
+        cout << n << " x " << i << " = " << (n * i) << "\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 8. Compute a^b using repeated multiplication
+#include <iostream>
+using namespace std;
+
+int main() {
+    int a, b;
+    cout << "Enter base (a): ";
+    cin >> a;
+    cout << "Enter exponent (b): ";
+    cin >> b;
+
+    long long result = 1;
+    for (int i = 1; i <= b; i++) {
+        result *= a;
+    }
+    cout << a << "^" << b << " = " << result << "\n";
+    return 0;
+}
+```
+
+```cpp
+// 9. Sum of even numbers from 1 to n
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter n: ";
+    cin >> n;
+
+    int sumEven = 0;
+    for (int i = 2; i <= n; i += 2) {
+        sumEven += i;
+    }
+
+    cout << "Sum of even numbers = " << sumEven << "\n";
+    return 0;
+}
+```
+
+- **Exercises / other lesson types**
+  - MCQ: spot off-by-one and accumulator reset mistakes.
+  - Code-rearrange: assemble sum/table/power loops.
+  - Fill-in-the-blanks: missing bounds or accumulator initialization.
+
+#### 5.2.C Topic - Nested `for` Loops (Numeric Only)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: functions; recursion; arrays; strings (beyond basic console input/output); pointers; classes/objects/structs; enums.
+  - Do **not** use star or shape patterns; use numeric grids/tables only.
+  - Use only: nested `for` loops with numeric output.
+- **Example snippets**
+
+```cpp
+// 9. Print a 3x4 grid of (row,col)
+#include <iostream>
+using namespace std;
+
+int main() {
+    for (int row = 1; row <= 3; row++) {
+        for (int col = 1; col <= 4; col++) {
+            cout << "(" << row << "," << col << ") ";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 10. Tables 1 to 5 (each 1 to 10)
+#include <iostream>
+using namespace std;
+
+int main() {
+    for (int n = 1; n <= 5; n++) {
+        cout << "Table of " << n << ":\n";
+        for (int i = 1; i <= 10; i++) {
+            cout << n << " x " << i << " = " << (n * i) << "\n";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 11. Factorials 1 to 10 using nested for
+#include <iostream>
+using namespace std;
+
+int main() {
+    for (int n = 1; n <= 10; n++) {
+        long long fact = 1;
+        for (int i = 1; i <= n; i++) {
+            fact *= i;
+        }
+        cout << "Factorial of " << n << " = " << fact << "\n";
+    }
+    return 0;
+}
+```
+
+- **Exercises / other lesson types**
+  - MCQ: iterations of inner vs outer loop; final value reasoning.
+  - Code-rearrange: assemble nested loop program (tables of tables / factorials 1 to 10).
+  - Fill-in-the-blanks: outer/inner bounds and inner reset.
+
+#### 5.2.D Topic - `for` vs `while` Trade-offs (Optional Short Tutorial)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: functions; recursion; arrays; strings (beyond basic console input/output); pointers; classes/objects/structs; enums.
+  - Use only: `for`, `while`, `do-while` and console I/O to compare readability and placement of init/condition/increment.
+
+---
+
+### 5.3 Patterns with `for` loops - Tutorial spec for AI (C++)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: functions; recursion; arrays (beyond loop counters); strings (beyond `cout`); pointers; classes/objects/structs; enums.
+  - Do **not** include numeric algorithms (sum, factorial, power, etc.).
+  - Use only: nested `for` loops, `cout`, and printing `*` or small numbers for pattern output.
+
+#### 5.3.A Topic - Rectangle Patterns (Rows x Columns)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: functions; recursion; arrays (beyond counters); strings; pointers; classes/objects/structs; enums; numeric algorithms.
+  - Use only: nested `for` loops and `cout` printing.
+
+```cpp
+// 1. Rectangle of '*' (3 rows, 5 columns)
+#include <iostream>
+using namespace std;
+
+int main() {
+    for (int row = 1; row <= 3; row++) {
+        for (int col = 1; col <= 5; col++) {
+            cout << "* ";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 2. Rectangle of row numbers
+// 1 1 1 1 1
+// 2 2 2 2 2
+// 3 3 3 3 3
+#include <iostream>
+using namespace std;
+
+int main() {
+    for (int row = 1; row <= 3; row++) {
+        for (int col = 1; col <= 5; col++) {
+            cout << row << " ";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 3. Rectangle of column numbers
+// 1 2 3 4 5
+// 1 2 3 4 5
+// 1 2 3 4 5
+#include <iostream>
+using namespace std;
+
+int main() {
+    for (int row = 1; row <= 3; row++) {
+        for (int col = 1; col <= 5; col++) {
+            cout << col << " ";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+#### 5.3.B Topic - Left Triangle Patterns (Right-angle on the left)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: functions; recursion; arrays (beyond counters); strings; pointers; classes/objects/structs; enums; numeric algorithms.
+  - Use only: nested `for` loops and `cout` printing.
+
+```cpp
+// 4. Left triangle of '*'
+#include <iostream>
+using namespace std;
+
+int main() {
+    int rows = 5;
+    for (int row = 1; row <= rows; row++) {
+        for (int col = 1; col <= row; col++) {
+            cout << "* ";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 5. Left triangle of row numbers
+#include <iostream>
+using namespace std;
+
+int main() {
+    int rows = 5;
+    for (int row = 1; row <= rows; row++) {
+        for (int col = 1; col <= row; col++) {
+            cout << row << " ";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 6. Left triangle of column numbers
+#include <iostream>
+using namespace std;
+
+int main() {
+    int rows = 5;
+    for (int row = 1; row <= rows; row++) {
+        for (int col = 1; col <= row; col++) {
+            cout << col << " ";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+#### 5.3.C Topic - Inverted Left Triangle Patterns
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: functions; recursion; arrays (beyond counters); strings; pointers; classes/objects/structs; enums; numeric algorithms.
+  - Use only: nested `for` loops and `cout` printing.
+
+```cpp
+// 7. Inverted left triangle of '*'
+#include <iostream>
+using namespace std;
+
+int main() {
+    int rows = 5;
+    for (int row = rows; row >= 1; row--) {
+        for (int col = 1; col <= row; col++) {
+            cout << "* ";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 8. Inverted left triangle of row numbers
+#include <iostream>
+using namespace std;
+
+int main() {
+    int rows = 5;
+    for (int row = rows; row >= 1; row--) {
+        for (int col = 1; col <= row; col++) {
+            cout << row << " ";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 9. Inverted left triangle of column numbers
+#include <iostream>
+using namespace std;
+
+int main() {
+    int rows = 5;
+    for (int row = rows; row >= 1; row--) {
+        for (int col = 1; col <= row; col++) {
+            cout << col << " ";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+#### 5.3.D Topic - Right & Inverted Right Triangles (Right-angle on the right)
+
+- **Exclusions (do not teach or mention in this topic)**
+  - Do **not** introduce or reference: functions; recursion; arrays (beyond counters); strings; pointers; classes/objects/structs; enums; numeric algorithms.
+  - Use only: nested `for` loops and `cout` printing.
+
+```cpp
+// 10. Right triangle of '*'
+#include <iostream>
+using namespace std;
+
+int main() {
+    int rows = 5;
+    for (int row = 1; row <= rows; row++) {
+        for (int s = 1; s <= rows - row; s++) {
+            cout << "  ";
+        }
+        for (int col = 1; col <= row; col++) {
+            cout << "* ";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+```cpp
+// 11. Inverted right triangle of '*'
+#include <iostream>
+using namespace std;
+
+int main() {
+    int rows = 5;
+    for (int row = rows; row >= 1; row--) {
+        for (int s = 1; s <= rows - row; s++) {
+            cout << "  ";
+        }
+        for (int col = 1; col <= row; col++) {
+            cout << "* ";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+```

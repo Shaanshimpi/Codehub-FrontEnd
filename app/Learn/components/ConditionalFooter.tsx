@@ -16,8 +16,12 @@ export default function ConditionalFooter() {
     pathname.includes("/Learn/Tutorials/") && // Tutorial page
     pathname.split("/").filter(Boolean).length > 3 // Individual tutorial page
 
-  // Hide footer on individual exercise and tutorial pages
-  if (shouldHideFooter || isTutorialPage) {
+  const isPlaygroundPage =
+    pathname === "/Learn/playground" ||
+    pathname.startsWith("/Learn/playground/")
+
+  // Hide footer on individual exercise and tutorial pages, and code playground
+  if (shouldHideFooter || isTutorialPage || isPlaygroundPage) {
     return null
   }
 

@@ -229,7 +229,7 @@ const PlaygroundAIAssistant: React.FC<PlaygroundAIAssistantProps> = ({
   const canUseModel = !requiresGold || isGoldUser
 
   return (
-    <div className="relative flex h-full flex-col bg-white dark:bg-gray-800">
+    <div className="relative flex h-full min-h-0 flex-col bg-white dark:bg-gray-800">
       {/* Floating Close Button - Top Right */}
       <button
         onClick={onClose}
@@ -239,8 +239,8 @@ const PlaygroundAIAssistant: React.FC<PlaygroundAIAssistantProps> = ({
         <X className="h-3.5 w-3.5" />
       </button>
 
-      {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden p-3">
+      {/* Messages Container — scrolls independently; min-h-0 allows flex child to shrink */}
+      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain p-3">
         {messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-center">
             <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
@@ -340,7 +340,7 @@ const PlaygroundAIAssistant: React.FC<PlaygroundAIAssistantProps> = ({
 
       {/* Error Display */}
       {error && (
-        <div className="border-t border-red-200 bg-red-50 px-3 py-1.5 dark:border-red-900/50 dark:bg-red-900/20">
+        <div className="shrink-0 border-t border-red-200 bg-red-50 px-3 py-1.5 dark:border-red-900/50 dark:bg-red-900/20">
           <div className="flex items-start justify-between gap-2">
             <p className="flex-1 whitespace-pre-line text-[10px] text-red-800 dark:text-red-200">
               {error}
@@ -356,7 +356,7 @@ const PlaygroundAIAssistant: React.FC<PlaygroundAIAssistantProps> = ({
       )}
 
       {/* Input Area - Matching Exercise Toolbar Style */}
-      <div className="border-t border-gray-300 bg-white px-3 py-2 shadow-lg dark:border-gray-600 dark:bg-black">
+      <div className="shrink-0 border-t border-gray-300 bg-white px-3 py-2 shadow-lg dark:border-gray-600 dark:bg-black">
         {/* Model Selector - Floating Above Input */}
         {showModelSelector && selectedModel && (
           <div className="mb-2 rounded-lg border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-700 dark:bg-gray-800">
