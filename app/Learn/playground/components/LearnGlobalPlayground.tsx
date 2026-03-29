@@ -14,6 +14,7 @@ import {
   Terminal,
 } from "lucide-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { configureMonaco } from "../configureMonacoSnippets"
 import { STANDALONE_PLAYGROUND_TUTORIAL } from "../standaloneTutorialStub"
 
 function detectInputRequirement(code: string, languageSlug: string): boolean {
@@ -86,6 +87,118 @@ function getMonacoLanguage(slug: string): string {
     nodejs: "javascript",
   }
   return langMap[slug.toLowerCase()] || "plaintext"
+}
+
+/** Map CMS / alias slugs to boilerplate keys */
+function normalizeBoilerplateKey(slug: string): string {
+  const s = slug.toLowerCase()
+  const aliases: Record<string, string> = {
+    "c-programming": "c",
+    "c++": "cpp",
+    "c#": "csharp",
+    nodejs: "javascript",
+    node: "javascript",
+  }
+  return aliases[s] ?? s
+}
+
+/** Default starter code per language when localStorage has no saved snippet */
+const LANGUAGE_BOILERPLATE: Record<string, string> = {
+  c: `#include <stdio.h>
+
+void main() {
+    printf("Hello CodeHub!!\\n");
+}
+`,
+  cpp: `#include <iostream>
+
+int main() {
+    std::cout << "Hello CodeHub!!" << std::endl;
+    return 0;
+}
+`,
+  java: `public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello CodeHub!!");
+    }
+}
+`,
+  python: `print("Hello CodeHub!!")
+`,
+  javascript: `console.log("Hello CodeHub!!");
+`,
+  typescript: `console.log("Hello CodeHub!!");
+`,
+  html: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Playground</title>
+</head>
+<body>
+  <p>Hello CodeHub!!</p>
+</body>
+</html>
+`,
+  css: `body {
+  font-family: system-ui, sans-serif;
+  margin: 1rem;
+}
+`,
+  json: `{
+  "message": "Hello CodeHub!!"
+}
+`,
+  sql: `SELECT 'Hello CodeHub!!' AS message;
+`,
+  csharp: `using System;
+
+class Program {
+    static void Main() {
+        Console.WriteLine("Hello CodeHub!!");
+    }
+}
+`,
+  go: `package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("Hello CodeHub!!")
+}
+`,
+  rust: `fn main() {
+    println!("Hello CodeHub!!");
+}
+`,
+  php: `<?php
+
+echo "Hello CodeHub!!\\n";
+`,
+  ruby: `puts "Hello CodeHub!!"
+`,
+  swift: `print("Hello CodeHub!!")
+`,
+  kotlin: `fun main() {
+    println("Hello CodeHub!!")
+}
+`,
+  scala: `object Main extends App {
+  println("Hello CodeHub!!")
+}
+`,
+}
+
+function getBoilerplateForLanguage(lang: Language): string {
+  const key = normalizeBoilerplateKey(lang.slug)
+  const template = LANGUAGE_BOILERPLATE[key]
+  if (template) return template
+  const monaco = getMonacoLanguage(lang.slug)
+  if (monaco === "plaintext") {
+    return `${lang.title}\n\n`
+  }
+  return `// ${lang.title} — start coding here\n\n`
 }
 
 const AI_TUTORIAL: Tutorial = STANDALONE_PLAYGROUND_TUTORIAL
@@ -169,16 +282,16 @@ const LearnGlobalPlayground: React.FC<LearnGlobalPlaygroundProps> = ({
       const raw = localStorage.getItem(key)
       if (raw) {
         const parsed = JSON.parse(raw)
-        if (typeof parsed.code === "string") setCode(parsed.code)
-        else setCode("")
+        const saved = typeof parsed.code === "string" ? parsed.code : ""
+        setCode(saved.trim() !== "" ? saved : getBoilerplateForLanguage(lang))
         if (typeof parsed.input === "string") setInput(parsed.input)
         else setInput("")
       } else {
-        setCode("")
+        setCode(getBoilerplateForLanguage(lang))
         setInput("")
       }
     } catch {
-      setCode("")
+      setCode(getBoilerplateForLanguage(lang))
       setInput("")
     }
   }, [])
@@ -419,10 +532,18 @@ const LearnGlobalPlayground: React.FC<LearnGlobalPlaygroundProps> = ({
 
   const handleEditorDidMount = (editor: any, monaco: any) => {
     setIsEditorReady(true)
+    configureMonaco(monaco)
 
     const run = () => runCodeRef.current()
+    const insertLineBelow = () => {
+      editor.getAction("editor.action.insertLineAfter")?.run()
+    }
 
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, run)
+    // Ctrl/Cmd+Enter: insert line below (VS Code default). Alt+Enter: run.
+    editor.addCommand(
+      monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+      insertLineBelow
+    )
     editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.Enter, run)
 
     editor.focus()
@@ -507,7 +628,7 @@ const LearnGlobalPlayground: React.FC<LearnGlobalPlaygroundProps> = ({
                       type="button"
                       onClick={() => handleRunCode()}
                       disabled={!code.trim() || isRunning || !isEditorReady}
-                      title={isRunning ? "Running…" : "Run code"}
+                      title={isRunning ? "Running…" : "Run code (Alt+Enter)"}
                       className={`focus-ring inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-transparent text-white lg:w-auto lg:gap-1.5 lg:px-2.5 xl:px-3 ${
                         !code.trim() || isRunning || !isEditorReady
                           ? "cursor-not-allowed bg-slate-400 opacity-60"
