@@ -7,6 +7,7 @@ export const LEARN_PATHS = {
   ROOT: "/Learn",
   TUTORIALS: "/Learn/Tutorials",
   EXERCISES: "/Learn/Exercise",
+  PLAYGROUND: "/Learn/playground",
   VIVY: "/Learn/Vivy",
   VIVY_IMAGE: "/Learn/Vivy-image",
 } as const

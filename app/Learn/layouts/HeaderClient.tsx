@@ -16,6 +16,7 @@ import {
   LogIn,
   Menu,
   Moon,
+  SquareCode,
   SquareGanttChart,
   Sun,
   User,
@@ -154,6 +155,17 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
               >
                 <BookOpen className="h-4 w-4" />
                 <span className="font-medium">Learn</span>
+              </Link>
+
+              <Link
+                href={`/${baseSegment}/playground`}
+                className={cn(
+                  "group flex items-center space-x-2 rounded-lg text-slate-100 transition-all duration-200 hover:bg-white/10 hover:text-white dark:text-slate-300 dark:hover:text-white",
+                  isShrunk ? "rounded-sm px-4 py-0" : "rounded-lg px-4 py-4"
+                )}
+              >
+                <SquareCode className="h-4 w-4" />
+                <span className="font-medium">Playground</span>
               </Link>
 
               {/* Tutorials Dropdown */}
@@ -500,6 +512,15 @@ const HeaderClient = ({ className, languages }: HeaderClientProps) => {
               >
                 <Home className="h-5 w-5" />
                 <span className="font-medium">Home</span>
+              </Link>
+
+              <Link
+                href={`/${baseSegment}/playground`}
+                className="flex items-center space-x-3 rounded-lg px-4 py-3 text-slate-100 transition-all duration-200 hover:bg-white/10"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <SquareCode className="h-5 w-5" />
+                <span className="font-medium">Playground</span>
               </Link>
 
               <div className="space-y-2">
